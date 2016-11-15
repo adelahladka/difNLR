@@ -1,2 +1,2 @@
 # difNLR
-Detection of Dichotomous Differential Item Functioning (DIF) by Non-Linear Regression Function
+Detection of Differential Item Functioning (DIF) in Dichotomous Items by Non-Linear Regression
