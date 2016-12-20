@@ -2,15 +2,18 @@ Package: difNLR
 Type: Package
 Title: Detection of Dichotomous Differential Item Functioning (DIF) by Non-
     Linear Regression Function
-Version: 0.2.0
+Version: 1.0.0
 Date: 2016-10-20
 Author: Adela Drabinova [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]
 Maintainer: Adela Drabinova <adela.drabinova@gmail.com>
 Depends:
     R (>= 3.2.2),
+    CTT,
     ggplot2,
     gridExtra,
     methods,
+    nnet,
+    reshape2,
     stats
 Description: Detection of differential item functioning among dichotomously
     scored items with non-linear regression procedure.

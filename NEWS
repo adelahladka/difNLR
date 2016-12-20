@@ -1,0 +1,72 @@
+      ****************************************************
+      *                                                  *
+      *  Changes and Developments in the difNLR Package  *
+      *                                                  *
+      ****************************************************
+
+
+
+----------------------------------------
+- Changes in difNLR 1.0.0 (2017-00-00) -
+----------------------------------------
+
+MAJOR UPDATES
+
+  o  New function ddfMLR() to detect Differential Distractor
+     Functioning (DDF) with Multinomial Log-linear Regression 
+     (MLR) model.
+     S3 methods for class 'ddfMLR' also added - 'print' and 'plot'.
+
+  o  New function MLR() to calculate likelihood ratio statistic
+     for detecting DDF with MLR model.
+
+  o  The 'difNLR()' function can handle 11 generalized logistic
+     regression models with option 'model'.
+
+  o  Functions 'startNLR()', 'genNLR()' ans S3 methods for class
+     'difNLR' were changed according 'difNLR()' function. S3 method
+     'coef' was created.
+
+  o  New functions NLR() and constrNLR() can now calculates DIF
+     detection statistics and specify constraints for generalized
+     logistic regression model.
+
+  o  Function 'difNLR()' was edited to response to 'difR' package
+     and its DIF detection functions.    
+
+
+
+MINOR UPDATES
+
+  o  The CITATION file was updated.
+
+  o  Several typos were fixed.
+
+  o  Some default options of input were changed.
+
+
+----------------------------------------
+- Changes in difNLR 0.2.0 (2016-11-09) -
+----------------------------------------
+
+MAJOR UPDATES
+
+  o S3 method 'plot' for class 'difNLR' was updated.
+
+  o New option of 'test' in 'difNLR()' function was added. Possible
+    choices are now 'F' for F-test and 'LR' for likelihood ratio test.
+
+  o Choice of significant level 'alpha' was added into 'difNLR()'
+    function with default option 0.05.
+
+  o Six new data sets were added - scored 'GMAT' data, its unscored version
+    'GMATtest' and its key 'GMATkey'. Scored 'difMedical' data set, its 
+    unscored version 'difMedicaltest' and key 'difMedicalkey'.
+
+  o New function 'genNLR()' was added to generate scored (binary) data with
+    model by 'difNLR'.
+
+
+MINOR UPDATES
+
+  o  Several typos were fixed.
