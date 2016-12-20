@@ -1,18 +1,29 @@
 #' Performs DIF detection using Non-Linear Regression method.
 #'
-#' @aliases difNLR print.difNLR plot.difNLR fitted.difNLR predict.difNLR
+#' @aliases difNLR print.difNLR plot.difNLR fitted.difNLR predict.difNLR coef.difNLR
 #'
-#' @description Performs DIF detection procedure based on Non-Linear Regression and either F-test or likelihood ratio test of submodel.
-#' @param data numeric: binary data matrix. See \strong{Details}.
-#' @param group numeric: binary vector of group membership. "0" for reference group, "1" for focal group.
-#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif"). See \strong{Details}.
-#' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
-#' @param start numeric: matrix with n rows (where n is the number of items) and at most 5 columns containing initial item parameters estimates. See \strong{Details}.
-#' @param test character: test to be performed for DIF detection (either "F" (default), or "LR"). See \strong{Details}.
+#' @description Performs DIF detection procedure based on Non-Linear Regression and either likelihood-ratio
+#' or F test of submodel.
+#'
+#' @param Data numeric: either the scored data matrix only, or the scored data
+#' matrix plus the vector of group. See \strong{Details}.
+#' @param group numeric or character: either the binary vector of group membership or
+#' the column indicator of group membership. See \strong{Details}.
+#' @param focal.name numeric or character: indicated the level of \code{group} which corresponds to
+#' focal group
+#' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
+#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
+#' See \strong{Details}.
+#' @param test character: test to be performed for DIF detection (either "F" (default), or "LR").
+#' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
+#' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
+#' @param start numeric: matrix with n rows (where n is the number of items) and at most 5 columns
+#' containing initial item parameters estimates. See \strong{Details}.
 #' @param x an object of 'difNLR' class
 #' @param object an object of 'difNLR' class
-#' @param plot.type character: type of plot to be plotted (either "cc" for characteristic curve (default), or "stat" for test statistics). See \strong{Details}.
+#' @param plot.type character: type of plot to be plotted (either "cc" for characteristic curve
+#' (default), or "stat" for test statistics). See \strong{Details}.
 #' @param item either character ("all"), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
 #' @param col character: single value, or vector of two values representing colors for plot.
 #' @param shape integer: shape parameter for plot.
@@ -20,49 +31,84 @@
 #' @param linetype numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.
 #' @param title string: title of plot.
 #' @param score numeric: standardized total score of subject.
-#' @param ... other generic parameters for \code{plot}, \code{fitted} or \code{predict} functions.
+#' @param ... other generic parameters for \code{print}, \code{plot}, \code{fitted},
+#' \code{predict} or \code{coef} functions.
 #'
-#' @usage difNLR(data, group,  type = "both", p.adjust.method = "BH",
-#'   start, test = "F", alpha = 0.05)
+#' @usage difNLR(Data, group, focal.name, model, type = "both",
+#' test = "LR", alpha = 0.05, p.adjust.method = "none", start)
 #'
 #' @details
-#' DIF detection procedure based on Non-Linear Regression is the extension of Logistic Regression procedure (Swaminathan and Rogers, 1990).
+#' DIF detection procedure based on Non-Linear Regression is the extension of Logistic Regression
+#' procedure (Swaminathan and Rogers, 1990).
 #'
-#' The \code{data} is a matrix whose rows represents examinee answers ("1" correct, "0" incorrect) and columns correspond to the items. The \code{group} must be a vector of the same length as \code{nrow(data)}.
+#' The \code{Data} is a matrix whose rows represents scored examinee answers ("1" correct,
+#' "0" incorrect) and columns correspond to the items. In addition, \code{Data} can hold
+#' the vector of group membership. If so, \code{group} is a column indicator of \code{Data}.
+#' Otherwise, \code{group} must be either a vector of the same length as \code{nrow(Data)}.
 #'
-#' The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"} to detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or \code{"nudif"} to detect only non-uniform DIF.
+#' The options of \code{model} are as follows: \code{Rasch} for one-parameter logistic model with
+#' discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
+#' model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
+#' \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
+#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups,
+#' \code{3PLc} and \code{3PL} for three-parameter logistic regression model with guessing parameter,
+#' \code{3PLd} for three-parameter logistic regression model with inattention parameter,
+#' \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
+#' parameter for both groups,
+#' \code{4PLcg} for four-parameter logistic regression model with fixed guessing for both groups,
+#' \code{4PLdg} for four-parameter logistic regression model with fixed inattention for both groups, or
+#' \code{4PL} for four-parameter logistic regression model.
 #'
-#' The \code{start} is a matrix with a number of rows equal to number of items. The number of columns correspond to number of parameters in model in alternative hypothesis (5 for values \code{"both"} and \code{"nudif"} in type, 4 for \code{"udif"} in type). If start missing, initial values are calculated by \code{startNLR} function.
+#' The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"} to
+#' detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or
+#' \code{"nudif"} to detect only non-uniform DIF.
 #'
-#' The \code{p.adjust.method} is a character for \code{p.adjust} function from the \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
+#' The \code{p.adjust.method} is a character for \code{p.adjust} function from the \code{stats}
+#' package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
+#' \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
+#'
+#' The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
+#' First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
+#' for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
+#' of generalized logistic regression model between reference and focal group.
 #'
 #' The output of the difNLR is displayed by the \code{print.difNLR} function.
 #'
-#' Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"} (default). The characteristic curve for item specified in item option is plotted. For default option \code{"all"} of item, characteristic curves of all converged items are plotted. The drawn curves represent best model.
-#' The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics (either F-test, or LR-test, depends on argument \code{test}) are displayed on the Y axis, for each coverged item. The detection threshold is displayed by a horizontal line and items detected as DIF are printed with the red color. Only parameters \code{size} and \code{title} are used.
+#' Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
+#' (default). The characteristic curve for item specified in \code{item} option is plotted. For default
+#' option \code{"all"} of item, characteristic curves of all converged items are plotted. The drawn
+#' curves represent best model.
+#' The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
+#' (either F-test, or LR-test, depends on argument \code{test}) are displayed on the Y axis,
+#' for each coverged item. The detection threshold is displayed by a horizontal line and items
+#' detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
+#' are used.
 #'
-#' Fitted values are extracted by the \code{fitted.difNLR} function for item(s) specified in \code{item} argument.
+#' Fitted values are extracted by the \code{fitted.difNLR} function for item(s) specified in
+#' \code{item} argument.
 #'
-#' Predicted values are produced by the \code{predict.difNLR} function for item(s) specified in \code{item} argument. \code{score} represents standardized total score of new subject and \code{group} argument represents group membership of new subject.
+#' Predicted values are produced by the \code{predict.difNLR} function for item(s) specified in
+#' \code{item} argument. \code{score} represents standardized total score of new subject and
+#' \code{group} argument represents group membership of new subject.
 #'
-#' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA} for both, \code{data} and \code{group} parameters.
+#' Missing values are allowed but discarded for item estimation. They must be coded as
+#' \code{NA} for both, \code{data} and \code{group} parameters.
 #'
 #' @return A list of class 'difNLR' with the following arguments:
 #' \describe{
-#'   \item{\code{DIF}}{either the column indicators of the items which were detected as DIF, or \code{"NONE"}.}
-#'   \item{\code{test}}{the test used for DIF detection.}
-#'   \item{\code{Sval}}{the values of \code{test} statistics.}
-#'   \item{\code{pval}}{the p-values by \code{test}.}
-#'   \item{\code{df}}{the degress of freedom of \code{test}.}
-#'   \item{\code{coef}}{the matrix of estimated item parameters.}
-#'   \item{\code{vcov}}{the list of estimated covariance matrices of item parameters.}
-#'   \item{\code{group}}{the vector of group membership.}
-#'   \item{\code{data}}{the binary data matrix.}
-#'   \item{\code{type}}{character: type of DIF that was tested.}
+#'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
+#'   \item{\code{nlrPAR}}{the estimates of final model.}
+#'   \item{\code{parM0}}{the estimates of null model.}
+#'   \item{\code{parM1}}{the estimates of alternative model.}
 #'   \item{\code{alpha}}{numeric: significance level.}
-#'   \item{\code{conv.fail}}{numeric: number of convergence issues.}
-#'   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
+#'   \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or \code{"No DIF item detected"}.}
+#'   \item{\code{type}}{character: type of DIF that was tested.}
 #'   \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
+#'   \item{\code{pval}}{the p-values by likelihood ratio test.}
+#'   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
+#'   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
+#'   \item{\code{group}}{the vector of group membership.}
+#'   \item{\code{Data}}{the data matrix.}
 #' }
 #'
 #' @author
@@ -90,25 +136,32 @@
 #' # loading data based on GMAT
 #' data(GMAT)
 #'
-#' data  <- GMAT[, colnames(GMAT) != "group"]
+#' Data  <- GMAT[, colnames(GMAT) != "group"]
 #' group <- GMAT[, "group"]
-#' # Testing both DIF effects using F test and Benjamini-Hochberg correction (default)
-#' x <- difNLR(data, group)
 #'
-#' # Testing both DIF effects using likelihood-ratio test
-#' x <- difNLR(data, group, test = "LR")
+#' # Testing both DIF effects using likelihood-ratio test and
+#' # 3PL model with fixed guessing for groups
+#' x <- difNLR(Data, group, focal.name = 1, model = "3PLcg")
 #'
-#' # Testing both DIF effects with none multiple comparison correction
-#' difNLR(data, group, type = "both", p.adjust.method = "none")
+#' # Testing both DIF effects using F test and
+#' # 3PL model with fixed guessing for groups
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
+#'
+#' # Testing both DIF effects using Rasch model
+#' difNLR(Data, group, focal.name = 1, model = "Rasch")
+#'
+#' # Testing both DIF effects using 2PL model
+#' difNLR(Data, group, focal.name = 1, model = "2PL")
 #'
 #' # Testing uniform DIF effects
-#' difNLR(data, group, type = "udif")
+#' difNLR(Data, group, focal.name = 1, model = "2PL", type = "udif")
 #' # Testing non-uniform DIF effects
-#' difNLR(data, group, type = "nudif")
+#' difNLR(Data, group, focal.name = 1, model = "2PL", type = "nudif")
 #'
 #' # Graphical devices
 #' plot(x)
-#' plot(x, item = x$DIF)
+#' x <- difNLR(Data, group, focal.name = 1, model = "1PL")
+#' plot(x, item = x$DIFitems)
 #' plot(x, plot.type = "stat")
 #'
 #' # Fitted values
@@ -126,27 +179,13 @@
 #' @export
 
 
-difNLR <- function(data, group, type = "both", p.adjust.method = "BH", start,
-                    test = "F", alpha = 0.05)
+difNLR <- function(Data, group, focal.name, model,
+                   type = "both",
+                   test = "LR", alpha = 0.05,
+                   p.adjust.method = "none", start
+                   )
 {
-  if (length(levels(as.factor(group))) != 2)
-    stop("'group' must be binary vector", call. = FALSE)
-  if (length(levels(as.factor(group))) != 2)
-    stop("'group' must be binary vector", call. = FALSE)
-  if (is.matrix(data) | is.data.frame(data)) {
-    if (!all(apply(data, 2, function(i) {
-      length(levels(as.factor(i))) == 2
-    })))
-      stop("'data' must be data frame or matrix of binary vectors",
-           call. = FALSE)
-    if (nrow(data) != length(group))
-      stop("'data' must have the same number of rows as is length of vector 'group'",
-           call. = FALSE)
-  }
-  else {
-    stop("'data' must be data frame or matrix of binary vectors",
-         call. = FALSE)
-  }
+
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
     stop("'type' must be either 'udif', 'nudif' or 'both'",
          call. = FALSE)
@@ -157,175 +196,115 @@ difNLR <- function(data, group, type = "both", p.adjust.method = "BH", start,
     stop("'alpha' must be between 0 and 1",
          call. = FALSE)
   if (missing(start)) {
-    start <- startNLR(data, group)
-    start_m0 <- switch(type,
-                       both = start,
-                       nudif = start,
-                       udif = start[, -4])
-    start_m1 <- switch(type,
-                       both = start[, -c(4, 5)],
-                       nudif = start[, -4],
-                       udif = start[, -c(4, 5)])
+    start <- NULL
   }
-  else {
-    if (ncol(start) != 5 & type != "udif")
-      stop("'start' must be data frame or matrix with 5 columns",
-           call. = FALSE)
-    if (ncol(start) != 4 & type == "udif")
-      stop("'start' must be data frame or matrix with 4 columns for detecting uniform DIF",
-           call. = FALSE)
-    if (nrow(start) != ncol(data))
-      stop("'start' must be data frame or matrix with starting values for each item",
-           call. = FALSE)
-    start_m0 <- start
-    start_m1 <- switch(type,
-                       both = start[, -c(4, 5)],
-                       nudif = start[, -4],
-                       udif = start[, -4])
-  }
-
-  # NA values
-  DATA <- data.frame(data, group)
-  DATA <- na.omit(DATA)
-  data <- DATA[, !(names(DATA) %in% "group")]
-  group <- DATA$group
-
-  regFce_nonUDIF <- deriv3( ~ c + (1 - c) / (1 + exp(-(a + aDif * group) * (x - (b + bDif * group)))),
-                            namevec = c("a", "b", "c", "aDif", "bDif"),
-                            function.arg = function(x, group, a, b, c, aDif, bDif){})
-  regFce_UDIF    <- deriv3( ~ c + (1 - c) / (1 + exp(-a * (x - (b + bDif * group)))),
-                            namevec = c("a", "b", "c", "bDif"),
-                            function.arg = function(x, group, a, b, c, bDif){})
-  regFce_noDIF   <- deriv3( ~ c + (1 - c) / (1 + exp(-a * (x - b))),
-                            namevec = c("a", "b", "c"),
-                            function.arg = function(x, group, a, b, c){})
-
-  stand_total_score <- c(scale(apply(data, 1, sum)))
-  m <- ncol(data)
-  n <- nrow(data)
-  conv.fail <- 0
-  k <- Inf
-  estim_m0 <- lapply(1:m, function(i) NA)
-  hv <- which(!(sapply(1:m, function(i) is(try(switch(type,
-                                                      both = nls(data[, i] ~ regFce_nonUDIF(stand_total_score, group, a, b, c, aDif, bDif),
-                                                                 algorithm = "port",
-                                                                 start = start_m0[i, ],
-                                                                 lower = c(-k, -k, 0, -k, -k),
-                                                                 upper = c(k, k, 1, k, k)),
-                                                      nudif = nls(data[, i] ~ regFce_nonUDIF(stand_total_score, group, a, b, c, aDif, bDif),
-                                                                  algorithm = "port",
-                                                                  start = start_m0[i, ],
-                                                                  lower = c(-k, -k, 0, -k, -k),
-                                                                  upper = c(k, k, 1, k, k)),
-                                                      udif = nls(data[, i] ~ regFce_UDIF(stand_total_score, group, a, b, c, bDif),
-                                                                 algorithm = "port",
-                                                                 start = start_m0[i, ],
-                                                                 lower = c(-k, -k, 0, -k),
-                                                                 upper = c(k, k, 1, k))),
-                                               silent = T), "try-error"))))
-  estim_m0[hv] <- lapply(hv, function(i) switch(type,
-                                                both = nls(data[, i] ~ regFce_nonUDIF(stand_total_score, group, a, b, c, aDif, bDif),
-                                                           algorithm = "port",
-                                                           start = start_m0[i, ],
-                                                           lower = c(-k, -k, 0, -k, -k),
-                                                           upper = c(k, k, 1, k, k)),
-                                                nudif = nls(data[, i] ~ regFce_nonUDIF(stand_total_score, group, a, b, c, aDif, bDif),
-                                                            algorithm = "port",
-                                                            start = start_m0[i, ],
-                                                            lower = c(-k, -k, 0, -k, -k),
-                                                            upper = c(k, k, 1, k, k)),
-                                                udif = nls(data[, i] ~ regFce_UDIF(stand_total_score, group, a, b, c, bDif),
-                                                           algorithm = "port",
-                                                           start = start_m0[i, ],
-                                                           lower = c(-k, -k, 0, -k),
-                                                           upper = c(k, k, 1, k))))
-  estim_m1 <- lapply(1:m, function(i) NA)
-  hv <- which(!(sapply(1:m, function(i) is(try(switch(type,
-                                                      both = nls(data[, i] ~ regFce_noDIF(stand_total_score, group, a, b, c),
-                                                                 algorithm = "port",
-                                                                 start = start_m1[i, ],
-                                                                 lower = c(-k, -k, 0),
-                                                                 upper = c(k, k, 1)),
-                                                      nudif = nls(data[, i] ~ regFce_UDIF(stand_total_score, group, a, b, c, bDif),
-                                                                  algorithm = "port",
-                                                                  start = start_m1[i, ],
-                                                                  lower = c(-k, -k, 0, -k),
-                                                                  upper = c(k, k, 1, k)),
-                                                      udif = nls(data[, i] ~ regFce_noDIF(stand_total_score, group, a, b, c),
-                                                                 algorithm = "port", start = start_m1[i, ],
-                                                                 lower = c(-k, -k, 0),
-                                                                 upper = c(k, k, 1))),
-                                               silent = T),
-                                           "try-error"))))
-  estim_m1[hv] <- lapply(hv, function(i) switch(type, both = nls(data[, i] ~ regFce_noDIF(stand_total_score, group, a, b, c),
-                                                                 algorithm = "port",
-                                                                 start = start_m1[i, ],
-                                                                 lower = c(-k, -k, 0),
-                                                                 upper = c(k, k, 1)),
-                                                nudif = nls(data[, i] ~ regFce_UDIF(stand_total_score, group, a, b, c, bDif),
-                                                            algorithm = "port",
-                                                            start = start_m1[i, ],
-                                                            lower = c(-k, -k, 0, -k),
-                                                            upper = c(k, k, 1, k)),
-                                                udif = nls(data[, i] ~ regFce_noDIF(stand_total_score, group, a, b, c),
-                                                           algorithm = "port",
-                                                           start = start_m1[i, ],
-                                                           lower = c(-k, -k, 0),
-                                                           upper = c(k, k, 1))))
-
-  conv.fail <- conv.fail + sum(is.na(estim_m1) | is.na(estim_m0))
-  conv.fail.which <- which(is.na(estim_m1) | is.na(estim_m0))
-  if (conv.fail > 0) {
-    warning("Convergence failure")
-  }
-
-  if (test == "F"){
-    pval <- Fval <- rep(NA, m)
-    df <- switch(type,
-                 both = c(2, n - 5),
-                 udif = c(1, n - 4),
-                 nudif = c(1, n - 5))
-    Fval[which(!((is.na(estim_m1)) | (is.na(estim_m0))))] <- sapply(which(!((is.na(estim_m1)) |  (is.na(estim_m0)))),
-                                                                    function(l) ((estim_m1[[l]]$m$deviance() - estim_m0[[l]]$m$deviance())/df[1])/(estim_m0[[l]]$m$deviance()/df[2]))
-    pval[which(!((is.na(estim_m1)) | (is.na(estim_m0))))] <- sapply(which(!((is.na(estim_m1)) | (is.na(estim_m0)))),
-                                                                    function(l) (1 - pf(Fval[l], df[1], df[2])))
+  if (missing(model)) {
+    stop("'model' is missing",
+         call. = FALSE)
   } else {
-    pval <- LRval <- rep(NA, m)
-    df <- switch(type,
-                 both = 2,
-                 udif = 1,
-                 nudif = 1)
-    LRval[which(!((is.na(estim_m1)) | (is.na(estim_m0))))] <- sapply(which(!((is.na(estim_m1)) |  (is.na(estim_m0)))),
-                                                                    function(l) -2 * c(logLik(estim_m1[[l]]) - logLik(estim_m0[[l]])))
-    pval[which(!((is.na(estim_m1)) | (is.na(estim_m0))))] <- sapply(which(!((is.na(estim_m1)) | (is.na(estim_m0)))),
-                                                                    function(l) (1 - pchisq(LRval[l], df)))
+    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4plcgdg",
+                       "4PLcg", "4PLdg", "4PL"))){
+      stop("Invalid value for 'model'",
+           call. = FALSE)
+    }
   }
-  pval_adj <- p.adjust(pval, method = p.adjust.method)
-  significant <- which(pval_adj < alpha)
-  if (length(significant) > 0) {
-    DIF <- significant
-  }
-  else {
-    DIF <- "NONE"
+  internalNLR <- function() {
+    if (length(group) == 1) {
+      if (is.numeric(group)) {
+        GROUP <- Data[, group]
+        DATA <- Data[, (1:ncol(Data)) != group]
+        colnames(DATA) <- colnames(Data)[(1:ncol(Data)) !=  group]
+      } else {
+        GROUP <- Data[, colnames(Data) == group]
+        DATA <- Data[, colnames(Data) != group]
+        colnames(DATA) <- colnames(Data)[colnames(Data) !=  group]
+      }
+    } else {
+      GROUP <- group
+      DATA <- Data
+    }
+    if (length(levels(as.factor(GROUP))) != 2)
+      stop("'group' must be binary vector", call. = FALSE)
+    if (is.matrix(DATA) | is.data.frame(DATA)) {
+      if (!all(apply(DATA, 2, function(i) {
+        length(levels(as.factor(i))) == 2
+      })))
+        stop("'Data' must be data frame or matrix of binary vectors",
+             call. = FALSE)
+      if (nrow(DATA) != length(GROUP))
+        stop("'Data' must have the same number of rows as is length of vector 'group'",
+             call. = FALSE)
+    } else {
+      stop("'Data' must be data frame or matrix of binary vectors",
+           call. = FALSE)
+    }
+
+    GROUP <- as.numeric(as.factor(GROUP) == focal.name)
+    if (is.null(start)) {
+      start <- startNLR(DATA, GROUP, model)
+      start <- switch(type,
+                      both = start,
+                      nudif = start,
+                      udif = start[, -4])
+
+    } else {
+      if (ncol(start) != 5 & type != "udif")
+        stop("'start' must be data frame or matrix with 5 columns",
+             call. = FALSE)
+      if (ncol(start) != 4 & type == "udif")
+        stop("'start' must be data frame or matrix with 4 columns for detecting uniform DIF",
+             call. = FALSE)
+      if (nrow(start) != ncol(Data))
+        stop("'start' must be data frame or matrix with starting values for each item",
+             call. = FALSE)
+    }
+
+    PROV <- NLR(DATA, GROUP, model = model, type = type, start = start,
+                p.adjust.method = p.adjust.method, test = test,
+                alpha = alpha)
+    STATS <- PROV$Sval
+    ADJ.PVAL <- PROV$adjusted.pval
+    significant <- which(ADJ.PVAL < alpha)
+    if (length(significant) > 0) {
+      DIFitems <- significant
+      nlrPAR <- PROV$par.m1
+      nlrSE <- PROV$se.m1
+
+
+      for (idif in 1:length(DIFitems)) {
+        nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
+        nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
+      }
+      # colnames(nlrPAR) <- colnames(nlrSE) <- switch(type,
+      #                                               "both" = c("a", "b", "c", "aDIF", "bDIF"),
+      #                                               "nudif" = c("a", "b", "c", "aDIF", "bDIF"),
+      #                                               "udif" = c("a", "b", "c", "bDIF"))
+    } else {
+      DIFitems <- "No DIF item detected"
+      nlrPAR <- PROV$par.m1
+      nlrSE <- PROV$se.m1
+    }
+
+
+    RES <- list(Sval = STATS,
+                nlrPAR = nlrPAR, nlrSE = nlrSE,
+                parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
+                parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
+                alpha = alpha, DIFitems = DIFitems,
+                model = model,
+                type = type, p.adjust.method = p.adjust.method,
+                pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
+                adjusted.p = NULL, test = test,
+                group = GROUP, Data = DATA,
+                conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which)
+    # , thr = Q
+    class(RES) <- "difNLR"
+    return(RES)
   }
 
-  coef <- ifelse(pval_adj < alpha, lapply(estim_m0[which(!is.na(estim_m0))], coef),
-                                  lapply(estim_m1[which(!is.na(estim_m1))], coef))
-  vcov <- ifelse(pval_adj < alpha, lapply(estim_m0[which(!is.na(estim_m0))], vcov),
-                                  lapply(estim_m1[which(!is.na(estim_m1))], vcov))
 
-  mat <- t(sapply(coef, "[", i = 1:5))
-  mat[is.na(mat)] <- 0
-  coef <- switch(type, both = mat, nudif = mat[, c(1:3, 5, 4)], udif = mat[, c(1:3, 5, 4)])
-  colnames(coef) <- c(letters[1:3], "aDif", "bDif")
-  results <- list(DIF = DIF,
-                  test = test, Sval = switch(test, "F" = Fval, "LR" = LRval), Pval = pval_adj, df = df,
-                  coef = coef, vcov = vcov,
-                  group = group, data = data, type = type, alpha = alpha,
-                  conv.fail = conv.fail, conv.fail.which = conv.fail.which,
-                  p.adjust.method = p.adjust.method)
-  class(results) <- "difNLR"
-  results
+  resToReturn <- internalNLR()
+  return(resToReturn)
 }
 
 
@@ -333,50 +312,67 @@ difNLR <- function(data, group, type = "both", p.adjust.method = "BH", start,
 #' @export
 print.difNLR <- function (x, ...){
   title <- switch(x$type,
-                  both = "Detection of both types of Differential Item Functioning using Non-Linear Regression method",
-                  udif = "Detection of uniform Differential Item Functioning using Non-Linear Regression method",
-                  nudif = "Detection of non-uniform Differential Item Functioning using Non-Linear Regression method")
+                  both = "Detection of both types of Differential Item Functioning using Generalized Logistic Regression Model",
+                  udif = "Detection of uniform Differential Item Functioning using Generalized Logistic Regression Model",
+                  nudif = "Detection of non-uniform Differential Item Functioning using Generalized Logistic Regression Model")
   cat(paste(strwrap(title, width = 60), collapse = "\n"))
-  cat(switch(x$test,
-             "F" = "\n\nNon-linear regression F-test statistics\n",
-             "LR" = "\n\nNon-linear regression Likelihood Ratio chi-square statistics\n"))
+  cat(paste(switch(x$test,
+                   "F" = "\n\nGeneralized Logistic Regression F-test statistics based on",
+                   "LR" = "\n\nGeneralized Logistic Regression Likelihood Ratio chi-square statistics based on\n"),
+            switch(x$model,
+                   "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
+                   "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
+                   "3PLdg" = "3PL model with fixed inattention parameter for groups",
+                   "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
+                   "4PLcgdf" = "4PL model with fixed guessing and inattention parameter for groups",
+                   "4PLcg" = "4PL model with fixed guessing for groups",
+                   "4PLdg" = "4PL model with fixed inattention parameter for groups",
+                   "4PL" = "4PL model")), "\n")
   if (x$p.adjust.method == "none") {
-    cat("p-values with none multiple comparison correction\n\n")
+    cat("No p-value adjustment for multiple comparisons\n\n")
   }
   else {
-    cat(paste("p-values adjusted using", switch(x$p.adjust.method,
-                                                holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
-                                                bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
-                                                BY = "Benjamini-Yekutieli", fdr = "FDR"), "method\n\n"))
+    cat(paste("Multiple comparisons made with",
+              switch(x$p.adjust.method,
+                     holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
+                     bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
+                     BY = "Benjamini-Yekutieli", fdr = "FDR"), "adjustment of p-values\n\n"))
   }
-  tab <- format(round(cbind(x$Sval, x$Pval), 4))
-  sign <- ifelse(is.na(x$Pval), " ", ifelse(x$Pval < 0.001,
-                                            "***", ifelse(x$Pval < 0.01, "**", ifelse(x$Pval < 0.05,
-                                                                                      "*", ifelse(x$Pval < 0.1, ".", " ")))))
-  tab <- matrix(cbind(tab, sign), ncol = 3)
-  rownames(tab) <- paste("Item", 1:length(x$Pval))
-  colnames(tab) <- switch(x$test,
-                          "F" = c("F-value", "P-value", ""),
-                          "LR" = c("Chisq-value", "P-value", ""))
+  sign <- ifelse(is.na(x$adj.pval), " ",
+                 ifelse(x$adj.pval < 0.001, "***",
+                        ifelse(x$adj.pval < 0.01, "**",
+                               ifelse(x$adj.pval < 0.05, "*",
+                                      ifelse(x$adj.pval < 0.1, ".", " ")))))
+  if (x$p.adjust.method == "none"){
+    tab <- format(round(cbind(x$Sval, x$pval), 4))
+    tab <- matrix(cbind(tab, sign), ncol = 3)
+    colnames(tab) <- switch(x$test,
+                            "F" = c("F-value", "P-value", ""),
+                            "LR" = c("Chisq-value", "P-value", ""))
+  } else {
+    tab <- format(round(cbind(x$Sval, x$pval, x$adj.pval), 4))
+    tab <- matrix(cbind(tab, sign), ncol = 4)
+    colnames(tab) <- switch(x$test,
+                            "F" = c("F-value", "P-value", "Adj. P-value", ""),
+                            "LR" = c("Chisq-value", "P-value", "Adj. P-value", ""))
+  }
+
+  rownames(tab) <- paste("Item", 1:length(x$adj.pval))
+
   print(tab, quote = F, digits = 4, zero.print = F)
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
-  n <- nrow(x$data)
-  df <- switch(x$type,
-               both = c(2, n - 5),
-               udif = c(1, n - 4),
-               nudif = c(1, n - 5))
-  df <- ifelse(x$test == "F", df, df[1])
-  critical <- ifelse(x$test == "F", qf(1 - x$alpha, df[1], df[2]), qchisq(1 - x$alpha, df))
+
+  critical <- ifelse(x$test == "F", qf(1 - x$alpha, x$df[1], x$df[2]), qchisq(1 - x$alpha, x$df))
   cat(paste("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")", sep = ""))
-  if (is.character(x$DIF)) {
+  if (is.character(x$DIFitems)) {
     switch(x$type, both = cat("\nNone of items is detected as DIF"),
            udif = cat("\nNone of items is detected as uniform DIF"),
            nudif = cat("\nNone of items is detected as non-uniform DIF"))
   }
   else {
-    switch(x$type, both = cat("\nItems detected as DIF items:\n"),
-           udif = cat("\nItems detected as uniform DIF items:\n"),
-           nudif = cat("\nItems detected as non-uniform DIF items:\n"))
+    switch(x$type, both = cat("\n\nItems detected as DIF items:"),
+           udif = cat("\n\nItems detected as uniform DIF items:"),
+           nudif = cat("\n\nItems detected as non-uniform DIF items:"))
     cat("\n", paste("Item ", x$DIF, "\n", sep = ""))
   }
 }
@@ -392,12 +388,16 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   plotstat <- function(x, size = size, title = title){
     if (x$conv.fail != 0){
       if (length(x$conv.fail) == length(x$Sval)){
-        switch(x$test, "F" = stop("None of items does converge. F-statistic values not plotted", call. = FALSE),
-                       "LR" = stop("None of items does converge. LR-statistic values not plotted", call. = FALSE))
+        switch(x$test, "F" = stop("None of items does converge.
+                                  F-statistic values not plotted", call. = FALSE),
+                       "LR" = stop("None of items does converge.
+                                   LR-statistic values not plotted", call. = FALSE))
       } else {
-        switch(x$test, "F" = warning(paste("Item ", x$conv.fail.which, " does not converge. F-statistic value not plotted",
+        switch(x$test, "F" = warning(paste("Item ", x$conv.fail.which,
+                                           " does not converge. F-statistic value not plotted",
                                            sep = "", collapse = "\n"), call. = FALSE),
-                       "LR" = warning(paste("Item ", x$conv.fail.which, " does not converge. LR-statistic value not plotted",
+                       "LR" = warning(paste("Item ", x$conv.fail.which,
+                                            " does not converge. LR-statistic value not plotted",
                                            sep = "", collapse = "\n"), call. = FALSE))
       }
     }
@@ -405,8 +405,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     if(missing(title)){
       title <- "Non-Linear Regression DIF Detection \n with None Multiple Comparison Correction"
     }
-    n <- nrow(x$data)
-    Sval_critical <- switch(x$test, "F" = qf(1 - x$alpha, x$df[1], x$df[2]), "LR" = qchisq(1 - x$alpha, x$df))
+    n <- nrow(x$Data)
+    Sval_critical <- switch(x$test,
+                            "F" = qf(1 - x$alpha, x$df[1], x$df[2]),
+                            "LR" = qchisq(1 - x$alpha, x$df))
     g <- as.factor(ifelse(x$Sval > Sval_critical, 1, 0))
     items <- setdiff(1:length(x$Sval), x$conv.fail.which)
     hv <- na.omit(as.data.frame(cbind(1:length(x$Sval), x$Sval, g)))
@@ -420,7 +422,9 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                   geom_hline(yintercept = Sval_critical, size = size) +
                   ### theme
                   ggtitle(title) +
-                  labs(x = "Item", y = switch(x$test, "F" = "F-statistic", "LR" = "Chisq-statistic")) +
+                  labs(x = "Item", y = switch(x$test,
+                                              "F" = "F-statistic",
+                                              "LR" = "Chisq-statistic")) +
                   theme_bw() +
                   theme(text = element_text(size = 11),
                         plot.title = element_text(size = 11, face = "bold", vjust = 1.5),
@@ -438,7 +442,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   plotCC <- function(x, item = item,
                      col = col, shape = shape, size = size,
                      linetype = linetype, title = title){
-    m <- nrow(x$coef)
+    m <- nrow(x$nlrPAR)
     if (class(item) == "character"){
       if (item != "all")
         stop("'item' must be either numeric vector or character string 'all' ",
@@ -494,32 +498,33 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     }
 
     ### functions
-    regFce_nonUDIF <- function(STS, group, a, b, c, aDif, bDif){
-      return(c + (1 - c)/(1 + exp(-(a + aDif*group)*(STS - (b + bDif*group)))))
-    }
+    gNLR <- deriv3( ~ (c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) /
+                      (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))),
+                    namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
+                    function.arg = function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){})
 
-    ### data
-    stand_total_score_R <- c(scale(apply(x$data[x$group == 0, ], 1, sum)))
-    stand_total_score_F <- c(scale(apply(x$data[x$group == 1, ], 1, sum)))
-    max_sts <- max(as.numeric(levels(as.factor(stand_total_score_R))),
-                   as.numeric(levels(as.factor(stand_total_score_F))))
-    min_sts <- min(as.numeric(levels(as.factor(stand_total_score_R))),
-                   as.numeric(levels(as.factor(stand_total_score_F))))
+    ### Data
+    xR <- c(scale(apply(x$Data[x$group == 0, ], 1, sum)))
+    xF <- c(scale(apply(x$Data[x$group == 1, ], 1, sum)))
+    max_sts <- max(as.numeric(levels(as.factor(xR))),
+                   as.numeric(levels(as.factor(xF))))
+    min_sts <- min(as.numeric(levels(as.factor(xR))),
+                   as.numeric(levels(as.factor(xF))))
     alpha <- 0.5
     plot_CC <- list()
 
     for (i in items){
-      hv_R <- data.frame(cbind(as.numeric(levels(as.factor(stand_total_score_R))),
-                               tapply(x$data[x$group == 0, i],
-                                      as.factor(stand_total_score_R), mean)))
-      hv_F <- data.frame(cbind(as.numeric(levels(as.factor(stand_total_score_F))),
-                               tapply(x$data[x$group == 1, i],
-                                      as.factor(stand_total_score_F), mean)))
+      hv_R <- data.frame(cbind(as.numeric(levels(as.factor(xR))),
+                               tapply(x$Data[x$group == 0, i],
+                                      as.factor(xR), mean)))
+      hv_F <- data.frame(cbind(as.numeric(levels(as.factor(xF))),
+                               tapply(x$Data[x$group == 1, i],
+                                      as.factor(xF), mean)))
       hv   <- data.frame(rbind(cbind(hv_R, Group = "Reference"),
                                cbind(hv_F, Group = "Focal")))
       rownames(hv) <- 1:dim(hv)[1]
-      hv$size <- c(table(stand_total_score_R),
-                   table(stand_total_score_F))
+      hv$size <- c(table(xR), table(xF))
+
       if (missing(title)){
         TITLE <- paste("Item", i)
       }
@@ -530,17 +535,21 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                                  alpha = alpha, shape = shape) +
                       ### lines
                       stat_function(aes(colour = "Reference", linetype = "Reference"),
-                                    fun = regFce_nonUDIF,
-                                    args = list(group = 0,
-                                                a = x$coef[i, 1], b = x$coef[i, 2], c = x$coef[i, 3],
-                                                aDif = x$coef[i, 4], bDif = x$coef[i, 5]),
+                                    fun = gNLR,
+                                    args = list(g = 0,
+                                                a = x$nlrPAR[i, "a"], b = x$nlrPAR[i, "b"],
+                                                c = x$nlrPAR[i, "c"], d = x$nlrPAR[i, "d"],
+                                                aDif = x$nlrPAR[i, "aDif"], bDif = x$nlrPAR[i, "bDif"],
+                                                cDif = x$nlrPAR[i, "cDif"], dDif = x$nlrPAR[i, "dDif"]),
                                     size = size,
                                     geom = "line") +
                       stat_function(aes(colour = "Focal", linetype = "Focal"),
-                                    fun = regFce_nonUDIF,
-                                    args = list(group = 1,
-                                                a = x$coef[i, 1], b = x$coef[i, 2], c = x$coef[i, 3],
-                                                aDif = x$coef[i, 4], bDif = x$coef[i, 5]),
+                                    fun = gNLR,
+                                    args = list(g = 1,
+                                                a = x$nlrPAR[i, "a"], b = x$nlrPAR[i, "b"],
+                                                c = x$nlrPAR[i, "c"], d = x$nlrPAR[i, "d"],
+                                                aDif = x$nlrPAR[i, "aDif"], bDif = x$nlrPAR[i, "bDif"],
+                                                cDif = x$nlrPAR[i, "cDif"], dDif = x$nlrPAR[i, "dDif"]),
                                     size = size,
                                     geom = "line") +
                       ### style
@@ -563,10 +572,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                       theme(legend.box.just = "left",
                             legend.justification = c(1, 0),
                             legend.position = c(0.97, 0.03),
-                            legend.margin = unit(0, "lines"),
+                            # legend.margin = margin(0, "lines"),
                             legend.box = "vertical",
-                            legend.key.size = unit(0.9, "cm"),
-                            legend.key.height = unit(0.8, "line"),
+                            # legend.key.size = unit(0.9, "cm"),
+                            # legend.key.height = unit(0.8, "line"),
                             legend.text.align = 0,
                             legend.title.align = 0,
                             legend.key = element_rect(colour = "white"))
@@ -574,7 +583,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     # names(plot_CC) <- paste("Item", items)
-    class(plot_CC)
+    # class(plot_CC)
 
     return(plot_CC)
   }
@@ -598,7 +607,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 fitted.difNLR <- function(object, item = "all", ...){
 
   ### checking input
-  m <- nrow(object$coef)
+  m <- nrow(object$nlrPAR)
   if (class(item) == "character"){
     if (item != "all")
       stop("'item' must be either numeric vector or character string 'all' ",
@@ -639,11 +648,11 @@ fitted.difNLR <- function(object, item = "all", ...){
   }
 
   ### data
-  STS <- c(scale(apply(object$data, 1, sum)))
+  STS <- c(scale(apply(object$Data, 1, sum)))
 
   ### fitted values
-  FV <- lapply(items, function(i) NLR(STS, object$group, object$coef[i, 1], object$coef[i, 2],
-                                      object$coef[i, 3], object$coef[i, 4], object$coef[i, 5]))
+  FV <- lapply(items, function(i) NLR(STS, object$group, object$nlrPAR[i, 1], object$nlrPAR[i, 2],
+                                      object$nlrPAR[i, 3], object$nlrPAR[i, 4], object$nlrPAR[i, 5]))
   FV <- lapply(FV, setNames, NULL)
   names(FV) <- paste("Item", items)
   return(FV)
@@ -656,7 +665,7 @@ predict.difNLR <- function(object, item = "all",
                            score, group, ...){
 
   ### checking input
-  m <- nrow(object$coef)
+  m <- nrow(object$nlrPAR)
   if (class(item) == "character"){
     if (item != "all")
       stop("'item' must be either numeric vector or character string 'all' ",
@@ -673,7 +682,7 @@ predict.difNLR <- function(object, item = "all",
     stop("'item' must be either numeric vector or character string 'all' ",
          call. = FALSE)
   if (missing(score)){
-    score <- c(scale(apply(object$data, 1, sum)))
+    score <- c(scale(apply(object$Data, 1, sum)))
   }
   if (missing(group)){
     group <- object$group
@@ -709,11 +718,15 @@ predict.difNLR <- function(object, item = "all",
 
 
   ### predicted values
-  PV <- lapply(items, function(i) NLR(STS, group, object$coef[i, 1], object$coef[i, 2],
-                                      object$coef[i, 3], object$coef[i, 4], object$coef[i, 5]))
+  PV <- lapply(items, function(i) NLR(STS, group, object$nlrPAR[i, 1], object$nlrPAR[i, 2],
+                                      object$nlrPAR[i, 3], object$nlrPAR[i, 4], object$nlrPAR[i, 5]))
   PV <- lapply(PV, setNames, NULL)
   names(PV) <- paste("Item", items)
   return(predict = PV)
 }
 
-
+#' @rdname difNLR
+#' @export
+coef.difNLR <- function(object, ...){
+  return(object$nlrPAR)
+}
