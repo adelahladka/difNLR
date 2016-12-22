@@ -166,10 +166,10 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
     significant <- which(ADJ.PVAL < alpha)
     if (length(significant) > 0) {
       DDFitems <- significant
-      nlrPAR <- PROV$par.m1
+      mlrPAR <- PROV$par.m1
       # nlrSE <- PROV$se.m1
       for (idif in 1:length(DDFitems)) {
-        nlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
+        mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
         # nlrSE[[DDFitems[idif]]] <- PROV$se.m0[[DDFitems[idif]]]
       }
 
@@ -185,7 +185,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
 
 
     RES <- list(Sval = STATS,
-                nlrPAR = nlrPAR,
+                mlrPAR = mlrPAR,
                 # nlrSE = nlrSE,
                 parM0 = PROV$par.m0,
                 # seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
@@ -246,7 +246,7 @@ print.ddfMLR <- function (x, ...){
 
   # critical <- ifelse(x$test == "F", qf(1 - x$alpha, x$df[1], x$df[2]), qchisq(1 - x$alpha, x$df))
   # cat(paste("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")", sep = ""))
-  if (is.character(x$DIFitems)) {
+  if (is.character(x$DDFitems)) {
     switch(x$type, both = cat("\nNone of items is detected as DDF"),
            udif = cat("\nNone of items is detected as uniform DDF"),
            nudif = cat("\nNone of items is detected as non-uniform DDF"))
@@ -255,7 +255,7 @@ print.ddfMLR <- function (x, ...){
     switch(x$type, both = cat("\n\nItems detected as DDF items:"),
            udif = cat("\n\nItems detected as uniform DDF items:"),
            nudif = cat("\n\nItems detected as non-uniform DDF items:"))
-    cat("\n", paste("Item ", x$DIF, "\n", sep = ""))
+    cat("\n", paste("Item ", x$DDFitems, "\n", sep = ""))
   }
 }
 
@@ -265,7 +265,7 @@ print.ddfMLR <- function (x, ...){
 #' @rdname ddfMLR
 #' @export
 plot.ddfMLR <- function(x, item = "all", title, ...){
-  m <- length(x$nlrPAR)
+  m <- length(x$mlrPAR)
   if (class(item) == "character"){
     if (item != "all")
       stop("'item' must be either numeric vector or character string 'all' ",
@@ -288,11 +288,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     items <- item
   }
 
-  if (!missing(title)){
-    TITLE <- title
-  } else {
-    TITLE <- paste("Item", i)
-  }
+
 
   score <- scale(unlist(score(x$Data, x$key)))
   sq <- seq(min(score), max(score), by = 0.1)
@@ -301,31 +297,37 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
   plot_CC <- list()
   for (i in items){
 
-    if(ncol(x$nlrPAR[[i]]) == 2)
-      x$nlrPAR[[i]] <- as.matrix(data.frame(x$nlrPAR[[i]], 0, 0))
-    prR <- prF <- c()
-    for (j in 1:nrow(x$nlrPAR[[i]])){
+    if (!missing(title)){
+      TITLE <- title
+    } else {
+      TITLE <- paste("Item", i)
+    }
 
-      prR <- rbind(prR, exp(x$nlrPAR[[i]][j, ] %*% t(sqR)))
-      prF <- rbind(prF, exp(x$nlrPAR[[i]][j, ] %*% t(sqF)))
+    if(ncol(x$mlrPAR[[i]]) == 2)
+      x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0, 0))
+    prR <- prF <- c()
+    for (j in 1:nrow(x$mlrPAR[[i]])){
+
+      prR <- rbind(prR, exp(x$mlrPAR[[i]][j, ] %*% t(sqR)))
+      prF <- rbind(prF, exp(x$mlrPAR[[i]][j, ] %*% t(sqF)))
     }
 
     prR <- as.data.frame(t(prR)); prF <- as.data.frame(t(prF))
-    colnames(prR) <- colnames(prF) <- rownames(x$nlrPAR[[i]])
+    colnames(prR) <- colnames(prF) <- rownames(x$mlrPAR[[i]])
     prR$sum <- apply(prR, 1, sum) + 1; prF$sum <- apply(prF, 1, sum) + 1
 
-    for (j in 1:nrow(x$nlrPAR[[i]])){
+    for (j in 1:nrow(x$mlrPAR[[i]])){
       prR <- data.frame(prR, prR[, j]/prR[, "sum"])
       prF <- data.frame(prF, prF[, j]/prF[, "sum"])
     }
 
-    hvR <- data.frame(1 - apply(prR[, (nrow(x$nlrPAR[[i]])+2):ncol(prR)], 1, sum),
-                      prR[, (nrow(x$nlrPAR[[i]])+2):ncol(prR)], "R")
-    hvF <- data.frame(1 - apply(prF[, (nrow(x$nlrPAR[[i]])+2):ncol(prF)], 1, sum),
-                      prF[, (nrow(x$nlrPAR[[i]])+2):ncol(prF)], "F")
+    hvR <- data.frame(1 - apply(prR[, (nrow(x$mlrPAR[[i]])+2):ncol(prR)], 1, sum),
+                      prR[, (nrow(x$mlrPAR[[i]])+2):ncol(prR)], "R")
+    hvF <- data.frame(1 - apply(prF[, (nrow(x$mlrPAR[[i]])+2):ncol(prF)], 1, sum),
+                      prF[, (nrow(x$mlrPAR[[i]])+2):ncol(prF)], "F")
     hvR <- data.frame(hvR, score = sq)
     hvF <- data.frame(hvF, score = sq)
-    colnames(hvR) <- colnames(hvF) <- c(x$key[i], rownames(x$nlrPAR[[i]]), "group", "score")
+    colnames(hvR) <- colnames(hvF) <- c(x$key[i], rownames(x$mlrPAR[[i]]), "group", "score")
     hv <- rbind(hvR, hvF)
 
     df <- melt(hv, id = c("score", "group"))
