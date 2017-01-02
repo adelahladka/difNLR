@@ -652,16 +652,24 @@ fitted.difNLR <- function(object, item = "all", ...){
 
 
   ### functions
-  NLR <- function(STS, group, a, b, c, aDif, bDif){
-    return(c + (1 - c)/(1 + exp(-(a + aDif*group)*(STS - (b + bDif*group)))))
+  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
+    return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
   }
 
+  if (dim(object$nlrPAR)[2] != 8){
+    PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1, aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+    PAR[, colnames(object$nlrPAR)] <- object$nlrPAR
+  } else {
+    PAR <- object$nlrPAR
+  }
   ### data
   STS <- c(scale(apply(object$Data, 1, sum)))
 
   ### fitted values
-  FV <- lapply(items, function(i) NLR(STS, object$group, object$nlrPAR[i, 1], object$nlrPAR[i, 2],
-                                      object$nlrPAR[i, 3], object$nlrPAR[i, 4], object$nlrPAR[i, 5]))
+  FV <- lapply(items, function(i) gNLR(STS, object$group, PAR[i, "a"], PAR[i, "b"],
+                                       PAR[i, "c"], PAR[i, "d"],
+                                       PAR[i, "aDif"], PAR[i, "bDif"],
+                                       PAR[i, "cDif"], PAR[i, "dDif"]))
   FV <- lapply(FV, setNames, NULL)
   names(FV) <- paste("Item", items)
   return(FV)
@@ -717,18 +725,28 @@ predict.difNLR <- function(object, item = "all",
       items <- setdiff(items, object$conv.fail.which)
     }
   }
+
   ### functions
-  NLR <- function(STS, group, a, b, c, aDif, bDif){
-    return(c + (1 - c)/(1 + exp(-(a + aDif*group)*(STS - (b + bDif*group)))))
+  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
+    return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
   }
 
+
+  if (dim(object$nlrPAR)[2] != 8){
+    PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1, aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+    PAR[, colnames(object$nlrPAR)] <- object$nlrPAR
+  } else {
+    PAR <- object$nlrPAR
+  }
   ### data
   STS <- score
 
 
   ### predicted values
-  PV <- lapply(items, function(i) NLR(STS, group, object$nlrPAR[i, 1], object$nlrPAR[i, 2],
-                                      object$nlrPAR[i, 3], object$nlrPAR[i, 4], object$nlrPAR[i, 5]))
+  PV <- lapply(items, function(i) NLR(STS, group, PAR[i, "a"], PAR[i, "b"],
+                                      PAR[i, "c"], PAR[i, "d"],
+                                      PAR[i, "aDif"], PAR[i, "bDif"],
+                                      PAR[i, "cDif"], PAR[i, "dDif"]))
   PV <- lapply(PV, setNames, NULL)
   names(PV) <- paste("Item", items)
   return(predict = PV)
