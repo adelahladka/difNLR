@@ -147,6 +147,11 @@
 #' # 3PL model with fixed guessing for groups
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
 #'
+#' # Testing both DIF effects using LR test,
+#' # 3PL model with fixed guessing for groups
+#' # and Benjamini-Hochberg correction
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")
+#'
 #' # Testing both DIF effects using Rasch model
 #' difNLR(Data, group, focal.name = 1, model = "Rasch")
 #'
@@ -160,7 +165,6 @@
 #'
 #' # Graphical devices
 #' plot(x)
-#' x <- difNLR(Data, group, focal.name = 1, model = "1PL")
 #' plot(x, item = x$DIFitems)
 #' plot(x, plot.type = "stat")
 #'
@@ -532,6 +536,13 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       if (missing(title)){
         TITLE <- paste("Item", i)
       }
+
+      if (dim(x$nlrPAR)[2] != 8){
+        PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1, aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+        PAR[, colnames(x$nlrPAR)] <- x$nlrPAR
+      } else {
+        PAR <- x$nlrPAR
+      }
       plot_CC[[i]] <- ggplot(hv, aes_string("X1", "X2")) +
                       ### points
                       geom_point(aes_string(colour = "Group", fill = "Group",
@@ -541,19 +552,19 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                       stat_function(aes(colour = "Reference", linetype = "Reference"),
                                     fun = gNLR,
                                     args = list(g = 0,
-                                                a = x$nlrPAR[i, "a"], b = x$nlrPAR[i, "b"],
-                                                c = x$nlrPAR[i, "c"], d = x$nlrPAR[i, "d"],
-                                                aDif = x$nlrPAR[i, "aDif"], bDif = x$nlrPAR[i, "bDif"],
-                                                cDif = x$nlrPAR[i, "cDif"], dDif = x$nlrPAR[i, "dDif"]),
+                                                a = PAR[i, "a"], b = PAR[i, "b"],
+                                                c = PAR[i, "c"], d = PAR[i, "d"],
+                                                aDif = PAR[i, "aDif"], bDif = PAR[i, "bDif"],
+                                                cDif = PAR[i, "cDif"], dDif = PAR[i, "dDif"]),
                                     size = size,
                                     geom = "line") +
                       stat_function(aes(colour = "Focal", linetype = "Focal"),
                                     fun = gNLR,
                                     args = list(g = 1,
-                                                a = x$nlrPAR[i, "a"], b = x$nlrPAR[i, "b"],
-                                                c = x$nlrPAR[i, "c"], d = x$nlrPAR[i, "d"],
-                                                aDif = x$nlrPAR[i, "aDif"], bDif = x$nlrPAR[i, "bDif"],
-                                                cDif = x$nlrPAR[i, "cDif"], dDif = x$nlrPAR[i, "dDif"]),
+                                                a = PAR[i, "a"], b = PAR[i, "b"],
+                                                c = PAR[i, "c"], d = PAR[i, "d"],
+                                                aDif = PAR[i, "aDif"], bDif = PAR[i, "bDif"],
+                                                cDif = PAR[i, "cDif"], dDif = PAR[i, "dDif"]),
                                     size = size,
                                     geom = "line") +
                       ### style
