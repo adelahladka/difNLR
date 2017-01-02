@@ -1,26 +1,26 @@
-      ****************************************************
-      *                                                  *
-      *  Changes and Developments in the difNLR Package  *
-      *                                                  *
-      ****************************************************
+****************************************************
+*                                                  *
+*  Changes and Developments in the difNLR Package  *
+*                                                  *
+****************************************************
 
 
 
 ----------------------------------------
-- Changes in difNLR 1.0.0 (2017-00-00) -
+- Changes in difNLR 1.0.0 (2017-01-02) -
 ----------------------------------------
 
 MAJOR UPDATES
 
   o  New function ddfMLR() to detect Differential Distractor
-     Functioning (DDF) with Multinomial Log-linear Regression 
+     Functioning (DDF) with Multinomial Log-linear Regression
      (MLR) model.
      S3 methods for class 'ddfMLR' also added - 'print' and 'plot'.
 
   o  New function MLR() to calculate likelihood ratio statistic
      for detecting DDF with MLR model.
 
-  o  The 'difNLR()' function can handle 11 generalized logistic
+  o  The 'difNLR()' function can handle 6 generalized logistic
      regression models with option 'model'.
 
   o  Functions 'startNLR()', 'genNLR()' ans S3 methods for class
@@ -32,7 +32,7 @@ MAJOR UPDATES
      logistic regression model.
 
   o  Function 'difNLR()' was edited to response to 'difR' package
-     and its DIF detection functions.    
+     and its DIF detection functions.
 
 
 
@@ -60,7 +60,7 @@ MAJOR UPDATES
     function with default option 0.05.
 
   o Six new data sets were added - scored 'GMAT' data, its unscored version
-    'GMATtest' and its key 'GMATkey'. Scored 'difMedical' data set, its 
+    'GMATtest' and its key 'GMATkey'. Scored 'difMedical' data set, its
     unscored version 'difMedicaltest' and key 'difMedicalkey'.
 
   o New function 'genNLR()' was added to generate scored (binary) data with

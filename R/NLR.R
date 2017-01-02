@@ -28,14 +28,9 @@
 #' discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
 #' model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
 #' \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups,
-#' \code{3PLc} and \code{3PL} for three-parameter logistic regression model with guessing parameter,
-#' \code{3PLd} for three-parameter logistic regression model with inattention parameter,
+#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
 #' \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-#' parameter for both groups,
-#' \code{4PLcg} for four-parameter logistic regression model with fixed guessing for both groups,
-#' \code{4PLdg} for four-parameter logistic regression model with fixed inattention for both groups, or
-#' \code{4PL} for four-parameter logistic regression model.
+#' parameter for both groups.
 
 #' The \code{type} corresponds to type of DIF to be tested. Possible values
 #' are \code{"both"} to detect any DIF (uniform and/or non-uniform), \code{"udif"}
