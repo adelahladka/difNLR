@@ -100,19 +100,21 @@
 #'
 #' data  <- GMAT[, colnames(GMAT) != "group"]
 #' group <- GMAT[, "group"]
-#' # Testing both DIF effects using F test and Benjamini-Hochberg correction (default)
-#' NLR(Data, group)
 #'
-#' # Testing both DIF effects using likelihood-ratio test
-#' NLR(Data, group, test = "LR")
+#' # Testing both DIF effects using LR test (default)
+#' # and model with fixed guessing for both groups
+#' NLR(Data, group, model = "3PLcg")
 #'
-#' # Testing both DIF effects with none multiple comparison correction
-#' NLR(Data, group, type = "both", p.adjust.method = "none")
+#' # using F test
+#' NLR(Data, group, model = "3PLcg", test = "F")
+#'
+#' # Testing both DIF effects with Benjamini-Hochberg correction
+#' NLR(Data, group, model = "3PLcg", p.adjust.method = "BH")
 #'
 #' # Testing uniform DIF effects
-#' NLR(Data, group, type = "udif")
+#' NLR(Data, group, model = "3PLcg", type = "udif")
 #' # Testing non-uniform DIF effects
-#' NLR(Data, group, type = "nudif")
+#' NLR(Data, group, model = "3PLcg", type = "nudif")
 #' }
 #' @keywords DIF
 #' @export
@@ -124,17 +126,12 @@ NLR <- function(Data, group, model, type = "both", start,
 
   gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
     return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
-    }
+  }
 
-
-  constr <- constrNLR(model = model, type = type)
-  lowerM0 <- constr["lowerM0", ]; upperM0 <- constr["upperM0", ]
-  lowerM1 <- constr["lowerM1", ]; upperM1 <- constr["upperM1", ]
-
-  # start <- startNLR(Data, group, model)
-
+  if(missing(start)){
+    start <- startNLR(Data, group, model)
+  }
   start_m0 <- start_m1 <- start
-
   start_m1[, "aDif"] <- 0
   if (!(type == "nudif")){
     start_m1[, "bDif"] <- 0
@@ -143,14 +140,16 @@ NLR <- function(Data, group, model, type = "both", start,
     }
   }
 
-  x <- scale(apply(Data, 1, sum))
-  m <- ncol(Data)
-  n <- nrow(Data)
+  constr <- constrNLR(model = model, type = type)
+  lowerM0 <- constr["lowerM0", ]; upperM0 <- constr["upperM0", ]
+  lowerM1 <- constr["lowerM1", ]; upperM1 <- constr["upperM1", ]
 
   fixedM0 <- lowerM0[lowerM0 == upperM0]
   fixedM1 <- lowerM1[lowerM1 == upperM1]
 
-
+  x <- scale(apply(Data, 1, sum))
+  m <- ncol(Data)
+  n <- nrow(Data)
 
   if (length(fixedM0) == 0){
     whM0 <- colnames(start_m0)
@@ -162,9 +161,6 @@ NLR <- function(Data, group, model, type = "both", start,
     start_m0 <- structure(data.frame(start_m0[, whM0]), .Names = whM0)
     lowerM0 <- lowerM0[whM0]; upperM0 <- upperM0[whM0]
   }
-
-
-
 
   m0 <- lapply(1:m, function(i) tryCatch(nls(Data[, i] ~ gNLR(x, group, a, b, c, d, aDif, bDif, cDif, dDif),
                                              algorithm = "port",
@@ -179,7 +175,6 @@ NLR <- function(Data, group, model, type = "both", start,
       rm(list = as.character(names(fixedM0)[i]))
     }
   }
-
 
   whM1 <- colnames(start_m1)[(!(colnames(start_m1) %in% names(fixedM1)))]
   start_m1 <- structure(data.frame(start_m1[, whM1]), .Names = whM1)
