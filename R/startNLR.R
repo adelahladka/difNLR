@@ -19,15 +19,9 @@
 #' discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
 #' model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
 #' \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups,
-#' \code{3PLc} and \code{3PL} for three-parameter logistic regression model with guessing parameter,
-#' \code{3PLd} for three-parameter logistic regression model with inattention parameter,
+#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
 #' \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-#' parameter for both groups,
-#' \code{4PLcg} for four-parameter logistic regression model with fixed guessing for both groups,
-#' \code{4PLdg} for four-parameter logistic regression model with fixed inattention for both groups, or
-#' \code{4PL} for four-parameter logistic regression model.
-
+#' parameter for both groups.
 #'
 #' @return
 #' A data.frame containing rows representing items and 5 columns representing parameters of \code{difNLR} model. First column represents discrimination (a), second difficulty (b), third guessing (c), fourth difference in discrimination between reference and focal group (aDif) and fifth difference in difficulty between reference and focal group (bDif).
@@ -66,8 +60,7 @@ startNLR <- function(Data, group, model, parameterization = "IRT"){
     stop("'model' is missing",
          call. = FALSE)
   } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4PLcgdg",
-                       "4PLcg", "4PLdg", "4PL"))){
+    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "4PLcgdg"))){
       stop("Invalid value for 'model'",
            call. = FALSE)
     }
