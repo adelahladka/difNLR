@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "data(GMAT)\nData <- GMAT[, 1:20]\ngroup <- GMAT[, 21]\n\n\n\n# type = \"both\"\n# type = \"nudif\"\n# type = \"udif\"\n# \n# model = \"4PL\"\n\ntest = \"F\"\nalpha = 0.05\np.adjust.method = \"none\"\n\n\nfor (model in c(\"4PL\")){\n  for (type in c(\"both\", \"nudif\", \"udif\")){\n    fit <- difNLR(Data, group, focal.name = 1, type = type, model = model,\n                  test = test, p.adjust.method = p.adjust.method)\n    print(paste(\"*** model\", model, \", type \", type, \"***\"))\n    print(colnames(fit$nlrPAR))\n    print(colnames(fit$parM0))\n    print(colnames(fit$parM1))\n  }\n}\n\n\n\nremove(fit)\n\n\nmodel = \"4PL\"\n\n\n\n\n\n\n\n\n\n\n\n\nNLR(Data, group, model, type ,start = \"NULL\", p.adjust.method = \"none\", test = \"LR\", alpha = 0.05)\n",
+    "created" : 1483343417827.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "537585112",
+    "id" : "F4397F79",
+    "lastKnownWriteTime" : 6,
+    "last_content_update" : -2147483648,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

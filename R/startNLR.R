@@ -60,12 +60,13 @@
 #' startNLR(Data, group, model = "3PL")
 #' }
 #' @export
+#'
 startNLR <- function(Data, group, model, parameterization = "IRT"){
   if (missing(model)) {
     stop("'model' is missing",
          call. = FALSE)
   } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4plcgdg",
+    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4PLcgdg",
                        "4PLcg", "4PLdg", "4PL"))){
       stop("Invalid value for 'model'",
            call. = FALSE)
@@ -116,8 +117,8 @@ startNLR <- function(Data, group, model, parameterization = "IRT"){
     if (grepl("dg", model)){
       d_R <- d_F <- apply(cbind(1, line$k * 4 + line$q), 1, min)
     } else {
-      c_R <- apply(cbind(1, line_R$k * 4 + line_R$q), 1, min)
-      c_F <- apply(cbind(1, line_F$k * 4 + line_F$q), 1, min)
+      d_R <- apply(cbind(1, line_R$k * 4 + line_R$q), 1, min)
+      d_F <- apply(cbind(1, line_F$k * 4 + line_F$q), 1, min)
     }
   }
 

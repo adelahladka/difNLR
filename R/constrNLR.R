@@ -66,7 +66,7 @@ constrNLR <- function(model, type = "both"){
     stop("'model' is missing",
          call. = FALSE)
   } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4plcgdg",
+    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4PLcgdg",
                        "4PLcg", "4PLdg", "4PL"))){
       stop("Invalid value for 'model'",
            call. = FALSE)
@@ -75,29 +75,35 @@ constrNLR <- function(model, type = "both"){
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
     stop("'type' must be either 'udif', 'nudif' or 'both'",
          call. = FALSE)
+
   lower <- c(a = -Inf, b = -Inf, c = 0, d = 0, aDif = -Inf, bDif = -Inf, cDif = 0, dDif = 0)
   upper <- c(a = Inf, b = Inf, c = 1, d = 1, aDif = Inf, bDif = Inf, cDif = 0, dDif = 0)
 
   if (grepl("4", model)){
     if (!(grepl("cgdg", model))){
       upper["cDif"] <- upper["dDif"] <- 1
+      lower["cDif"] <- lower["dDif"] <- -1
       if (grepl("cg", model)){
-        upper["cDif"] <- 0 # TBS
+        lower["cDif"] <- upper["cDif"] <- 0 # TBS
       } else {
         if (grepl("dg", model))
-          upper["dDif"] <- 0 # TBS
+          lower["dDif"] <- upper["dDif"] <- 0 # TBS
       }
     }
   } else {
     if (grepl("3", model)){
       if (!(grepl("d", model))){
         lower["d"] <- 1
-        if (!(grepl("g", model)))
+        if (!(grepl("g", model))){
           upper["cDif"] <- 1 # TBS
+          lower["cDif"] <- -1 # TBS
+        }
       } else {
         upper["c"] <- 0
-        if (!(grepl("g", model)))
+        if (!(grepl("g", model))){
           upper["dDif"] <- 1 # TBS
+          lower["dDif"] <- -1 # TBS
+        }
       }
     } else {
       upper["c"] <- 0

@@ -113,7 +113,6 @@
 #' NLR(Data, group, type = "udif")
 #' # Testing non-uniform DIF effects
 #' NLR(Data, group, type = "nudif")
-#'
 #' }
 #' @keywords DIF
 #' @export
@@ -123,16 +122,16 @@
 NLR <- function(Data, group, model, type = "both", start,
                 p.adjust.method = "none", test = "LR", alpha = 0.05){
 
-  gNLR <- deriv3( ~ (c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) /
-                    (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))),
-                    namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
-                    function.arg = function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){})
+  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
+    return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
+    }
+
 
   constr <- constrNLR(model = model, type = type)
   lowerM0 <- constr["lowerM0", ]; upperM0 <- constr["upperM0", ]
   lowerM1 <- constr["lowerM1", ]; upperM1 <- constr["upperM1", ]
 
-  start <- startNLR(Data, group, model)
+  # start <- startNLR(Data, group, model)
 
   start_m0 <- start_m1 <- start
 
@@ -144,26 +143,65 @@ NLR <- function(Data, group, model, type = "both", start,
     }
   }
 
-
   x <- scale(apply(Data, 1, sum))
   m <- ncol(Data)
   n <- nrow(Data)
+
+  fixedM0 <- lowerM0[lowerM0 == upperM0]
+  fixedM1 <- lowerM1[lowerM1 == upperM1]
+
+
+
+  if (length(fixedM0) == 0){
+    whM0 <- colnames(start_m0)
+  } else {
+    for (i in 1:length(fixedM0)){
+      assign(names(fixedM0)[i], fixedM0[i])
+    }
+    whM0 <- colnames(start_m0)[(!(colnames(start_m0) %in% names(fixedM0)))]
+    start_m0 <- structure(data.frame(start_m0[, whM0]), .Names = whM0)
+    lowerM0 <- lowerM0[whM0]; upperM0 <- upperM0[whM0]
+  }
+
+
+
+
   m0 <- lapply(1:m, function(i) tryCatch(nls(Data[, i] ~ gNLR(x, group, a, b, c, d, aDif, bDif, cDif, dDif),
-                                                              algorithm = "port",
-                                                              start = start_m0[i, ],
-                                                              lower = lowerM0,
-                                                              upper = upperM0),
+                                             algorithm = "port",
+                                             start = structure(start_m0[i, ], .Names = whM0),
+                                             lower = lowerM0,
+                                             upper = upperM0),
                                          error = function(e){cat("ERROR : ",
                                                                  conditionMessage(e), "\n")}))
+
+  if (length(fixedM0) != 0){
+    for (i in 1:length(fixedM0)){
+      rm(list = as.character(names(fixedM0)[i]))
+    }
+  }
+
+
+  whM1 <- colnames(start_m1)[(!(colnames(start_m1) %in% names(fixedM1)))]
+  start_m1 <- structure(data.frame(start_m1[, whM1]), .Names = whM1)
+
+  lowerM1 <- lowerM0[whM1]; upperM1 <- upperM0[whM1]
+
+  for (i in 1:length(fixedM1)){
+    assign(names(fixedM1)[i], fixedM1[i])
+  }
+
   m1 <- lapply(1:m, function(i) tryCatch(nls(Data[, i] ~ gNLR(x, group, a, b, c, d, aDif, bDif, cDif, dDif),
-                                                              algorithm = "port",
-                                                              start = start_m1[i, ],
-                                                              lower = lowerM1,
-                                                              upper = upperM1),
+                                             algorithm = "port",
+                                             start = structure(start_m1[i, ], .Names = whM1),
+                                             lower = lowerM1,
+                                             upper = upperM1),
                                          error = function(e){cat("ERROR : ",
                                                                  conditionMessage(e), "\n")}))
-  conv.fail <- sum(is.na(m1) | is.na(m0))
-  conv.fail.which <- which(is.na(m1) | is.na(m0))
+
+  cfM0 <- unlist(lapply(m0, is.null)); cfM1 <- unlist(lapply(m1, is.null))
+  conv.fail <- sum(cfM0, cfM1)
+  conv.fail.which <- which(cfM0 | cfM1)
+
   if (conv.fail > 0) {
     warning("Convergence failure")
   }
@@ -174,9 +212,9 @@ NLR <- function(Data, group, model, type = "both", start,
                  both = c(2, n - 5),
                  udif = c(1, n - 4),
                  nudif = c(1, n - 5))
-    Fval[which(!((is.na(m1)) | (is.na(m0))))] <- sapply(which(!((is.na(m1)) |  (is.na(m0)))),
+    Fval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 |  cfM0)),
                                                         function(l) ((m1[[l]]$m$deviance() - m0[[l]]$m$deviance())/df[1])/(m0[[l]]$m$deviance()/df[2]))
-    pval[which(!((is.na(m1)) | (is.na(m0))))] <- sapply(which(!((is.na(m1)) | (is.na(m0)))),
+    pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
                                                         function(l) (1 - pf(Fval[l], df[1], df[2])))
   } else {
     pval <- LRval <- rep(NA, m)
@@ -184,21 +222,36 @@ NLR <- function(Data, group, model, type = "both", start,
                  both = 2,
                  udif = 1,
                  nudif = 1)
-    LRval[which(!((is.na(m1)) | (is.na(m0))))] <- sapply(which(!((is.na(m1)) |  (is.na(m0)))),
+    LRval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 |  cfM0)),
                                                          function(l) -2 * c(logLik(m1[[l]]) - logLik(m0[[l]])))
-    pval[which(!((is.na(m1)) | (is.na(m0))))] <- sapply(which(!((is.na(m1)) | (is.na(m0)))),
+    pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
                                                         function(l) (1 - pchisq(LRval[l], df)))
   }
+
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
 
-  par.m1 <- t(sapply(m1[which(!is.na(m1))], coef))
-  par.m0 <- t(sapply(m0[which(!is.na(m0))], coef))
+  par.m1 <- se.m1 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(lowerM1))), .Names = names(lowerM1))
+  par.m0 <- se.m0 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(lowerM0))), .Names = names(lowerM0))
 
-  cov.m1 <- lapply(m1[which(!is.na(m1))], vcov)
-  cov.m0 <- lapply(m0[which(!is.na(m0))], vcov)
+  if (dim(par.m1)[2] == 1){
+    par.m1[which(!cfM1), ] <- sapply(m1[which(!cfM1)], coef)
+    par.m1 <- structure(data.frame(par.m1), names = unique(names(par.m1)))
+  } else {
+    par.m1[which(!cfM1), ] <- t(sapply(m1[which(!cfM1)], coef))
+  }
+  par.m0[which(!cfM0), ] <- t(sapply(m0[which(!cfM0)], coef))
 
-  se.m1 <- sqrt(t(sapply(cov.m1, diag)))
-  se.m0 <- sqrt(t(sapply(cov.m0, diag)))
+  cov.m0 <- cov.m1 <- lapply(1:m, function(i) NA)
+  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
+  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
+
+  if (dim(par.m1)[2] == 1){
+    se.m1[which(!cfM1), ] <- sqrt(sapply(cov.m1[which(!cfM1)], diag))
+    se.m1 <- structure(data.frame(se.m1), names = unique(names(se.m1)))
+  } else {
+    se.m1[which(!cfM1), ] <- sqrt(t(sapply(cov.m1[which(!cfM1)], diag)))
+  }
+  se.m0[which(!cfM0), ] <- sqrt(t(sapply(cov.m0[which(!cfM0)] , diag)))
 
   rownames(par.m1) <- rownames(par.m0) <- rownames(se.m1) <- rownames(se.m0) <- paste("Item", 1:m, sep = "")
   results <- list(Sval = switch(test, "F" = Fval, "LR" = LRval),
@@ -209,25 +262,3 @@ NLR <- function(Data, group, model, type = "both", start,
                   conv.fail = conv.fail, conv.fail.which = conv.fail.which)
   return(results)
 }
-
-
-# fit3PLcg <- NLR(Data, group, model = "3PLcg",
-#                 type = "both", p.adjust.method = "none", test = "LR", alpha = 0.05)
-# fit3PLcg$par.m0
-# fit3PLcg$par.m1
-#
-# fit2PL <- NLR(Data, group, model = "2PL",
-#                 type = "both", p.adjust.method = "none", test = "LR", alpha = 0.05)
-# fit2PL$par.m0
-# fit2PL$par.m1
-#
-#
-# fit1PL <- NLR(Data, group, model = "1PL",
-#               type = "both", p.adjust.method = "none", test = "LR", alpha = 0.05)
-# fit1PL$par.m0
-# fit1PL$par.m1
-#
-# fitRasch <- NLR(Data, group, model = "Rasch",
-#               type = "both", p.adjust.method = "none", test = "LR", alpha = 0.05)
-# fitRasch$par.m0
-# fitRasch$par.m1

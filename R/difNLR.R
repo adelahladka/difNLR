@@ -185,7 +185,12 @@ difNLR <- function(Data, group, focal.name, model,
                    p.adjust.method = "none", start
                    )
 {
-
+  if (type == "nudif" & model == "1PL")
+    stop("Detection of non-uniform DIF is not possible with 1PL model!",
+         call. = FALSE)
+  if (type == "nudif" & model == "Rasch")
+    stop("Detection of non-uniform DIF is not possible with Rasch model!",
+         call. = FALSE)
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
     stop("'type' must be either 'udif', 'nudif' or 'both'",
          call. = FALSE)
@@ -202,7 +207,7 @@ difNLR <- function(Data, group, focal.name, model,
     stop("'model' is missing",
          call. = FALSE)
   } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4plcgdg",
+    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PLd", "3PL", "4PLcgdg",
                        "4PLcg", "4PLdg", "4PL"))){
       stop("Invalid value for 'model'",
            call. = FALSE)
@@ -242,10 +247,10 @@ difNLR <- function(Data, group, focal.name, model,
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
     if (is.null(start)) {
       start <- startNLR(DATA, GROUP, model)
-      start <- switch(type,
-                      both = start,
-                      nudif = start,
-                      udif = start[, -4])
+      # start <- switch(type,
+      #                 both = start,
+      #                 nudif = start,
+      #                 udif = start[, -4])
 
     } else {
       if (ncol(start) != 5 & type != "udif")
@@ -267,18 +272,17 @@ difNLR <- function(Data, group, focal.name, model,
     significant <- which(ADJ.PVAL < alpha)
     if (length(significant) > 0) {
       DIFitems <- significant
-      nlrPAR <- PROV$par.m1
-      nlrSE <- PROV$se.m1
+      nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
+                                   .Names = colnames(PROV$par.m0))
 
+      nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
+      nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
 
       for (idif in 1:length(DIFitems)) {
         nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
         nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
       }
-      # colnames(nlrPAR) <- colnames(nlrSE) <- switch(type,
-      #                                               "both" = c("a", "b", "c", "aDIF", "bDIF"),
-      #                                               "nudif" = c("a", "b", "c", "aDIF", "bDIF"),
-      #                                               "udif" = c("a", "b", "c", "bDIF"))
+
     } else {
       DIFitems <- "No DIF item detected"
       nlrPAR <- PROV$par.m1
