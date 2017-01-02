@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: difNLR\nType: Package\nTitle: Detection of Dichotomous Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by Non-Linear Regression Models\nVersion: 1.0.0\nDate: 2017-01-02\nAuthor: Adela Drabinova [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]\nMaintainer: Adela Drabinova <adela.drabinova@gmail.com>\nDepends:\n    R (>= 3.2.2),\n    CTT,\n    ggplot2,\n    gridExtra,\n    methods,\n    nnet,\n    reshape2,\n    stats\nDescription: Detection of DIF among dichotomously scored items and DDF among unscored items with non-linear regression procedures based on generalized regression models.\nLicense: GPL-3\nLazyData: no\nRoxygenNote: 5.0.1\n",
+    "created" : 1482226466431.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1364922901",
+    "id" : "930363E7",
+    "lastKnownWriteTime" : 1483367796,
+    "last_content_update" : -2147483648,
+    "path" : "U:/difNLR/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}

@@ -39,14 +39,9 @@ The options of \code{model} are as follows: \code{Rasch} for one-parameter logis
 discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
 model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
 \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-\code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups,
-\code{3PLc} and \code{3PL} for three-parameter logistic regression model with guessing parameter,
-\code{3PLd} for three-parameter logistic regression model with inattention parameter,
+\code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
 \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-parameter for both groups,
-\code{4PLcg} for four-parameter logistic regression model with fixed guessing for both groups,
-\code{4PLdg} for four-parameter logistic regression model with fixed inattention for both groups, or
-\code{4PL} for four-parameter logistic regression model.
+parameter for both groups.
 The \code{type} corresponds to type of DIF to be tested. Possible values
 are \code{"both"} to detect any DIF (uniform and/or non-uniform), \code{"udif"}
 to detect only uniform DIF or \code{"nudif"} to detect only non-uniform DIF.
@@ -72,20 +67,21 @@ data(GMAT)
 
 data  <- GMAT[, colnames(GMAT) != "group"]
 group <- GMAT[, "group"]
-# Testing both DIF effects using F test and Benjamini-Hochberg correction (default)
-NLR(Data, group)
 
-# Testing both DIF effects using likelihood-ratio test
-NLR(Data, group, test = "LR")
+# Testing both DIF effects using LR test (default)
+# and model with fixed guessing for both groups
+NLR(Data, group, model = "3PLcg")
 
-# Testing both DIF effects with none multiple comparison correction
-NLR(Data, group, type = "both", p.adjust.method = "none")
+# using F test
+NLR(Data, group, model = "3PLcg", test = "F")
+
+# Testing both DIF effects with Benjamini-Hochberg correction
+NLR(Data, group, model = "3PLcg", p.adjust.method = "BH")
 
 # Testing uniform DIF effects
-NLR(Data, group, type = "udif")
+NLR(Data, group, model = "3PLcg", type = "udif")
 # Testing non-uniform DIF effects
-NLR(Data, group, type = "nudif")
-
+NLR(Data, group, model = "3PLcg", type = "nudif")
 }
 }
 \author{

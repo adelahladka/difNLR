@@ -108,14 +108,9 @@ The options of \code{model} are as follows: \code{Rasch} for one-parameter logis
 discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
 model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
 \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-\code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups,
-\code{3PLc} and \code{3PL} for three-parameter logistic regression model with guessing parameter,
-\code{3PLd} for three-parameter logistic regression model with inattention parameter,
+\code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
 \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-parameter for both groups,
-\code{4PLcg} for four-parameter logistic regression model with fixed guessing for both groups,
-\code{4PLdg} for four-parameter logistic regression model with fixed inattention for both groups, or
-\code{4PL} for four-parameter logistic regression model.
+parameter for both groups.
 
 The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"} to
 detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or
@@ -168,6 +163,11 @@ x <- difNLR(Data, group, focal.name = 1, model = "3PLcg")
 # 3PL model with fixed guessing for groups
 difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
 
+# Testing both DIF effects using LR test,
+# 3PL model with fixed guessing for groups
+# and Benjamini-Hochberg correction
+difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")
+
 # Testing both DIF effects using Rasch model
 difNLR(Data, group, focal.name = 1, model = "Rasch")
 
@@ -181,7 +181,6 @@ difNLR(Data, group, focal.name = 1, model = "2PL", type = "nudif")
 
 # Graphical devices
 plot(x)
-x <- difNLR(Data, group, focal.name = 1, model = "1PL")
 plot(x, item = x$DIFitems)
 plot(x, plot.type = "stat")
 
