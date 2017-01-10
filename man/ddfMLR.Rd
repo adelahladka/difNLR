@@ -21,12 +21,12 @@ matrix plus the vector of group. See \strong{Details}.}
 \item{group}{numeric or character: either the binary vector of group membership or
 the column indicator of group membership. See \strong{Details}.}
 
-\item{focal.name}{numeric or character: indicated the level of \code{group} which corresponds to
+\item{focal.name}{numeric or character: indicates the level of \code{group} which corresponds to
 focal group}
 
 \item{key}{character: the answer key. See \strong{Details}.}
 
-\item{type}{character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
+\item{type}{character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
@@ -44,10 +44,10 @@ corresponding to column indicators. See \strong{Details}.}
 \item{title}{string: title of plot.}
 }
 \value{
-A list of class 'difNLR' with the following arguments:
+A list of class 'ddfMLR' with the following arguments:
 \describe{
   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
-  \item{\code{nlrPAR}}{the estimates of final model.}
+  \item{\code{mlrPAR}}{the estimates of final model.}
   \item{\code{parM0}}{the estimates of null model.}
   \item{\code{parM1}}{the estimates of alternative model.}
   \item{\code{alpha}}{numeric: significance level.}
@@ -73,9 +73,9 @@ columns correspond to the items. The \code{group} must be either a vector of the
 length as \code{nrow(data)} or column indicator of \code{Data}. The \code{key} must be
 a vector of correct answers corresponding to columns of \code{Data}.
 
-The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"}
-to detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or
-\code{"nudif"} to detect only non-uniform DIF.
+The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
+to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
+\code{"nudif"} to detect only non-uniform DDF.
 
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
@@ -86,13 +86,6 @@ The output of the ddfMLR is displayed by the \code{print.ddfMLR} function.
 The characteristic curve for item specified in \code{item} option can be plotted. For default
 option \code{"all"} of item, characteristic curves of all converged items are plotted.
 The drawn curves represent best model.
-
-Fitted values are extracted by the \code{fitted.difNLR} function for item(s) specified in
-\code{item} argument.
-
-Predicted values are produced by the \code{predict.difNLR} function for item(s) specified in
-\code{item} argument. \code{score} represents standardized total score of new subject and
-\code{group} argument represents group membership of new subject.
 
 Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 for both, \code{data} and \code{group} parameters.

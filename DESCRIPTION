@@ -2,7 +2,7 @@ Package: difNLR
 Type: Package
 Title: Detection of Dichotomous Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by Non-Linear Regression Models
 Version: 1.0.0
-Date: 2017-01-02
+Date: 2017-01-10
 Author: Adela Drabinova [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]
 Maintainer: Adela Drabinova <adela.drabinova@gmail.com>
 Depends:
@@ -14,7 +14,7 @@ Depends:
     nnet,
     reshape2,
     stats
-Description: Detection of DIF among dichotomously scored items and DDF among unscored items with non-linear regression procedures based on generalized regression models.
+Description: Detection of DIF among dichotomously scored items and DDF among unscored items with non-linear regression procedures based on generalized logistic regression models.
 License: GPL-3
 LazyData: no
 RoxygenNote: 5.0.1

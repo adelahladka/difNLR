@@ -31,7 +31,7 @@ matrix plus the vector of group. See \strong{Details}.}
 \item{group}{numeric or character: either the binary vector of group membership or
 the column indicator of group membership. See \strong{Details}.}
 
-\item{focal.name}{numeric or character: indicated the level of \code{group} which corresponds to
+\item{focal.name}{numeric or character: indicates the level of \code{group} which corresponds to
 focal group}
 
 \item{model}{character: generalized logistic regression model to be fitted. See \strong{Details}.}

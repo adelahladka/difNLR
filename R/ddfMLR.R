@@ -9,10 +9,10 @@
 #' matrix plus the vector of group. See \strong{Details}.
 #' @param group numeric or character: either the binary vector of group membership or
 #' the column indicator of group membership. See \strong{Details}.
-#' @param focal.name numeric or character: indicated the level of \code{group} which corresponds to
+#' @param focal.name numeric or character: indicates the level of \code{group} which corresponds to
 #' focal group
 #' @param key character: the answer key. See \strong{Details}.
-#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
+#' @param type character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 #' See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
@@ -34,9 +34,9 @@
 #' length as \code{nrow(data)} or column indicator of \code{Data}. The \code{key} must be
 #' a vector of correct answers corresponding to columns of \code{Data}.
 #'
-#' The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"}
-#' to detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or
-#' \code{"nudif"} to detect only non-uniform DIF.
+#' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
+#' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
+#' \code{"nudif"} to detect only non-uniform DDF.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
@@ -48,20 +48,13 @@
 #' option \code{"all"} of item, characteristic curves of all converged items are plotted.
 #' The drawn curves represent best model.
 #'
-#' Fitted values are extracted by the \code{fitted.difNLR} function for item(s) specified in
-#' \code{item} argument.
-#'
-#' Predicted values are produced by the \code{predict.difNLR} function for item(s) specified in
-#' \code{item} argument. \code{score} represents standardized total score of new subject and
-#' \code{group} argument represents group membership of new subject.
-#'
 #' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 #' for both, \code{data} and \code{group} parameters.
 #'
-#' @return A list of class 'difNLR' with the following arguments:
+#' @return A list of class 'ddfMLR' with the following arguments:
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
-#'   \item{\code{nlrPAR}}{the estimates of final model.}
+#'   \item{\code{mlrPAR}}{the estimates of final model.}
 #'   \item{\code{parM0}}{the estimates of null model.}
 #'   \item{\code{parM1}}{the estimates of alternative model.}
 #'   \item{\code{alpha}}{numeric: significance level.}
@@ -167,26 +160,26 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
     if (length(significant) > 0) {
       DDFitems <- significant
       mlrPAR <- PROV$par.m1
-      # nlrSE <- PROV$se.m1
+      # mlrSE <- PROV$se.m1
       for (idif in 1:length(DDFitems)) {
         mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-        # nlrSE[[DDFitems[idif]]] <- PROV$se.m0[[DDFitems[idif]]]
+        # mlrSE[[DDFitems[idif]]] <- PROV$se.m0[[DDFitems[idif]]]
       }
 
-      # colnames(nlrPAR) <- colnames(nlrSE) <- switch(type,
+      # colnames(mlrPAR) <- colnames(mlrSE) <- switch(type,
       #                                               "both" = c("a", "b", "c", "aDIF", "bDIF"),
       #                                               "nudif" = c("a", "b", "c", "aDIF", "bDIF"),
       #                                                "udif" = c("a", "b", "c", "bDIF"))
       } else {
         DDFitems <- "No DDF item detected"
-        nlrPAR <- PROV$par.m1
-        # nlrSE <- PROV$se.m1
+        mlrPAR <- PROV$par.m1
+        # mlrSE <- PROV$se.m1
       }
 
 
     RES <- list(Sval = STATS,
                 mlrPAR = mlrPAR,
-                # nlrSE = nlrSE,
+                # mlrSE = mlrSE,
                 parM0 = PROV$par.m0,
                 # seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
                 parM1 = PROV$par.m1,
@@ -209,9 +202,9 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
 #' @export
 print.ddfMLR <- function (x, ...){
   title <- switch(x$type,
-                  both = "Detection of both types of Distractor Differential Functioning using Logistic Regression method",
-                  udif = "Detection of uniform Distractor Differential Functioning using Logistic Regression method",
-                  nudif = "Detection of non-uniform Distractor Differential Functioning using Logistic Regression method")
+                  both = "Detection of both types of Differential Distractor Functioning using Multinomial Log-linear Regression model",
+                  udif = "Detection of uniform Differential Distractor Functioning using Multinomial Log-linear Regression model",
+                  nudif = "Detection of non-uniform Differential Distractor Functioning using Multinomial Log-linear Regression model")
   cat(paste(strwrap(title, width = 60), collapse = "\n"))
   cat("\n\nLikelihood-ratio chi-square statistics\n")
   if (x$p.adjust.method == "none") {
@@ -357,7 +350,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
       ylim(0, 1) +
       labs(title = paste("Item", i),
            x = "Standardized Total Score",
-           y = "Probability of Correct Answer") +
+           y = "Probability of Answer") +
       scale_linetype_discrete(name = "Group", labels = c("Reference", "Focal")) +
       scale_size_continuous(name = "Counts")  +
       scale_colour_discrete(name = "Answer", breaks = df2$answ) +

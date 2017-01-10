@@ -7,13 +7,13 @@
 MLR(Data, group, key, type = "both", p.adjust.method = "none", alpha = 0.05)
 }
 \arguments{
-\item{Data}{character: the unscored data matrix only.}
+\item{Data}{character: the unscored data matrix.}
 
 \item{group}{numeric or character: the binary vector of group membership}
 
 \item{key}{character: the answer key.}
 
-\item{type}{character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
+\item{type}{character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 See \strong{Details}.}
 
 \item{p.adjust.method}{character: method for multiple comparison correction.
@@ -45,9 +45,9 @@ columns correspond to the items. The \code{group} must be a vector of the same
 length as \code{nrow(data)}. The \code{key} must be a vector of correct answers
 corresponding to columns of \code{Data}.
 
-The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"}
-to detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or
-\code{"nudif"} to detect only non-uniform DIF.
+The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
+to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
+\code{"nudif"} to detect only non-uniform DDF.
 
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
@@ -65,13 +65,13 @@ Data  <- GMATtest[, colnames(GMATtest) != "group"]
 group <- GMATtest[, "group"]
 key <- GMATkey
 
-# Testing both DIF effects
+# Testing both DDF effects
 MLR(Data, group, key, type = "both")
 
-# Testing uniform DIF effects
+# Testing uniform DDF effects
 MLR(Data, group, key, type = "udif")
 
-# Testing non-uniform DIF effects
+# Testing non-uniform DDF effects
 MLR(Data, group, key, type = "nudif")
 }
 }

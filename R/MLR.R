@@ -4,10 +4,10 @@
 #'
 #' @description Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
 #'
-#' @param Data character: the unscored data matrix only.
+#' @param Data character: the unscored data matrix.
 #' @param group numeric or character: the binary vector of group membership
 #' @param key character: the answer key.
-#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
+#' @param type character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 #' See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
@@ -22,9 +22,9 @@
 #' length as \code{nrow(data)}. The \code{key} must be a vector of correct answers
 #' corresponding to columns of \code{Data}.
 #'
-#' The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"}
-#' to detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or
-#' \code{"nudif"} to detect only non-uniform DIF.
+#' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
+#' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
+#' \code{"nudif"} to detect only non-uniform DDF.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
@@ -67,13 +67,13 @@
 #' group <- GMATtest[, "group"]
 #' key <- GMATkey
 #'
-#' # Testing both DIF effects
+#' # Testing both DDF effects
 #' MLR(Data, group, key, type = "both")
 #'
-#' # Testing uniform DIF effects
+#' # Testing uniform DDF effects
 #' MLR(Data, group, key, type = "udif")
 #'
-#' # Testing non-uniform DIF effects
+#' # Testing non-uniform DDF effects
 #' MLR(Data, group, key, type = "nudif")
 #' }
 #' @keywords DDF
@@ -125,7 +125,6 @@ MLR <- function(Data, group, key, type = "both", p.adjust.method = "none", alpha
   # se.m1 <- sqrt(t(sapply(cov.m1, diag)))
   # se.m0 <- sqrt(t(sapply(cov.m0, diag)))
 
-  # rownames(par.m1) <- rownames(par.m0) <- rownames(se.m1) <- rownames(se.m0) <- paste("Item", 1:m, sep = "")
   results <- list(Sval = MLRstat[1, ],
                   pval = MLRstat[2, ], adjusted.pval = adjusted.pval,
                   df = df,

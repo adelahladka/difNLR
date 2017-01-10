@@ -1,14 +1,14 @@
 {
     "collab_server" : "",
-    "contents" : "Package: difNLR\nType: Package\nTitle: Detection of Dichotomous Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by Non-Linear Regression Models\nVersion: 1.0.0\nDate: 2017-01-02\nAuthor: Adela Drabinova [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]\nMaintainer: Adela Drabinova <adela.drabinova@gmail.com>\nDepends:\n    R (>= 3.2.2),\n    CTT,\n    ggplot2,\n    gridExtra,\n    methods,\n    nnet,\n    reshape2,\n    stats\nDescription: Detection of DIF among dichotomously scored items and DDF among unscored items with non-linear regression procedures based on generalized regression models.\nLicense: GPL-3\nLazyData: no\nRoxygenNote: 5.0.1\n",
+    "contents" : "Package: difNLR\nType: Package\nTitle: Detection of Dichotomous Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by Non-Linear Regression Models\nVersion: 1.0.0\nDate: 2017-01-10\nAuthor: Adela Drabinova [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]\nMaintainer: Adela Drabinova <adela.drabinova@gmail.com>\nDepends:\n    R (>= 3.2.2),\n    CTT,\n    ggplot2,\n    gridExtra,\n    methods,\n    nnet,\n    reshape2,\n    stats\nDescription: Detection of DIF among dichotomously scored items and DDF among unscored items with non-linear regression procedures based on generalized logistic regression models.\nLicense: GPL-3\nLazyData: no\nRoxygenNote: 5.0.1\n",
     "created" : 1478633582601.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "1364922901",
+    "hash" : "4050589888",
     "id" : "F50A4349",
-    "lastKnownWriteTime" : 1484042314,
-    "last_content_update" : 1484042314,
+    "lastKnownWriteTime" : 1484043325,
+    "last_content_update" : 1484043325734,
     "path" : "~/GitHub/difNLR/DESCRIPTION",
     "project_path" : "DESCRIPTION",
     "properties" : {

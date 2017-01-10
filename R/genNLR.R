@@ -1,18 +1,23 @@
-#' Generates binary data set based on \code{difNLR} model.
+#' Generates binary data set based on Non-Linear Regression model (generalized logistic regression).
 #'
 #' @param N numeric: number of rows representing correspondents.
 #' @param ratio numeric: ratio of number of rows for reference and focal group.
-#' @param parameters numeric: matrix representing true parameters of \code{difNLR} model. See \strong{Details}.
+#' @param parameters numeric: matrix representing with n rows (where n is number of items) and 8 columns
+#' representing true parameters of generalized logistic regression model . See \strong{Details}.
 #'
-#' @description Generates binary data set based on \code{difNLR} model with the same guessing parameter for both groups, reference and focal.
+#' @description Generates binary data set based on generalized logistic model.
 #'
 #' @details
-#' The \code{parameters} is a numeric matrix with 5 columns. First column represents discrimination parameter (a), second represents difficulty (b), third guessing (c), fourth difference in discrimination between reference and focal group (aDif) and fifth difference in difficulty between reference and focal group (bDif). Rows represent items and their number (n) corresponds to number of columns of resultant data set.
+#' The \code{parameters} is a numeric matrix with 8 columns. First 4 columns represent parameters (a, b, c, d)
+#' of generalized logistic regression model for reference group. Last 4 columns represent differences of
+#' parameters (aDif, bDif, cDif, dDif) of generalized logistic regression model between reference and focal
+#' group. Rows represent items and their number (n) corresponds to number of columns of resultant data set.
 #'
 #' @usage genNLR(N = 1000, ratio = 1, parameters)
 #'
 #' @return
-#' A data.frame containing \code{N} rows representing correspondents and n+1 columns representing n items. Last column is group membership variable with coding 0 for reference group and 1 for focal group.
+#' A data.frame containing \code{N} rows representing correspondents and n+1 columns representing n items.
+#' Last column is group membership variable with coding 0 for reference group and 1 for focal group.
 #'
 #' @author
 #' Adela Drabinova \cr
@@ -38,7 +43,9 @@
 #' parameters <- data.frame(a = runif(10, 0.8, 2),
 #'                          b = rnorm(10),
 #'                          c = runif(10, 0, 0.4),
-#'                          aDif = 0, bDif = 0)
+#'                          d = 1,
+#'                          aDif = 0, bDif = 0,
+#'                          cDif = 0, dDif = 0)
 #'
 #' # generating data set with 300 observations (150 each group)
 #' genNLR(N = 300, parameters = parameters)
@@ -57,20 +64,19 @@ genNLR <- function(N = 1000, ratio = 1, parameters){
   N_F   <- round(N/(ratio + 1))
   group <- c(rep(0, N_R), rep(1, N_F))
 
-  theta <- rnorm(N, mean = 0, sd = 1)
-  a <- parameters[1:n, 1]
-  b <- parameters[1:n, 2]
-  c <- parameters[1:n, 3]
-  aF <- parameters[1:n, 1] + parameters[1:n, 4]
-  bF <- parameters[1:n, 2] + parameters[1:n, 5]
-
-  n <- nrow(parameters)
-
-  p <- matrix(NA, nrow = N, ncol = n)
-  for (i in 1:n){
-    p[1:N_R, i] <- c[i] + (1 - c[i]) / ( 1 + exp(- a[i] * (theta[1:N_R] - b[i])))
-    p[(N_R + 1):N, i] <- c[i] + (1 - c[i]) / ( 1 + exp( - aF[i] * (theta[(N_R + 1):N] - bF[i])))
+  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
+    return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
   }
+
+  theta <- rnorm(N, mean = 0, sd = 1)
+
+
+  pR <- sapply(1:nrow(parameters), function(i)
+    do.call(gNLR, c(list(x = theta[1:N_R], g  = 0), parameters[i, ])))
+  pF <- sapply(1:nrow(parameters), function(i)
+    do.call(gNLR, c(list(x = theta[(N_R + 1):N], g  = 1), parameters[i, ])))
+
+  p <- rbind(pR, pF)
 
   answer <- matrix(NA, nrow = N, ncol = n)
   for (j in 1:n) {
