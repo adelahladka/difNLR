@@ -2,8 +2,8 @@
 #'
 #' @aliases difNLR print.difNLR plot.difNLR fitted.difNLR predict.difNLR coef.difNLR
 #'
-#' @description Performs DIF detection procedure based on Non-Linear Regression and either likelihood-ratio
-#' or F test of submodel.
+#' @description Performs DIF detection procedure based on Non-Linear Regression model (generalized logistic
+#' regression) and either likelihood-ratio or F test of submodel.
 #'
 #' @param Data numeric: either the scored data matrix only, or the scored data
 #' matrix plus the vector of group. See \strong{Details}.
@@ -14,11 +14,11 @@
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
 #' See \strong{Details}.
-#' @param test character: test to be performed for DIF detection (either "F" (default), or "LR").
+#' @param test character: test to be performed for DIF detection (either "LR" (default), or "F").
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
-#' @param start numeric: matrix with n rows (where n is the number of items) and at most 5 columns
+#' @param start numeric: matrix with n rows (where n is the number of items) and 8 columns
 #' containing initial item parameters estimates. See \strong{Details}.
 #' @param x an object of 'difNLR' class
 #' @param object an object of 'difNLR' class
@@ -65,7 +65,8 @@
 #' The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
 #' First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
 #' for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
-#' of generalized logistic regression model between reference and focal group.
+#' of generalized logistic regression model between reference and focal group. If not specified, starting
+#' values are calculated with \code{startNLR} function.
 #'
 #' The output of the difNLR is displayed by the \code{print.difNLR} function.
 #'
@@ -74,7 +75,7 @@
 #' option \code{"all"} of item, characteristic curves of all converged items are plotted. The drawn
 #' curves represent best model.
 #' The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
-#' (either F-test, or LR-test, depends on argument \code{test}) are displayed on the Y axis,
+#' (either LR-test, or F-test, depends on argument \code{test}) are displayed on the Y axis,
 #' for each coverged item. The detection threshold is displayed by a horizontal line and items
 #' detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
 #' are used.
@@ -743,7 +744,7 @@ predict.difNLR <- function(object, item = "all",
 
 
   ### predicted values
-  PV <- lapply(items, function(i) NLR(STS, group, PAR[i, "a"], PAR[i, "b"],
+  PV <- lapply(items, function(i) gNLR(STS, group, PAR[i, "a"], PAR[i, "b"],
                                       PAR[i, "c"], PAR[i, "d"],
                                       PAR[i, "aDif"], PAR[i, "bDif"],
                                       PAR[i, "cDif"], PAR[i, "dDif"]))

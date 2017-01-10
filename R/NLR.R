@@ -4,13 +4,17 @@
 #'
 #' @description Performs DIF detection procedure based on Non-Linear Regression and either F-test or likelihood ratio test of submodel.
 #'
-#' @param Data numeric: either binary data matrix only, or the binary data matrix plus the vector of group . See \strong{Details}.
+#' @param Data numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
+#' See \strong{Details}.
 #' @param group numeric: binary vector of group membership. "0" for reference group, "1" for focal group.
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
-#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif"). See \strong{Details}.
+#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
+#' See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
-#' @param start numeric: matrix with n rows (where n is the number of items) and at most 5 columns containing initial item parameters estimates. See \strong{Details}.
-#' @param test character: test to be performed for DIF detection (either "F" (default), or "LR"). See \strong{Details}.
+#' @param start numeric: matrix with n rows (where n is the number of items) and 8 columns containing initial
+#' item parameters estimates. See \strong{Details}.
+#' @param test character: test to be performed for DIF detection (either "LR" (default), or "F").
+#' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
 #' @usage NLR(Data, group, model, type = "both", start,
@@ -39,8 +43,8 @@
 #' The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
 #' First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
 #' for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
-#' of generalized logistic regression model between reference and focal group. If \code{start}
-#' missing, starting values are calculated by \code{startNLR()} function.
+#' of generalized logistic regression model between reference and focal group.  If not specified, starting
+#' values are calculated with \code{startNLR} function.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
