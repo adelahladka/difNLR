@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Key of Correct Answers for \\code{GMAT2test} Data Set\n#'\n#' @description The \\code{GMAT2key} is a vector of factors representing correct answers of generated\n#' \\code{GMAT2test} data set based on Graduate Management Admission Test (GMAT) data set (Kingston et al., 1985).\n#'\n#' @usage data(GMAT2key)\n#'\n#' @author\n#' Adela Drabinova \\cr\n#' Institute of Computer Science, The Czech Academy of Sciences \\cr\n#' Faculty of Mathematics and Physics, Charles University \\cr\n#' adela.drabinova@gmail.com \\cr\n#'\n#' Patricia Martinkova \\cr\n#' Institute of Computer Science, The Czech Academy of Sciences \\cr\n#' martinkova@cs.cas.cz \\cr\n#'\n#' Karel Zvara \\cr\n#' Faculty of Mathematics and Physics, Charles University \\cr\n#'\n#' @references\n#' Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response\n#' Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.\n#'\n#' Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear\n#' Regression, Technical Report, V-1229, \\url{http://hdl.handle.net/11104/0259498}.\n#'\n#' @keywords datasets\n#'\n#' @seealso \\code{\\link{GMAT2}}, \\code{\\link{GMAT2test}}\n#'\n#' @format A data frame with 20 values representing correct answers to items of \\code{GMAT2test} data set.\n#' For more details see \\code{\\link{GMAT2test}}.\n\"GMAT2key\"\n#> [1] \"GMAT2key\"\n",
+    "created" : 1484045665263.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4066576040",
+    "id" : "14968651",
+    "lastKnownWriteTime" : 1484045680,
+    "last_content_update" : 1484045680608,
+    "path" : "~/GitHub/difNLR/R/GMAT2key.R",
+    "project_path" : "R/GMAT2key.R",
+    "properties" : {
+    },
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

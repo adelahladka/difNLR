@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Dichotomous Data Set Based on Graduate Management Admission Test with the Same Total Score Distribution for Groups\n#'\n#' @description The \\code{GMAT} data set is generated data set based on parameters from Graduate\n#' Management Admission Test (GMAT) data set (Kingston et al., 1985). First two items were\n#' considered to function differently in uniform and non-uniform way respectively. The data set\n#' represents responses of 2,000 subjects to multiple-choice test of 20 items. A correct answer\n#' is coded as 1 and incorrect answer as 0. The column \\code{group} represents group membership,\n#' where 0 represents reference group and 1 represents focal group. Groups are the same\n#' size (i.e. 1,000 per group). The distributions of total scores (sum of correct answers) are the\n#' same for both reference and focal group (Martinkova et al., 2016).\n#'\n#' @usage data(GMAT)\n#'\n#' @author\n#' Adela Drabinova \\cr\n#' Institute of Computer Science, The Czech Academy of Sciences \\cr\n#' Faculty of Mathematics and Physics, Charles University \\cr\n#' adela.drabinova@gmail.com \\cr\n#'\n#' Patricia Martinkova \\cr\n#' Institute of Computer Science, The Czech Academy of Sciences \\cr\n#' martinkova@cs.cas.cz \\cr\n#'\n#' Karel Zvara \\cr\n#' Faculty of Mathematics and Physics, Charles University \\cr\n#'\n#' @references\n#' Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.\n#'\n#' Martinkova, P., Drabinova, A., Liaw Y.-L., Sanders E. A., McFarland J. L., Price R. M. (2016). Using DIF Analysis to Reveal Potential Equity Gaps in Conceptual Assessments. In review.\n#'\n#' @keywords datasets\n#'\n#' @seealso \\code{\\link{GMATtest}}, \\code{\\link{GMATkey}}\n#'\n#' @format A \\code{GMAT} data frame consists of 2,000 observations on the following 21 variables.\n#' The first 20 columns represent dichotomously scored items of the test. The 21st column is vector\n#' of group membership; values 0 and 1 refer to reference and focal group.\n\"GMAT\"\n\n",
+    "created" : 1484045651267.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "148621339",
+    "id" : "1D985F30",
+    "lastKnownWriteTime" : 1484042314,
+    "last_content_update" : 1484042314,
+    "path" : "~/GitHub/difNLR/R/GMAT.R",
+    "project_path" : "R/GMAT.R",
+    "properties" : {
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

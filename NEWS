@@ -7,7 +7,7 @@
 
 
 ----------------------------------------
-- Changes in difNLR 1.0.0 (2017-01-02) -
+- Changes in difNLR 1.0.0 (2017-01-10) -
 ----------------------------------------
 
 MAJOR UPDATES
@@ -33,6 +33,9 @@ MAJOR UPDATES
 
   o  Function 'difNLR()' was edited to response to 'difR' package
      and its DIF detection functions.
+
+  o  Function 'genNLR()' was changed to generate dataset from
+     generalized logistic regression model with 8 parameters.
 
 
 

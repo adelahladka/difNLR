@@ -2,7 +2,7 @@
 % Please edit documentation in R/genNLR.R
 \name{genNLR}
 \alias{genNLR}
-\title{Generates binary data set based on \code{difNLR} model.}
+\title{Generates binary data set based on Non-Linear Regression model (generalized logistic regression).}
 \usage{
 genNLR(N = 1000, ratio = 1, parameters)
 }
@@ -11,16 +11,21 @@ genNLR(N = 1000, ratio = 1, parameters)
 
 \item{ratio}{numeric: ratio of number of rows for reference and focal group.}
 
-\item{parameters}{numeric: matrix representing true parameters of \code{difNLR} model. See \strong{Details}.}
+\item{parameters}{numeric: matrix representing with n rows (where n is number of items) and 8 columns
+representing true parameters of generalized logistic regression model . See \strong{Details}.}
 }
 \value{
-A data.frame containing \code{N} rows representing correspondents and n+1 columns representing n items. Last column is group membership variable with coding 0 for reference group and 1 for focal group.
+A data.frame containing \code{N} rows representing correspondents and n+1 columns representing n items.
+Last column is group membership variable with coding 0 for reference group and 1 for focal group.
 }
 \description{
-Generates binary data set based on \code{difNLR} model with the same guessing parameter for both groups, reference and focal.
+Generates binary data set based on generalized logistic model.
 }
 \details{
-The \code{parameters} is a numeric matrix with 5 columns. First column represents discrimination parameter (a), second represents difficulty (b), third guessing (c), fourth difference in discrimination between reference and focal group (aDif) and fifth difference in difficulty between reference and focal group (bDif). Rows represent items and their number (n) corresponds to number of columns of resultant data set.
+The \code{parameters} is a numeric matrix with 8 columns. First 4 columns represent parameters (a, b, c, d)
+of generalized logistic regression model for reference group. Last 4 columns represent differences of
+parameters (aDif, bDif, cDif, dDif) of generalized logistic regression model between reference and focal
+group. Rows represent items and their number (n) corresponds to number of columns of resultant data set.
 }
 \examples{
 \dontrun{
@@ -30,7 +35,9 @@ set.seed(123)
 parameters <- data.frame(a = runif(10, 0.8, 2),
                          b = rnorm(10),
                          c = runif(10, 0, 0.4),
-                         aDif = 0, bDif = 0)
+                         d = 1,
+                         aDif = 0, bDif = 0,
+                         cDif = 0, dDif = 0)
 
 # generating data set with 300 observations (150 each group)
 genNLR(N = 300, parameters = parameters)

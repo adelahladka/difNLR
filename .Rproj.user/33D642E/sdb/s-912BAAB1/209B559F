@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "****************************************************\n*                                                  *\n*  Changes and Developments in the difNLR Package  *\n*                                                  *\n****************************************************\n\n\n\n----------------------------------------\n- Changes in difNLR 1.0.0 (2017-01-10) -\n----------------------------------------\n\nMAJOR UPDATES\n\n  o  New function ddfMLR() to detect Differential Distractor\n     Functioning (DDF) with Multinomial Log-linear Regression\n     (MLR) model.\n     S3 methods for class 'ddfMLR' also added - 'print' and 'plot'.\n\n  o  New function MLR() to calculate likelihood ratio statistic\n     for detecting DDF with MLR model.\n\n  o  The 'difNLR()' function can handle 6 generalized logistic\n     regression models with option 'model'.\n\n  o  Functions 'startNLR()', 'genNLR()' ans S3 methods for class\n     'difNLR' were changed according 'difNLR()' function. S3 method\n     'coef' was created.\n\n  o  New functions NLR() and constrNLR() can now calculates DIF\n     detection statistics and specify constraints for generalized\n     logistic regression model.\n\n  o  Function 'difNLR()' was edited to response to 'difR' package\n     and its DIF detection functions.\n\n  o  Function 'genNLR()' was changed to generate dataset from\n     generalized logistic regression model with 8 parameters.\n\n\n\nMINOR UPDATES\n\n  o  The CITATION file was updated.\n\n  o  Several typos were fixed.\n\n  o  Some default options of input were changed.\n\n\n----------------------------------------\n- Changes in difNLR 0.2.0 (2016-11-09) -\n----------------------------------------\n\nMAJOR UPDATES\n\n  o S3 method 'plot' for class 'difNLR' was updated.\n\n  o New option of 'test' in 'difNLR()' function was added. Possible\n    choices are now 'F' for F-test and 'LR' for likelihood ratio test.\n\n  o Choice of significant level 'alpha' was added into 'difNLR()'\n    function with default option 0.05.\n\n  o Six new data sets were added - scored 'GMAT' data, its unscored version\n    'GMATtest' and its key 'GMATkey'. Scored 'difMedical' data set, its\n    unscored version 'difMedicaltest' and key 'difMedicalkey'.\n\n  o New function 'genNLR()' was added to generate scored (binary) data with\n    model by 'difNLR'.\n\n\nMINOR UPDATES\n\n  o  Several typos were fixed.\n",
+    "created" : 1484045519269.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3056065208",
+    "id" : "209B559F",
+    "lastKnownWriteTime" : 1484045582,
+    "last_content_update" : 1484045582569,
+    "path" : "~/GitHub/difNLR/NEWS",
+    "project_path" : "NEWS",
+    "properties" : {
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "text"
+}
