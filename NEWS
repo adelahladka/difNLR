@@ -47,6 +47,8 @@ MINOR UPDATES
 
   o  Some default options of input were changed.
 
+  o  'AIC()', 'BIC()' and 'logLik()' S3 methods added to 'difNLR()'
+
 
 ----------------------------------------
 - Changes in difNLR 0.2.0 (2016-11-09) -

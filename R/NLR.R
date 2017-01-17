@@ -54,24 +54,28 @@
 #' Missing values are allowed but discarded for item estimation. They must be coded
 #' as \code{NA} for both, \code{data} and \code{group} parameters.
 #'
-# ' @return A list of class 'difNLR' with the following arguments:
-# ' \describe{
-# '   \item{\code{DIF}}{either the column indicators of the items which were detected as DIF, or \code{"NONE"}.}
-# '   \item{\code{test}}{the test used for DIF detection.}
-# '   \item{\code{Sval}}{the values of \code{test} statistics.}
-# '   \item{\code{pval}}{the p-values by \code{test}.}
-# '   \item{\code{df}}{the degress of freedom of \code{test}.}
-# '   \item{\code{coef}}{the matrix of estimated item parameters.}
-# '   \item{\code{vcov}}{the list of estimated covariance matrices of item parameters.}
-# '   \item{\code{group}}{the vector of group membership.}
-# '   \item{\code{data}}{the binary data matrix.}
-# '   \item{\code{type}}{character: type of DIF that was tested.}
-# '   \item{\code{alpha}}{numeric: significance level.}
-# '   \item{\code{conv.fail}}{numeric: number of convergence issues.}
-# '   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
-# '   \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
-# ' }
-#'
+#' @return A list with the following arguments:
+#' \describe{
+#'   \item{\code{Sval}}{the values of \code{test} statistics.}
+#'   \item{\code{pval}}{the p-values by \code{test}.}
+#'   \item{\code{adjusted.pval}}{adjusted p-values by \code{p.adjust.method}.}
+#'   \item{\code{df}}{the degress of freedom of \code{test}.}
+#'   \item{\code{test}}{used test.}
+#'   \item{\code{par.m0}}{the matrix of estimated item parameters for m0 model.}
+#'   \item{\code{se.m0}}{the matrix of standard errors of item parameters for m0 model.}
+#'   \item{\code{cov.m0}}{list of covariance matrices of item parameters for m0 model.}
+#'   \item{\code{par.m1}}{the matrix of estimated item parameters for m1 model.}
+#'   \item{\code{se.m1}}{the matrix of standard errors of item parameters for m1 model.}
+#'   \item{\code{cov.m1}}{list of covariance matrices of item parameters for m1 model.}
+#'   \item{\code{conv.fail}}{numeric: number of convergence issues.}
+#'   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
+#'   \item{\code{ll.m0}}{log-likelihood of m0 model.}
+#'   \item{\code{ll.m1}}{log-likelihood of m1 model.}
+#'   \item{\code{AIC.m0}}{AIC of m0 model.}
+#'   \item{\code{AIC.m1}}{AIC of m1 model.}
+#'   \item{\code{BIC.m0}}{BIC of m0 model.}
+#'   \item{\code{BIC.m1}}{BIC of m1 model.}
+#' }
 #' @author
 #' Adela Drabinova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -97,7 +101,7 @@
 #' # loading data based on GMAT
 #' data(GMAT)
 #'
-#' data  <- GMAT[, colnames(GMAT) != "group"]
+#' Data  <- GMAT[, colnames(GMAT) != "group"]
 #' group <- GMAT[, "group"]
 #'
 #' # Testing both DIF effects using LR test (default)
@@ -222,6 +226,9 @@ NLR <- function(Data, group, model, type = "both", start,
                                                         function(l) (1 - pchisq(LRval[l], df)))
   }
 
+  ll.m0 <- lapply(m0, logLik)
+  ll.m1 <- lapply(m1, logLik)
+
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
 
   par.m1 <- se.m1 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(lowerM1))), .Names = names(lowerM1))
@@ -239,6 +246,8 @@ NLR <- function(Data, group, model, type = "both", start,
   cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
   cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
 
+
+
   if (dim(par.m1)[2] == 1){
     se.m1[which(!cfM1), ] <- sqrt(sapply(cov.m1[which(!cfM1)], diag))
     se.m1 <- structure(data.frame(se.m1), names = unique(names(se.m1)))
@@ -248,11 +257,18 @@ NLR <- function(Data, group, model, type = "both", start,
   se.m0[which(!cfM0), ] <- sqrt(t(sapply(cov.m0[which(!cfM0)] , diag)))
 
   rownames(par.m1) <- rownames(par.m0) <- rownames(se.m1) <- rownames(se.m0) <- paste("Item", 1:m, sep = "")
+
+  AIC.m0 <- lapply(m0, AIC); AIC.m1 <- lapply(m1, AIC)
+  BIC.m0 <- lapply(m0, BIC); BIC.m1 <- lapply(m1, BIC)
+
   results <- list(Sval = switch(test, "F" = Fval, "LR" = LRval),
                   pval = pval, adjusted.pval = adjusted.pval,
                   df = df, test = test,
                   par.m0 = par.m0, se.m0 = se.m0, cov.m0 = cov.m0,
                   par.m1 = par.m1, se.m1 = se.m1, cov.m1 = cov.m1,
-                  conv.fail = conv.fail, conv.fail.which = conv.fail.which)
+                  conv.fail = conv.fail, conv.fail.which = conv.fail.which,
+                  ll.m0 = ll.m0, ll.m1 = ll.m1,
+                  AIC.m0 = AIC.m0, AIC.m1 = AIC.m1,
+                  BIC.m0 = BIC.m0, BIC.m1 = BIC.m1 )
   return(results)
 }

@@ -94,10 +94,17 @@
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
 #'   \item{\code{nlrPAR}}{the estimates of final model.}
+#'   \item{\code{nlrSE}}{the standard errors of estimates of final model.}
 #'   \item{\code{parM0}}{the estimates of null model.}
+#'   \item{\code{seM0}}{the standard errors of estimates of null model.}
+#'   \item{\code{covM0}}{the covariance matrices of estimates of null model.}
 #'   \item{\code{parM1}}{the estimates of alternative model.}
+#'   \item{\code{seM1}}{the standard errors of estimates of alternative model.}
+#'   \item{\code{covM1}}{the covariance matrices of estimates of alternative model.}
 #'   \item{\code{alpha}}{numeric: significance level.}
-#'   \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or \code{"No DIF item detected"}.}
+#'   \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or
+#'   \code{"No DIF item detected"}.}
+#'   \item{\code{model}}{fitted model.}
 #'   \item{\code{type}}{character: type of DIF that was tested.}
 #'   \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
 #'   \item{\code{pval}}{the p-values by likelihood ratio test.}
@@ -105,7 +112,16 @@
 #'   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{Data}}{the data matrix.}
+#'   \item{\code{conv.fail}}{numeric: number of convergence issues.}
+#'   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
+#'   \item{\code{llM0}}{log-likelihood of null model.}
+#'   \item{\code{llM1}}{log-likelihood of alternative model.}
+#'   \item{\code{AICM0}}{AIC of null model.}
+#'   \item{\code{AICM1}}{AIC of alternative model.}
+#'   \item{\code{BICM0}}{BIC of null model.}
+#'   \item{\code{BICM1}}{BIC of alternative model.}
 #' }
+#'
 #'
 #' @author
 #' Adela Drabinova \cr
@@ -174,6 +190,11 @@
 #' # Predicted values for new subjects
 #' predict(x, item = 1, score = 0, group = 1)
 #' predict(x, item = 1, score = 0, group = 0)
+#'
+#' # AIC, BIC, logLik
+#' AIC(x)
+#' BIC(x)
+#' logLik(x)
 #' }
 #' @keywords DIF
 #' @export
@@ -299,7 +320,10 @@ difNLR <- function(Data, group, focal.name, model,
                 pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
                 adjusted.p = NULL, test = test,
                 group = GROUP, Data = DATA,
-                conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which)
+                conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
+                llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
+                AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
+                BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
     # , thr = Q
     class(RES) <- "difNLR"
     return(RES)
@@ -758,3 +782,29 @@ predict.difNLR <- function(object, item = "all",
 coef.difNLR <- function(object, ...){
   return(object$nlrPAR)
 }
+
+#' @rdname difNLR
+#' @export
+logLik.difNLR <- function(object, ...){
+  m <- nrow(object$nlrPAR)
+  LL <- ifelse(1:m %in% object$DIFitems, object$llM0, object$llM1)
+  return(LL)
+}
+
+#' @rdname difNLR
+#' @export
+AIC.difNLR <- function(object, ...){
+  m <- nrow(object$nlrPAR)
+  AIC <- ifelse(1:m %in% object$DIFitems, object$AICM0, object$AICM1)
+  return(AIC)
+}
+
+
+#' @rdname difNLR
+#' @export
+BIC.difNLR <- function(object, ...){
+  m <- nrow(object$nlrPAR)
+  BIC <- ifelse(1:m %in% object$DIFitems, object$BICM0, object$BICM1)
+  return(BIC)
+}
+
