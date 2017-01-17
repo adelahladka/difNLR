@@ -121,7 +121,7 @@
 #' }
 #' @keywords DIF
 #' @export
-
+#' @importFrom stats AIC BIC logLik
 
 
 NLR <- function(Data, group, model, type = "both", start,

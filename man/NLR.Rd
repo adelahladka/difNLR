@@ -28,6 +28,30 @@ See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 }
+\value{
+A list with the following arguments:
+\describe{
+  \item{\code{Sval}}{the values of \code{test} statistics.}
+  \item{\code{pval}}{the p-values by \code{test}.}
+  \item{\code{adjusted.pval}}{adjusted p-values by \code{p.adjust.method}.}
+  \item{\code{df}}{the degress of freedom of \code{test}.}
+  \item{\code{test}}{used test.}
+  \item{\code{par.m0}}{the matrix of estimated item parameters for m0 model.}
+  \item{\code{se.m0}}{the matrix of standard errors of item parameters for m0 model.}
+  \item{\code{cov.m0}}{list of covariance matrices of item parameters for m0 model.}
+  \item{\code{par.m1}}{the matrix of estimated item parameters for m1 model.}
+  \item{\code{se.m1}}{the matrix of standard errors of item parameters for m1 model.}
+  \item{\code{cov.m1}}{list of covariance matrices of item parameters for m1 model.}
+  \item{\code{conv.fail}}{numeric: number of convergence issues.}
+  \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
+  \item{\code{ll.m0}}{log-likelihood of m0 model.}
+  \item{\code{ll.m1}}{log-likelihood of m1 model.}
+  \item{\code{AIC.m0}}{AIC of m0 model.}
+  \item{\code{AIC.m1}}{AIC of m1 model.}
+  \item{\code{BIC.m0}}{BIC of m0 model.}
+  \item{\code{BIC.m1}}{BIC of m1 model.}
+}
+}
 \description{
 Performs DIF detection procedure based on Non-Linear Regression and either F-test or likelihood ratio test of submodel.
 }
@@ -69,7 +93,7 @@ as \code{NA} for both, \code{data} and \code{group} parameters.
 # loading data based on GMAT
 data(GMAT)
 
-data  <- GMAT[, colnames(GMAT) != "group"]
+Data  <- GMAT[, colnames(GMAT) != "group"]
 group <- GMAT[, "group"]
 
 # Testing both DIF effects using LR test (default)
