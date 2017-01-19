@@ -265,6 +265,13 @@ difNLR <- function(Data, group, focal.name, model,
     }
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
+
+    df <- data.frame(DATA, GROUP)
+    df <- df[complete.cases(df), ]
+
+    GROUP <- df[, "GROUP"]
+    DATA <- df[, colnames(df) != "GROUP"]
+
     if (is.null(start)) {
       start <- startNLR(DATA, GROUP, model)
       # start <- switch(type,

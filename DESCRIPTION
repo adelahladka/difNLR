@@ -9,7 +9,6 @@ Depends:
     R (>= 3.2.2),
     CTT,
     ggplot2,
-    gridExtra,
     methods,
     nnet,
     reshape2,

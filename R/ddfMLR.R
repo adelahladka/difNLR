@@ -55,6 +55,7 @@
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
 #'   \item{\code{mlrPAR}}{the estimates of final model.}
+#'   \item{\code{mlrSE}}{standard errors of the estimates of final model.}
 #'   \item{\code{parM0}}{the estimates of null model.}
 #'   \item{\code{parM1}}{the estimates of alternative model.}
 #'   \item{\code{alpha}}{numeric: significance level.}
@@ -88,15 +89,15 @@
 #' group <- GMATtest[, "group"]
 #' key <- GMATkey
 #'
-#' # Testing both DIF effects
+#' # Testing both DDF effects
 #' x <- ddfMLR(Data, group, focal.name = 1, key)
 #'
-#' # Testing both DIF effects with Benjamini-Hochberg adjustment method
-#' ddfMLR(Data, group, focal.name = 1, key, type = "both", p.adjust.method = "BH")
+#' # Testing both DDF effects with Benjamini-Hochberg adjustment method
+#' ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 #'
-#' # Testing uniform DIF effects
+#' # Testing uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "udif")
-#' # Testing non-uniform DIF effects
+#' # Testing non-uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 #'
 #' # Graphical devices
@@ -151,35 +152,39 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
+    df <- data.frame(DATA, GROUP)
+    df <- df[complete.cases(df), ]
+
+    GROUP <- df[, "GROUP"]
+    DATA <- df[, colnames(df) != "GROUP"]
+
     PROV <- MLR(DATA, GROUP, key = key, type = type,
                 p.adjust.method = p.adjust.method,
                 alpha = alpha)
     STATS <- PROV$Sval
     ADJ.PVAL <- PROV$adjusted.pval
+    se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
+    se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
     significant <- which(ADJ.PVAL < alpha)
+
     if (length(significant) > 0) {
       DDFitems <- significant
       mlrPAR <- PROV$par.m1
-      # mlrSE <- PROV$se.m1
+      mlrSE <- se.m1
       for (idif in 1:length(DDFitems)) {
         mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-        # mlrSE[[DDFitems[idif]]] <- PROV$se.m0[[DDFitems[idif]]]
+        mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
       }
-
-      # colnames(mlrPAR) <- colnames(mlrSE) <- switch(type,
-      #                                               "both" = c("a", "b", "c", "aDIF", "bDIF"),
-      #                                               "nudif" = c("a", "b", "c", "aDIF", "bDIF"),
-      #                                                "udif" = c("a", "b", "c", "bDIF"))
-      } else {
-        DDFitems <- "No DDF item detected"
-        mlrPAR <- PROV$par.m1
-        # mlrSE <- PROV$se.m1
+    } else {
+      DDFitems <- "No DDF item detected"
+      mlrPAR <- PROV$par.m1
+      mlrSE <- se.m1
       }
 
 
     RES <- list(Sval = STATS,
                 mlrPAR = mlrPAR,
-                # mlrSE = mlrSE,
+                mlrSE = mlrSE,
                 parM0 = PROV$par.m0,
                 # seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
                 parM1 = PROV$par.m1,
@@ -283,7 +288,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
 
 
 
-  score <- scale(unlist(score(x$Data, x$key)))
+  score <- c(scale(unlist(CTT::score(x$Data, x$key))))
   sq <- seq(min(score), max(score), by = 0.1)
   sqR <- as.matrix(data.frame(1, sq, 0, 0))
   sqF <- as.matrix(data.frame(1, sq, 1, sq))
@@ -323,7 +328,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     colnames(hvR) <- colnames(hvF) <- c(x$key[i], rownames(x$mlrPAR[[i]]), "group", "score")
     hv <- rbind(hvR, hvF)
 
-    df <- melt(hv, id = c("score", "group"))
+    df <- reshape2::melt(hv, id = c("score", "group"))
     df$group <- as.factor(df$group)
 
     df2 <- rbind(data.frame(prop.table(table(x$Data[x$group == 1, i], score[x$group == 1]), 2),

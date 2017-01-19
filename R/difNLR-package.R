@@ -1,22 +1,26 @@
-#' Detection of Dichotomous Differential Item Functioning (DIF) by Non-Linear Regression Function
+#' Detection of Dichotomous Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by Non-Linear Regression Models
 #'
-#' @description The difNLR package containts DIF detection method based on Non-Linear Regression. Both uniform and non-uniform DIF effects can be detected when considering one focal group. DIF detection method is based either on F-test, or likelihood-ratio test of submodel.
+#' @description The difNLR package containts DIF detection method based on Non-Linear
+#' Regression. Both uniform and non-uniform DIF effects can be detected when considering
+#' one focal group. DIF detection method is based either on likelihood-ratio test, or on F-test
+#' of submodel. Package also offers DDF detection method based on Multinomial Log-linear Regression
+#' model.
 #'
 #' @aliases difNLR-package
 #'
 #' @import ggplot2
-#' gridExtra
-#'
-#' @importFrom stats deriv3 na.omit nls p.adjust pf qf pchisq qchisq quantile setNames logLik rbinom rnorm
+#' @importFrom CTT score
 #' @importFrom methods is
-#'
+#' @importFrom nnet multinom
+#' @importFrom reshape2 melt
+#' @importFrom stats anova complete.cases deriv3 deviance na.omit nls p.adjust pf qf pchisq qchisq quantile setNames logLik rbinom relevel rnorm
 #'
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 0.2.0\cr
-#' Date: 2016-10-20\cr
-#' Depends: R (>= 3.2.2), ggplot2, gridExtra, methods, stats\cr
+#' Version: 1.0.0\cr
+#' Date: 2017-01-19\cr
+#' Depends: R (>= 3.2.2), CTT, ggplot2, methods, nnet, reshape2, stats\cr
 #' License: GPL-3\cr
 #'
 #' @author

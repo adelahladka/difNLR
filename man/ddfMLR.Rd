@@ -48,6 +48,7 @@ A list of class 'ddfMLR' with the following arguments:
 \describe{
   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
   \item{\code{mlrPAR}}{the estimates of final model.}
+  \item{\code{mlrSE}}{standard errors of the estimates of final model.}
   \item{\code{parM0}}{the estimates of null model.}
   \item{\code{parM1}}{the estimates of alternative model.}
   \item{\code{alpha}}{numeric: significance level.}
@@ -99,15 +100,15 @@ Data  <- GMATtest[, colnames(GMATtest) != "group"]
 group <- GMATtest[, "group"]
 key <- GMATkey
 
-# Testing both DIF effects
+# Testing both DDF effects
 x <- ddfMLR(Data, group, focal.name = 1, key)
 
-# Testing both DIF effects with Benjamini-Hochberg adjustment method
-ddfMLR(Data, group, focal.name = 1, key, type = "both", p.adjust.method = "BH")
+# Testing both DDF effects with Benjamini-Hochberg adjustment method
+ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 
-# Testing uniform DIF effects
+# Testing uniform DDF effects
 ddfMLR(Data, group, focal.name = 1, key, type = "udif")
-# Testing non-uniform DIF effects
+# Testing non-uniform DDF effects
 ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 
 # Graphical devices

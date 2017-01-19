@@ -51,9 +51,6 @@
 #' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"},
 #' \code{"none"}.
 #'
-#' Missing values are allowed but discarded for item estimation. They must be coded
-#' as \code{NA} for both, \code{data} and \code{group} parameters.
-#'
 #' @return A list with the following arguments:
 #' \describe{
 #'   \item{\code{Sval}}{the values of \code{test} statistics.}
