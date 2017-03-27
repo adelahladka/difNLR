@@ -20,6 +20,14 @@ where 0 represents reference group and 1 represents focal group. Groups are the 
 size (i.e. 1,000 per group). The distributions of total scores (sum of correct answers) are the
 same for both reference and focal group (Martinkova et al., 2016).
 }
+\references{
+Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+
+Martinkova, P., Drabinova, A., Liaw Y.-L., Sanders E. A., McFarland J. L., Price R. M. (2016). Using DIF Analysis to Reveal Potential Equity Gaps in Conceptual Assessments. In review.
+}
+\seealso{
+\code{\link{GMATtest}}, \code{\link{GMATkey}}
+}
 \author{
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -33,13 +41,4 @@ martinkova@cs.cas.cz \cr
 Karel Zvara \cr
 Faculty of Mathematics and Physics, Charles University \cr
 }
-\references{
-Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
-
-Martinkova, P., Drabinova, A., Liaw Y.-L., Sanders E. A., McFarland J. L., Price R. M. (2016). Using DIF Analysis to Reveal Potential Equity Gaps in Conceptual Assessments. In review.
-}
-\seealso{
-\code{\link{GMATtest}}, \code{\link{GMATkey}}
-}
 \keyword{datasets}
-

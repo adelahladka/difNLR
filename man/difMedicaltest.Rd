@@ -11,6 +11,14 @@ data(difMedicaltest)
 \description{
 The \code{difMedicaltest} data set consists of the responses of 1,407 subjects (484 males, 923 females) to multiple-choice admission test to medical school in Czech republic. It contains 20 selected items from original test while first item was previously detected detected as differently functioning (Vlckova, 2014). Possible answers were A, B, C, D, while any combination of these can be correct. The column \code{gender} represents gender of students, where 0 represents males (reference group) and 1 represents females (focal group).
 }
+\references{
+Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
+
+Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+}
+\seealso{
+\code{\link{difMedical}}, \code{\link{difMedicalkey}}
+}
 \author{
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -24,13 +32,4 @@ martinkova@cs.cas.cz \cr
 Karel Zvara \cr
 Faculty of Mathematics and Physics, Charles University \cr
 }
-\references{
-Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
-
-Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
-}
-\seealso{
-\code{\link{difMedical}}, \code{\link{difMedicalkey}}
-}
 \keyword{datasets}
-

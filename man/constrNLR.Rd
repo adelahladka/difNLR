@@ -61,4 +61,3 @@ Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 martinkova@cs.cas.cz \cr
 }
-

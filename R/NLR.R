@@ -51,9 +51,6 @@
 #' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"},
 #' \code{"none"}.
 #'
-#' Missing values are allowed but discarded for item estimation. They must be coded
-#' as \code{NA} for both, \code{data} and \code{group} parameters.
-#'
 #' @return A list with the following arguments:
 #' \describe{
 #'   \item{\code{Sval}}{the values of \code{test} statistics.}
@@ -171,7 +168,8 @@ NLR <- function(Data, group, model, type = "both", start,
                                              lower = lowerM0,
                                              upper = upperM0),
                                          error = function(e){cat("ERROR : ",
-                                                                 conditionMessage(e), "\n")}))
+                                                                 conditionMessage(e), "\n")},
+                                         finally = ""))
 
   if (length(fixedM0) != 0){
     for (i in 1:length(fixedM0)){
@@ -194,7 +192,8 @@ NLR <- function(Data, group, model, type = "both", start,
                                              lower = lowerM1,
                                              upper = upperM1),
                                          error = function(e){cat("ERROR : ",
-                                                                 conditionMessage(e), "\n")}))
+                                                                 conditionMessage(e), "\n")},
+                                         finally = ""))
 
   cfM0 <- unlist(lapply(m0, is.null)); cfM1 <- unlist(lapply(m1, is.null))
   conv.fail <- sum(cfM0, cfM1)
@@ -226,8 +225,9 @@ NLR <- function(Data, group, model, type = "both", start,
                                                         function(l) (1 - pchisq(LRval[l], df)))
   }
 
-  ll.m0 <- lapply(m0, logLik)
-  ll.m1 <- lapply(m1, logLik)
+  ll.m0 <- ll.m1 <- lapply(1:m, function(i) NA)
+  ll.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], logLik)
+  ll.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], logLik)
 
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
 
@@ -247,7 +247,6 @@ NLR <- function(Data, group, model, type = "both", start,
   cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
 
 
-
   if (dim(par.m1)[2] == 1){
     se.m1[which(!cfM1), ] <- sqrt(sapply(cov.m1[which(!cfM1)], diag))
     se.m1 <- structure(data.frame(se.m1), names = unique(names(se.m1)))
@@ -258,8 +257,13 @@ NLR <- function(Data, group, model, type = "both", start,
 
   rownames(par.m1) <- rownames(par.m0) <- rownames(se.m1) <- rownames(se.m0) <- paste("Item", 1:m, sep = "")
 
-  AIC.m0 <- lapply(m0, AIC); AIC.m1 <- lapply(m1, AIC)
-  BIC.m0 <- lapply(m0, BIC); BIC.m1 <- lapply(m1, BIC)
+  AIC.m0 <- AIC.m1 <- lapply(1:m, function(i) NA)
+  AIC.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], AIC)
+  AIC.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], AIC)
+
+  BIC.m0 <- BIC.m1 <- lapply(1:m, function(i) NA)
+  BIC.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], BIC)
+  BIC.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], BIC)
 
   results <- list(Sval = switch(test, "F" = Fval, "LR" = LRval),
                   pval = pval, adjusted.pval = adjusted.pval,

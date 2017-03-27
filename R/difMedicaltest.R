@@ -14,9 +14,6 @@
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' martinkova@cs.cas.cz \cr
 #'
-#' Karel Zvara \cr
-#' Faculty of Mathematics and Physics, Charles University \cr
-#'
 #' @references
 #' Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 #'

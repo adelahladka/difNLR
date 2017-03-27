@@ -17,4 +17,4 @@ Depends:
 Description: Detection of DIF among dichotomously scored items and DDF among unscored items with non-linear regression procedures based on generalized logistic regression models.
 License: GPL-3
 LazyData: no
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

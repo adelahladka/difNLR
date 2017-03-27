@@ -30,8 +30,6 @@
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 #' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
 #'
-#' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
-#' for both, \code{data} and \code{group} parameters.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -85,28 +83,28 @@
 
 MLR <- function(Data, group, key, type = "both", p.adjust.method = "none", alpha = 0.05){
 
-  x <- scale(unlist(score(Data, key)))
+  x <- c(scale(unlist(CTT::score(Data, key))))
   m <- ncol(Data)
   n <- nrow(Data)
 
   m0 <- lapply(1:m, function(i) switch(type,
-                                       "both" = multinom(relevel(as.factor(Data[, i]),
+                                       "both" = nnet::multinom(relevel(as.factor(Data[, i]),
                                                                  ref = paste(key[i])) ~ x * group,
                                                          trace = F),
-                                       "nudif" = multinom(relevel(as.factor(Data[, i]),
+                                       "nudif" = nnet::multinom(relevel(as.factor(Data[, i]),
                                                                   ref = paste(key[i])) ~ x * group,
                                                           trace = F),
-                                       "udif" = multinom(relevel(as.factor(Data[, i]),
+                                       "udif" = nnet::multinom(relevel(as.factor(Data[, i]),
                                                                  ref = paste(key[i])) ~ x + group,
                                                          trace = F)))
   m1 <- lapply(1:m, function(i) switch(type,
-                                       "both" = multinom(relevel(as.factor(Data[, i]),
+                                       "both" = nnet::multinom(relevel(as.factor(Data[, i]),
                                                                  ref = paste(key[i])) ~ x,
                                                          trace = F),
-                                       "nudif" = multinom(relevel(as.factor(Data[, i]),
+                                       "nudif" = nnet::multinom(relevel(as.factor(Data[, i]),
                                                                   ref = paste(key[i])) ~ x + group,
                                                           trace = F),
-                                       "udif" = multinom(relevel(as.factor(Data[, i]),
+                                       "udif" = nnet::multinom(relevel(as.factor(Data[, i]),
                                                                  ref = paste(key[i])) ~ x,
                                                          trace = F)))
 
@@ -114,7 +112,7 @@ MLR <- function(Data, group, key, type = "both", p.adjust.method = "none", alpha
   MLRstat <- sapply(1:m, function(i) c(MLRtest[[i]]$`LR stat.`[2], MLRtest[[i]]$`Pr(Chi)`[2]))
   df <- lapply(1:m, function(i) MLRtest[[i]]$`Resid. df`)
 
-  adjusted.pval <- p.adjust(MLRstat[2, ], method = p.adjust.methods)
+  adjusted.pval <- p.adjust(MLRstat[2, ], method = p.adjust.method)
 
   par.m1 <- lapply(m1, coef)
   par.m0 <- lapply(m0, coef)

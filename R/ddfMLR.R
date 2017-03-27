@@ -55,6 +55,7 @@
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
 #'   \item{\code{mlrPAR}}{the estimates of final model.}
+#'   \item{\code{mlrSE}}{standard errors of the estimates of final model.}
 #'   \item{\code{parM0}}{the estimates of null model.}
 #'   \item{\code{parM1}}{the estimates of alternative model.}
 #'   \item{\code{alpha}}{numeric: significance level.}
@@ -88,15 +89,15 @@
 #' group <- GMATtest[, "group"]
 #' key <- GMATkey
 #'
-#' # Testing both DIF effects
+#' # Testing both DDF effects
 #' x <- ddfMLR(Data, group, focal.name = 1, key)
 #'
-#' # Testing both DIF effects with Benjamini-Hochberg adjustment method
-#' ddfMLR(Data, group, focal.name = 1, key, type = "both", p.adjust.method = "BH")
+#' # Testing both DDF effects with Benjamini-Hochberg adjustment method
+#' ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 #'
-#' # Testing uniform DIF effects
+#' # Testing uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "udif")
-#' # Testing non-uniform DIF effects
+#' # Testing non-uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 #'
 #' # Graphical devices
@@ -151,35 +152,38 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
-    PROV <- MLR(DATA, GROUP, key = key, type = type,
-                p.adjust.method = p.adjust.method,
-                alpha = alpha)
+    df <- data.frame(DATA, GROUP)
+    df <- df[complete.cases(df), ]
+
+    GROUP <- df[, "GROUP"]
+    DATA <- df[, colnames(df) != "GROUP"]
+
+    PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, type = type,
+                                 p.adjust.method = p.adjust.method,
+                                 alpha = alpha))
     STATS <- PROV$Sval
     ADJ.PVAL <- PROV$adjusted.pval
+    se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
+    se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
     significant <- which(ADJ.PVAL < alpha)
+
     if (length(significant) > 0) {
       DDFitems <- significant
       mlrPAR <- PROV$par.m1
-      # mlrSE <- PROV$se.m1
+      mlrSE <- se.m1
       for (idif in 1:length(DDFitems)) {
         mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-        # mlrSE[[DDFitems[idif]]] <- PROV$se.m0[[DDFitems[idif]]]
+        mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
       }
-
-      # colnames(mlrPAR) <- colnames(mlrSE) <- switch(type,
-      #                                               "both" = c("a", "b", "c", "aDIF", "bDIF"),
-      #                                               "nudif" = c("a", "b", "c", "aDIF", "bDIF"),
-      #                                                "udif" = c("a", "b", "c", "bDIF"))
-      } else {
-        DDFitems <- "No DDF item detected"
-        mlrPAR <- PROV$par.m1
-        # mlrSE <- PROV$se.m1
+    } else {
+      DDFitems <- "No DDF item detected"
+      mlrPAR <- PROV$par.m1
+      mlrSE <- se.m1
       }
-
 
     RES <- list(Sval = STATS,
                 mlrPAR = mlrPAR,
-                # mlrSE = mlrSE,
+                mlrSE = mlrSE,
                 parM0 = PROV$par.m0,
                 # seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
                 parM1 = PROV$par.m1,
@@ -252,9 +256,6 @@ print.ddfMLR <- function (x, ...){
   }
 }
 
-
-
-
 #' @rdname ddfMLR
 #' @export
 plot.ddfMLR <- function(x, item = "all", title, ...){
@@ -281,9 +282,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     items <- item
   }
 
-
-
-  score <- scale(unlist(score(x$Data, x$key)))
+  score <- c(scale(unlist(CTT::score(x$Data, x$key))))
   sq <- seq(min(score), max(score), by = 0.1)
   sqR <- as.matrix(data.frame(1, sq, 0, 0))
   sqF <- as.matrix(data.frame(1, sq, 1, sq))
@@ -299,8 +298,8 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     if(ncol(x$mlrPAR[[i]]) == 2)
       x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0, 0))
     prR <- prF <- c()
-    for (j in 1:nrow(x$mlrPAR[[i]])){
 
+    for (j in 1:nrow(x$mlrPAR[[i]])){
       prR <- rbind(prR, exp(x$mlrPAR[[i]][j, ] %*% t(sqR)))
       prF <- rbind(prF, exp(x$mlrPAR[[i]][j, ] %*% t(sqF)))
     }
@@ -320,10 +319,10 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
                       prF[, (nrow(x$mlrPAR[[i]])+2):ncol(prF)], "F")
     hvR <- data.frame(hvR, score = sq)
     hvF <- data.frame(hvF, score = sq)
-    colnames(hvR) <- colnames(hvF) <- c(x$key[i], rownames(x$mlrPAR[[i]]), "group", "score")
+    colnames(hvR) <- colnames(hvF) <- c(paste(x$key[i]), rownames(x$mlrPAR[[i]]), "group", "score")
     hv <- rbind(hvR, hvF)
 
-    df <- melt(hv, id = c("score", "group"))
+    df <- reshape2::melt(hv, id = c("score", "group"))
     df$group <- as.factor(df$group)
 
     df2 <- rbind(data.frame(prop.table(table(x$Data[x$group == 1, i], score[x$group == 1]), 2),
@@ -337,6 +336,8 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     df2$answ <- relevel(df2$Var1, ref = paste(x$key[i]))
     df2$group <- as.factor(df2$group)
 
+    df$variable <- relevel(df$variable, ref = paste(x$key[i]))
+
     plot_CC[[i]] <-  ggplot() +
       geom_line(data = df,
                 aes_string(x = "score" , y = "value",
@@ -349,16 +350,16 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
 
       ylim(0, 1) +
       labs(title = paste("Item", i),
-           x = "Standardized Total Score",
-           y = "Probability of Answer") +
+           x = "Standardized total score",
+           y = "Probability of answer") +
       scale_linetype_discrete(name = "Group", labels = c("Reference", "Focal")) +
       scale_size_continuous(name = "Counts")  +
       scale_colour_discrete(name = "Answer", breaks = df2$answ) +
       scale_fill_discrete(guide = F) +
-
       theme_bw() +
       theme(axis.line  = element_line(colour = "black"),
-            text = element_text(size = 14),
+            text = element_text(size = 11),
+            plot.title = element_text(size = 11, face = "bold", vjust = 1.5),
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank(),
             panel.background = element_blank(),
@@ -367,10 +368,11 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
             legend.background = element_blank(),
             legend.box = "horizontal",
             legend.key = element_rect(colour = "white"),
-            plot.title = element_text(face = "bold"),
-            legend.key.width = unit(1, "cm"))
+            legend.key.width = unit(0.8, "cm"),
+            legend.key.height = unit(0.5, "cm"),
+            legend.spacing.x = unit(-0.05, "cm"))
 
   }
-
+  plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
   return(plot_CC)
 }

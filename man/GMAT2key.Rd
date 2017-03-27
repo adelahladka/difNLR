@@ -13,6 +13,16 @@ data(GMAT2key)
 The \code{GMAT2key} is a vector of factors representing correct answers of generated
 \code{GMAT2test} data set based on Graduate Management Admission Test (GMAT) data set (Kingston et al., 1985).
 }
+\references{
+Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
+Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+
+Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear
+Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+}
+\seealso{
+\code{\link{GMAT2}}, \code{\link{GMAT2test}}
+}
 \author{
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -26,15 +36,4 @@ martinkova@cs.cas.cz \cr
 Karel Zvara \cr
 Faculty of Mathematics and Physics, Charles University \cr
 }
-\references{
-Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
-Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
-
-Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear
-Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
-}
-\seealso{
-\code{\link{GMAT2}}, \code{\link{GMAT2test}}
-}
 \keyword{datasets}
-

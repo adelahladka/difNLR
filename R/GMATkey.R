@@ -16,8 +16,6 @@
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' martinkova@cs.cas.cz \cr
 #'
-#' Karel Zvara \cr
-#' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
 #' Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.

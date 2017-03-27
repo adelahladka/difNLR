@@ -265,6 +265,13 @@ difNLR <- function(Data, group, focal.name, model,
     }
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
+
+    df <- data.frame(DATA, GROUP)
+    df <- df[complete.cases(df), ]
+
+    GROUP <- df[, "GROUP"]
+    DATA <- df[, colnames(df) != "GROUP"]
+
     if (is.null(start)) {
       start <- startNLR(DATA, GROUP, model)
       # start <- switch(type,
@@ -284,31 +291,27 @@ difNLR <- function(Data, group, focal.name, model,
              call. = FALSE)
     }
 
-    PROV <- NLR(DATA, GROUP, model = model, type = type, start = start,
+    PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, type = type, start = start,
                 p.adjust.method = p.adjust.method, test = test,
-                alpha = alpha)
+                alpha = alpha))
     STATS <- PROV$Sval
     ADJ.PVAL <- PROV$adjusted.pval
     significant <- which(ADJ.PVAL < alpha)
+
+    nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
+                                 .Names = colnames(PROV$par.m0))
+    nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
+    nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
+
     if (length(significant) > 0) {
       DIFitems <- significant
-      nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
-                                   .Names = colnames(PROV$par.m0))
-
-      nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
-      nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
-
       for (idif in 1:length(DIFitems)) {
         nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
         nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
       }
-
     } else {
       DIFitems <- "No DIF item detected"
-      nlrPAR <- PROV$par.m1
-      nlrSE <- PROV$se.m1
     }
-
 
     RES <- list(Sval = STATS,
                 nlrPAR = nlrPAR, nlrSE = nlrSE,
@@ -606,19 +609,13 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                       theme(legend.box.just = "left",
                             legend.justification = c(1, 0),
                             legend.position = c(0.97, 0.03),
-                            # legend.margin = margin(0, "lines"),
                             legend.box = "vertical",
-                            # legend.key.size = unit(0.9, "cm"),
-                            # legend.key.height = unit(0.8, "line"),
                             legend.text.align = 0,
                             legend.title.align = 0,
-                            legend.key = element_rect(colour = "white"))
+                            legend.key = element_rect(colour = "white"),
+                            legend.spacing.y = unit(-0.05, "cm"))
     }
-
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
-    # names(plot_CC) <- paste("Item", items)
-    # class(plot_CC)
-
     return(plot_CC)
   }
   ### checking input

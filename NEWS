@@ -4,6 +4,26 @@
 *                                                  *
 ****************************************************
 
+----------------------------------------
+- Changes in difNLR 1.1.0 (2017-03-27) -
+----------------------------------------
+
+MAJOR UPDATES
+
+  o Bug of dimensions for parameter estimates of 'difNLR()'
+    function was fixed.
+
+
+
+MINOR UPDATES
+
+  o  Functions 'plot.ddfMLR()' and 'plot.difNLR()' were slightly
+     improved.
+
+  o  Updated error and warning handling in 'difNLR()' and 'ddfMLR()'
+     functions.
+
+
 
 
 ----------------------------------------

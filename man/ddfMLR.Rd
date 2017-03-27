@@ -2,9 +2,10 @@
 % Please edit documentation in R/ddfMLR.R
 \name{ddfMLR}
 \alias{ddfMLR}
-\alias{plot.ddfMLR}
+\alias{print.ddfMLR}
 \alias{plot.ddfMR}
 \alias{print.ddfMLR}
+\alias{plot.ddfMLR}
 \title{Performs DDF detection using Multinomial Log-linear Regression model.}
 \usage{
 ddfMLR(Data, group, focal.name, key, type = "both",
@@ -48,6 +49,7 @@ A list of class 'ddfMLR' with the following arguments:
 \describe{
   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
   \item{\code{mlrPAR}}{the estimates of final model.}
+  \item{\code{mlrSE}}{standard errors of the estimates of final model.}
   \item{\code{parM0}}{the estimates of null model.}
   \item{\code{parM1}}{the estimates of alternative model.}
   \item{\code{alpha}}{numeric: significance level.}
@@ -99,15 +101,15 @@ Data  <- GMATtest[, colnames(GMATtest) != "group"]
 group <- GMATtest[, "group"]
 key <- GMATkey
 
-# Testing both DIF effects
+# Testing both DDF effects
 x <- ddfMLR(Data, group, focal.name = 1, key)
 
-# Testing both DIF effects with Benjamini-Hochberg adjustment method
-ddfMLR(Data, group, focal.name = 1, key, type = "both", p.adjust.method = "BH")
+# Testing both DDF effects with Benjamini-Hochberg adjustment method
+ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 
-# Testing uniform DIF effects
+# Testing uniform DDF effects
 ddfMLR(Data, group, focal.name = 1, key, type = "udif")
-# Testing non-uniform DIF effects
+# Testing non-uniform DDF effects
 ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 
 # Graphical devices
@@ -115,6 +117,9 @@ plot(x, item = 1)
 plot(x, item = x$DDFitems)
 plot(x, item = "all")
 }
+}
+\seealso{
+\code{\link[stats]{p.adjust}}
 }
 \author{
 Adela Drabinova \cr
@@ -125,8 +130,4 @@ adela.drabinova@gmail.com \cr
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 }
-\seealso{
-\code{\link[stats]{p.adjust}}
-}
 \keyword{DDF}
-

@@ -52,9 +52,6 @@ to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uni
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
-
-Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
-for both, \code{data} and \code{group} parameters.
 }
 \examples{
 \dontrun{
@@ -75,6 +72,9 @@ MLR(Data, group, key, type = "udif")
 MLR(Data, group, key, type = "nudif")
 }
 }
+\seealso{
+\code{\link[stats]{p.adjust}}
+}
 \author{
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -85,8 +85,4 @@ Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 martinkova@cs.cas.cz \cr
 }
-\seealso{
-\code{\link[stats]{p.adjust}}
-}
 \keyword{DDF}
-

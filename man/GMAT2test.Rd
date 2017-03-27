@@ -19,6 +19,16 @@ multiple-choice test of 20 items. Aditionally, 4 possible answers on all items w
 coded A, B, C and D. The column \code{group} represents group membership, where 0 represents reference group
 and 1 represent focal group. Groups are the same size (i.e. 500 per group).
 }
+\references{
+Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
+Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+
+Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear
+Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+}
+\seealso{
+\code{\link{GMAT2}}, \code{\link{GMAT2key}}
+}
 \author{
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -32,15 +42,4 @@ martinkova@cs.cas.cz \cr
 Karel Zvara \cr
 Faculty of Mathematics and Physics, Charles University \cr
 }
-\references{
-Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
-Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
-
-Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear
-Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
-}
-\seealso{
-\code{\link{GMAT2}}, \code{\link{GMAT2key}}
-}
 \keyword{datasets}
-
