@@ -37,8 +37,5 @@ adela.drabinova@gmail.com \cr
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 martinkova@cs.cas.cz \cr
-
-Karel Zvara \cr
-Faculty of Mathematics and Physics, Charles University \cr
 }
 \keyword{datasets}

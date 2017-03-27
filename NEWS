@@ -5,7 +5,7 @@
 ****************************************************
 
 ----------------------------------------
-- Changes in difNLR 1.1.0 (2017-03-27) -
+- Changes in difNLR 1.0.1 (2017-03-27) -
 ----------------------------------------
 
 MAJOR UPDATES
@@ -22,6 +22,8 @@ MINOR UPDATES
 
   o  Updated error and warning handling in 'difNLR()' and 'ddfMLR()'
      functions.
+
+  o  Description file was updated.
 
 
 
