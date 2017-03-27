@@ -44,8 +44,9 @@ return(rbind(lowerM0, upperM0, lowerM1, upperM1))
 # to test both types of DIF
 constrNLR(model = "3PLcg", type = "both")
 
-# 3PL model to test uniform DIF
-constrNLR(model = "3PL", type = "udif")
+# 4PL model with the same guessing and inattention
+# to test uniform DIF
+constrNLR(model = "4PLcgdg", type = "udif")
 
 # 2PL model to test non-uniform DIF
 constrNLR(model = "2PL", type = "nudif")

@@ -158,9 +158,11 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
     GROUP <- df[, "GROUP"]
     DATA <- df[, colnames(df) != "GROUP"]
 
+
     PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, type = type,
                                  p.adjust.method = p.adjust.method,
                                  alpha = alpha))
+
     STATS <- PROV$Sval
     ADJ.PVAL <- PROV$adjusted.pval
     se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
