@@ -152,12 +152,11 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
-    df <- data.frame(DATA, GROUP)
+    df <- data.frame(DATA, GROUP, check.names = F)
     df <- df[complete.cases(df), ]
 
     GROUP <- df[, "GROUP"]
     DATA <- df[, colnames(df) != "GROUP"]
-
 
     PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, type = type,
                                  p.adjust.method = p.adjust.method,
@@ -238,7 +237,7 @@ print.ddfMLR <- function (x, ...){
     colnames(tab) <- c("Chisq-value", "P-value", "Adj. P-value", "")
   }
 
-  rownames(tab) <- paste("Item", 1:length(x$adj.pval))
+  rownames(tab) <- colnames(x$Data)
 
   print(tab, quote = F, digits = 4, zero.print = F)
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
@@ -254,7 +253,7 @@ print.ddfMLR <- function (x, ...){
     switch(x$type, both = cat("\n\nItems detected as DDF items:"),
            udif = cat("\n\nItems detected as uniform DDF items:"),
            nudif = cat("\n\nItems detected as non-uniform DDF items:"))
-    cat("\n", paste("Item ", x$DDFitems, "\n", sep = ""))
+    cat("\n", paste(colnames(x$Data)[x$DDFitems], "\n", sep = ""))
   }
 }
 
@@ -294,7 +293,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     if (!missing(title)){
       TITLE <- title
     } else {
-      TITLE <- paste("Item", i)
+      TITLE <- colnames(x$Data)[i]
     }
 
     if(ncol(x$mlrPAR[[i]]) == 2)
@@ -351,8 +350,8 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
                  alpha = 0.5, shape = 21) +
 
       ylim(0, 1) +
-      labs(title = paste("Item", i),
-           x = "Standardized total score",
+      ggtitle(TITLE) +
+      labs(x = "Standardized total score",
            y = "Probability of answer") +
       scale_linetype_discrete(name = "Group", labels = c("Reference", "Focal")) +
       scale_size_continuous(name = "Counts")  +
@@ -378,3 +377,4 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
   plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
   return(plot_CC)
 }
+
