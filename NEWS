@@ -5,7 +5,7 @@
 ****************************************************
 
 ----------------------------------------
-- Changes in difNLR 1.0.1 (2017-03-27) -
+- Changes in difNLR 1.0.1 (2017-05-19) -
 ----------------------------------------
 
 MAJOR UPDATES
@@ -19,11 +19,10 @@ MINOR UPDATES
 
   o  Functions 'plot.ddfMLR()' and 'plot.difNLR()' were slightly
      improved.
-
   o  Updated error and warning handling in 'difNLR()' and 'ddfMLR()'
      functions.
-
   o  Description file was updated.
+  o  Item names are now the same as in original data set.
 
 
 
