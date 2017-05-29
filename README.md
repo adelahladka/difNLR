@@ -1,5 +1,5 @@
 # difNLR
-Detection of dichotomous Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by non-linear regression models.
+Detection of Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by non-linear regression models.
 
 ## Installation
 ```
@@ -10,6 +10,8 @@ install.packages("difNLR")
 # install.packages("devtools")
 devtools::install_github("drabinova/difNLR")
 ```
+## Version
+Current version on CRAN is 1.0.0. The newest development version available on GitHub is 1.0.1.
 
 ## Getting help
 If you find any bug or just need help with `difNLR` package you can leave your message as an issue here or directly contact us at adela.drabinova@gmail.com
