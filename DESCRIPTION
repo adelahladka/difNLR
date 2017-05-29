@@ -9,7 +9,7 @@ Maintainer: Adela Drabinova <adela.drabinova@gmail.com>
 Depends:
     R (>= 3.2.2),
     CTT,
-    ggplot2,
+    ggplot2 (>= 2.2.1),
     methods,
     nnet,
     reshape2,
