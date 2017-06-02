@@ -97,7 +97,7 @@ for both, \code{data} and \code{group} parameters.
 # loading data based on GMAT
 data(GMATtest, GMATkey)
 
-Data  <- GMATtest[, colnames(GMATtest) != "group"]
+Data  <- GMATtest[, 1:20]
 group <- GMATtest[, "group"]
 key <- GMATkey
 

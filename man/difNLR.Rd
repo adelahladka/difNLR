@@ -182,7 +182,7 @@ Missing values are allowed but discarded for item estimation. They must be coded
 # loading data based on GMAT
 data(GMAT)
 
-Data  <- GMAT[, colnames(GMAT) != "group"]
+Data  <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
 # Testing both DIF effects using likelihood-ratio test and

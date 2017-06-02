@@ -5,13 +5,15 @@
 ****************************************************
 
 ----------------------------------------
-- Changes in difNLR 1.0.1 (2017-05-23) -
+- Changes in difNLR 1.0.2 (2017-06-02) -
 ----------------------------------------
 
 MAJOR UPDATES
 
   o Bug of dimensions for parameter estimates of 'difNLR()'
     function was fixed.
+  o Datasets 'GMAT' and 'GMATtest' were extended by 'criterion'
+    variable which is intended to be predicted by test.
 
 
 

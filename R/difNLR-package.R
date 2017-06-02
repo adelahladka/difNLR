@@ -18,8 +18,8 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.0.1\cr
-#' Date: 2017-05-29\cr
+#' Version: 1.0.2\cr
+#' Date: 2017-06-02\cr
 #' Depends: R (>= 3.2.2), CTT, ggplot2 (>= 2.2.1), methods, nnet, reshape2, stats\cr
 #' License: GPL-3\cr
 #' BugReports: https://github.com/drabinova/difNLR/issues

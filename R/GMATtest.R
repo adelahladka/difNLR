@@ -8,6 +8,8 @@
 #' \code{group} represents group membership, where 0 represents reference group and 1 represent
 #' focal group. Groups are the same size (i.e. 1,000 per group). The distributions of total scores
 #' (sum of correct answers) are the same for both reference and focal group (Martinkova et al., 2016).
+#' The column \code{criterion} represents generated continuous variable which is intended to be predicted
+#' by test.
 #'
 #' @usage data(GMATtest)
 #'
@@ -32,7 +34,8 @@
 #'
 #' @format A \code{GMAT} data frame consists of 2,000 observations on the following 21 variables.
 #' The first 20 columns represents answers of subject to an items of the test. The 21st column is
-#' vector of group membership; values 0 and 1 refer to reference and focal group.
+#' vector of group membership; values 0 and 1 refer to reference and focal group. The 22nd column is vector
+#' representing variable which is intended to be predicted by test.
 #' Correct answers are presented in \code{\link{GMATkey}} data set.
 "GMATtest"
 
