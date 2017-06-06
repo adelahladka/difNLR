@@ -6,6 +6,10 @@
 \alias{plot.ddfMR}
 \alias{print.ddfMLR}
 \alias{plot.ddfMLR}
+\alias{coef.ddfMLR}
+\alias{logLik.ddfMLR}
+\alias{AIC.ddfMLR}
+\alias{BIC.ddfMLR}
 \title{Performs DDF detection using Multinomial Log-linear Regression model.}
 \usage{
 ddfMLR(Data, group, focal.name, key, type = "both",
@@ -14,6 +18,14 @@ alpha = 0.05, p.adjust.method = "none")
 \method{print}{ddfMLR}(x, ...)
 
 \method{plot}{ddfMLR}(x, item = "all", title, ...)
+
+\method{coef}{ddfMLR}(object, ...)
+
+\method{logLik}{ddfMLR}(object, ...)
+
+\method{AIC}{ddfMLR}(object, ...)
+
+\method{BIC}{ddfMLR}(object, ...)
 }
 \arguments{
 \item{Data}{character: either the unscored data matrix only, or the unscored data
@@ -43,6 +55,8 @@ See \strong{Details}.}
 corresponding to column indicators. See \strong{Details}.}
 
 \item{title}{string: title of plot.}
+
+\item{object}{an object of 'ddfMLR' class}
 }
 \value{
 A list of class 'ddfMLR' with the following arguments:
@@ -61,6 +75,12 @@ A list of class 'ddfMLR' with the following arguments:
   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
   \item{\code{group}}{the vector of group membership.}
   \item{\code{Data}}{the data matrix.}
+  \item{\code{llM0}}{log-likelihood of null model.}
+  \item{\code{llM1}}{log-likelihood of alternative model.}
+  \item{\code{AICM0}}{AIC of null model.}
+  \item{\code{AICM1}}{AIC of alternative model.}
+  \item{\code{BICM0}}{BIC of null model.}
+  \item{\code{BICM1}}{BIC of alternative model.}
   }
 }
 \description{
@@ -116,6 +136,11 @@ ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 plot(x, item = 1)
 plot(x, item = x$DDFitems)
 plot(x, item = "all")
+
+# AIC, BIC, logLik
+AIC(x)
+BIC(x)
+logLik(x)
 }
 }
 \seealso{

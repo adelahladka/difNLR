@@ -18,6 +18,7 @@
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param x an object of 'ddfMLR' class
+#' @param object an object of 'ddfMLR' class
 #' @param item either character ("all"), or numeric vector, or single number
 #'corresponding to column indicators. See \strong{Details}.
 #' @param title string: title of plot.
@@ -67,6 +68,12 @@
 #'   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{Data}}{the data matrix.}
+#'   \item{\code{llM0}}{log-likelihood of null model.}
+#'   \item{\code{llM1}}{log-likelihood of alternative model.}
+#'   \item{\code{AICM0}}{AIC of null model.}
+#'   \item{\code{AICM1}}{AIC of alternative model.}
+#'   \item{\code{BICM0}}{BIC of null model.}
+#'   \item{\code{BICM1}}{BIC of alternative model.}
 #'   }
 #'
 #' @author
@@ -104,6 +111,11 @@
 #' plot(x, item = 1)
 #' plot(x, item = x$DDFitems)
 #' plot(x, item = "all")
+#'
+#' # AIC, BIC, logLik
+#' AIC(x)
+#' BIC(x)
+#' logLik(x)
 #' }
 #' @keywords DDF
 #' @export
@@ -193,7 +205,10 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
                 type = type, p.adjust.method = p.adjust.method,
                 pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
                 adjusted.p = NULL,
-                group = GROUP, Data = DATA, key = key)
+                group = GROUP, Data = DATA, key = key,
+                llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
+                AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
+                BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
 
     class(RES) <- "ddfMLR"
     return(RES)
@@ -378,3 +393,32 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
   return(plot_CC)
 }
 
+#' @rdname ddfMLR
+#' @export
+coef.ddfMLR <- function(object, ...){
+  return(object$mlrPAR)
+}
+
+#' @rdname ddfMLR
+#' @export
+logLik.ddfMLR <- function(object, ...){
+  m <- length(object$mlrPAR)
+  LL <- ifelse(1:m %in% object$DIFitems, object$llM0, object$llM1)
+  return(LL)
+}
+
+#' @rdname ddfMLR
+#' @export
+AIC.ddfMLR <- function(object, ...){
+  m <- length(object$mlrPAR)
+  AIC <- ifelse(1:m %in% object$DDFitems, object$AICM0, object$AICM1)
+  return(AIC)
+}
+
+#' @rdname ddfMLR
+#' @export
+BIC.ddfMLR <- function(object, ...){
+  m <- length(object$mlrPAR)
+  BIC <- ifelse(1:m %in% object$DDFitems, object$BICM0, object$BICM1)
+  return(BIC)
+}

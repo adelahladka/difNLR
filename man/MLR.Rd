@@ -32,6 +32,12 @@ A list with the following arguments:
   \item{\code{par.m1}}{the estimates of alternative model.}
   \item{\code{cov.m0}}{the estimates of covariance structure of null model.}
   \item{\code{cov.m1}}{the estimates of covariance structure of alternative model.}
+  \item{\code{ll.m0}}{log-likelihood of m0 model.}
+  \item{\code{ll.m1}}{log-likelihood of m1 model.}
+  \item{\code{AIC.m0}}{AIC of m0 model.}
+  \item{\code{AIC.m1}}{AIC of m1 model.}
+  \item{\code{BIC.m0}}{BIC of m0 model.}
+  \item{\code{BIC.m1}}{BIC of m1 model.}
   }
 }
 \description{

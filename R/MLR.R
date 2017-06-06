@@ -41,6 +41,12 @@
 #'   \item{\code{par.m1}}{the estimates of alternative model.}
 #'   \item{\code{cov.m0}}{the estimates of covariance structure of null model.}
 #'   \item{\code{cov.m1}}{the estimates of covariance structure of alternative model.}
+#'   \item{\code{ll.m0}}{log-likelihood of m0 model.}
+#'   \item{\code{ll.m1}}{log-likelihood of m1 model.}
+#'   \item{\code{AIC.m0}}{AIC of m0 model.}
+#'   \item{\code{AIC.m1}}{AIC of m1 model.}
+#'   \item{\code{BIC.m0}}{BIC of m0 model.}
+#'   \item{\code{BIC.m1}}{BIC of m1 model.}
 #'   }
 #'
 #' @author
@@ -123,11 +129,23 @@ MLR <- function(Data, group, key, type = "both", p.adjust.method = "none", alpha
   # se.m1 <- sqrt(t(sapply(cov.m1, diag)))
   # se.m0 <- sqrt(t(sapply(cov.m0, diag)))
 
+  ll.m0 <- sapply(m0, logLik)
+  ll.m1 <- sapply(m0, logLik)
+
+  AIC.m0 <- sapply(m0, AIC)
+  AIC.m1 <- sapply(m1, AIC)
+
+  BIC.m0 <- sapply(m0, BIC)
+  BIC.m1 <- sapply(m1, BIC)
+
   results <- list(Sval = MLRstat[1, ],
                   pval = MLRstat[2, ], adjusted.pval = adjusted.pval,
                   df = df,
                   par.m0 = par.m0, cov.m0 = cov.m0,
-                  par.m1 = par.m1, cov.m1 = cov.m1)
+                  par.m1 = par.m1, cov.m1 = cov.m1,
+                  ll.m0 = ll.m0, ll.m1 = ll.m1,
+                  AIC.m0 = AIC.m0, AIC.m1 = AIC.m1,
+                  BIC.m0 = BIC.m0, BIC.m1 = BIC.m1)
   return(results)
 }
 

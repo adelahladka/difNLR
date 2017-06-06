@@ -792,7 +792,6 @@ AIC.difNLR <- function(object, ...){
   return(AIC)
 }
 
-
 #' @rdname difNLR
 #' @export
 BIC.difNLR <- function(object, ...){

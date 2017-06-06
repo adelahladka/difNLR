@@ -5,7 +5,7 @@
 ****************************************************
 
 ----------------------------------------
-- Changes in difNLR 1.0.2 (2017-06-02) -
+- Changes in difNLR 1.0.2 (2017-06-06) -
 ----------------------------------------
 
 MAJOR UPDATES
@@ -14,8 +14,8 @@ MAJOR UPDATES
     function was fixed.
   o Datasets 'GMAT' and 'GMATtest' were extended by 'criterion'
     variable which is intended to be predicted by test.
-
-
+  o 'coef', 'logLik', 'AIC' and 'BIC' S3 methods were added for
+    class 'ddfMLR'.
 
 MINOR UPDATES
 
@@ -26,9 +26,6 @@ MINOR UPDATES
   o  Description file was updated.
   o  Item names are now the same as in original data set.
   o  Readme file updated.
-
-
-
 
 ----------------------------------------
 - Changes in difNLR 1.0.0 (2017-01-10) -
@@ -61,8 +58,6 @@ MAJOR UPDATES
   o  Function 'genNLR()' was changed to generate dataset from
      generalized logistic regression model with 8 parameters.
 
-
-
 MINOR UPDATES
 
   o  The CITATION file was updated.
@@ -72,7 +67,6 @@ MINOR UPDATES
   o  Some default options of input were changed.
 
   o  'AIC()', 'BIC()' and 'logLik()' S3 methods added to 'difNLR()'
-
 
 ----------------------------------------
 - Changes in difNLR 0.2.0 (2016-11-09) -
@@ -94,7 +88,6 @@ MAJOR UPDATES
 
   o New function 'genNLR()' was added to generate scored (binary) data with
     model by 'difNLR'.
-
 
 MINOR UPDATES
 
