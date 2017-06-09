@@ -313,6 +313,9 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
 
     if(ncol(x$mlrPAR[[i]]) == 2)
       x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0, 0))
+    if(ncol(x$mlrPAR[[i]]) == 3)
+      x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0))
+
     prR <- prF <- c()
 
     for (j in 1:nrow(x$mlrPAR[[i]])){
