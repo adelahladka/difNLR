@@ -4,12 +4,13 @@
 *                                                  *
 ****************************************************
 ----------------------------------------
-- Changes in difNLR 1.0.3 (2017-06-09) -
+- Changes in difNLR 1.0.3 (2017-06-15) -
 ----------------------------------------
 
 MAJOR UPDATES
 
   o Bug of plot.ddfMLR() for nonuniform DDF was fixed.
+  o References were updated.
 
 ----------------------------------------
 - Changes in difNLR 1.0.2 (2017-06-06) -

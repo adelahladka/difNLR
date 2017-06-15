@@ -22,7 +22,7 @@
 #' @references
 #' Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 #'
-#' Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on
+#' Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on
 #' Non-Linear Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 #'
 #' @keywords datasets

@@ -20,10 +20,10 @@
 #' martinkova@cs.cas.cz \cr
 #'
 #' @references
-#' Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
+#' Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
 #' Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
 #'
-#' Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear
+#' Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear
 #' Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 #'
 #' @keywords datasets

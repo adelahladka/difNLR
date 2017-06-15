@@ -38,13 +38,18 @@
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
-#' Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+#' Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
+#' Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 #'
-#' Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+#' Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory
+#' Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
 #'
-#' Martinkova, P., Drabinova, A., Liaw Y.-L., Sanders E. A., McFarland J. L., Price R. M. (2016). Using DIF Analysis to Reveal Potential Equity Gaps in Conceptual Assessments. In review.
+#' Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
+#' Checking equity: Why Differential Item Functioning Analysis Should Be a Routine Part of Developing Conceptual
+#' Assessments. CBE-Life Sciences Education, 16(2), \url{http://www.lifescied.org/content/16/2/rm2}.
 #'
-#' Swaminathan, H. and Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures. Journal of Educational Measurement, 27, 361-370.
+#' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
+#' Journal of Educational Measurement, 27, 361-370.
 #'
 #' Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 #'

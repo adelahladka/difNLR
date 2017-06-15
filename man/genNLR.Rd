@@ -48,7 +48,8 @@ genNLR(N = 300, ratio = 5, parameters = parameters)
 }
 }
 \references{
-Drabinova, A. and Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
+Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 }
 \author{
 Adela Drabinova \cr

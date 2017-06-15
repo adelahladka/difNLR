@@ -23,9 +23,12 @@ same for both reference and focal group (Martinkova et al., 2016). The column \c
 represents generated continuous variable which is intended to be predicted by test.
 }
 \references{
-Kingston, N., Leary, L., and Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
+Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
 
-Martinkova, P., Drabinova, A., Liaw Y.-L., Sanders E. A., McFarland J. L., Price R. M. (2016). Using DIF Analysis to Reveal Potential Equity Gaps in Conceptual Assessments. In review.
+Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
+Checking equity: Why Differential Item Functioning Analysis Should Be a Routine Part of Developing Conceptual
+Assessments. CBE-Life Sciences Education, 16(2), \url{http://www.lifescied.org/content/16/2/rm2}.
 }
 \seealso{
 \code{\link{GMATtest}}, \code{\link{GMATkey}}
