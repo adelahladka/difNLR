@@ -8,13 +8,16 @@
 #' @param Data numeric: either the scored data matrix only, or the scored data
 #' matrix plus the vector of group. See \strong{Details}.
 #' @param group numeric or character: either the binary vector of group membership or
-#' the column indicator of group membership. See \strong{Details}.
+#' the column indicator (in \code{Data}) of group membership. See \strong{Details}.
 #' @param focal.name numeric or character: indicates the level of \code{group} which corresponds to
 #' focal group
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
-#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
-#' See \strong{Details}.
-#' @param test character: test to be performed for DIF detection (either "LR" (default), or "F").
+#' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
+#' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+#' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
+#' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
+#' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
+#' @param test character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
@@ -22,20 +25,20 @@
 #' containing initial item parameters estimates. See \strong{Details}.
 #' @param x an object of 'difNLR' class
 #' @param object an object of 'difNLR' class
-#' @param plot.type character: type of plot to be plotted (either "cc" for characteristic curve
-#' (default), or "stat" for test statistics). See \strong{Details}.
-#' @param item either character ("all"), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+#' @param plot.type character: type of plot to be plotted (either \code{"cc"} for characteristic curve
+#' (default), or \code{"stat"} for test statistics). See \strong{Details}.
+#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
 #' @param col character: single value, or vector of two values representing colors for plot.
 #' @param shape integer: shape parameter for plot.
 #' @param size numeric: single number, or vector of two numbers representing line width in plot.
 #' @param linetype numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.
 #' @param title string: title of plot.
 #' @param score numeric: standardized total score of subject.
-#' @param ... other generic parameters for \code{print}, \code{plot}, \code{fitted},
-#' \code{predict} or \code{coef} functions.
+#' @param ... other generic parameters for \code{print()}, \code{plot()}, \code{fitted()},
+#' \code{predict()} or \code{coef()} functions.
 #'
-#' @usage difNLR(Data, group, focal.name, model, type = "both",
-#' test = "LR", alpha = 0.05, p.adjust.method = "none", start)
+#' @usage difNLR(Data, group, focal.name, model, constraints, type = "both",
+#' match = "zscore", test = "LR", alpha = 0.05, p.adjust.method = "none", start)
 #'
 #' @details
 #' DIF detection procedure based on Non-Linear Regression is the extension of Logistic Regression
@@ -46,19 +49,45 @@
 #' the vector of group membership. If so, \code{group} is a column indicator of \code{Data}.
 #' Otherwise, \code{group} must be either a vector of the same length as \code{nrow(Data)}.
 #'
-#' The options of \code{model} are as follows: \code{Rasch} for one-parameter logistic model with
-#' discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
-#' model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
-#' \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
-#' \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-#' parameter for both groups.
+#' The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
+#' P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
+#' where x is standardized total score (also called Z-score) and g is group membership. Parameters a, b, c and d
+#' are discrimination, difficulty, guessing and inattention. Parameters aDif, bDif, cDif and dDif
+#' then represetn differences between two groups in discrimination, difficulty, guessing and inattention.
 #'
-#' The \code{type} corresponds to type of DIF to be tested. Possible values are \code{"both"} to
-#' detect any DIF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DIF or
-#' \code{"nudif"} to detect only non-uniform DIF.
+#' This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
+#' The arguments \code{model} and \code{constraints} can be also combined.
 #'
-#' The \code{p.adjust.method} is a character for \code{p.adjust} function from the \code{stats}
+#' The \code{model} argument offers several predefined models. The options are as follows:
+#' \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
+#' \code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+#' \code{2PL} for logistic regression model,
+#' \code{3PLcg} for 3PL model with fixed guessing for both groups,
+#' \code{3PLdg} for 3PL model with fixed inattention for both groups,
+#' \code{3PLc} (alternatively also \code{3PL}) for 3PL regression model with guessing parameter,
+#' \code{3PLd} for 3PL model with inattention parameter,
+#' \code{4PLcgdg} for 4PL model with fixed guessing and inattention parameter for both groups,
+#' \code{4PLcgd} (alternatively also \code{4PLd}) for 4PL model with fixed guessing for both groups,
+#' \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
+#' or \code{4PL} for 4PL model.
+#'
+#' The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
+#' arguments should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
+#' inattention (d) are fixed for both groups and other parameters (b and c) are not.
+#'
+#' The \code{type} corresponds to type of DIF to be tested. Possible values are
+#' \code{"both"} to detect any DIF caused by difference in difficulty or discrimination (i.e., uniform and/or non-uniform),
+#' \code{"udif"} to detect only uniform DIF (i.e., difference in difficulty b),
+#' \code{"nudif"} to detect only non-uniform DIF (i.e., difference in discrimination a), or
+#' \code{"all"} to detect DIF caused by difference caused by any parameter that can differed between groups. The \code{type}
+#' of DIF can be also specified in more detail by using combination of parameters a, b, c and d. For example, with an option
+#' \code{"c"} for 4PL model only the difference in parameter c is tested.
+#'
+#' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
+#' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
+#' in \code{Data}. Matching criterion is used in \code{NLR()} function as a covariate in non-linear regression model.
+#'
+#' The \code{p.adjust.method} is a character for \code{p.adjust()} function from the \code{stats}
 #' package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 #' \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
 #'
@@ -66,9 +95,9 @@
 #' First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
 #' for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
 #' of generalized logistic regression model between reference and focal group. If not specified, starting
-#' values are calculated with \code{startNLR} function.
+#' values are calculated with \code{startNLR()} function.
 #'
-#' The output of the difNLR is displayed by the \code{print.difNLR} function.
+#' The output of the difNLR is displayed by the \code{print.difNLR()} function.
 #'
 #' Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
 #' (default). The characteristic curve for item specified in \code{item} option is plotted. For default
@@ -80,15 +109,19 @@
 #' detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
 #' are used.
 #'
-#' Fitted values are extracted by the \code{fitted.difNLR} function for item(s) specified in
+#' Fitted values are extracted by the \code{fitted.difNLR()} function for item(s) specified in
 #' \code{item} argument.
 #'
-#' Predicted values are produced by the \code{predict.difNLR} function for item(s) specified in
+#' Predicted values are produced by the \code{predict.difNLR()} function for item(s) specified in
 #' \code{item} argument. \code{score} represents standardized total score of new subject and
 #' \code{group} argument represents group membership of new subject.
 #'
 #' Missing values are allowed but discarded for item estimation. They must be coded as
 #' \code{NA} for both, \code{data} and \code{group} parameters.
+#'
+#' In case that model considers difference in guessing or inattention parameter, the different parameterization is
+#' used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
+#' alternative parameterization.
 #'
 #' @return A list of class 'difNLR' with the following arguments:
 #' \describe{
@@ -105,7 +138,9 @@
 #'   \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or
 #'   \code{"No DIF item detected"}.}
 #'   \item{\code{model}}{fitted model.}
-#'   \item{\code{type}}{character: type of DIF that was tested.}
+#'   \item{\code{type}}{character: type of DIF that was tested. If parameters were specified, the value is \code{"other"}.}
+#'   \item{\code{types}}{character: the parameters (specified by user, \code{type} has value \code{"other"}) which were
+#'   tested for difference.}
 #'   \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
 #'   \item{\code{pval}}{the p-values by likelihood ratio test.}
 #'   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
@@ -122,7 +157,6 @@
 #'   \item{\code{BICM1}}{BIC of alternative model.}
 #' }
 #'
-#'
 #' @author
 #' Adela Drabinova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -137,6 +171,9 @@
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
+#' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
+#'
 #' Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
 #' Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 #'
@@ -155,7 +192,7 @@
 #'
 #' # Testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
-#' x <- difNLR(Data, group, focal.name = 1, model = "3PLcg")
+#' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
 #' # Testing both DIF effects using F test and
 #' # 3PL model with fixed guessing for groups
@@ -166,16 +203,20 @@
 #' # and Benjamini-Hochberg correction
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")
 #'
-#' # Testing both DIF effects using Rasch model
-#' difNLR(Data, group, focal.name = 1, model = "Rasch")
+#' # Testing both DIF effects using 3PL model with fixed guessing for groups
+#' # and total score as matching criterion
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score")
 #'
-#' # Testing both DIF effects using 2PL model
-#' difNLR(Data, group, focal.name = 1, model = "2PL")
+#' # Testing uniform DIF effects using 4PL model with the same
+#' # guessing and inattention
+#' difNLR(Data, group, focal.name = 1, model = "4PLcgdg", type = "udif")
 #'
-#' # Testing uniform DIF effects
-#' difNLR(Data, group, focal.name = 1, model = "2PL", type = "udif")
-#' # Testing non-uniform DIF effects
+#' # Testing non-uniform DIF effects using 2PL model
 #' difNLR(Data, group, focal.name = 1, model = "2PL", type = "nudif")
+#'
+#' # Testing difference in parameter b using 4PL model with fixed
+#' # a and c parameters
+#' difNLR(Data, group, focal.name = 1, model = "4PL", constraints = "ac", type = "b")
 #'
 #' # Graphical devices
 #' plot(x)
@@ -202,39 +243,68 @@
 #' @export
 
 
-difNLR <- function(Data, group, focal.name, model,
+difNLR <- function(Data, group, focal.name, model, constraints,
                    type = "both",
+                   match = "zscore",
                    test = "LR", alpha = 0.05,
                    p.adjust.method = "none", start
                    )
 {
   if (type == "nudif" & model == "1PL")
-    stop("Detection of non-uniform DIF is not possible with 1PL model!",
-         call. = FALSE)
+    stop("Detection of non-uniform DIF is not possible with 1PL model!", call. = FALSE)
   if (type == "nudif" & model == "Rasch")
-    stop("Detection of non-uniform DIF is not possible with Rasch model!",
-         call. = FALSE)
-  if (!type %in% c("udif", "nudif", "both") | !is.character(type))
-    stop("'type' must be either 'udif', 'nudif' or 'both'",
-         call. = FALSE)
+    stop("Detection of non-uniform DIF is not possible with Rasch model!", call. = FALSE)
+  # input check
+  ### model
+  if (missing(model)) {
+    stop("'model' is missing", call. = FALSE)
+  } else {
+    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd", "4PLcgdg", "4PLcgd",
+                       "4PLd", "4PLcdg", "4PLc", "4PL"))){
+      stop("Invalid value for 'model'", call. = FALSE)
+    }
+  }
+  ### constraints
+  if (!(missing(constraints))){
+    constr <- unique(unlist(strsplit(constraints, split = "")))
+    if (!all(constr %in% letters[1:4])){
+      stop("Constraints can be only 'a', 'b', 'c' or 'd'!")
+    }
+    if (!(type %in% c("udif", "nudif", "both", "all"))){
+      types <- unlist(strsplit(type, split = ""))
+      if (length(intersect(types, constr)) > 0){
+        stop("The difference in constrained parameters cannot be tested!")
+      }
+    }
+  } else {
+    constraints <- NULL
+  }
+  ### matching criterion
+  if (!(match %in% c("score", "zscore"))){
+    if (length(match) != dim(Data)[1]){
+      stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
+           of observations in 'Data'!")
+    }
+  }
+  ### type of DIF to be tested
+  if (!(type %in% c("udif", "nudif", "both", "all"))){
+    types <- unique(unlist(strsplit(type, split = "")))
+    if (!all(types %in% letters[1:4])){
+      stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
+           or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'")
+    }
+  }
+  ### test
   if (!test %in% c("F", "LR") | !is.character(type))
-    stop("'test' must be either 'F' or 'LR'",
-         call. = FALSE)
+    stop("'test' must be either 'F' or 'LR'", call. = FALSE)
+  ### significance level
   if (alpha > 1 | alpha < 0)
-    stop("'alpha' must be between 0 and 1",
-         call. = FALSE)
+    stop("'alpha' must be between 0 and 1", call. = FALSE)
+  ### starting values
   if (missing(start)) {
     start <- NULL
   }
-  if (missing(model)) {
-    stop("'model' is missing",
-         call. = FALSE)
-  } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "4PLcgdg"))){
-      stop("Invalid value for 'model'",
-           call. = FALSE)
-    }
-  }
+  # internal NLR function
   internalNLR <- function() {
     if (length(group) == 1) {
       if (is.numeric(group)) {
@@ -253,17 +323,12 @@ difNLR <- function(Data, group, focal.name, model,
     if (length(levels(as.factor(GROUP))) != 2)
       stop("'group' must be binary vector", call. = FALSE)
     if (is.matrix(DATA) | is.data.frame(DATA)) {
-      if (!all(apply(DATA, 2, function(i) {
-        length(levels(as.factor(i))) == 2
-      })))
-        stop("'Data' must be data frame or matrix of binary vectors",
-             call. = FALSE)
+      if (!all(apply(DATA, 2, function(i) { length(levels(as.factor(i))) == 2 })))
+        stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
       if (nrow(DATA) != length(GROUP))
-        stop("'Data' must have the same number of rows as is length of vector 'group'",
-             call. = FALSE)
+        stop("'Data' must have the same number of rows as is length of vector 'group'", call. = FALSE)
     } else {
-      stop("'Data' must be data frame or matrix of binary vectors",
-           call. = FALSE)
+      stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
     }
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
@@ -274,23 +339,25 @@ difNLR <- function(Data, group, focal.name, model,
     GROUP <- df[, "GROUP"]
     DATA <- df[, colnames(df) != "GROUP"]
 
-    if (is.null(start)) {
-      start <- startNLR(DATA, GROUP, model)
+    if (is.null(start)){
+      if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
+        parameterization <- "alternative"
+        start <- startNLR(Data, group, model, match = match, parameterization = parameterization)
+        } else {
+          parameterization <- "classic"
+          start <- startNLR(Data, group, model, match = match, parameterization = parameterization)
+        }
     } else {
-      if (ncol(start) != 5 & type != "udif")
-        stop("'start' must be data frame or matrix with 5 columns",
-             call. = FALSE)
-      if (ncol(start) != 4 & type == "udif")
-        stop("'start' must be data frame or matrix with 4 columns for detecting uniform DIF",
-             call. = FALSE)
-      if (nrow(start) != ncol(Data))
-        stop("'start' must be data frame or matrix with starting values for each item",
-             call. = FALSE)
+      if (ncol(start) != 8 | nrow(start) != ncol(DATA)){
+        stop("'start' must be data frame or matrix with 8 columns and the number of its rows need
+             to correspond to number of items!", call. = FALSE)
+      }
+      colnames(start) <- c(letters[1:4], paste(letters[1:4], "Dif", sep = ""))
     }
 
-    PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, type = type, start = start,
-                p.adjust.method = p.adjust.method, test = test,
-                alpha = alpha))
+    PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
+                                 start = start, p.adjust.method = p.adjust.method, test = test,
+                                 alpha = alpha))
     STATS <- PROV$Sval
     ADJ.PVAL <- PROV$adjusted.pval
     significant <- which(ADJ.PVAL < alpha)
@@ -309,14 +376,18 @@ difNLR <- function(Data, group, focal.name, model,
     } else {
       DIFitems <- "No DIF item detected"
     }
-
+    types <- NULL
+    if (!(type %in% c("udif", "nudif", "both", "all"))){
+      types <- unlist(strsplit(type, split = ""))
+      type <- "other"
+    }
     RES <- list(Sval = STATS,
                 nlrPAR = nlrPAR, nlrSE = nlrSE,
                 parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
                 parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
                 alpha = alpha, DIFitems = DIFitems,
-                model = model,
-                type = type, p.adjust.method = p.adjust.method,
+                model = model, constraints = constraints,
+                type = type, types = types, p.adjust.method = p.adjust.method,
                 pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
                 adjusted.p = NULL, test = test,
                 group = GROUP, Data = DATA,
@@ -324,7 +395,6 @@ difNLR <- function(Data, group, focal.name, model,
                 llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                 AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
                 BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
-    # , thr = Q
     class(RES) <- "difNLR"
     return(RES)
   }
@@ -338,28 +408,37 @@ difNLR <- function(Data, group, focal.name, model,
 #' @rdname difNLR
 #' @export
 print.difNLR <- function (x, ...){
-  title <- switch(x$type,
-                  both = "Detection of both types of Differential Item Functioning using Generalized Logistic Regression Model",
-                  udif = "Detection of uniform Differential Item Functioning using Generalized Logistic Regression Model",
-                  nudif = "Detection of non-uniform Differential Item Functioning using Generalized Logistic Regression Model")
-  cat(paste(strwrap(title, width = 60), collapse = "\n"))
-  cat(paste(switch(x$test,
-                   "F" = "\n\nGeneralized Logistic Regression F-test statistics based on",
-                   "LR" = "\n\nGeneralized Logistic Regression Likelihood Ratio chi-square statistics based on\n"),
+  cat(paste("Detection of",
+            switch(x$type,
+                   both = " both types of ", udif = " uniform ", nudif = " non-uniform ", all = " all types of ",
+                   other = " "),
+            "Differential Item Functioning\n",
+            switch(x$type,
+                   both = "", udif = "", nudif = "", all = "",
+                   other = paste("caused by difference in", x$types, "parameter\n")),
+            "using Generalized Logistic Regression Model", sep = ""))
+  cat(paste("\n\nGeneralized Logistic Regression", switch(x$test, "F" = " F-test ", "LR" = " Likelihood Ratio chi-square "),
+            "statistics \nbased on ",
             switch(x$model,
                    "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
                    "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
                    "3PLdg" = "3PL model with fixed inattention parameter for groups",
                    "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
-                   "4PLcgdf" = "4PL model with fixed guessing and inattention parameter for groups",
-                   "4PLcg" = "4PL model with fixed guessing for groups",
-                   "4PLdg" = "4PL model with fixed inattention parameter for groups",
-                   "4PL" = "4PL model")), "\n")
+                   "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
+                   "4PLcgd" = "4PL model with fixed guessing for groups",
+                   "4PLd" = "4PL model with fixed guessing for groups",
+                   "4PLcdg" = "4PL model with fixed inattention parameter for groups",
+                   "4PLc" = "4PL model with fixed inattention parameter for groups",
+                   "4PL" = "4PL model"),
+            ifelse(is.null(x$constraints), "",
+                   paste(" with constraints on",
+                         paste(unique(unlist(strsplit(x$constraints, split = ""))), collapse = ", "),
+                         "parameter")), sep = ""), "\n")
   if (x$p.adjust.method == "none") {
-    cat("No p-value adjustment for multiple comparisons\n\n")
+    cat("\nNo p-value adjustment for multiple comparisons\n\n")
   }
   else {
-    cat(paste("Multiple comparisons made with",
+    cat(paste("\nMultiple comparisons made with",
               switch(x$p.adjust.method,
                      holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
                      bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
@@ -384,7 +463,6 @@ print.difNLR <- function (x, ...){
                             "LR" = c("Chisq-value", "P-value", "Adj. P-value", ""))
   }
 
-  # rownames(tab) <- paste("Item", 1:length(x$adj.pval))
   rownames(tab) <- colnames(x$Data)
 
   print(tab, quote = F, digits = 4, zero.print = F)
@@ -393,14 +471,10 @@ print.difNLR <- function (x, ...){
   critical <- ifelse(x$test == "F", qf(1 - x$alpha, x$df[1], x$df[2]), qchisq(1 - x$alpha, x$df))
   cat(paste("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")", sep = ""))
   if (is.character(x$DIFitems)) {
-    switch(x$type, both = cat("\nNone of items is detected as DIF"),
-           udif = cat("\nNone of items is detected as uniform DIF"),
-           nudif = cat("\nNone of items is detected as non-uniform DIF"))
+    cat("\nNone of items is detected as DIF")
   }
   else {
-    switch(x$type, both = cat("\n\nItems detected as DIF items:"),
-           udif = cat("\n\nItems detected as uniform DIF items:"),
-           nudif = cat("\n\nItems detected as non-uniform DIF items:"))
+    cat("\n\nItems detected as DIF items:")
     cat("\n", paste(colnames(x$Data)[x$DIFitems], "\n", sep = ""))
   }
 }
@@ -431,7 +505,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     }
 
     if(missing(title)){
-      title <- "Non-linear regression DIF detection \n with none multiple comparison correction"
+      title <- "Non-linear regression DIF detection with none multiple comparison correction"
     }
     n <- nrow(x$Data)
     Sval_critical <- switch(x$test,

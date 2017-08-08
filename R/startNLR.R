@@ -5,23 +5,37 @@
 #' "0" for reference group, "1" for focal group.
 #' @param model character: generalized logistic regression model
 #' to be fitted. See \strong{Details}.
+#' @param match vector of matching criterion. Its length need to be the same as number
+#' of observations in \code{Data}.
 #' @param parameterization character: parameterization of regression
-#' coefficients. Possible options are \code{"IRT"} (Item response theory,
-#' default option) and \code{"LR"} (Logistic regression)
+#' coefficients. Possible options are \code{"classic"} (IRT parameterization),
+#' \code{"alternative"} (default) and \code{"logistic"} (logistic regression).
+#' See \strong{Details}.
 #'
 #' @description Calculates starting values for \code{difNLR} function based
 #' on linear approximation.
 #'
-#' @usage startNLR(Data, group, model, parameterization = "IRT")
+#' @usage startNLR(Data, group, model, match = "zscore", parameterization = "alternative")
 #'
 #' @details
-#' The options of \code{model} are as follows: \code{Rasch} for one-parameter logistic model with
-#' discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
-#' model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
-#' \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
-#' \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-#' parameter for both groups.
+#' The \code{model} argument offers several predefined models. The options are as follows:
+#' \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
+#' \code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+#' \code{2PL} for logistic regression model,
+#' \code{3PLcg} for 3PL model with fixed guessing for both groups,
+#' \code{3PLdg} for 3PL model with fixed inattention for both groups,
+#' \code{3PLc} (alternatively also \code{3PL}) for 3PL regression model with guessing parameter,
+#' \code{3PLd} for 3PL model with inattention parameter,
+#' \code{4PLcgdg} for 4PL model with fixed guessing and inattention parameter for both groups,
+#' \code{4PLcgd} (alternatively also \code{4PLd}) for 4PL model with fixed guessing for both groups,
+#' \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
+#' or \code{4PL} for 4PL model.
+#'
+#' Three possible parameterization can be specified in \code{"parameterization"} argument: \code{"classic"}
+#' returns IRT parameters of reference group and differences in these parameters between reference and focal group.
+#' \code{"alternative"} returns IRT parameters of reference group, the differences in parameters a and b between
+#' two groups and parameters c and d for focal group. \code{"logistic"} returns parameters in logistic regression
+#' parameterization.
 #'
 #' @return
 #' A data.frame containing rows representing items and 5 columns representing parameters of \code{difNLR} model. First column represents discrimination (a), second difficulty (b), third guessing (c), fourth difference in discrimination between reference and focal group (aDif) and fifth difference in difficulty between reference and focal group (bDif).
@@ -45,33 +59,54 @@
 #' # loading data based on GMAT
 #' data(GMAT)
 #'
-#' Data  <- GMAT[, colnames(GMAT) != "group"]
+#' Data  <- GMAT[, 1:20]
 #' group <- GMAT[, "group"]
 #'
 #' # starting values for 3PL model
 #' startNLR(Data, group, model = "3PL")
+#'
+#' # starting values for 3PL model
+#' # with score as matching criterion
+#' startNLR(Data, group, model = "3PL", match = "score")
+#'
 #' }
 #' @export
-#'
-startNLR <- function(Data, group, model, parameterization = "IRT"){
+
+startNLR <- function(Data, group, model, match = "zscore", parameterization = "alternative"){
   if (missing(model)) {
     stop("'model' is missing",
          call. = FALSE)
   } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "4PLcgdg"))){
+    if (!(model %in% c("Rasch", "1PL", "2PL",
+                       "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
+                       "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"))){
       stop("Invalid value for 'model'",
            call. = FALSE)
     }
   }
-  startNLR_line <- function(DATA){
-    stand_total_score <- c(scale(apply(DATA, 1, sum)))
 
-    Q3 <- cut(stand_total_score, quantile(stand_total_score, (0:3) / 3),
+  startNLR_line <- function(match, DATA){
+    if (match == "zscore"){
+      covar <- scale(apply(DATA, 1, sum))
+    } else {
+      if (match == "score"){
+        covar <- as.numeric(apply(DATA, 1, sum))
+      } else {
+        if (length(match) == dim(DATA)[1]){
+          covar <- match
+        } else {
+          stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of
+                the same length as number of observations in 'Data'!")
+        }
+      }
+    }
+
+    Q3 <- cut(covar, quantile(covar, (0:3) / 3),
               c("I", "II", "III"),
               include.lowest = TRUE)
 
-    x <- cbind(mean(stand_total_score[Q3 == "I"]), apply(DATA[Q3 == "I", ], 2, mean))
-    y <- cbind(mean(stand_total_score[Q3 == "III"]), apply(DATA[Q3 == "III", ], 2, mean))
+    x <- cbind(mean(covar[Q3 == "I"], na.rm = T), colMeans(DATA[Q3 == "I", ], na.rm = T))
+    y <- cbind(mean(covar[Q3 == "III"], na.rm = T), colMeans(DATA[Q3 == "III", ], na.rm = T))
     u1 <- y[, 1] - x[, 1]
     u2 <- y[, 2] - x[, 2]
 
@@ -83,12 +118,12 @@ startNLR <- function(Data, group, model, parameterization = "IRT"){
     return(results)
   }
 
-  line <- startNLR_line(Data)
+  line <- startNLR_line(match, DATA = Data)
 
   data_R <- Data[group == 0, ] ### reference group
   data_F <- Data[group == 1, ] ### foal group
-  line_R <- startNLR_line(data_R)
-  line_F <- startNLR_line(data_F)
+  line_R <- startNLR_line(match, DATA = data_R)
+  line_F <- startNLR_line(match, DATA = data_F)
 
   if (model %in% c("Rasch", "1PL", "2PL", "3PLdg", "3PLd")){
     c_R <- c_F <- 0
@@ -102,7 +137,7 @@ startNLR <- function(Data, group, model, parameterization = "IRT"){
   }
 
 
-  if (model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLc")){
+  if (model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLc", "3PL")){
     d_R <- d_F <- 1
   } else {
     if (grepl("dg", model)){
@@ -127,13 +162,19 @@ startNLR <- function(Data, group, model, parameterization = "IRT"){
   b_R <- ((1 + c_R)/2 - line_R$q)/line_R$k
   b_F <- ((1 + c_F)/2 - line_F$q)/line_F$k
 
+  # b_R[b_R > max(covar)] <- max(covar, na.rm = T)
+  # b_F[b_F > max(covar)] <- max(covar, na.rm = T)
+  # b_R[b_R < min(covar)] <- min(covar, na.rm = T)
+  # b_F[b_F < min(covar)] <- min(covar, na.rm = T)
 
   results <- switch(parameterization,
-                    IRT = data.frame(a_R, b_R, c_R, d_R,
-                                     a_F - a_R, b_F - b_R, c_F - c_R, d_F - d_R),
-                    logistic = data.frame(a_R, -a_R * b_R, c_R, d_R,
-                                          a_F - a_R, -a_R * b_R + a_F * b_F, c_F - c_R, d_F - d_R))
-  colnames(results) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+                    classic = data.frame("a" = a_R, "b" = b_R, "c" = c_R, "d" = d_R,
+                                         "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cDif" = c_F - c_R, "dDif" = d_F - d_R),
+                    alternative = data.frame("a" = a_R, "b" = b_R, "cR" = c_R, "dR" = d_R,
+                                             "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cF" = c_F, "dF" = d_F),
+                    logistic = data.frame("b1" = a_R, "b0" = -a_R * b_R, "c" = c_R, "d" = d_R,
+                                          "b3" = a_F - a_R, "b2" = -a_R * b_R + a_F * b_F, "cDif" = c_F - c_R, "dDif" = d_F - d_R))
+
   return(results)
 }
 

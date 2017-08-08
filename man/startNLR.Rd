@@ -4,7 +4,7 @@
 \alias{startNLR}
 \title{Calculates starting values for \code{difNLR} function.}
 \usage{
-startNLR(Data, group, model, parameterization = "IRT")
+startNLR(Data, group, model, match = "zscore", parameterization = "alternative")
 }
 \arguments{
 \item{Data}{numeric: a matrix or data.frame of binary data.}
@@ -15,9 +15,13 @@ startNLR(Data, group, model, parameterization = "IRT")
 \item{model}{character: generalized logistic regression model
 to be fitted. See \strong{Details}.}
 
+\item{match}{vector of matching criterion. Its length need to be the same as number
+of observations in \code{Data}.}
+
 \item{parameterization}{character: parameterization of regression
-coefficients. Possible options are \code{"IRT"} (Item response theory,
-default option) and \code{"LR"} (Logistic regression)}
+coefficients. Possible options are \code{"classic"} (IRT parameterization),
+\code{"alternative"} (default) and \code{"logistic"} (logistic regression).
+See \strong{Details}.}
 }
 \value{
 A data.frame containing rows representing items and 5 columns representing parameters of \code{difNLR} model. First column represents discrimination (a), second difficulty (b), third guessing (c), fourth difference in discrimination between reference and focal group (aDif) and fifth difference in difficulty between reference and focal group (bDif).
@@ -27,24 +31,40 @@ Calculates starting values for \code{difNLR} function based
 on linear approximation.
 }
 \details{
-The options of \code{model} are as follows: \code{Rasch} for one-parameter logistic model with
-discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
-model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
-\code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-\code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
-\code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-parameter for both groups.
+The \code{model} argument offers several predefined models. The options are as follows:
+\code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
+\code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+\code{2PL} for logistic regression model,
+\code{3PLcg} for 3PL model with fixed guessing for both groups,
+\code{3PLdg} for 3PL model with fixed inattention for both groups,
+\code{3PLc} (alternatively also \code{3PL}) for 3PL regression model with guessing parameter,
+\code{3PLd} for 3PL model with inattention parameter,
+\code{4PLcgdg} for 4PL model with fixed guessing and inattention parameter for both groups,
+\code{4PLcgd} (alternatively also \code{4PLd}) for 4PL model with fixed guessing for both groups,
+\code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
+or \code{4PL} for 4PL model.
+
+Three possible parameterization can be specified in \code{"parameterization"} argument: \code{"classic"}
+returns IRT parameters of reference group and differences in these parameters between reference and focal group.
+\code{"alternative"} returns IRT parameters of reference group, the differences in parameters a and b between
+two groups and parameters c and d for focal group. \code{"logistic"} returns parameters in logistic regression
+parameterization.
 }
 \examples{
 \dontrun{
 # loading data based on GMAT
 data(GMAT)
 
-Data  <- GMAT[, colnames(GMAT) != "group"]
+Data  <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
 # starting values for 3PL model
 startNLR(Data, group, model = "3PL")
+
+# starting values for 3PL model
+# with score as matching criterion
+startNLR(Data, group, model = "3PL", match = "score")
+
 }
 }
 \references{

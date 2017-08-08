@@ -2,22 +2,26 @@
 #'
 #' @aliases NLR
 #'
-#' @description Performs DIF detection procedure based on Non-Linear Regression and either F-test or likelihood ratio test of submodel.
+#' @description Performs DIF detection procedure based on Non-Linear Regression and either
+#' likelihood ratio test or F-test of submodel.
 #'
 #' @param Data numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
 #' See \strong{Details}.
-#' @param group numeric: binary vector of group membership. "0" for reference group, "1" for focal group.
+#' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
-#' @param type character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
-#' See \strong{Details}.
+#' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
+#' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+#' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
+#' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
+#' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
 #' @param start numeric: matrix with n rows (where n is the number of items) and 8 columns containing initial
 #' item parameters estimates. See \strong{Details}.
-#' @param test character: test to be performed for DIF detection (either "LR" (default), or "F").
+#' @param test character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage NLR(Data, group, model, type = "both", start,
+#' @usage NLR(Data, group, model, constraints, type = "both", match = "zscore", start,
 #' p.adjust.method = "none", test = "LR", alpha = 0.05)
 #'
 #' @details
@@ -28,17 +32,43 @@
 #' ("1" correct, "0" incorrect) and columns correspond to the items.
 #' The \code{group} must be a vector of the same length as \code{nrow(data)}.
 #'
-#' The options of \code{model} are as follows: \code{Rasch} for one-parameter logistic model with
-#' discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
-#' model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
-#' \code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-#' \code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
-#' \code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-#' parameter for both groups.
-
-#' The \code{type} corresponds to type of DIF to be tested. Possible values
-#' are \code{"both"} to detect any DIF (uniform and/or non-uniform), \code{"udif"}
-#' to detect only uniform DIF or \code{"nudif"} to detect only non-uniform DIF.
+#' The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
+#' P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
+#' where x is standardized total score (also called Z-score) and g is group membership. Parameters a, b, c and d
+#' are discrimination, difficulty, guessing and inattention. Parameters aDif, bDif, cDif and dDif
+#' then represetn differences between two groups in discrimination, difficulty, guessing and inattention.
+#'
+#' This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
+#' The arguments \code{model} and \code{constraints} can be also combined.
+#'
+#' The \code{model} argument offers several predefined models. The options are as follows:
+#' \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
+#' \code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+#' \code{2PL} for logistic regression model,
+#' \code{3PLcg} for 3PL model with fixed guessing for both groups,
+#' \code{3PLdg} for 3PL model with fixed inattention for both groups,
+#' \code{3PLc} (alternatively also \code{3PL}) for 3PL regression model with guessing parameter,
+#' \code{3PLd} for 3PL model with inattention parameter,
+#' \code{4PLcgdg} for 4PL model with fixed guessing and inattention parameter for both groups,
+#' \code{4PLcgd} (alternatively also \code{4PLd}) for 4PL model with fixed guessing for both groups,
+#' \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
+#' or \code{4PL} for 4PL model.
+#'
+#' The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
+#' arguments should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
+#' inattention (d) are fixed for both groups and other parameters (b and c) are not.
+#'
+#' The \code{type} corresponds to type of DIF to be tested. Possible values are
+#' \code{"both"} to detect any DIF caused by difference in difficulty or discrimination (i.e., uniform and/or non-uniform),
+#' \code{"udif"} to detect only uniform DIF (i.e., difference in difficulty b),
+#' \code{"nudif"} to detect only non-uniform DIF (i.e., difference in discrimination a), or
+#' \code{"all"} to detect DIF caused by difference caused by any parameter that can differed between groups. The \code{type}
+#' of DIF can be also specified in more detail by using combination of parameters a, b, c and d. For example, with an option
+#' \code{"c"} for 4PL model only the difference in parameter c is tested.
+#'
+#' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
+#' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
+#' in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
 #'
 #' The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
 #' First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
@@ -50,6 +80,10 @@
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 #' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"},
 #' \code{"none"}.
+#'
+#' In case that model considers difference in guessing or inattention parameter, the different parameterization is
+#' used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
+#' alternative parameterization.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -87,6 +121,9 @@
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
+#' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
+#'
 #' Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
 #' Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 #'
@@ -107,96 +144,79 @@
 #' # and model with fixed guessing for both groups
 #' NLR(Data, group, model = "3PLcg")
 #'
-#' # using F test
+#' # Using F test
 #' NLR(Data, group, model = "3PLcg", test = "F")
 #'
 #' # Testing both DIF effects with Benjamini-Hochberg correction
 #' NLR(Data, group, model = "3PLcg", p.adjust.method = "BH")
 #'
-#' # Testing uniform DIF effects
-#' NLR(Data, group, model = "3PLcg", type = "udif")
-#' # Testing non-uniform DIF effects
-#' NLR(Data, group, model = "3PLcg", type = "nudif")
+#' # 4PL model with the same guessing and inattention
+#' # to test uniform DIF
+#' NLR(Data, group, model = "4PLcgdg", type = "udif")
+#'
+#' # 2PL model to test non-uniform DIF
+#' NLR(Data, group, model = "2PL", type = "nudif")
+#'
+#' # 4PL model with fixed a and c parameter
+#' # to test difference in b
+#' NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
+#'
 #' }
 #' @keywords DIF
 #' @export
 #' @importFrom stats AIC BIC logLik
+#' @importFrom msm deltamethod
 
 
-NLR <- function(Data, group, model, type = "both", start,
+NLR <- function(Data, group, model, constraints, type = "both",
+                match = "zscore",
+                start,
                 p.adjust.method = "none", test = "LR", alpha = 0.05){
 
-  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
-    return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
-  }
-
-  if(missing(start)){
-    start <- startNLR(Data, group, model)
-  }
-  start_m0 <- start_m1 <- start
-  start_m1[, "aDif"] <- 0
-  if (!(type == "nudif")){
-    start_m1[, "bDif"] <- 0
-    if (type == "udif"){
-      start_m0[, "aDif"] <- 0
+  if (match == "zscore"){
+    x <- scale(apply(Data, 1, sum))
+  } else {
+    if (match == "score"){
+      x <- apply(Data, 1, sum)
+    } else {
+      if (length(match) == dim(Data)[1]){
+        x <- match
+      } else {
+        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
+             of observations in 'Data'!")
+      }
     }
   }
 
-  constr <- constrNLR(model = model, type = type)
-  lowerM0 <- constr["lowerM0", ]; upperM0 <- constr["upperM0", ]
-  lowerM1 <- constr["lowerM1", ]; upperM1 <- constr["upperM1", ]
-
-  fixedM0 <- lowerM0[lowerM0 == upperM0]
-  fixedM1 <- lowerM1[lowerM1 == upperM1]
-
-  x <- scale(apply(Data, 1, sum))
   m <- ncol(Data)
   n <- nrow(Data)
 
-  if (length(fixedM0) == 0){
-    whM0 <- colnames(start_m0)
+
+  if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
+    parameterization <- "alternative"
   } else {
-    for (i in 1:length(fixedM0)){
-      assign(names(fixedM0)[i], fixedM0[i])
-    }
-    whM0 <- colnames(start_m0)[(!(colnames(start_m0) %in% names(fixedM0)))]
-    start_m0 <- structure(data.frame(start_m0[, whM0]), .Names = whM0)
-    lowerM0 <- lowerM0[whM0]; upperM0 <- upperM0[whM0]
+    parameterization <- "classic"
   }
 
-  m0 <- lapply(1:m, function(i) tryCatch(nls(Data[, i] ~ gNLR(x, group, a, b, c, d, aDif, bDif, cDif, dDif),
+  M <- formulaNLR(model = model, type = type, constraints, parameterization = parameterization)
+  m0 <- lapply(1:m, function(i) tryCatch(nls(formula = M$M0$formula,
+                                             data = data.frame(y = Data[, i], g = group, x = x),
                                              algorithm = "port",
-                                             start = structure(start_m0[i, ], .Names = whM0),
-                                             lower = lowerM0,
-                                             upper = upperM0),
-                                         error = function(e){cat("ERROR : ",
-                                                                 conditionMessage(e), "\n")},
+                                             start = start[i, M$M0$parameters],
+                                             lower = M$M0$lower,
+                                             upper = M$M0$upper),
+                                         error = function(e){cat("ERROR : ", conditionMessage(e), "\n")},
                                          finally = ""))
 
-  if (length(fixedM0) != 0){
-    for (i in 1:length(fixedM0)){
-      rm(list = as.character(names(fixedM0)[i]))
-    }
-  }
-
-  whM1 <- colnames(start_m1)[(!(colnames(start_m1) %in% names(fixedM1)))]
-  start_m1 <- structure(data.frame(start_m1[, whM1]), .Names = whM1)
-
-  lowerM1 <- lowerM0[whM1]; upperM1 <- upperM0[whM1]
-
-  for (i in 1:length(fixedM1)){
-    assign(names(fixedM1)[i], fixedM1[i])
-  }
-
-  m1 <- lapply(1:m, function(i) tryCatch(nls(Data[, i] ~ gNLR(x, group, a, b, c, d, aDif, bDif, cDif, dDif),
+  m1 <- lapply(1:m, function(i) tryCatch(nls(formula = M$M1$formula,
+                                             data = data.frame(y = Data[, i], g = group, x = x),
                                              algorithm = "port",
-                                             start = structure(start_m1[i, ], .Names = whM1),
-                                             lower = lowerM1,
-                                             upper = upperM1),
-                                         error = function(e){cat("ERROR : ",
-                                                                 conditionMessage(e), "\n")},
+                                             start = start[i, M$M1$parameters],
+                                             lower = M$M1$lower,
+                                             upper = M$M1$upper),
+                                         error = function(e){cat("ERROR : ", conditionMessage(e), "\n")},
                                          finally = ""))
-
+  # convergence failures
   cfM0 <- unlist(lapply(m0, is.null)); cfM1 <- unlist(lapply(m1, is.null))
   conv.fail <- sum(cfM0, cfM1)
   conv.fail.which <- which(cfM0 | cfM1)
@@ -204,37 +224,35 @@ NLR <- function(Data, group, model, type = "both", start,
   if (conv.fail > 0) {
     warning("Convergence failure")
   }
-
+  # test
   if (test == "F"){
     pval <- Fval <- rep(NA, m)
-    df <- switch(type,
-                 both = c(2, n - 5),
-                 udif = c(1, n - 4),
-                 nudif = c(1, n - 5))
+
+    df <- c(length(M$M0$parameters) - length(M$M1$parameters), n -  length(M$M0$parameters))
     Fval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 |  cfM0)),
-                                                        function(l) ((m1[[l]]$m$deviance() - m0[[l]]$m$deviance())/df[1])/(m0[[l]]$m$deviance()/df[2]))
+                                          function(l) ((m1[[l]]$m$deviance() - m0[[l]]$m$deviance())/df[1])/(m0[[l]]$m$deviance()/df[2]))
     pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
-                                                        function(l) (1 - pf(Fval[l], df[1], df[2])))
+                                          function(l) (1 - pf(Fval[l], df[1], df[2])))
   } else {
     pval <- LRval <- rep(NA, m)
-    df <- switch(type,
-                 both = 2,
-                 udif = 1,
-                 nudif = 1)
-    LRval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 |  cfM0)),
-                                                         function(l) -2 * c(logLik(m1[[l]]) - logLik(m0[[l]])))
-    pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
-                                                        function(l) (1 - pchisq(LRval[l], df)))
-  }
 
+    df <- length(M$M0$parameters) - length(M$M1$parameters)
+    LRval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 |  cfM0)),
+                                           function(l) -2 * c(logLik(m1[[l]]) - logLik(m0[[l]])))
+    pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
+                                          function(l) (1 - pchisq(LRval[l], df)))
+  }
+  # likelihood
   ll.m0 <- ll.m1 <- lapply(1:m, function(i) NA)
   ll.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], logLik)
   ll.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], logLik)
-
+  # adjusted p-values
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
-
-  par.m1 <- se.m1 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(lowerM1))), .Names = names(lowerM1))
-  par.m0 <- se.m0 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(lowerM0))), .Names = names(lowerM0))
+  # parameters
+  par.m1 <- se.m1 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(M$M1$parameters))),
+                               .Names = M$M1$parameters)
+  par.m0 <- se.m0 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(M$M0$parameters))),
+                               .Names = M$M0$parameters)
 
   if (dim(par.m1)[2] == 1){
     par.m1[which(!cfM1), ] <- sapply(m1[which(!cfM1)], coef)
@@ -244,11 +262,12 @@ NLR <- function(Data, group, model, type = "both", start,
   }
   par.m0[which(!cfM0), ] <- t(sapply(m0[which(!cfM0)], coef))
 
+  # covariance structure
   cov.m0 <- cov.m1 <- lapply(1:m, function(i) NA)
   cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
   cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
 
-
+  # se
   if (dim(par.m1)[2] == 1){
     se.m1[which(!cfM1), ] <- sqrt(sapply(cov.m1[which(!cfM1)], diag))
     se.m1 <- structure(data.frame(se.m1), names = unique(names(se.m1)))
@@ -257,7 +276,53 @@ NLR <- function(Data, group, model, type = "both", start,
   }
   se.m0[which(!cfM0), ] <- sqrt(t(sapply(cov.m0[which(!cfM0)] , diag)))
 
-  rownames(par.m1) <- rownames(par.m0) <- rownames(se.m1) <- rownames(se.m0) <- paste("Item", 1:m, sep = "")
+  # delta method
+  if ("cR" %in% colnames(par.m0)){
+    if ("cF" %in% colnames(par.m0)){
+      cDif0 <- par.m0$cF - par.m0$cR
+      se.cDif0 <- lapply(1:20, function(i) deltamethod(~ x2 - x1, par.m0[i, c("cR", "cF")],
+                                                      cov.m0[[i]][c("cR", "cF"), c("cR", "cF")]))
+      par.m0$cF <- cDif0
+      se.m0$cF <- se.cDif0
+      colnames(par.m0)[colnames(par.m0) == "cF"] <- colnames(se.m0)[colnames(se.m0) == "cF"] <- "cDif"
+    }
+    colnames(par.m0)[colnames(par.m0) == "cR"] <- colnames(se.m0)[colnames(se.m0) == "cR"] <- "c"
+  }
+  if ("dR" %in% colnames(par.m0)){
+    if ("dF" %in% colnames(par.m0)){
+      dDif0 <- par.m0$dF - par.m0$dR
+      se.dDif0 <- lapply(1:20, function(i) deltamethod(~ x2 - x1, par.m0[i, c("dR", "dF")],
+                                                      cov.m0[[i]][c("dR", "dF"), c("dR", "dF")]))
+      par.m0$dF <- dDif0
+      se.m0$dF <- se.dDif0
+      colnames(par.m0)[colnames(par.m0) == "dF"] <- colnames(se.m0)[colnames(se.m0) == "dF"] <- "dDif"
+    }
+    colnames(par.m0)[colnames(par.m0) == "dR"] <- colnames(se.m0)[colnames(se.m0) == "dR"] <- "d"
+  }
+  if ("cR" %in% colnames(par.m1)){
+    if ("cF" %in% colnames(par.m1)){
+      cDif1 <- par.m1$cF - par.m1$cR
+      se.cDif1 <- lapply(1:20, function(i) deltamethod(~ x2 - x1, par.m1[i, c("cR", "cF")],
+                                                       cov.m1[[i]][c("cR", "cF"), c("cR", "cF")]))
+      par.m1$cF <- cDif1
+      se.m1$cF <- se.cDif1
+      colnames(par.m1)[colnames(par.m1) == "cF"] <- colnames(se.m1)[colnames(se.m1) == "cF"] <- "cDif"
+    }
+    colnames(par.m1)[colnames(par.m1) == "cR"] <- colnames(se.m1)[colnames(se.m1) == "cR"] <- "c"
+  }
+  if ("dR" %in% colnames(par.m1)){
+    if ("dF" %in% colnames(par.m1)){
+      dDif1 <- par.m1$dF - par.m1$dR
+      se.dDif1 <- lapply(1:20, function(i) deltamethod(~ x2 - x1, par.m1[i, c("dR", "dF")],
+                                                       cov.m1[[i]][c("dR", "dF"), c("dR", "dF")]))
+      par.m1$dF <- dDif1
+      se.m1$dF <- se.dDif1
+      colnames(par.m1)[colnames(par.m1) == "dF"] <- colnames(se.m1)[colnames(se.m1) == "dF"] <- "dDif"
+    }
+    colnames(par.m1)[colnames(par.m1) == "dR"] <- colnames(se.m1)[colnames(se.m1) == "dR"] <- "d"
+  }
+
+  rownames(par.m1) <- rownames(par.m0) <- rownames(se.m1) <- rownames(se.m0) <- colnames(Data)
 
   AIC.m0 <- AIC.m1 <- lapply(1:m, function(i) NA)
   AIC.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], AIC)

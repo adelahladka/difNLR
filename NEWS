@@ -3,13 +3,45 @@
 *  Changes and Developments in the difNLR Package  *
 *                                                  *
 ****************************************************
+
+----------------------------------------
+- Changes in difNLR 1.0.4 (2017-08-08) -
+----------------------------------------
+
+MAJOR UPDATES
+
+  o New function 'formulaNLR()' was implemented. Function
+    returns formula for NLR model for 11 predefined models and 4
+    predefined DIF types to test. Model and DIF type can be also
+    specified with constraints on parameters a, b, c and d.
+  o Function 'NLR()' now handles 11 predefined models and 4
+    predefined DIF types to test. Model and DIF type can be also
+    specified with constraints on parameters a, b, c and d.
+  o Function 'startNLR()' was edited to return starting
+    parameters with different parameterization. It was also mildly
+    changed to correspond to new version of 'NLR()' function.
+  o Function 'difNLR()' can now handle also total score or other
+    user-specified matching score.
+  o Function 'constrNLR()' is no longer part of the 'difNLR'
+    package.
+
+
+MINOR UPDATES
+
+  o References were updated.
+  o Some minor bugs were fixed:
+      - Items are no longer renamed by 'difNLR()' and 'ddfMLR()' functions.
+      - Starting values are now correctly checked in 'difNLR()' function.
+  o 'msm' package is now used for delta method in 'difNLR()' function
+
+
 ----------------------------------------
 - Changes in difNLR 1.0.3 (2017-06-15) -
 ----------------------------------------
 
 MAJOR UPDATES
 
-  o Bug of plot.ddfMLR() for nonuniform DDF was fixed.
+  o Bug of 'plot.ddfMLR()' for non-uniform DDF was fixed.
   o References were updated.
 
 ----------------------------------------

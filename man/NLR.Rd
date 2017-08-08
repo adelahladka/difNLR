@@ -4,26 +4,31 @@
 \alias{NLR}
 \title{Non-Linear Regression DIF statistic}
 \usage{
-NLR(Data, group, model, type = "both", start,
+NLR(Data, group, model, constraints, type = "both", match = "zscore", start,
 p.adjust.method = "none", test = "LR", alpha = 0.05)
 }
 \arguments{
 \item{Data}{numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
 See \strong{Details}.}
 
-\item{group}{numeric: binary vector of group membership. "0" for reference group, "1" for focal group.}
+\item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.}
 
 \item{model}{character: generalized logistic regression model to be fitted. See \strong{Details}.}
 
-\item{type}{character: type of DIF to be tested (either "both" (default), "udif", or "nudif").
-See \strong{Details}.}
+\item{constraints}{character: which parameters should be the same for both groups. See \strong{Details}.}
+
+\item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
+\code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}
+
+\item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+\code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.}
 
 \item{start}{numeric: matrix with n rows (where n is the number of items) and 8 columns containing initial
 item parameters estimates. See \strong{Details}.}
 
 \item{p.adjust.method}{character: method for multiple comparison correction. See \strong{Details}.}
 
-\item{test}{character: test to be performed for DIF detection (either "LR" (default), or "F").
+\item{test}{character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
 See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
@@ -53,7 +58,8 @@ A list with the following arguments:
 }
 }
 \description{
-Performs DIF detection procedure based on Non-Linear Regression and either F-test or likelihood ratio test of submodel.
+Performs DIF detection procedure based on Non-Linear Regression and either
+likelihood ratio test or F-test of submodel.
 }
 \details{
 DIF detection procedure based on Non-Linear Regression is the extension
@@ -63,16 +69,43 @@ The \code{Data} is a matrix whose rows represents examinee scored answers
 ("1" correct, "0" incorrect) and columns correspond to the items.
 The \code{group} must be a vector of the same length as \code{nrow(data)}.
 
-The options of \code{model} are as follows: \code{Rasch} for one-parameter logistic model with
-discrimination parameter fixed on value 1 for both groups, \code{1PL} for one-parameter logistic
-model with discrimination parameter fixed for both groups, \code{2PL} for logistic regression model,
-\code{3PLcg} for three-parameter logistic regression model with fixed guessing for both groups,
-\code{3PLdg} for three-parameter logistic regression model with fixed inattention for both groups, or
-\code{4PLcgdg} for four-parameter logistic regression model with fixed guessing and inattention
-parameter for both groups.
-The \code{type} corresponds to type of DIF to be tested. Possible values
-are \code{"both"} to detect any DIF (uniform and/or non-uniform), \code{"udif"}
-to detect only uniform DIF or \code{"nudif"} to detect only non-uniform DIF.
+The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
+P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
+where x is standardized total score (also called Z-score) and g is group membership. Parameters a, b, c and d
+are discrimination, difficulty, guessing and inattention. Parameters aDif, bDif, cDif and dDif
+then represetn differences between two groups in discrimination, difficulty, guessing and inattention.
+
+This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
+The arguments \code{model} and \code{constraints} can be also combined.
+
+The \code{model} argument offers several predefined models. The options are as follows:
+\code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
+\code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+\code{2PL} for logistic regression model,
+\code{3PLcg} for 3PL model with fixed guessing for both groups,
+\code{3PLdg} for 3PL model with fixed inattention for both groups,
+\code{3PLc} (alternatively also \code{3PL}) for 3PL regression model with guessing parameter,
+\code{3PLd} for 3PL model with inattention parameter,
+\code{4PLcgdg} for 4PL model with fixed guessing and inattention parameter for both groups,
+\code{4PLcgd} (alternatively also \code{4PLd}) for 4PL model with fixed guessing for both groups,
+\code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
+or \code{4PL} for 4PL model.
+
+The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
+arguments should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
+inattention (d) are fixed for both groups and other parameters (b and c) are not.
+
+The \code{type} corresponds to type of DIF to be tested. Possible values are
+\code{"both"} to detect any DIF caused by difference in difficulty or discrimination (i.e., uniform and/or non-uniform),
+\code{"udif"} to detect only uniform DIF (i.e., difference in difficulty b),
+\code{"nudif"} to detect only non-uniform DIF (i.e., difference in discrimination a), or
+\code{"all"} to detect DIF caused by difference caused by any parameter that can differed between groups. The \code{type}
+of DIF can be also specified in more detail by using combination of parameters a, b, c and d. For example, with an option
+\code{"c"} for 4PL model only the difference in parameter c is tested.
+
+Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
+total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
+in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
 
 The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
 First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
@@ -84,6 +117,10 @@ The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"},
 \code{"none"}.
+
+In case that model considers difference in guessing or inattention parameter, the different parameterization is
+used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
+alternative parameterization.
 }
 \examples{
 \dontrun{
@@ -97,19 +134,29 @@ group <- GMAT[, "group"]
 # and model with fixed guessing for both groups
 NLR(Data, group, model = "3PLcg")
 
-# using F test
+# Using F test
 NLR(Data, group, model = "3PLcg", test = "F")
 
 # Testing both DIF effects with Benjamini-Hochberg correction
 NLR(Data, group, model = "3PLcg", p.adjust.method = "BH")
 
-# Testing uniform DIF effects
-NLR(Data, group, model = "3PLcg", type = "udif")
-# Testing non-uniform DIF effects
-NLR(Data, group, model = "3PLcg", type = "nudif")
+# 4PL model with the same guessing and inattention
+# to test uniform DIF
+NLR(Data, group, model = "4PLcgdg", type = "udif")
+
+# 2PL model to test non-uniform DIF
+NLR(Data, group, model = "2PL", type = "nudif")
+
+# 4PL model with fixed a and c parameter
+# to test difference in b
+NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
+
 }
 }
 \references{
+Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
+
 Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
 Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 

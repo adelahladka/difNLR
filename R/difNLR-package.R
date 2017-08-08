@@ -13,14 +13,15 @@
 #' @importFrom methods is
 #' @importFrom nnet multinom
 #' @importFrom reshape2 melt
-#' @importFrom stats anova complete.cases deriv3 deviance na.omit nls p.adjust pf qf pchisq qchisq quantile setNames logLik rbinom relevel rnorm
+#' @importFrom stats AIC BIC as.formula anova complete.cases deriv3 deviance na.omit nls p.adjust pf qf pchisq qchisq quantile setNames logLik rbinom relevel rnorm
+#' @importFrom msm deltamethod
 #'
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.0.3\cr
-#' Date: 2017-06-15\cr
-#' Depends: R (>= 3.2.2), CTT, ggplot2 (>= 2.2.1), methods, nnet, reshape2, stats\cr
+#' Version: 1.0.4\cr
+#' Date: 2017-08-08\cr
+#' Depends: R (>= 3.2.2), CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats\cr
 #' License: GPL-3\cr
 #' BugReports: https://github.com/drabinova/difNLR/issues
 #'
@@ -38,6 +39,9 @@
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
+#' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
+#'
 #' Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
 #' Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
 #'
