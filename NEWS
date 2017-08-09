@@ -5,6 +5,22 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.0.5 (2017-08-09) -
+----------------------------------------
+
+MAJOR UPDATES
+
+  o Datasets 'difMedical', 'difMedicaltest' and 'difMedicalkey'
+    were renamed. Now they are 'MSATB', 'MSATBtest' and 'MSATBkey'
+    from Medical School Admission Test in Biology.
+
+
+MINOR UPDATES
+
+  o LazyData is now available.
+  o References were updated.
+
+----------------------------------------
 - Changes in difNLR 1.0.4 (2017-08-08) -
 ----------------------------------------
 
@@ -34,10 +50,11 @@ MINOR UPDATES
       - Starting values are now correctly checked in 'difNLR()' function.
   o 'msm' package is now used for delta method in 'difNLR()' function
 
-
 ----------------------------------------
 - Changes in difNLR 1.0.3 (2017-06-15) -
 ----------------------------------------
+
+*** THIS IS A CRAN VERSION ***
 
 MAJOR UPDATES
 
@@ -47,6 +64,8 @@ MAJOR UPDATES
 ----------------------------------------
 - Changes in difNLR 1.0.2 (2017-06-06) -
 ----------------------------------------
+
+*** THIS IS A CRAN VERSION ***
 
 MAJOR UPDATES
 
@@ -70,6 +89,8 @@ MINOR UPDATES
 ----------------------------------------
 - Changes in difNLR 1.0.0 (2017-01-10) -
 ----------------------------------------
+
+*** THIS IS A CRAN VERSION ***
 
 MAJOR UPDATES
 
@@ -111,6 +132,8 @@ MINOR UPDATES
 ----------------------------------------
 - Changes in difNLR 0.2.0 (2016-11-09) -
 ----------------------------------------
+
+*** THIS IS A CRAN VERSION ***
 
 MAJOR UPDATES
 
