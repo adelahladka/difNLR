@@ -1,7 +1,7 @@
 # difNLR
 Detection of Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by non-linear regression models.
 
-[![GitHub version](https://badge.fury.io/gh/drabinova%2FdifNLR.svg)](https://badge.fury.io/gh/drabinova%2FdifNLR)
+![GHversion](https://img.shields.io/github/release/drabinova/difNLR.svg)
 [![version](https://www.r-pkg.org/badges/version/difNLR)](https://CRAN.R-project.org/package=difNLR)
 ![cranlogs](https://cranlogs.r-pkg.org/badges/difNLR)
 
