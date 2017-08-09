@@ -3,6 +3,18 @@
 *  Changes and Developments in the difNLR Package  *
 *                                                  *
 ****************************************************
+----------------------------------------
+- Changes in difNLR 1.0.6 (2017-08-09) -
+----------------------------------------
+
+MAJOR UPDATES
+
+  o Item purification was implemented into 'difNLR()' function.
+  o Anchor items were implemented into 'NLR()' function.
+
+MINOR UPDATES
+
+  o README file was updated.
 
 ----------------------------------------
 - Changes in difNLR 1.0.5 (2017-08-09) -

@@ -18,7 +18,8 @@
 \title{Performs DIF detection using Non-Linear Regression method.}
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "both",
-match = "zscore", test = "LR", alpha = 0.05, p.adjust.method = "none", start)
+match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
+alpha = 0.05, p.adjust.method = "none", start)
 
 \method{print}{difNLR}(x, ...)
 
@@ -57,6 +58,14 @@ focal group}
 
 \item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.}
+
+\item{anchor}{Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
+currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+See \strong{Details}.}
+
+\item{purify}{logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.}
+
+\item{nrIter}{numeric: the maximal number of iterations in the item purification (default is 10).}
 
 \item{test}{character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
 See \strong{Details}.}
@@ -107,6 +116,7 @@ A list of class 'difNLR' with the following arguments:
   \item{\code{alpha}}{numeric: significance level.}
   \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or
   \code{"No DIF item detected"}.}
+  \item{\code{match}}{matching criterion.}
   \item{\code{model}}{fitted model.}
   \item{\code{type}}{character: type of DIF that was tested. If parameters were specified, the value is \code{"other"}.}
   \item{\code{types}}{character: the parameters (specified by user, \code{type} has value \code{"other"}) which were
@@ -115,6 +125,15 @@ A list of class 'difNLR' with the following arguments:
   \item{\code{pval}}{the p-values by likelihood ratio test.}
   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
+  \item{\code{test}}{used test.}
+  \item{\code{purification}}{\code{purify} value.}
+  \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
+  is \code{TRUE}.}
+  \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
+  "1" in i-th row and j-th column means that j-th item was identified as DIF in i-1-th iteration. Returned only
+  if \code{purify} is \code{TRUE}.}
+  \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
+  \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{group}}{the vector of group membership.}
   \item{\code{Data}}{the data matrix.}
   \item{\code{conv.fail}}{numeric: number of convergence issues.}
@@ -234,6 +253,11 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
 # 3PL model with fixed guessing for groups
 # and Benjamini-Hochberg correction
 difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")
+
+# Testing both DIF effects using LR test,
+# 3PL model with fixed guessing for groups
+# and item purification
+difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = T)
 
 # Testing both DIF effects using 3PL model with fixed guessing for groups
 # and total score as matching criterion

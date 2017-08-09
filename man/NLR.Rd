@@ -4,8 +4,8 @@
 \alias{NLR}
 \title{Non-Linear Regression DIF statistic}
 \usage{
-NLR(Data, group, model, constraints, type = "both", match = "zscore", start,
-p.adjust.method = "none", test = "LR", alpha = 0.05)
+NLR(Data, group, model, constraints, type = "both", match = "zscore",
+anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR", alpha = 0.05)
 }
 \arguments{
 \item{Data}{numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
@@ -21,7 +21,11 @@ See \strong{Details}.}
 \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}
 
 \item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-\code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.}
+\code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.}
+
+\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+See \strong{Details}.}
 
 \item{start}{numeric: matrix with n rows (where n is the number of items) and 8 columns containing initial
 item parameters estimates. See \strong{Details}.}

@@ -15,6 +15,11 @@
 #' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
+#' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
+#' currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' See \strong{Details}.
+#' @param purify logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.
+#' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
 #' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
 #' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
 #' @param test character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
@@ -38,7 +43,8 @@
 #' \code{predict()} or \code{coef()} functions.
 #'
 #' @usage difNLR(Data, group, focal.name, model, constraints, type = "both",
-#' match = "zscore", test = "LR", alpha = 0.05, p.adjust.method = "none", start)
+#' match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
+#' alpha = 0.05, p.adjust.method = "none", start)
 #'
 #' @details
 #' DIF detection procedure based on Non-Linear Regression is the extension of Logistic Regression
@@ -137,6 +143,7 @@
 #'   \item{\code{alpha}}{numeric: significance level.}
 #'   \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or
 #'   \code{"No DIF item detected"}.}
+#'   \item{\code{match}}{matching criterion.}
 #'   \item{\code{model}}{fitted model.}
 #'   \item{\code{type}}{character: type of DIF that was tested. If parameters were specified, the value is \code{"other"}.}
 #'   \item{\code{types}}{character: the parameters (specified by user, \code{type} has value \code{"other"}) which were
@@ -145,6 +152,15 @@
 #'   \item{\code{pval}}{the p-values by likelihood ratio test.}
 #'   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
 #'   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
+#'   \item{\code{test}}{used test.}
+#'   \item{\code{purification}}{\code{purify} value.}
+#'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
+#'   is \code{TRUE}.}
+#'   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
+#'   "1" in i-th row and j-th column means that j-th item was identified as DIF in i-1-th iteration. Returned only
+#'   if \code{purify} is \code{TRUE}.}
+#'   \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
+#'   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{Data}}{the data matrix.}
 #'   \item{\code{conv.fail}}{numeric: number of convergence issues.}
@@ -203,6 +219,11 @@
 #' # and Benjamini-Hochberg correction
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")
 #'
+#' # Testing both DIF effects using LR test,
+#' # 3PL model with fixed guessing for groups
+#' # and item purification
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = T)
+#'
 #' # Testing both DIF effects using 3PL model with fixed guessing for groups
 #' # and total score as matching criterion
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score")
@@ -243,12 +264,9 @@
 #' @export
 
 
-difNLR <- function(Data, group, focal.name, model, constraints,
-                   type = "both",
-                   match = "zscore",
-                   test = "LR", alpha = 0.05,
-                   p.adjust.method = "none", start
-                   )
+difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
+                   match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
+                   test = "LR", alpha = 0.05, p.adjust.method = "none", start)
 {
   if (type == "nudif" & model == "1PL")
     stop("Detection of non-uniform DIF is not possible with 1PL model!", call. = FALSE)
@@ -279,13 +297,6 @@ difNLR <- function(Data, group, focal.name, model, constraints,
   } else {
     constraints <- NULL
   }
-  ### matching criterion
-  if (!(match %in% c("score", "zscore"))){
-    if (length(match) != dim(Data)[1]){
-      stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
-           of observations in 'Data'!")
-    }
-  }
   ### type of DIF to be tested
   if (!(type %in% c("udif", "nudif", "both", "all"))){
     types <- unique(unlist(strsplit(type, split = "")))
@@ -294,6 +305,16 @@ difNLR <- function(Data, group, focal.name, model, constraints,
            or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'")
     }
   }
+  ### matching criterion
+  if (!(match[1] %in% c("score", "zscore"))){
+    if (length(match) != dim(Data)[1]){
+      stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
+           of observations in 'Data'!")
+    }
+  }
+  ### purification
+  if (purify & !(match[1] %in% c("score", "zscore")))
+    stop("purification not allowed when matching variable is not 'zscore' or 'score'",  call. = FALSE)
   ### test
   if (!test %in% c("F", "LR") | !is.character(type))
     stop("'test' must be either 'F' or 'LR'", call. = FALSE)
@@ -339,6 +360,17 @@ difNLR <- function(Data, group, focal.name, model, constraints,
     GROUP <- df[, "GROUP"]
     DATA <- df[, colnames(df) != "GROUP"]
 
+    if (!is.null(anchor)) {
+      if (is.numeric(anchor)){
+        ANCHOR <- anchor
+        } else {
+        ANCHOR <- NULL
+        for (i in 1:length(anchor))
+          ANCHOR[i] <- (1:ncol(DATA))[colnames(DATA) == anchor[i]]
+      }
+    } else {
+      ANCHOR <- 1:ncol(DATA)
+    }
     if (is.null(start)){
       if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
         parameterization <- "alternative"
@@ -354,47 +386,153 @@ difNLR <- function(Data, group, focal.name, model, constraints,
       }
       colnames(start) <- c(letters[1:4], paste(letters[1:4], "Dif", sep = ""))
     }
-
-    PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
-                                 start = start, p.adjust.method = p.adjust.method, test = test,
+    if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
+      PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
+                                 anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method, test = test,
                                  alpha = alpha))
-    STATS <- PROV$Sval
-    ADJ.PVAL <- PROV$adjusted.pval
-    significant <- which(ADJ.PVAL < alpha)
+      STATS <- PROV$Sval
+      ADJ.PVAL <- PROV$adjusted.pval
+      significant <- which(ADJ.PVAL < alpha)
 
-    nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
-                                 .Names = colnames(PROV$par.m0))
-    nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
-    nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
+      nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
+                                   .Names = colnames(PROV$par.m0))
+      nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
+      nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
 
-    if (length(significant) > 0) {
-      DIFitems <- significant
-      for (idif in 1:length(DIFitems)) {
-        nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
-        nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
+      if (length(significant) > 0) {
+        DIFitems <- significant
+        for (idif in 1:length(DIFitems)) {
+          nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
+          nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
+        }
+      } else {
+        DIFitems <- "No DIF item detected"
       }
+      types <- NULL
+      if (!(type %in% c("udif", "nudif", "both", "all"))){
+        types <- unlist(strsplit(type, split = ""))
+        type <- "other"
+      }
+      RES <- list(Sval = STATS,
+                  nlrPAR = nlrPAR, nlrSE = nlrSE,
+                  parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
+                  parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
+                  alpha = alpha, DIFitems = DIFitems, match = PROV$match,
+                  model = model, constraints = constraints,
+                  type = type, types = types, p.adjust.method = p.adjust.method,
+                  pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
+                  purification = purify,
+                  group = GROUP, Data = DATA,
+                  conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
+                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
+                  AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
+                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
     } else {
-      DIFitems <- "No DIF item detected"
+      nrPur <- 0
+      difPur <- NULL
+      noLoop <- FALSE
+      prov1 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
+                                    start = start, p.adjust.method = p.adjust.method, test = test,
+                                    alpha = alpha))
+      stats1 <- prov1$Sval
+      adj.pval1 <- prov1$adjusted.pval
+      significant1 <- which(adj.pval1 < alpha)
+
+      if (length(significant1) == 0) {
+        PROV <- prov1
+        STATS <- stats1
+        DIFitems <- "No DIF item detected"
+        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
+                                     .Names = colnames(PROV$par.m0))
+        nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
+        nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
+        noLoop <- TRUE
+      } else {
+        dif <- significant1
+        difPur <- rep(0, length(stats1))
+        difPur[dif] <- 1
+        repeat {
+          if (nrPur >= nrIter){
+            break
+            } else {
+              nrPur <- nrPur + 1
+              nodif <- NULL
+              if (is.null(dif)) {
+                nodif <- 1:ncol(DATA)
+                } else {
+                  for (i in 1:ncol(DATA)) {
+                    if (sum(i == dif) == 0)
+                      nodif <- c(nodif, i)
+                  }
+                }
+              prov2 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
+                                            anchor = nodif, start = start, p.adjust.method = p.adjust.method, test = test,
+                                            alpha = alpha))
+              stats2 <- prov2$Sval
+              adj.pval2 <- prov2$adjusted.pval
+              significant2 <- which(adj.pval2 < alpha)
+              if (length(significant2) == 0)
+                dif2 <- NULL
+              else dif2 <- significant2
+              difPur <- rbind(difPur, rep(0, ncol(DATA)))
+              difPur[nrPur + 1, dif2] <- 1
+              if (length(dif) != length(dif2))
+                dif <- dif2
+              else {
+                dif <- sort(dif)
+                dif2 <- sort(dif2)
+                if (sum(dif == dif2) == length(dif)) {
+                  noLoop <- TRUE
+                  break
+                  }
+                else dif <- dif2
+            }
+          }
+        }
+        PROV <- prov2
+        STATS <- stats2
+        significant1 <- significant2
+        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
+                                     .Names = colnames(PROV$par.m0))
+        nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
+        nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
+        if (length(significant1) > 0) {
+          DIFitems <- significant1
+          for (idif in 1:length(DIFitems)) {
+            nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
+            nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
+          }
+        } else {
+          DIFitems <- "No DIF item detected"
+        }
+      }
+      if (is.null(difPur) == FALSE) {
+        ro <- co <- NULL
+        for (ir in 1:nrow(difPur)) ro[ir] <- paste("Step", ir - 1, sep = "")
+        for (ic in 1:ncol(difPur)) co[ic] <- paste("Item", ic, sep = "")
+        rownames(difPur) <- ro
+        colnames(difPur) <- co
+      }
+      types <- NULL
+      if (!(type %in% c("udif", "nudif", "both", "all"))){
+        types <- unlist(strsplit(type, split = ""))
+        type <- "other"
+      }
+      RES <- list(Sval = STATS,
+                  nlrPAR = nlrPAR, nlrSE = nlrSE,
+                  parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
+                  parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
+                  alpha = alpha, DIFitems = DIFitems, match = PROV$match,
+                  model = model, constraints = constraints,
+                  type = type, types = types, p.adjust.method = p.adjust.method,
+                  pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
+                  purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
+                  group = GROUP, Data = DATA,
+                  conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
+                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
+                  AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
+                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
     }
-    types <- NULL
-    if (!(type %in% c("udif", "nudif", "both", "all"))){
-      types <- unlist(strsplit(type, split = ""))
-      type <- "other"
-    }
-    RES <- list(Sval = STATS,
-                nlrPAR = nlrPAR, nlrSE = nlrSE,
-                parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
-                parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
-                alpha = alpha, DIFitems = DIFitems,
-                model = model, constraints = constraints,
-                type = type, types = types, p.adjust.method = p.adjust.method,
-                pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                adjusted.p = NULL, test = test,
-                group = GROUP, Data = DATA,
-                conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
-                llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
-                AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
-                BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
     class(RES) <- "difNLR"
     return(RES)
   }
@@ -434,10 +572,18 @@ print.difNLR <- function (x, ...){
                    paste(" with constraints on",
                          paste(unique(unlist(strsplit(x$constraints, split = ""))), collapse = ", "),
                          "parameter")), sep = ""), "\n")
-  if (x$p.adjust.method == "none") {
-    cat("\nNo p-value adjustment for multiple comparisons\n\n")
+  if (x$purification) word.iteration <- ifelse(x$nrPur <= 1, " iteration", " iterations")
+  cat(paste("\nItem purification was", ifelse(x$purification, " ", " not "), "applied",
+      ifelse(x$purification, paste(" with ", x$nrPur, word.iteration, sep = ""), ""), "\n", sep = ""))
+  if (x$purification){
+    if (!x$conv.puri){
+      cat(paste("WARNING: Item purification process not converged after "), x$nrPur, word.iteration, "\n",
+          "         Results are based on last iteration of the item purification.\n", sep = "")
+    }
   }
-  else {
+  if (x$p.adjust.method == "none") {
+    cat("No p-value adjustment for multiple comparisons\n\n")
+  } else {
     cat(paste("\nMultiple comparisons made with",
               switch(x$p.adjust.method,
                      holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",

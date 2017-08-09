@@ -11,7 +11,10 @@
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-#' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
+#' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
+#' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+#' default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' See \strong{Details}.
 #' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
 #' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
@@ -21,8 +24,8 @@
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage NLR(Data, group, model, constraints, type = "both", match = "zscore", start,
-#' p.adjust.method = "none", test = "LR", alpha = 0.05)
+#' @usage NLR(Data, group, model, constraints, type = "both", match = "zscore",
+#' anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR", alpha = 0.05)
 #'
 #' @details
 #' DIF detection procedure based on Non-Linear Regression is the extension
@@ -169,15 +172,14 @@
 
 
 NLR <- function(Data, group, model, constraints, type = "both",
-                match = "zscore",
-                start,
-                p.adjust.method = "none", test = "LR", alpha = 0.05){
+                match = "zscore", anchor = 1:ncol(Data),
+                start, p.adjust.method = "none", test = "LR", alpha = 0.05){
 
-  if (match == "zscore"){
-    x <- scale(apply(Data, 1, sum))
+  if (match[1] == "zscore"){
+    x <- scale(apply(as.data.frame(Data[, anchor]), 1, sum))
   } else {
-    if (match == "score"){
-      x <- apply(Data, 1, sum)
+    if (match[1] == "score"){
+      x <- apply(as.data.frame(Data[, anchor]), 1, sum)
     } else {
       if (length(match) == dim(Data)[1]){
         x <- match
