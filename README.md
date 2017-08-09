@@ -1,5 +1,10 @@
+
+
 # difNLR
 Detection of Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by non-linear regression models.
+
+[![version](https://www.r-pkg.org/badges/version/difNLR)](https://CRAN.R-project.org/package=difNLR)
+![cranlogs](https://cranlogs.r-pkg.org/badges/difNLR)
 
 ## Installation
 ```
