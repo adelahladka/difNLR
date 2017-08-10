@@ -7,13 +7,17 @@
 #' @param Data character: the unscored data matrix.
 #' @param group numeric or character: the binary vector of group membership
 #' @param key character: the answer key.
+#' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+#' default, all items are considered as anchors.
 #' @param type character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 #' See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage MLR(Data, group, key, type = "both", p.adjust.method = "none", alpha = 0.05)
+#' @usage MLR(Data, group, key, anchor = 1:ncol(Data), type = "both",
+#' p.adjust.method = "none", alpha = 0.05)
+#'
 #' @details
 #' Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
 #'
@@ -87,9 +91,9 @@
 #' @importFrom CTT score
 
 
-MLR <- function(Data, group, key, type = "both", p.adjust.method = "none", alpha = 0.05){
+MLR <- function(Data, group, key, anchor = 1:ncol(Data), type = "both", p.adjust.method = "none", alpha = 0.05){
 
-  x <- c(scale(unlist(CTT::score(Data, key))))
+  x <- c(scale(unlist(CTT::score(as.data.frame(Data[, anchor]), key[anchor]))))
   m <- ncol(Data)
   n <- nrow(Data)
 

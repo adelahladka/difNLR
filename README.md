@@ -15,7 +15,7 @@ install.packages("difNLR")
 devtools::install_github("drabinova/difNLR")
 ```
 ## Version
-Current version on CRAN is 1.0.3. The newest development version available on GitHub is 1.0.6.
+Current version on CRAN is 1.0.3. The newest development version available on GitHub is 1.0.7.
 
 ## Getting help
 If you find any bug or just need help with `difNLR` package you can leave your message as an issue here or directly contact us at adela.drabinova@gmail.com

@@ -197,6 +197,12 @@ Argument \code{match} represents the matching criterion. It can be either the st
 total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
 in \code{Data}. Matching criterion is used in \code{NLR()} function as a covariate in non-linear regression model.
 
+A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
+item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
+In case anchor items are provided, only these items are used to compute matching criterion \code{match}. If the \code{match}
+argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored. When anchor items are
+provided, purification is not applied.
+
 The \code{p.adjust.method} is a character for \code{p.adjust()} function from the \code{stats}
 package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.

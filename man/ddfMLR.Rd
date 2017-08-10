@@ -12,8 +12,8 @@
 \alias{BIC.ddfMLR}
 \title{Performs DDF detection using Multinomial Log-linear Regression model.}
 \usage{
-ddfMLR(Data, group, focal.name, key, type = "both",
-alpha = 0.05, p.adjust.method = "none")
+ddfMLR(Data, group, focal.name, key, type = "both", anchor = NULL,
+purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 
 \method{print}{ddfMLR}(x, ...)
 
@@ -42,6 +42,13 @@ focal group}
 \item{type}{character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 See \strong{Details}.}
 
+\item{anchor}{Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
+currently considered as anchor (DIF free) items.}
+
+\item{purify}{logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.}
+
+\item{nrIter}{numeric: the maximal number of iterations in the item purification (default is 10).}
+
 \item{alpha}{numeric: significance level (default is 0.05).}
 
 \item{p.adjust.method}{character: method for multiple comparison correction.
@@ -69,6 +76,14 @@ A list of class 'ddfMLR' with the following arguments:
   \item{\code{alpha}}{numeric: significance level.}
   \item{\code{DDFitems}}{either the column indicators of the items which were detected as DDF, or \code{"No DDF item detected"}.}
   \item{\code{type}}{character: type of DIF that was tested.}
+  \item{\code{purification}}{\code{purify} value.}
+  \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
+  is \code{TRUE}.}
+  \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
+  "1" in i-th row and j-th column means that j-th item was identified as DIF in i-1-th iteration. Returned only
+  if \code{purify} is \code{TRUE}.}
+  \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
+  \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
   \item{\code{pval}}{the p-values by likelihood ratio test.}
   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
@@ -99,6 +114,11 @@ The \code{type} corresponds to type of DDF to be tested. Possible values are \co
 to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
 \code{"nudif"} to detect only non-uniform DDF.
 
+A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
+item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
+In case anchor items are provided, only these items are used to compute standardized total score. When anchor items are
+provided, purification is not applied.
+
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
@@ -122,10 +142,13 @@ group <- GMATtest[, "group"]
 key <- GMATkey
 
 # Testing both DDF effects
-x <- ddfMLR(Data, group, focal.name = 1, key)
+(x <- ddfMLR(Data, group, focal.name = 1, key))
 
 # Testing both DDF effects with Benjamini-Hochberg adjustment method
 ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
+
+# Testing both DDF effects with item purification
+ddfMLR(Data, group, focal.name = 1, key, purify = T)
 
 # Testing uniform DDF effects
 ddfMLR(Data, group, focal.name = 1, key, type = "udif")

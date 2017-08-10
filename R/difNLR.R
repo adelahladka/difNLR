@@ -13,6 +13,8 @@
 #' focal group
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
+#' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
+#' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
 #' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
@@ -20,8 +22,6 @@
 #' See \strong{Details}.
 #' @param purify logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
-#' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-#' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
 #' @param test character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
@@ -92,6 +92,12 @@
 #' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
 #' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
 #' in \code{Data}. Matching criterion is used in \code{NLR()} function as a covariate in non-linear regression model.
+#'
+#' A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
+#' item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
+#' In case anchor items are provided, only these items are used to compute matching criterion \code{match}. If the \code{match}
+#' argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored. When anchor items are
+#' provided, purification is not applied.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust()} function from the \code{stats}
 #' package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},

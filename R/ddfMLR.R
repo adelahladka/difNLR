@@ -14,6 +14,10 @@
 #' @param key character: the answer key. See \strong{Details}.
 #' @param type character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 #' See \strong{Details}.
+#' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
+#' currently considered as anchor (DIF free) items.
+#' @param purify logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.
+#' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
@@ -24,8 +28,8 @@
 #' @param title string: title of plot.
 #' @param ... other generic parameters for \code{print} or \code{plot} functions.
 #'
-#' @usage ddfMLR(Data, group, focal.name, key, type = "both",
-#' alpha = 0.05, p.adjust.method = "none")
+#' @usage ddfMLR(Data, group, focal.name, key, type = "both", anchor = NULL,
+#' purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 #'
 #' @details
 #' DDF detection procedure based on Multinomial Log-linear model.
@@ -38,6 +42,11 @@
 #' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
 #' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
 #' \code{"nudif"} to detect only non-uniform DDF.
+#'
+#' A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
+#' item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
+#' In case anchor items are provided, only these items are used to compute standardized total score. When anchor items are
+#' provided, purification is not applied.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
@@ -62,6 +71,14 @@
 #'   \item{\code{alpha}}{numeric: significance level.}
 #'   \item{\code{DDFitems}}{either the column indicators of the items which were detected as DDF, or \code{"No DDF item detected"}.}
 #'   \item{\code{type}}{character: type of DIF that was tested.}
+#'   \item{\code{purification}}{\code{purify} value.}
+#'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
+#'   is \code{TRUE}.}
+#'   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
+#'   "1" in i-th row and j-th column means that j-th item was identified as DIF in i-1-th iteration. Returned only
+#'   if \code{purify} is \code{TRUE}.}
+#'   \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
+#'   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
 #'   \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
 #'   \item{\code{pval}}{the p-values by likelihood ratio test.}
 #'   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
@@ -97,10 +114,13 @@
 #' key <- GMATkey
 #'
 #' # Testing both DDF effects
-#' x <- ddfMLR(Data, group, focal.name = 1, key)
+#' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
 #' # Testing both DDF effects with Benjamini-Hochberg adjustment method
 #' ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
+#'
+#' # Testing both DDF effects with item purification
+#' ddfMLR(Data, group, focal.name = 1, key, purify = T)
 #'
 #' # Testing uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "udif")
@@ -122,9 +142,8 @@
 #' @importFrom reshape2 melt
 #' @importFrom stats relevel
 
-ddfMLR <- function(Data, group, focal.name, key, type = "both",
-                alpha = 0.05,
-                p.adjust.method = "none")
+ddfMLR <- function(Data, group, focal.name, key, type = "both", anchor = NULL, purify = FALSE,
+                   nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
     stop("'type' must be either 'udif', 'nudif' or 'both'",
@@ -170,46 +189,154 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
     GROUP <- df[, "GROUP"]
     DATA <- df[, colnames(df) != "GROUP"]
 
-    PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, type = type,
-                                 p.adjust.method = p.adjust.method,
-                                 alpha = alpha))
-
-    STATS <- PROV$Sval
-    ADJ.PVAL <- PROV$adjusted.pval
-    se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
-    se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
-    significant <- which(ADJ.PVAL < alpha)
-
-    if (length(significant) > 0) {
-      DDFitems <- significant
-      mlrPAR <- PROV$par.m1
-      mlrSE <- se.m1
-      for (idif in 1:length(DDFitems)) {
-        mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-        mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
+    if (!is.null(anchor)) {
+      if (is.numeric(anchor)){
+        ANCHOR <- anchor
+      } else {
+        ANCHOR <- NULL
+        for (i in 1:length(anchor))
+          ANCHOR[i] <- (1:ncol(DATA))[colnames(DATA) == anchor[i]]
       }
     } else {
-      DDFitems <- "No DDF item detected"
-      mlrPAR <- PROV$par.m1
-      mlrSE <- se.m1
+      ANCHOR <- 1:ncol(DATA)
+    }
+    if (!purify | !is.null(anchor)) {
+      PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, anchor = ANCHOR, type = type,
+                                   p.adjust.method = p.adjust.method, alpha = alpha))
+
+      STATS <- PROV$Sval
+      ADJ.PVAL <- PROV$adjusted.pval
+      se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
+      se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+      significant <- which(ADJ.PVAL < alpha)
+
+      if (length(significant) > 0) {
+        DDFitems <- significant
+        mlrPAR <- PROV$par.m1
+        mlrSE <- se.m1
+        for (idif in 1:length(DDFitems)) {
+          mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
+          mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
+        }
+      } else {
+        DDFitems <- "No DDF item detected"
+        mlrPAR <- PROV$par.m1
+        mlrSE <- se.m1
+        }
+
+      RES <- list(Sval = STATS,
+                  mlrPAR = mlrPAR,
+                  mlrSE = mlrSE,
+                  parM0 = PROV$par.m0,
+                  # seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
+                  parM1 = PROV$par.m1,
+                  # seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
+                  alpha = alpha, DDFitems = DDFitems,
+                  type = type, purification = purify, p.adjust.method = p.adjust.method,
+                  pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
+                  group = GROUP, Data = DATA, key = key,
+                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
+                  AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
+                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
+    } else {
+      nrPur <- 0
+      difPur <- NULL
+      noLoop <- FALSE
+      prov1 <- suppressWarnings(MLR(DATA, GROUP, key = key, type = type,
+                                    p.adjust.method = p.adjust.method, alpha = alpha))
+      stats1 <- prov1$Sval
+      adj.pval1 <- prov1$adjusted.pval
+      significant1 <- which(adj.pval1 < alpha)
+      if (length(significant1) == 0) {
+        PROV <- prov1
+        STATS <- stats1
+        DDFitems <- "No DIF item detected"
+        se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
+        se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+        mlrPAR <- PROV$par.m1
+        mlrSE <- se.m1
+        noLoop <- TRUE
+      } else {
+        dif <- significant1
+        difPur <- rep(0, length(stats1))
+        difPur[dif] <- 1
+        repeat {
+          if (nrPur >= nrIter){
+            break
+          } else {
+            nrPur <- nrPur + 1
+            nodif <- NULL
+            if (is.null(dif)) {
+              nodif <- 1:ncol(DATA)
+            } else {
+              for (i in 1:ncol(DATA)) {
+                if (sum(i == dif) == 0)
+                  nodif <- c(nodif, i)
+              }
+            }
+            prov2 <- suppressWarnings(MLR(DATA, GROUP, key = key, anchor = nodif, type = type,
+                                          p.adjust.method = p.adjust.method, alpha = alpha))
+            stats2 <- prov2$Sval
+            adj.pval2 <- prov2$adjusted.pval
+            significant2 <- which(adj.pval2 < alpha)
+            if (length(significant2) == 0)
+              dif2 <- NULL
+            else dif2 <- significant2
+            difPur <- rbind(difPur, rep(0, ncol(DATA)))
+            difPur[nrPur + 1, dif2] <- 1
+            if (length(dif) != length(dif2))
+              dif <- dif2
+            else {
+              dif <- sort(dif)
+              dif2 <- sort(dif2)
+              if (sum(dif == dif2) == length(dif)) {
+                noLoop <- TRUE
+                break
+              }
+              else dif <- dif2
+            }
+          }
+        }
+        PROV <- prov2
+        STATS <- stats2
+        significant1 <- significant2
+        se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
+        se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+        mlrPAR <- PROV$par.m1
+        mlrSE <- se.m1
+        if (length(significant1) > 0) {
+          DDFitems <- significant1
+          for (idif in 1:length(DDFitems)) {
+            mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
+            mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
+          }
+        } else {
+          DDFitems <- "No DIF item detected"
+        }
+      }
+      if (is.null(difPur) == FALSE) {
+        ro <- co <- NULL
+        for (ir in 1:nrow(difPur)) ro[ir] <- paste("Step", ir - 1, sep = "")
+        for (ic in 1:ncol(difPur)) co[ic] <- paste("Item", ic, sep = "")
+        rownames(difPur) <- ro
+        colnames(difPur) <- co
       }
 
-    RES <- list(Sval = STATS,
-                mlrPAR = mlrPAR,
-                mlrSE = mlrSE,
-                parM0 = PROV$par.m0,
-                # seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
-                parM1 = PROV$par.m1,
-                # seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
-                alpha = alpha, DDFitems = DDFitems,
-                type = type, p.adjust.method = p.adjust.method,
-                pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                adjusted.p = NULL,
-                group = GROUP, Data = DATA, key = key,
-                llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
-                AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
-                BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
-
+      RES <- list(Sval = STATS,
+                  mlrPAR = mlrPAR,
+                  mlrSE = mlrSE,
+                  parM0 = PROV$par.m0,
+                  # seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
+                  parM1 = PROV$par.m1,
+                  # seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
+                  alpha = alpha, DDFitems = DDFitems,
+                  type = type, purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
+                  p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
+                  group = GROUP, Data = DATA, key = key,
+                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
+                  AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
+                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
+    }
     class(RES) <- "ddfMLR"
     return(RES)
   }
@@ -227,6 +354,15 @@ print.ddfMLR <- function (x, ...){
                   nudif = "Detection of non-uniform Differential Distractor Functioning using Multinomial Log-linear Regression model")
   cat(paste(strwrap(title, width = 60), collapse = "\n"))
   cat("\n\nLikelihood-ratio chi-square statistics\n")
+  if (x$purification) word.iteration <- ifelse(x$nrPur <= 1, " iteration", " iterations")
+  cat(paste("\nItem purification was", ifelse(x$purification, " ", " not "), "applied",
+            ifelse(x$purification, paste(" with ", x$nrPur, word.iteration, sep = ""), ""), "\n", sep = ""))
+  if (x$purification){
+    if (!x$conv.puri){
+      cat(paste("WARNING: Item purification process not converged after "), x$nrPur, word.iteration, "\n",
+          "         Results are based on last iteration of the item purification.\n", sep = "")
+    }
+  }
   if (x$p.adjust.method == "none") {
     cat("No p-value adjustment for multiple comparisons\n\n")
   }
@@ -406,7 +542,7 @@ coef.ddfMLR <- function(object, ...){
 #' @export
 logLik.ddfMLR <- function(object, ...){
   m <- length(object$mlrPAR)
-  LL <- ifelse(1:m %in% object$DIFitems, object$llM0, object$llM1)
+  LL <- ifelse(1:m %in% object$DDFitems, object$llM0, object$llM1)
   return(LL)
 }
 

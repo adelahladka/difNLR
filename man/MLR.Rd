@@ -4,7 +4,8 @@
 \alias{MLR}
 \title{DDF likelihood ratio statistics based on Multinomial Log-linear Regression model.}
 \usage{
-MLR(Data, group, key, type = "both", p.adjust.method = "none", alpha = 0.05)
+MLR(Data, group, key, anchor = 1:ncol(Data), type = "both",
+p.adjust.method = "none", alpha = 0.05)
 }
 \arguments{
 \item{Data}{character: the unscored data matrix.}
@@ -12,6 +13,9 @@ MLR(Data, group, key, type = "both", p.adjust.method = "none", alpha = 0.05)
 \item{group}{numeric or character: the binary vector of group membership}
 
 \item{key}{character: the answer key.}
+
+\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+default, all items are considered as anchors.}
 
 \item{type}{character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 See \strong{Details}.}
