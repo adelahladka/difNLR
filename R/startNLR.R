@@ -86,27 +86,16 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
   }
 
   startNLR_line <- function(match, DATA){
-    if (match == "zscore"){
-      covar <- scale(apply(DATA, 1, sum))
-    } else {
-      if (match == "score"){
-        covar <- as.numeric(apply(DATA, 1, sum))
-      } else {
-        if (length(match) == dim(DATA)[1]){
-          covar <- match
-        } else {
-          stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of
-                the same length as number of observations in 'Data'!")
-        }
-      }
-    }
+
+    covar <- match
+
 
     Q3 <- cut(covar, quantile(covar, (0:3) / 3),
               c("I", "II", "III"),
               include.lowest = TRUE)
 
-    x <- cbind(mean(covar[Q3 == "I"], na.rm = T), colMeans(DATA[Q3 == "I", ], na.rm = T))
-    y <- cbind(mean(covar[Q3 == "III"], na.rm = T), colMeans(DATA[Q3 == "III", ], na.rm = T))
+    x <- cbind(mean(covar[Q3 == "I"], na.rm = T), colMeans(data.frame(DATA[Q3 == "I", ]), na.rm = T))
+    y <- cbind(mean(covar[Q3 == "III"], na.rm = T), colMeans(data.frame(DATA[Q3 == "III", ]), na.rm = T))
     u1 <- y[, 1] - x[, 1]
     u2 <- y[, 2] - x[, 2]
 
@@ -118,12 +107,27 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
     return(results)
   }
 
-  line <- startNLR_line(match, DATA = Data)
+  if (match[1] == "zscore"){
+    MATCH <- scale(apply(Data, 1, sum))
+  } else {
+    if (match[1] == "score"){
+      MATCH <- as.numeric(apply(Data, 1, sum))
+    } else {
+      if (length(match) == dim(Data)[1]){
+        MATCH <- match
+      } else {
+        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of
+                the same length as number of observations in 'Data'!")
+      }
+    }
+  }
 
-  data_R <- Data[group == 0, ] ### reference group
-  data_F <- Data[group == 1, ] ### foal group
-  line_R <- startNLR_line(match, DATA = data_R)
-  line_F <- startNLR_line(match, DATA = data_F)
+  line <- startNLR_line(MATCH, DATA = Data)
+
+  data_R <- data.frame(Data[group == 0, ]) ### reference group
+  data_F <- data.frame(Data[group == 1, ]) ### foal group
+  line_R <- startNLR_line(MATCH[group == 0], DATA = data_R)
+  line_F <- startNLR_line(MATCH[group == 1], DATA = data_F)
 
   if (model %in% c("Rasch", "1PL", "2PL", "3PLdg", "3PLd")){
     c_R <- c_F <- 0

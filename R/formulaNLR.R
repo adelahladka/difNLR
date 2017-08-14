@@ -157,8 +157,10 @@ formulaNLR <- function(model, constraints, type = "both", parameterization = "cl
   }
 
   if (type == "other"){
-    if (length(intersect(types, constr)) > 0){
-      stop("The difference in constrained parameters cannot be tested!")
+    if (!is.null(constraints)){
+      if (length(intersect(types, constr)) > 0){
+        stop("The difference in constrained parameters cannot be tested!")
+      }
     }
   }
 

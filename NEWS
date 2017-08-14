@@ -5,6 +5,20 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.0.8 (2017-08-14) -
+----------------------------------------
+
+MAJOR UPDATES
+
+  o Several bugs were fixed:
+    - 'difNLR()' function can handle 'Data' with one column.
+    - 'startNLR()' now works when 'match' argument is set.
+    - Check input condition was fixed in 'formulaNLR()' function.
+    - Delta method in 'NLR()' function.
+  o Function 'startNLR()' was mildly updated.
+
+
+----------------------------------------
 - Changes in difNLR 1.0.7 (2017-08-10) -
 ----------------------------------------
 

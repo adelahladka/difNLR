@@ -290,13 +290,13 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
   }
   ### constraints
   if (!(missing(constraints))){
-    constr <- unique(unlist(strsplit(constraints, split = "")))
-    if (!all(constr %in% letters[1:4])){
+    constraints <- unique(unlist(strsplit(constraints, split = "")))
+    if (!all(constraints %in% letters[1:4])){
       stop("Constraints can be only 'a', 'b', 'c' or 'd'!")
     }
     if (!(type %in% c("udif", "nudif", "both", "all"))){
       types <- unlist(strsplit(type, split = ""))
-      if (length(intersect(types, constr)) > 0){
+      if (length(intersect(types, constraints)) > 0){
         stop("The difference in constrained parameters cannot be tested!")
       }
     }
@@ -364,7 +364,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
     df <- df[complete.cases(df), ]
 
     GROUP <- df[, "GROUP"]
-    DATA <- df[, colnames(df) != "GROUP"]
+    DATA <- data.frame(df[, colnames(df) != "GROUP"])
 
     if (!is.null(anchor)) {
       if (is.numeric(anchor)){
