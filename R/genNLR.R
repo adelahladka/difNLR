@@ -85,7 +85,7 @@ genNLR <- function(N = 1000, ratio = 1, parameters){
 
   data <- data.frame(answer, group)
 
-  colnames(data) <- c(paste("Item", seq_along(1:n), sep=""), "group")
+  colnames(data) <- c(paste("Item", seq_along(1:n), sep = ""), "group")
   return(data)
 }
 

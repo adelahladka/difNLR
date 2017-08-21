@@ -5,6 +5,22 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.1.0 (2017-08-21) -
+----------------------------------------
+
+*** THIS IS A CRAN VERSION ***
+
+MINOR UPDATES
+
+  o Bug in plot.difNLR was fixed.
+  o README file was updated.
+  o Package documentation was updated.
+  o Default value for 'constraints' arguments in 'NLR()' and 'formulaNLR()'
+    functions were set to 'NULL'.
+  o Default starting values were added into 'NLR()' function
+    by 'startNLR()' function.
+
+----------------------------------------
 - Changes in difNLR 1.0.8 (2017-08-14) -
 ----------------------------------------
 

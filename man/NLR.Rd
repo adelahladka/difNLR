@@ -4,7 +4,7 @@
 \alias{NLR}
 \title{Non-Linear Regression DIF statistic}
 \usage{
-NLR(Data, group, model, constraints, type = "both", match = "zscore",
+NLR(Data, group, model, constraints = NULL, type = "both", match = "zscore",
 anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR", alpha = 0.05)
 }
 \arguments{
@@ -15,7 +15,7 @@ See \strong{Details}.}
 
 \item{model}{character: generalized logistic regression model to be fitted. See \strong{Details}.}
 
-\item{constraints}{character: which parameters should be the same for both groups. See \strong{Details}.}
+\item{constraints}{character: which parameters should be the same for both groups. Default value is \code{NULL}. See \strong{Details}.}
 
 \item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
 \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}

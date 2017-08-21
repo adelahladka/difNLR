@@ -8,12 +8,13 @@
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param type character: type of DIF to be tested. Possible values are "both" (default), "udif", "nudif", "all",
 #' or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
-#' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
+#' @param constraints character: which parameters should be the same for both groups. Default value is \code{NULL}. See \strong{Details}.
 #' @param parameterization character: which parameterization should be used. Possible values are "classic" (default)
 #' and "alternative". See \strong{Details}.
 #' @param outcome character: name of outcome to be printed in formula. If not specified 'y' is used.
 #'
-#' @usage formulaNLR(model, constraints, type = "both", parameterization = "classic", outcome)
+#' @usage formulaNLR(model, constraints = NULL, type = "both", parameterization = "classic",
+#' outcome)
 #'
 #' @details
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
@@ -95,7 +96,7 @@
 #' @export
 #' @importFrom stats as.formula
 
-formulaNLR <- function(model, constraints, type = "both", parameterization = "classic", outcome){
+formulaNLR <- function(model, constraints = NULL, type = "both", parameterization = "classic", outcome){
   if (missing(model)) {
     stop("Argument 'model' is missing")
   } else {

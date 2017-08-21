@@ -836,8 +836,8 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                             legend.box = "vertical",
                             legend.text.align = 0,
                             legend.title.align = 0,
-                            legend.key = element_rect(colour = "white"),
-                            legend.spacing.y = unit(-0.05, "cm"))
+                            legend.key = element_rect(colour = "white"))
+                            # legend.spacing.y = unit(-0.05, "cm"))
     }
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     return(plot_CC)

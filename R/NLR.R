@@ -9,7 +9,7 @@
 #' See \strong{Details}.
 #' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
-#' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
+#' @param constraints character: which parameters should be the same for both groups. Default value is \code{NULL}. See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
 #' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
@@ -24,7 +24,7 @@
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage NLR(Data, group, model, constraints, type = "both", match = "zscore",
+#' @usage NLR(Data, group, model, constraints = NULL, type = "both", match = "zscore",
 #' anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR", alpha = 0.05)
 #'
 #' @details
@@ -171,7 +171,7 @@
 #' @importFrom msm deltamethod
 
 
-NLR <- function(Data, group, model, constraints, type = "both",
+NLR <- function(Data, group, model, constraints = NULL, type = "both",
                 match = "zscore", anchor = 1:ncol(Data),
                 start, p.adjust.method = "none", test = "LR", alpha = 0.05){
 
@@ -187,6 +187,16 @@ NLR <- function(Data, group, model, constraints, type = "both",
         stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
              of observations in 'Data'!")
       }
+    }
+  }
+
+  if (missing(start)){
+    if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
+      parameterization <- "alternative"
+      start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+    } else {
+      parameterization <- "classic"
+      start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
     }
   }
 

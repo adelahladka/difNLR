@@ -4,12 +4,13 @@
 \alias{formulaNLR}
 \title{Formula for Non-Linear Regression Model}
 \usage{
-formulaNLR(model, constraints, type = "both", parameterization = "classic", outcome)
+formulaNLR(model, constraints = NULL, type = "both", parameterization = "classic",
+outcome)
 }
 \arguments{
 \item{model}{character: generalized logistic regression model to be fitted. See \strong{Details}.}
 
-\item{constraints}{character: which parameters should be the same for both groups. See \strong{Details}.}
+\item{constraints}{character: which parameters should be the same for both groups. Default value is \code{NULL}. See \strong{Details}.}
 
 \item{type}{character: type of DIF to be tested. Possible values are "both" (default), "udif", "nudif", "all",
 or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}
