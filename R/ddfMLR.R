@@ -510,7 +510,11 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
       scale_linetype_discrete(name = "Group", labels = c("Reference", "Focal")) +
       scale_size_continuous(name = "Counts")  +
       scale_colour_discrete(name = "Answer", breaks = df2$answ) +
-      scale_fill_discrete(guide = F) +
+      scale_fill_discrete(name = "Answer", breaks = df2$answ) +
+      guides(colour = guide_legend(title = "Answer", order = 1)) +
+      guides(fill = guide_legend(title = "Answer", order = 1)) +
+      guides(size = guide_legend(title = "Counts", order = 2)) +
+      guides(linetype = guide_legend(title = "Group", order = 3)) +
       theme_bw() +
       theme(text = element_text(size = 11),
             plot.title = element_text(size = 11, face = "bold", vjust = 1.5),
@@ -519,15 +523,11 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
             panel.grid.minor = element_blank(),
             plot.background = element_rect(fill = "transparent", colour = NA)) +
       ### legend
-      ### legend
-      theme(legend.box.just = "left",
-            legend.justification = c(1, 0),
+      theme(legend.box.just = "top",
+            legend.justification = c("left", "top"),
             legend.position = c(0, 1),
             legend.box = "horizontal",
-            legend.key = element_rect(colour = "white"),
-            legend.key.width = unit(0.8, "cm"),
-            legend.key.height = unit(0.5, "cm"),
-            legend.spacing.x = unit(-0.05, "cm"))
+            legend.box.margin = margin(3, 3, 3, 3))
 
   }
   plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)

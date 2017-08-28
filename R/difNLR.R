@@ -818,6 +818,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                       scale_colour_manual(breaks = hv$Group, values = col, name = "Group") +
                       scale_fill_manual(breaks = hv$Group, values = col, name = "Group") +
                       scale_linetype_manual(breaks = hv$Group, values = linetype, name = "Group") +
+                      guides(colour = guide_legend(title = "Group", order = 1)) +
+                      guides(fill = guide_legend(title = "Group", order = 1)) +
+                      guides(linetype = guide_legend(title = "Group", order = 1)) +
+                      guides(size = guide_legend(title = "Counts", order = 2)) +
                       ### theme
                       ggtitle(TITLE) +
                       labs(x = "Standardized total score", y = "Probability of correct answer") +
@@ -830,14 +834,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                             panel.grid.minor = element_blank(),
                             plot.background = element_rect(fill = "transparent", colour = NA)) +
                       ### legend
-                      theme(legend.box.just = "left",
+                      theme(legend.box.just = "top",
                             legend.justification = c(1, 0),
-                            legend.position = c(0.97, 0.03),
-                            legend.box = "vertical",
-                            legend.text.align = 0,
-                            legend.title.align = 0,
-                            legend.key = element_rect(colour = "white"))
-                            # legend.spacing.y = unit(-0.05, "cm"))
+                            legend.position = c(1, 0),
+                            legend.box = "horizontal")
     }
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     return(plot_CC)
