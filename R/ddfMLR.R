@@ -512,15 +512,17 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
       scale_colour_discrete(name = "Answer", breaks = df2$answ) +
       scale_fill_discrete(guide = F) +
       theme_bw() +
-      theme(axis.line  = element_line(colour = "black"),
-            text = element_text(size = 11),
+      theme(text = element_text(size = 11),
             plot.title = element_text(size = 11, face = "bold", vjust = 1.5),
+            axis.line  = element_line(colour = "black"),
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank(),
-            panel.background = element_blank(),
+            plot.background = element_rect(fill = "transparent", colour = NA)) +
+      ### legend
+      ### legend
+      theme(legend.box.just = "left",
+            legend.justification = c(1, 0),
             legend.position = c(0, 1),
-            legend.justification = c(0, 1),
-            legend.background = element_blank(),
             legend.box = "horizontal",
             legend.key = element_rect(colour = "white"),
             legend.key.width = unit(0.8, "cm"),

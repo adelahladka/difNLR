@@ -16,7 +16,7 @@ Or you can get the newest development version from GitHub:
 devtools::install_github("drabinova/difNLR")
 ```
 ## Version
-Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.1.0. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.1.0.
+Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.1.1. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.1.1.
 
 ## Getting help
 If you find any bug or just need help with `difNLR` package you can leave your message as an issue here or directly contact us at adela.drabinova@gmail.com

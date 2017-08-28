@@ -90,7 +90,7 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
     covar <- match
 
 
-    Q3 <- cut(covar, quantile(covar, (0:3) / 3),
+    Q3 <- cut(covar, quantile(covar, (0:3) / 3, na.rm = T),
               c("I", "II", "III"),
               include.lowest = TRUE)
 

@@ -5,6 +5,21 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.1.1 (2017-08-28) -
+----------------------------------------
+
+*** THIS IS A CRAN VERSION ***
+
+MAJOR UPDATES
+
+  o Bug in 'startNLR()' function for missing values was fixed.
+
+MINOR UPDATES
+
+  o Graphical representation for 'difNLR()' and 'ddfMLR()' functions was
+    mildly updated and unified.
+
+----------------------------------------
 - Changes in difNLR 1.1.0 (2017-08-21) -
 ----------------------------------------
 
