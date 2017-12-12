@@ -5,6 +5,28 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.1.2 (2017-12-12) -
+----------------------------------------
+
+*** THIS WILL BE A CRAN VERSION ***
+
+MAJOR UPDATES
+
+  o CITATION file was added with reference to relevant paper.
+  o Bug when loading group by group identificator was fixed.
+  o Condition to check dimension of complete cases data was added.
+  o Function 'residuals.difNLR()' was added.
+  o S3 functions 'AIC()' and 'BIC()' for 'difNLR' class were
+    updated.
+  o S3 functions 'plot()', 'fitted()' and 'predict()' for 'difNLR' class
+    can now handle also other matching criterions than 'zscore'.
+
+MINOR UPDATES
+
+  o Reference lists were updated.
+  o README file was updated.
+
+----------------------------------------
 - Changes in difNLR 1.1.1 (2017-08-28) -
 ----------------------------------------
 

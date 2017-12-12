@@ -15,6 +15,8 @@
 \alias{logLik.difNLR}
 \alias{AIC.difNLR}
 \alias{BIC.difNLR}
+\alias{residuals.difNLR}
+\alias{resid.difNLR}
 \title{Performs DIF detection using Non-Linear Regression method.}
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "both",
@@ -38,6 +40,8 @@ alpha = 0.05, p.adjust.method = "none", start)
 \method{AIC}{difNLR}(object, ...)
 
 \method{BIC}{difNLR}(object, ...)
+
+\method{residuals}{difNLR}(object, ...)
 }
 \arguments{
 \item{Data}{numeric: either the scored data matrix only, or the scored data
@@ -140,10 +144,6 @@ A list of class 'difNLR' with the following arguments:
   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
   \item{\code{llM0}}{log-likelihood of null model.}
   \item{\code{llM1}}{log-likelihood of alternative model.}
-  \item{\code{AICM0}}{AIC of null model.}
-  \item{\code{AICM1}}{AIC of alternative model.}
-  \item{\code{BICM0}}{BIC of null model.}
-  \item{\code{BICM1}}{BIC of alternative model.}
 }
 }
 \description{
@@ -301,13 +301,11 @@ AIC(x)
 BIC(x)
 logLik(x)
 }
+
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
-
-Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
-Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
 Journal of Educational Measurement, 27, 361-370.
@@ -319,7 +317,7 @@ Journal of Educational Measurement, 27, 361-370.
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-adela.drabinova@gmail.com \cr
+drabinova@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

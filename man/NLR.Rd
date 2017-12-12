@@ -55,10 +55,6 @@ A list with the following arguments:
   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
   \item{\code{ll.m0}}{log-likelihood of m0 model.}
   \item{\code{ll.m1}}{log-likelihood of m1 model.}
-  \item{\code{AIC.m0}}{AIC of m0 model.}
-  \item{\code{AIC.m1}}{AIC of m1 model.}
-  \item{\code{BIC.m0}}{BIC of m0 model.}
-  \item{\code{BIC.m1}}{BIC of m1 model.}
 }
 }
 \description{
@@ -159,10 +155,7 @@ NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
-
-Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
-Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
 Journal of Educational Measurement, 27, 361-370.
@@ -174,7 +167,7 @@ Journal of Educational Measurement, 27, 361-370.
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-adela.drabinova@gmail.com \cr
+drabinova@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

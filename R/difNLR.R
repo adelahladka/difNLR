@@ -173,17 +173,13 @@
 #'   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
 #'   \item{\code{llM0}}{log-likelihood of null model.}
 #'   \item{\code{llM1}}{log-likelihood of alternative model.}
-#'   \item{\code{AICM0}}{AIC of null model.}
-#'   \item{\code{AICM1}}{AIC of alternative model.}
-#'   \item{\code{BICM0}}{BIC of null model.}
-#'   \item{\code{BICM1}}{BIC of alternative model.}
 #' }
 #'
 #' @author
 #' Adela Drabinova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' adela.drabinova@gmail.com \cr
+#' drabinova@cs.cas.cz \cr
 #'
 #' Patricia Martinkova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -194,10 +190,7 @@
 #'
 #' @references
 #' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
-#'
-#' Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
-#' Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
 #'
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
 #' Journal of Educational Measurement, 27, 361-370.
@@ -266,6 +259,7 @@
 #' BIC(x)
 #' logLik(x)
 #' }
+#'
 #' @keywords DIF
 #' @export
 
@@ -363,6 +357,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
     df <- data.frame(DATA, GROUP, check.names = F)
     df <- df[complete.cases(df), ]
 
+    if (dim(df)[1] == 0){
+      stop("It seems that your 'Data' does not include any subjects that are complete. ", call. = FALSE)
+    }
+
     GROUP <- df[, "GROUP"]
     DATA <- data.frame(df[, colnames(df) != "GROUP"])
 
@@ -380,10 +378,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
     if (is.null(start)){
       if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
         parameterization <- "alternative"
-        start <- startNLR(Data, group, model, match = match, parameterization = parameterization)
+        start <- startNLR(DATA, GROUP, model, match = match, parameterization = parameterization)
         } else {
           parameterization <- "classic"
-          start <- startNLR(Data, group, model, match = match, parameterization = parameterization)
+          start <- startNLR(DATA, GROUP, model, match = match, parameterization = parameterization)
         }
     } else {
       if (ncol(start) != 8 | nrow(start) != ncol(DATA)){
@@ -423,16 +421,14 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
                   nlrPAR = nlrPAR, nlrSE = nlrSE,
                   parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
                   parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
-                  alpha = alpha, DIFitems = DIFitems, match = PROV$match,
+                  alpha = alpha, DIFitems = DIFitems, match = match,
                   model = model, constraints = constraints,
                   type = type, types = types, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
                   purification = purify,
                   group = GROUP, Data = DATA,
                   conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
-                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
-                  AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
-                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
+                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
     } else {
       nrPur <- 0
       difPur <- NULL
@@ -528,16 +524,14 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
                   nlrPAR = nlrPAR, nlrSE = nlrSE,
                   parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
                   parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
-                  alpha = alpha, DIFitems = DIFitems, match = PROV$match,
+                  alpha = alpha, DIFitems = DIFitems, match = match,
                   model = model, constraints = constraints,
                   type = type, types = types, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
                   purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
                   group = GROUP, Data = DATA,
                   conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
-                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
-                  AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
-                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
+                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
     }
     class(RES) <- "difNLR"
     return(RES)
@@ -680,8 +674,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                                               "F" = "F-statistic",
                                               "LR" = "Chisq-statistic")) +
                   theme_bw() +
-                  theme(text = element_text(size = 11),
-                        plot.title = element_text(size = 11, face = "bold", vjust = 1.5),
+                  theme(plot.title = element_text(face = "bold", vjust = 1.5),
                         axis.line  = element_line(colour = "black"),
                         panel.grid.major = element_blank(),
                         panel.grid.minor = element_blank(),
@@ -690,7 +683,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                         axis.ticks.x = element_blank(),
                         legend.position = "none")
 
-    print(plot_stat)
+    return(plot_stat)
   }
 
   plotCC <- function(x, item = item,
@@ -756,8 +749,22 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                     function.arg = function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){})
 
     ### Data
-    xR <- c(scale(apply(x$Data[x$group == 0, ], 1, sum)))
-    xF <- c(scale(apply(x$Data[x$group == 1, ], 1, sum)))
+    if (length(x$match) > 1){
+      xlab <- "Matching criterion"
+      xR <- x$match[x$group == 0]
+      xF <- x$match[x$group == 1]
+    } else {
+      if (x$match == "score"){
+        xlab <- "Total score"
+        xR <- c(apply(x$Data[x$group == 0, ], 1, sum))
+        xF <- c(apply(x$Data[x$group == 1, ], 1, sum))
+      } else {
+        xlab <- "Standardized total score"
+        xR <- c(scale(apply(x$Data[x$group == 0, ], 1, sum)))
+        xF <- c(scale(apply(x$Data[x$group == 1, ], 1, sum)))
+      }
+    }
+
     max_sts <- max(as.numeric(levels(as.factor(xR))),
                    as.numeric(levels(as.factor(xF))))
     min_sts <- min(as.numeric(levels(as.factor(xR))),
@@ -784,18 +791,22 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       }
 
       if (dim(x$nlrPAR)[2] != 8){
-        PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1, aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+        PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1,
+                          aDif = 0, bDif = 0, cDif = 0, dDif = 0)
         PAR[, colnames(x$nlrPAR)] <- x$nlrPAR
       } else {
         PAR <- x$nlrPAR
       }
+
       plot_CC[[i]] <- ggplot(hv, aes_string("X1", "X2")) +
                       ### points
-                      geom_point(aes_string(colour = "Group", fill = "Group",
+                      geom_point(aes_string(colour = "Group",
+                                            fill = "Group",
                                             size = "size"),
                                  alpha = alpha, shape = shape) +
                       ### lines
-                      stat_function(aes(colour = "Reference", linetype = "Reference"),
+                      stat_function(aes(colour = "Reference",
+                                        linetype = "Reference"),
                                     fun = gNLR,
                                     args = list(g = 0,
                                                 a = PAR[i, "a"], b = PAR[i, "b"],
@@ -824,11 +835,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                       guides(size = guide_legend(title = "Counts", order = 2)) +
                       ### theme
                       ggtitle(TITLE) +
-                      labs(x = "Standardized total score", y = "Probability of correct answer") +
+                      labs(x = xlab, y = "Probability of correct answer") +
                       scale_y_continuous(limits = c(0, 1)) +
                       theme_bw() +
-                      theme(text = element_text(size = 11),
-                            plot.title = element_text(size = 11, face = "bold", vjust = 1.5),
+                      theme(plot.title = element_text(face = "bold", vjust = 1.5),
                             axis.line  = element_line(colour = "black"),
                             panel.grid.major = element_blank(),
                             panel.grid.minor = element_blank(),
@@ -844,7 +854,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   }
   ### checking input
   if (!(plot.type %in% c("cc", "stat"))){
-    stop("Possible values of 'plot.type' is 'cc' or 'stat' ",
+    stop("Possible values of 'plot.type' is 'cc' or 'stat'.",
          call. = FALSE)
   } else {
     if (plot.type == "cc"){
@@ -909,10 +919,19 @@ fitted.difNLR <- function(object, item = "all", ...){
     PAR <- object$nlrPAR
   }
   ### data
-  STS <- c(scale(apply(object$Data, 1, sum)))
+  if (length(object$match) > 1){
+    match <- object$match
+  } else {
+    if (object$match == "score"){
+      match <- c(apply(object$Data, 1, sum))
+    } else {
+      match <- c(scale(apply(object$Data, 1, sum)))
+    }
+  }
 
   ### fitted values
-  FV <- lapply(items, function(i) gNLR(STS, object$group, PAR[i, "a"], PAR[i, "b"],
+  FV <- lapply(items, function(i) gNLR(match, object$group,
+                                       PAR[i, "a"], PAR[i, "b"],
                                        PAR[i, "c"], PAR[i, "d"],
                                        PAR[i, "aDif"], PAR[i, "bDif"],
                                        PAR[i, "cDif"], PAR[i, "dDif"]))
@@ -945,7 +964,17 @@ predict.difNLR <- function(object, item = "all",
     stop("'item' must be either numeric vector or character string 'all' ",
          call. = FALSE)
   if (missing(score)){
-    score <- c(scale(apply(object$Data, 1, sum)))
+    if (length(object$match) > 1){
+      match <- object$match
+    } else {
+      if (object$match == "score"){
+        match <- c(apply(object$Data, 1, sum))
+      } else {
+        match <- c(scale(apply(object$Data, 1, sum)))
+      }
+    }
+  } else {
+    match <- score
   }
   if (missing(group)){
     group <- object$group
@@ -984,12 +1013,10 @@ predict.difNLR <- function(object, item = "all",
   } else {
     PAR <- object$nlrPAR
   }
-  ### data
-  STS <- score
 
 
   ### predicted values
-  PV <- lapply(items, function(i) gNLR(STS, group, PAR[i, "a"], PAR[i, "b"],
+  PV <- lapply(items, function(i) gNLR(match, group, PAR[i, "a"], PAR[i, "b"],
                                       PAR[i, "c"], PAR[i, "d"],
                                       PAR[i, "aDif"], PAR[i, "bDif"],
                                       PAR[i, "cDif"], PAR[i, "dDif"]))
@@ -1016,7 +1043,8 @@ logLik.difNLR <- function(object, ...){
 #' @export
 AIC.difNLR <- function(object, ...){
   m <- nrow(object$nlrPAR)
-  AIC <- ifelse(1:m %in% object$DIFitems, object$AICM0, object$AICM1)
+  k <- ifelse(1:m %in% object$DIFitems, ncol(object$parM0), ncol(object$parM1))
+  AIC <- 2*k - 2*unlist(logLik.difNLR(object))
   return(AIC)
 }
 
@@ -1024,7 +1052,17 @@ AIC.difNLR <- function(object, ...){
 #' @export
 BIC.difNLR <- function(object, ...){
   m <- nrow(object$nlrPAR)
-  BIC <- ifelse(1:m %in% object$DIFitems, object$BICM0, object$BICM1)
+  k <- ifelse(1:m %in% object$DIFitems, ncol(object$parM0), ncol(object$parM1))
+  n <- nrow(object$Data)
+  BIC <- log(n)*k - 2*unlist(logLik.difNLR(object))
   return(BIC)
 }
 
+#' @rdname difNLR
+#' @aliases resid.difNLR
+#' @export
+residuals.difNLR <- function(object, ...){
+  m <- nrow(object$nlrPAR)
+  residuals <- object$Data - fitted.difNLR(object)
+  return(residuals)
+}

@@ -19,10 +19,7 @@ gender of students, where 0 represents males (reference group) and 1 represents 
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
-
-Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on
-Non-Linear Regression, Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
 
 Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 }
@@ -33,7 +30,7 @@ Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-adela.drabinova@gmail.com \cr
+drabinova@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

@@ -16,7 +16,11 @@ Or you can get the newest development version from GitHub:
 devtools::install_github("drabinova/difNLR")
 ```
 ## Version
-Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.1.1. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.1.1.
+Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.1.1. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.1.2.
+
+## Reference
+
+New paper about models for DIF detection based on generalized regression is [online](http://onlinelibrary.wiley.com/doi/10.1111/jedm.12158/full).
 
 ## Getting help
-If you find any bug or just need help with `difNLR` package you can leave your message as an issue here or directly contact us at adela.drabinova@gmail.com
+If you find any bug or just need help with `difNLR` package you can leave your message as an issue here or directly contact us at drabinova@cs.cas.cz

@@ -15,9 +15,9 @@ model.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.1.1\cr
-Date: 2017-08-28\cr
-Depends: R (>= 3.2.2), CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats\cr
+Version: 1.1.2\cr
+Date: 2017-12-12\cr
+Depends: R (>= 3.4.3), CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats\cr
 License: GPL-3\cr
 BugReports: https://github.com/drabinova/difNLR/issues
 }
@@ -26,10 +26,7 @@ This package was supported by grant funded by Czech Science foundation under num
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement. Accepted.
-
-Drabinova, A. & Martinkova P. (2016). Detection of Differenctial Item Functioning Based on Non-Linear Regression,
-Technical Report, V-1229, \url{http://hdl.handle.net/11104/0259498}.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
 
 Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory
 Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
@@ -54,7 +51,7 @@ Useful links:
 Adela Drabinova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-adela.drabinova@gmail.com \cr
+drabinova@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
