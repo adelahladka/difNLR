@@ -285,10 +285,10 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   if ("cR" %in% colnames(par.m0)){
     if ("cF" %in% colnames(par.m0)){
       cDif0 <- par.m0$cF - par.m0$cR
-      se.cDif0 <- lapply(1:m, function(i) deltamethod(~ x2 - x1, par.m0[i, c("cR", "cF")],
-                                                      cov.m0[[i]][c("cR", "cF"), c("cR", "cF")]))
+      se.cDif0 <- sapply(which(!cfM0), function(i) deltamethod(~ x2 - x1, par.m0[i, c("cR", "cF")],
+                                                               cov.m0[[i]][c("cR", "cF"), c("cR", "cF")]))
       par.m0$cF <- cDif0
-      se.m0$cF <- se.cDif0
+      se.m0$cF[which(!cfM0)] <- se.cDif0
       colnames(par.m0)[colnames(par.m0) == "cF"] <- colnames(se.m0)[colnames(se.m0) == "cF"] <- "cDif"
     }
     colnames(par.m0)[colnames(par.m0) == "cR"] <- colnames(se.m0)[colnames(se.m0) == "cR"] <- "c"
@@ -296,10 +296,10 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   if ("dR" %in% colnames(par.m0)){
     if ("dF" %in% colnames(par.m0)){
       dDif0 <- par.m0$dF - par.m0$dR
-      se.dDif0 <- lapply(1:m, function(i) deltamethod(~ x2 - x1, par.m0[i, c("dR", "dF")],
-                                                      cov.m0[[i]][c("dR", "dF"), c("dR", "dF")]))
+      se.dDif0 <- sapply(which(!cfM0), function(i) deltamethod(~ x2 - x1, par.m0[i, c("dR", "dF")],
+                                                               cov.m0[[i]][c("dR", "dF"), c("dR", "dF")]))
       par.m0$dF <- dDif0
-      se.m0$dF <- se.dDif0
+      se.m0$dF[which(!cfM0)] <- se.dDif0
       colnames(par.m0)[colnames(par.m0) == "dF"] <- colnames(se.m0)[colnames(se.m0) == "dF"] <- "dDif"
     }
     colnames(par.m0)[colnames(par.m0) == "dR"] <- colnames(se.m0)[colnames(se.m0) == "dR"] <- "d"
@@ -307,10 +307,10 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   if ("cR" %in% colnames(par.m1)){
     if ("cF" %in% colnames(par.m1)){
       cDif1 <- par.m1$cF - par.m1$cR
-      se.cDif1 <- lapply(1:m, function(i) deltamethod(~ x2 - x1, par.m1[i, c("cR", "cF")],
-                                                       cov.m1[[i]][c("cR", "cF"), c("cR", "cF")]))
+      se.cDif1 <- sapply(1:m, function(i) deltamethod(~ x2 - x1, par.m1[i, c("cR", "cF")],
+                                                      cov.m1[[i]][c("cR", "cF"), c("cR", "cF")]))
       par.m1$cF <- cDif1
-      se.m1$cF <- se.cDif1
+      se.m1$cF[which(!cfM1)] <- se.cDif1
       colnames(par.m1)[colnames(par.m1) == "cF"] <- colnames(se.m1)[colnames(se.m1) == "cF"] <- "cDif"
     }
     colnames(par.m1)[colnames(par.m1) == "cR"] <- colnames(se.m1)[colnames(se.m1) == "cR"] <- "c"
@@ -318,10 +318,10 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   if ("dR" %in% colnames(par.m1)){
     if ("dF" %in% colnames(par.m1)){
       dDif1 <- par.m1$dF - par.m1$dR
-      se.dDif1 <- lapply(1:m, function(i) deltamethod(~ x2 - x1, par.m1[i, c("dR", "dF")],
-                                                       cov.m1[[i]][c("dR", "dF"), c("dR", "dF")]))
+      se.dDif1 <- sapply(1:m, function(i) deltamethod(~ x2 - x1, par.m1[i, c("dR", "dF")],
+                                                      cov.m1[[i]][c("dR", "dF"), c("dR", "dF")]))
       par.m1$dF <- dDif1
-      se.m1$dF <- se.dDif1
+      se.m1$dF[which(!cfM1)] <- se.dDif1
       colnames(par.m1)[colnames(par.m1) == "dF"] <- colnames(se.m1)[colnames(se.m1) == "dF"] <- "dDif"
     }
     colnames(par.m1)[colnames(par.m1) == "dR"] <- colnames(se.m1)[colnames(se.m1) == "dR"] <- "d"

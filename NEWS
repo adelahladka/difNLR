@@ -5,10 +5,23 @@
 ****************************************************
 
 ----------------------------------------
-- Changes in difNLR 1.1.2 (2017-12-12) -
+- Changes in difNLR 1.1.3 (2018-02-05) -
 ----------------------------------------
 
 *** THIS WILL BE A CRAN VERSION ***
+
+MAJOR UPDATES
+
+  o Bug in delta method in 'NLR()' function was fixed.
+
+MINOR UPDATES
+
+  o
+
+
+----------------------------------------
+- Changes in difNLR 1.1.2 (2017-12-12) -
+----------------------------------------
 
 MAJOR UPDATES
 
