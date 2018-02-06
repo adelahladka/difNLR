@@ -12,7 +12,7 @@
 \alias{BIC.ddfMLR}
 \title{Performs DDF detection using Multinomial Log-linear Regression model.}
 \usage{
-ddfMLR(Data, group, focal.name, key, type = "both", anchor = NULL,
+ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
 purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 
 \method{print}{ddfMLR}(x, ...)
@@ -42,8 +42,11 @@ focal group}
 \item{type}{character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 See \strong{Details}.}
 
+\item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+\code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.}
+
 \item{anchor}{Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
-currently considered as anchor (DIF free) items.}
+currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
 
 \item{purify}{logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.}
 
@@ -90,6 +93,7 @@ A list of class 'ddfMLR' with the following arguments:
   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
   \item{\code{group}}{the vector of group membership.}
   \item{\code{Data}}{the data matrix.}
+  \item{\code{match}}{matching criterion.}
   \item{\code{llM0}}{log-likelihood of null model.}
   \item{\code{llM1}}{log-likelihood of alternative model.}
   \item{\code{AICM0}}{AIC of null model.}
@@ -114,9 +118,14 @@ The \code{type} corresponds to type of DDF to be tested. Possible values are \co
 to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
 \code{"nudif"} to detect only non-uniform DDF.
 
+Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
+total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
+in \code{Data}. Matching criterion is used in \code{MLR()} function as a covariate in multinomial model.
+
 A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
 item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
-In case anchor items are provided, only these items are used to compute standardized total score. When anchor items are
+In case anchor items are provided, only these items are used to compute matching criterion \code{match}. If the \code{match}
+argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored.  When anchor items are
 provided, purification is not applied.
 
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the
@@ -154,6 +163,9 @@ ddfMLR(Data, group, focal.name = 1, key, purify = T)
 ddfMLR(Data, group, focal.name = 1, key, type = "udif")
 # Testing non-uniform DDF effects
 ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
+
+# Testing both DDF effects with total score as matching criterion
+ddfMLR(Data, group, focal.name = 1, key, match = "score")
 
 # Graphical devices
 plot(x, item = 1)

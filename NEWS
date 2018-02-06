@@ -5,18 +5,29 @@
 ****************************************************
 
 ----------------------------------------
-- Changes in difNLR 1.1.3 (2018-02-05) -
+- Changes in difNLR 1.1.3 (2018-02-06) -
 ----------------------------------------
 
 *** THIS WILL BE A CRAN VERSION ***
 
 MAJOR UPDATES
 
-  o Bug in delta method in 'NLR()' function was fixed.
+  o Bugs fixing:
+    - Bug in delta method in 'NLR()' function was fixed.
+    - Bug in 'match' argument in 'difNLR()' function was fixed.
+    - Bug in one dimensional 'Data' in 'difNLR()' function was fixed.
+  o Specification of upper and lower asymptotes in
+    'startNLR()' function was improved.
+  o Functions 'ddfMLR()' and 'MLR()' can now handle also total score
+    or other user-specified matching criterion.
+  o S3 functions 'plot()' for class 'ddfMLR' can also handle total score
+    or other user-specified matching criterion.
 
 MINOR UPDATES
 
-  o
+  o New auxiliary function 'checkInterval()' was added.
+  o Size of labs and title was unified in graphical outputs of functions
+    'difNLR()' and 'ddfMLR()'.
 
 
 ----------------------------------------

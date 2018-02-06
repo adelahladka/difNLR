@@ -2,7 +2,7 @@ Package: difNLR
 Type: Package
 Title: Detection of Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by Non-Linear Regression Models
 Version: 1.1.3
-Date: 2018-02-05
+Date: 2018-02-06
 Authors@R: c(person("Adela", "Drabinova", role = c("aut", "cre"), email = "drabinova@cs.cas.cz"), person("Patricia", "Martinkova", role = "aut"), person("Karel", "Zvara", role = "aut"))
 Author: Adela Drabinova [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]
 Maintainer: Adela Drabinova <adela.drabinova@gmail.com>

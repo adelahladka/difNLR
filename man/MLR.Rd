@@ -4,7 +4,7 @@
 \alias{MLR}
 \title{DDF likelihood ratio statistics based on Multinomial Log-linear Regression model.}
 \usage{
-MLR(Data, group, key, anchor = 1:ncol(Data), type = "both",
+MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
 p.adjust.method = "none", alpha = 0.05)
 }
 \arguments{
@@ -14,10 +14,14 @@ p.adjust.method = "none", alpha = 0.05)
 
 \item{key}{character: the answer key.}
 
-\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
-default, all items are considered as anchors.}
-
 \item{type}{character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
+See \strong{Details}.}
+
+\item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+\code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.}
+
+\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 See \strong{Details}.}
 
 \item{p.adjust.method}{character: method for multiple comparison correction.
@@ -58,6 +62,10 @@ corresponding to columns of \code{Data}.
 The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
 to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
 \code{"nudif"} to detect only non-uniform DDF.
+
+Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
+total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
+in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
 
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
