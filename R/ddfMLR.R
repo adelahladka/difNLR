@@ -14,8 +14,10 @@
 #' @param key character: the answer key. See \strong{Details}.
 #' @param type character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
 #' See \strong{Details}.
+#' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+#' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
 #' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
-#' currently considered as anchor (DIF free) items.
+#' currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' @param purify logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
 #' @param p.adjust.method character: method for multiple comparison correction.
@@ -28,7 +30,7 @@
 #' @param title string: title of plot.
 #' @param ... other generic parameters for \code{print} or \code{plot} functions.
 #'
-#' @usage ddfMLR(Data, group, focal.name, key, type = "both", anchor = NULL,
+#' @usage ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
 #' purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 #'
 #' @details
@@ -43,9 +45,14 @@
 #' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
 #' \code{"nudif"} to detect only non-uniform DDF.
 #'
+#' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
+#' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
+#' in \code{Data}. Matching criterion is used in \code{MLR()} function as a covariate in multinomial model.
+#'
 #' A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
 #' item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
-#' In case anchor items are provided, only these items are used to compute standardized total score. When anchor items are
+#' In case anchor items are provided, only these items are used to compute matching criterion \code{match}. If the \code{match}
+#' argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored.  When anchor items are
 #' provided, purification is not applied.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
@@ -85,6 +92,7 @@
 #'   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{Data}}{the data matrix.}
+#'   \item{\code{match}}{matching criterion.}
 #'   \item{\code{llM0}}{log-likelihood of null model.}
 #'   \item{\code{llM1}}{log-likelihood of alternative model.}
 #'   \item{\code{AICM0}}{AIC of null model.}
@@ -127,6 +135,9 @@
 #' # Testing non-uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 #'
+#' # Testing both DDF effects with total score as matching criterion
+#' ddfMLR(Data, group, focal.name = 1, key, match = "score")
+#'
 #' # Graphical devices
 #' plot(x, item = 1)
 #' plot(x, item = x$DDFitems)
@@ -142,7 +153,8 @@
 #' @importFrom reshape2 melt
 #' @importFrom stats relevel
 
-ddfMLR <- function(Data, group, focal.name, key, type = "both", anchor = NULL, purify = FALSE,
+ddfMLR <- function(Data, group, focal.name, key, type = "both",
+                   match = "zscore", anchor = NULL, purify = FALSE,
                    nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
@@ -151,6 +163,22 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", anchor = NULL, p
   if (alpha > 1 | alpha < 0)
     stop("'alpha' must be between 0 and 1",
          call. = FALSE)
+  ### matching criterion
+  if (!(match[1] %in% c("score", "zscore"))){
+    if (is.null(dim(Data))){
+      no <- length(Data)
+    } else {
+      no <- dim(Data)[1]
+    }
+    if (length(match) != no){
+      stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
+           of observations in 'Data'!")
+    }
+  }
+  ### purification
+  if (purify & !(match[1] %in% c("score", "zscore")))
+    stop("Purification not allowed when matching variable is not 'zscore' or 'score'",  call. = FALSE)
+
   internalMLR <- function() {
     if (length(group) == 1) {
       if (is.numeric(group)) {
@@ -183,11 +211,25 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", anchor = NULL, p
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
-    df <- data.frame(DATA, GROUP, check.names = F)
+    if (length(match) == dim(DATA)[1]){
+      df <- data.frame(DATA, GROUP, match, check.names = F)
+    } else {
+      df <- data.frame(DATA, GROUP, check.names = F)
+    }
+
     df <- df[complete.cases(df), ]
 
+    if (dim(df)[1] == 0){
+      stop("It seems that your 'Data' does not include any subjects that are complete. ",
+           call. = FALSE)
+    }
+
     GROUP <- df[, "GROUP"]
-    DATA <- df[, colnames(df) != "GROUP"]
+    DATA <- data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
+
+    if (length(match) > 1){
+      match <- df[, "match"]
+    }
 
     if (!is.null(anchor)) {
       if (is.numeric(anchor)){
@@ -200,9 +242,9 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", anchor = NULL, p
     } else {
       ANCHOR <- 1:ncol(DATA)
     }
-    if (!purify | !is.null(anchor)) {
-      PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, anchor = ANCHOR, type = type,
-                                   p.adjust.method = p.adjust.method, alpha = alpha))
+    if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
+      PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, match = match, anchor = ANCHOR,
+                                   type = type, p.adjust.method = p.adjust.method, alpha = alpha))
 
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
@@ -234,7 +276,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", anchor = NULL, p
                   alpha = alpha, DDFitems = DDFitems,
                   type = type, purification = purify, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                  group = GROUP, Data = DATA, key = key,
+                  group = GROUP, Data = DATA, key = key, match = match,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                   AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
                   BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
@@ -332,7 +374,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", anchor = NULL, p
                   alpha = alpha, DDFitems = DDFitems,
                   type = type, purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
                   p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                  group = GROUP, Data = DATA, key = key,
+                  group = GROUP, Data = DATA, key = key, match = match,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                   AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
                   BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
@@ -434,10 +476,22 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     items <- item
   }
 
-  score <- c(scale(unlist(CTT::score(x$Data, x$key))))
+  score <- x$match
   sq <- seq(min(score), max(score), by = 0.1)
   sqR <- as.matrix(data.frame(1, sq, 0, 0))
   sqF <- as.matrix(data.frame(1, sq, 1, sq))
+
+  ### Data
+  if (length(x$match) > 1){
+    xlab <- "Matching criterion"
+  } else {
+    if (x$match == "score"){
+      xlab <- "Total score"
+    } else {
+      xlab <- "Standardized total score"
+    }
+  }
+
   plot_CC <- list()
   for (i in items){
 
@@ -505,7 +559,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
 
       ylim(0, 1) +
       ggtitle(TITLE) +
-      labs(x = "Standardized total score",
+      labs(x = xlab,
            y = "Probability of answer") +
       scale_linetype_discrete(name = "Group", labels = c("Reference", "Focal")) +
       scale_size_continuous(name = "Counts")  +
@@ -516,8 +570,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
       guides(size = guide_legend(title = "Counts", order = 2)) +
       guides(linetype = guide_legend(title = "Group", order = 3)) +
       theme_bw() +
-      theme(text = element_text(size = 11),
-            plot.title = element_text(size = 11, face = "bold", vjust = 1.5),
+      theme(plot.title = element_text(face = "bold", vjust = 1.5),
             axis.line  = element_line(colour = "black"),
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank(),

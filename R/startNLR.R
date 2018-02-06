@@ -133,10 +133,10 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
     c_R <- c_F <- 0
   } else {
     if (grepl("cg", model)){
-      c_R <- c_F <- apply(cbind(0, line$k * (-4) + line$q), 1, max)
+      c_R <- c_F <- checkInterval(line$k * (-4) + line$q, c(0, 0.99))
     } else {
-      c_R <- apply(cbind(0, line_R$k * (-4) + line_R$q), 1, max)
-      c_F <- apply(cbind(0, line_F$k * (-4) + line_F$q), 1, max)
+      c_R <- checkInterval(line_R$k * (-4) + line_R$q, c(0, 0.99))
+      c_F <- checkInterval(line_F$k * (-4) + line_F$q, c(0, 0.99))
     }
   }
 
@@ -145,10 +145,10 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
     d_R <- d_F <- 1
   } else {
     if (grepl("dg", model)){
-      d_R <- d_F <- apply(cbind(1, line$k * 4 + line$q), 1, min)
+      d_R <- d_F <- checkInterval(line$k * 4 + line$q, c(0.01, 1))
     } else {
-      d_R <- apply(cbind(1, line_R$k * 4 + line_R$q), 1, min)
-      d_F <- apply(cbind(1, line_F$k * 4 + line_F$q), 1, min)
+      d_R <- checkInterval(line_R$k * 4 + line_R$q, c(0.01, 1))
+      d_F <- checkInterval(line_F$k * 4 + line_F$q, c(0.01, 1))
     }
   }
 
@@ -156,20 +156,15 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
     a_R <- a_F <- 1
   } else {
     if (model == "1PL") {
-      a_R <- a_F <- 4 * line$k/(1 - c_R)
+      a_R <- a_F <- 4 * line$k/(d_R - c_R)
     } else {
-      a_R <- 4 * line_R$k/(1 - c_R)
-      a_F <- 4 * line_F$k/(1 - c_F)
+      a_R <- 4 * line_R$k/(d_R - c_R)
+      a_F <- 4 * line_F$k/(d_F - c_F)
     }
   }
 
-  b_R <- ((1 + c_R)/2 - line_R$q)/line_R$k
-  b_F <- ((1 + c_F)/2 - line_F$q)/line_F$k
-
-  # b_R[b_R > max(covar)] <- max(covar, na.rm = T)
-  # b_F[b_F > max(covar)] <- max(covar, na.rm = T)
-  # b_R[b_R < min(covar)] <- min(covar, na.rm = T)
-  # b_F[b_F < min(covar)] <- min(covar, na.rm = T)
+  b_R <- ((d_R + c_R)/2 - line_R$q)/line_R$k
+  b_F <- ((d_F + c_F)/2 - line_F$q)/line_F$k
 
   results <- switch(parameterization,
                     classic = data.frame("a" = a_R, "b" = b_R, "c" = c_R, "d" = d_R,

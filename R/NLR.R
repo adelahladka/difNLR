@@ -183,25 +183,20 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     }
   }
 
-  if (missing(start)){
-    if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
-      parameterization <- "alternative"
-      start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
-    } else {
-      parameterization <- "classic"
-      start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
-    }
-  }
-
-  m <- ncol(Data)
-  n <- nrow(Data)
-
-
   if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
     parameterization <- "alternative"
   } else {
     parameterization <- "classic"
   }
+
+  if (missing(start)){
+    start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+  } else {
+    start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+  }
+
+  m <- ncol(Data)
+  n <- nrow(Data)
 
   M <- formulaNLR(model = model, type = type, constraints, parameterization = parameterization)
   m0 <- lapply(1:m, function(i) tryCatch(nls(formula = M$M0$formula,

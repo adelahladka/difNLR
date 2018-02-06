@@ -307,14 +307,19 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
   }
   ### matching criterion
   if (!(match[1] %in% c("score", "zscore"))){
-    if (length(match) != dim(Data)[1]){
+    if (is.null(dim(Data))){
+      no <- length(Data)
+    } else {
+      no <- dim(Data)[1]
+    }
+    if (length(match) != no){
       stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
            of observations in 'Data'!")
     }
   }
   ### purification
   if (purify & !(match[1] %in% c("score", "zscore")))
-    stop("purification not allowed when matching variable is not 'zscore' or 'score'",  call. = FALSE)
+    stop("Purification not allowed when matching variable is not 'zscore' or 'score'",  call. = FALSE)
   ### test
   if (!test %in% c("F", "LR") | !is.character(type))
     stop("'test' must be either 'F' or 'LR'", call. = FALSE)
@@ -349,20 +354,36 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
       if (nrow(DATA) != length(GROUP))
         stop("'Data' must have the same number of rows as is length of vector 'group'", call. = FALSE)
     } else {
-      stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
+      if (is.vector(DATA)){
+        if (length(DATA) != length(GROUP))
+          stop("'Data' must have the same number of rows as is length of vector 'group'", call. = FALSE)
+        DATA <- as.data.frame(DATA)
+      } else {
+        stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
+      }
     }
 
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
-    df <- data.frame(DATA, GROUP, check.names = F)
+    if (length(match) == dim(DATA)[1]){
+      df <- data.frame(DATA, GROUP, match, check.names = F)
+    } else {
+      df <- data.frame(DATA, GROUP, check.names = F)
+    }
+
     df <- df[complete.cases(df), ]
 
     if (dim(df)[1] == 0){
-      stop("It seems that your 'Data' does not include any subjects that are complete. ", call. = FALSE)
+      stop("It seems that your 'Data' does not include any subjects that are complete. ",
+           call. = FALSE)
     }
 
     GROUP <- df[, "GROUP"]
-    DATA <- data.frame(df[, colnames(df) != "GROUP"])
+    DATA <- data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
+
+    if (length(match) > 1){
+      match <- df[, "match"]
+    }
 
     if (!is.null(anchor)) {
       if (is.numeric(anchor)){
@@ -847,7 +868,8 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                       theme(legend.box.just = "top",
                             legend.justification = c(1, 0),
                             legend.position = c(1, 0),
-                            legend.box = "horizontal")
+                            legend.box = "horizontal",
+                            legend.box.margin = margin(3, 3, 3, 3))
     }
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     return(plot_CC)

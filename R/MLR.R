@@ -7,15 +7,18 @@
 #' @param Data character: the unscored data matrix.
 #' @param group numeric or character: the binary vector of group membership
 #' @param key character: the answer key.
-#' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
-#' default, all items are considered as anchors.
 #' @param type character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
+#' See \strong{Details}.
+#' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+#' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
+#' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+#' default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage MLR(Data, group, key, anchor = 1:ncol(Data), type = "both",
+#' @usage MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
 #' p.adjust.method = "none", alpha = 0.05)
 #'
 #' @details
@@ -29,6 +32,10 @@
 #' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
 #' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
 #' \code{"nudif"} to detect only non-uniform DDF.
+#'
+#' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
+#' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
+#' in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
@@ -91,9 +98,23 @@
 #' @importFrom CTT score
 
 
-MLR <- function(Data, group, key, anchor = 1:ncol(Data), type = "both", p.adjust.method = "none", alpha = 0.05){
+MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data), p.adjust.method = "none", alpha = 0.05){
 
-  x <- c(scale(unlist(CTT::score(as.data.frame(Data[, anchor]), key[anchor]))))
+  if (match[1] == "zscore"){
+    x <- c(scale(unlist(CTT::score(as.data.frame(Data[, anchor]), key[anchor]))))
+  } else {
+    if (match[1] == "score"){
+      x <- c(unlist(CTT::score(as.data.frame(Data[, anchor]), key[anchor])))
+    } else {
+      if (length(match) == dim(Data)[1]){
+        x <- match
+      } else {
+        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
+             of observations in 'Data'!")
+      }
+    }
+  }
+
   m <- ncol(Data)
   n <- nrow(Data)
 
