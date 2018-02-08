@@ -4,13 +4,15 @@
 *                                                  *
 ****************************************************
 ----------------------------------------
-- Changes in difNLR 1.2.0 (2018-02-07) -
+- Changes in difNLR 1.2.0 (2018-02-08) -
 ----------------------------------------
 
 MAJOR UPDATES
 
   o New function 'estimNLR()' to estimate parameters of NLR models
     was added. This is very first (and experimental) version.
+  o Bugs fixing:
+    - Bug in 'plot()' for 'ddfMLR' class in matching criterion was fixed.
 
 
 ----------------------------------------

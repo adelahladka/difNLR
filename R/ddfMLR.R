@@ -476,8 +476,22 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     items <- item
   }
 
-  score <- x$match
-  sq <- seq(min(score), max(score), by = 0.1)
+  if (x$match[1] == "zscore"){
+    score <- c(scale(unlist(CTT::score(as.data.frame(x$Data), x$key))))
+  } else {
+    if (x$match[1] == "score"){
+      score <- c(unlist(CTT::score(as.data.frame(x$Data), x$key)))
+    } else {
+      if (length(x$match) == dim(x$Data)[1]){
+        score <- x$match
+      } else {
+        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
+             of observations in 'Data'!")
+      }
+    }
+  }
+
+  sq <- seq(min(score, na.rm = T), max(score, na.rm = T), by = 0.1)
   sqR <- as.matrix(data.frame(1, sq, 0, 0))
   sqF <- as.matrix(data.frame(1, sq, 1, sq))
 
