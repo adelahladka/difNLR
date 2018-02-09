@@ -191,8 +191,6 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
 
   if (missing(start)){
     start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
-  } else {
-    start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
   }
 
   m <- ncol(Data)
@@ -233,6 +231,12 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
                                           function(l) ((m1[[l]]$m$deviance() - m0[[l]]$m$deviance())/df[1])/(m0[[l]]$m$deviance()/df[2]))
     pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
                                           function(l) (1 - pf(Fval[l], df[1], df[2])))
+    # RSS0 <- rep(NA, m); RSS1 <- rep(NA, m)
+    # RSS0[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(resid(m0[[l]])^2))
+    # RSS1[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(resid(m1[[l]])^2))
+    #
+    # Fval <- ((RSS1 - RSS0)/df[1])/(RSS0/df[2])
+    # pval <- 1 - pf(Fval, df[1], df[2])
   } else {
     pval <- LRval <- rep(NA, m)
 

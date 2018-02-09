@@ -13,7 +13,12 @@ MAJOR UPDATES
     was added. This is very first (and experimental) version.
   o Bugs fixing:
     - Bug in 'plot()' for 'ddfMLR' class in matching criterion was fixed.
+    - Bug in 'NLR()' was fixed. User-specified starting values are now
+      available.
 
+MINOR UPDATES
+
+  o Some preparation for new estimation methods for F test in 'NLR()' was done.
 
 ----------------------------------------
 - Changes in difNLR 1.1.3 (2018-02-06) -
