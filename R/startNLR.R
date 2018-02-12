@@ -89,13 +89,15 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
 
     covar <- match
 
+    breaks <- unique(quantile(covar, (0:3) / 3, na.rm = T))
+    lb <- length(breaks) - 1
+    Q3 <- cut(covar, breaks, include.lowest = TRUE)
+    levels(Q3) <- LETTERS[1:lb]
 
-    Q3 <- cut(covar, quantile(covar, (0:3) / 3, na.rm = T),
-              c("I", "II", "III"),
-              include.lowest = TRUE)
-
-    x <- cbind(mean(covar[Q3 == "I"], na.rm = T), colMeans(data.frame(DATA[Q3 == "I", ]), na.rm = T))
-    y <- cbind(mean(covar[Q3 == "III"], na.rm = T), colMeans(data.frame(DATA[Q3 == "III", ]), na.rm = T))
+    x <- cbind(mean(covar[Q3 == LETTERS[1]], na.rm = T),
+               colMeans(data.frame(DATA[Q3 == LETTERS[1], ]), na.rm = T))
+    y <- cbind(mean(covar[Q3 == LETTERS[lb]], na.rm = T),
+               colMeans(data.frame(DATA[Q3 == LETTERS[lb], ]), na.rm = T))
     u1 <- y[, 1] - x[, 1]
     u2 <- y[, 2] - x[, 2]
 

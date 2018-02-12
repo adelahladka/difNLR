@@ -4,7 +4,7 @@
 *                                                  *
 ****************************************************
 ----------------------------------------
-- Changes in difNLR 1.2.0 (2018-02-08) -
+- Changes in difNLR 1.2.0 (2018-02-12) -
 ----------------------------------------
 
 MAJOR UPDATES
@@ -15,6 +15,8 @@ MAJOR UPDATES
     - Bug in 'plot()' for 'ddfMLR' class in matching criterion was fixed.
     - Bug in 'NLR()' was fixed. User-specified starting values are now
       available.
+    - Bug in 'startNLR()' was fixed. Function runs even if there are not
+      unique cuts for total scores/match.
 
 MINOR UPDATES
 
