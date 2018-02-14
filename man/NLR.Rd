@@ -2,10 +2,11 @@
 % Please edit documentation in R/NLR.R
 \name{NLR}
 \alias{NLR}
-\title{Non-Linear Regression DIF statistic}
+\title{Non-Linear Regression DIF statistic.}
 \usage{
-NLR(Data, group, model, constraints = NULL, type = "both", match = "zscore",
-anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR", alpha = 0.05)
+NLR(Data, group, model, constraints = NULL, type = "both", method = "nls",
+match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
+alpha = 0.05)
 }
 \arguments{
 \item{Data}{numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
@@ -19,6 +20,9 @@ See \strong{Details}.}
 
 \item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
 \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}
+
+\item{method}{character: what method should be used for estimation of parameters in \code{model}. The options are
+\code{"nls"} for non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.}
 
 \item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.}
@@ -151,6 +155,8 @@ NLR(Data, group, model = "2PL", type = "nudif")
 # to test difference in b
 NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
 
+# using maximum likelihood estimation method
+NLR(Data, group, model = "3PLcg", method = "likelihood")
 }
 }
 \references{

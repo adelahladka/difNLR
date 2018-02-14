@@ -2,9 +2,9 @@
 % Please edit documentation in R/estimNLR.R
 \name{estimNLR}
 \alias{estimNLR}
-\title{Estimation for non-linear regression DIF models}
+\title{Non-Linear Regression DIF models estimation.}
 \usage{
-estimNLR(y, match, group, formula, start, method)
+estimNLR(y, match, group, formula, method, lower, upper, start)
 }
 \arguments{
 \item{y}{numeric: binary vector. See \strong{Details}.}
@@ -13,45 +13,61 @@ estimNLR(y, match, group, formula, start, method)
 
 \item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.}
 
-\item{formula}{list: with the same structure as output of \code{formulaNLR} function. See \strong{Details}.}
+\item{formula}{formula: specification of the model. See \strong{Details}.}
+
+\item{method}{character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
+squares (default) and \code{"likelihood"} for maximum likelihood method.}
+
+\item{lower}{numeric: lower bounds for parameters of model specified in \code{formula}.}
+
+\item{upper}{numeric: upper bounds for parameters of model specified in \code{formula}.}
 
 \item{start}{numeric: initial parameters. See \strong{Details}.}
-
-\item{method}{character: method used to estimate parameters. Options are \code{"nls"} for non-linear
-least squares and \code{"likelihood"} for maximum likelihood. See \strong{Details}.}
 }
 \description{
-Estimates parameters of non-linear regression models for DIF detection.
-This is very first version of the function.
+Estimates parameters of non-linear regression models for DIF detection using either
+non-linear least squares or maximum likelihood method.
 }
 \examples{
 \dontrun{
 data(GMAT)
 
+# item 1
 y  <- GMAT[, 1]
-x  <- scale(apply(GMAT[, 1:20], 1, sum))
-g <- GMAT[, "group"]
+match  <- scale(apply(GMAT[, 1:20], 1, sum))
+group <- GMAT[, "group"]
 
-# starting values for 3PL model
-start <- startNLR(GMAT[, 1:20], g, model = "3PLcg")
-start <- start[1, c(1, 2, 3, 5, 6)]
-names(start) <- c("a", "b", "c", "aDif", "bDif")
+# formula for 3PL model with the same guessing
+M <- formulaNLR(model = "3PLcg", type = "both")
 
-formula <- formulaNLR(model = "3PLcg", type = "both")
+# starting values for 3PL model with the same guessing for item 1
+start <- startNLR(GMAT[, 1:20], group, model = "3PLcg", parameterization = "classic")
+start <- start[1, M$M0$parameters]
 
 # Non-linear least squares
-fitNLS <- estimNLR(y = y, match = x, group = g, formula = formula,
-start = start, method = "nls")
-lapply(fitNLS, coef)
-lapply(fitNLS, logLik)
-lapply(fitNLS, vcov)
+fitNLSM0 <- estimNLR(y = y, match = match, group = group,
+formula = M$M0$formula, method = "nls",
+lower = M$M0$lower, upper = M$M0$upper, start = start)
+fitNLSM0
+
+coef(fitNLSM0)
+logLik(fitNLSM0)
+vcov(fitNLSM0)
+fitted(fitNLSM0)
+residuals(fitNLSM0)
 
 # Maximum likelihood
-fitLKL <- estimNLR(y = y, match = x, group = g, formula = formula,
-start = start, method = "likelihood")
-lapply(fitLKL, coef)
-lapply(fitLKL, logLik)
-lapply(fitLKL, vcov)
+fitLKLM0 <- estimNLR(y = y, match = match, group = group,
+formula = M$M0$formula, method = "likelihood",
+lower = M$M0$lower, upper = M$M0$upper, start = start)
+fitLKLM0
+
+coef(fitLKLM0)
+logLik(fitLKLM0)
+vcov(fitLKLM0)
+fitted(fitLKLM0)
+residuals(fitLKLM0)
+
 }
 
 }

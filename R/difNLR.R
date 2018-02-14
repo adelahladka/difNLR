@@ -15,6 +15,8 @@
 #' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
 #' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
 #' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
+#' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
+#' squares (default) and \code{"likelihood"} for maximum likelihood method.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
 #' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
@@ -42,9 +44,9 @@
 #' @param ... other generic parameters for \code{print()}, \code{plot()}, \code{fitted()},
 #' \code{predict()} or \code{coef()} functions.
 #'
-#' @usage difNLR(Data, group, focal.name, model, constraints, type = "both",
-#' match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-#' alpha = 0.05, p.adjust.method = "none", start)
+#' @usage difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
+#' match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
+#' p.adjust.method = "none", start)
 #'
 #' @details
 #' DIF detection procedure based on Non-Linear Regression is the extension of Logistic Regression
@@ -169,6 +171,7 @@
 #'   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{Data}}{the data matrix.}
+#'   \item{\code{method}}{used estimation method.}
 #'   \item{\code{conv.fail}}{numeric: number of convergence issues.}
 #'   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
 #'   \item{\code{llM0}}{log-likelihood of null model.}
@@ -238,6 +241,11 @@
 #' # a and c parameters
 #' difNLR(Data, group, focal.name = 1, model = "4PL", constraints = "ac", type = "b")
 #'
+#' # Testing both DIF effects using LR test,
+#' # 3PL model with fixed guessing for groups
+#' # with maximum likelihood estimation method
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
+#'
 #' # Graphical devices
 #' plot(x)
 #' plot(x, item = x$DIFitems)
@@ -264,14 +272,14 @@
 #' @export
 
 
-difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
+difNLR <- function(Data, group, focal.name, model, constraints, type = "both", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start)
 {
   if (type == "nudif" & model == "1PL")
-    stop("Detection of non-uniform DIF is not possible with 1PL model!", call. = FALSE)
+    stop("Detection of non-uniform DIF is not possible with 1PL model.", call. = FALSE)
   if (type == "nudif" & model == "Rasch")
-    stop("Detection of non-uniform DIF is not possible with Rasch model!", call. = FALSE)
+    stop("Detection of non-uniform DIF is not possible with Rasch model.", call. = FALSE)
   # input check
   ### model
   if (missing(model)) {
@@ -279,19 +287,19 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
   } else {
     if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd", "4PLcgdg", "4PLcgd",
                        "4PLd", "4PLcdg", "4PLc", "4PL"))){
-      stop("Invalid value for 'model'", call. = FALSE)
+      stop("Invalid value for 'model'.", call. = FALSE)
     }
   }
   ### constraints
   if (!(missing(constraints))){
     constraints <- unique(unlist(strsplit(constraints, split = "")))
     if (!all(constraints %in% letters[1:4])){
-      stop("Constraints can be only 'a', 'b', 'c' or 'd'!")
+      stop("Constraints can be only 'a', 'b', 'c' or 'd'.")
     }
     if (!(type %in% c("udif", "nudif", "both", "all"))){
       types <- unlist(strsplit(type, split = ""))
       if (length(intersect(types, constraints)) > 0){
-        stop("The difference in constrained parameters cannot be tested!")
+        stop("The difference in constrained parameters cannot be tested.")
       }
     }
   } else {
@@ -302,7 +310,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
     types <- unique(unlist(strsplit(type, split = "")))
     if (!all(types %in% letters[1:4])){
       stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
-           or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'")
+           or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.")
     }
   }
   ### matching criterion
@@ -314,21 +322,25 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
     }
     if (length(match) != no){
       stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
-           of observations in 'Data'!")
+           of observations in 'Data'.")
     }
   }
   ### purification
   if (purify & !(match[1] %in% c("score", "zscore")))
-    stop("Purification not allowed when matching variable is not 'zscore' or 'score'",  call. = FALSE)
+    stop("Purification not allowed when matching variable is not 'zscore' or 'score'.",  call. = FALSE)
   ### test
   if (!test %in% c("F", "LR") | !is.character(type))
-    stop("'test' must be either 'F' or 'LR'", call. = FALSE)
+    stop("Invalid value for 'test'. Test for DIF detection must be either 'F' or 'LR'.", call. = FALSE)
   ### significance level
   if (alpha > 1 | alpha < 0)
-    stop("'alpha' must be between 0 and 1", call. = FALSE)
+    stop("Argument 'alpha' must be between 0 and 1.", call. = FALSE)
   ### starting values
   if (missing(start)) {
     start <- NULL
+  }
+  ### estimation method
+  if (!(method %in% c("nls", "likelihood"))){
+    stop("Invalid value for 'method'. Estimation method must be either 'nls' or 'likelihood'.", call. = FALSE)
   }
   # internal NLR function
   internalNLR <- function() {
@@ -350,13 +362,13 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
       stop("'group' must be binary vector", call. = FALSE)
     if (is.matrix(DATA) | is.data.frame(DATA)) {
       if (!all(apply(DATA, 2, function(i) { length(levels(as.factor(i))) == 2 })))
-        stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
+        stop("'Data' must be data frame or matrix of binary vectors.", call. = FALSE)
       if (nrow(DATA) != length(GROUP))
-        stop("'Data' must have the same number of rows as is length of vector 'group'", call. = FALSE)
+        stop("'Data' must have the same number of rows as is length of vector 'group'.", call. = FALSE)
     } else {
       if (is.vector(DATA)){
         if (length(DATA) != length(GROUP))
-          stop("'Data' must have the same number of rows as is length of vector 'group'", call. = FALSE)
+          stop("'Data' must have the same number of rows as is length of vector 'group'.", call. = FALSE)
         DATA <- as.data.frame(DATA)
       } else {
         stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
@@ -406,15 +418,15 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
         }
     } else {
       if (ncol(start) != 8 | nrow(start) != ncol(DATA)){
-        stop("'start' must be data frame or matrix with 8 columns and the number of its rows need
-             to correspond to number of items!", call. = FALSE)
+        stop("Invalid value for 'start'. Initial values must be a data frame or matrix with 8 columns and the number of
+              its rows need to correspond to number of items.", call. = FALSE)
       }
       colnames(start) <- c(letters[1:4], paste(letters[1:4], "Dif", sep = ""))
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
-      PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
-                                 anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method, test = test,
-                                 alpha = alpha))
+      PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
+                                   match = match, anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method,
+                                   test = test, alpha = alpha))
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
       significant <- which(ADJ.PVAL < alpha)
@@ -447,15 +459,15 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
                   type = type, types = types, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
                   purification = purify,
-                  group = GROUP, Data = DATA,
+                  group = GROUP, Data = DATA, method = method,
                   conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
     } else {
       nrPur <- 0
       difPur <- NULL
       noLoop <- FALSE
-      prov1 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
-                                    start = start, p.adjust.method = p.adjust.method, test = test,
+      prov1 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
+                                    match = match, start = start, p.adjust.method = p.adjust.method, test = test,
                                     alpha = alpha))
       stats1 <- prov1$Sval
       adj.pval1 <- prov1$adjusted.pval
@@ -488,9 +500,9 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
                       nodif <- c(nodif, i)
                   }
                 }
-              prov2 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, match = match,
-                                            anchor = nodif, start = start, p.adjust.method = p.adjust.method, test = test,
-                                            alpha = alpha))
+              prov2 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
+                                            match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
+                                            test = test, alpha = alpha))
               stats2 <- prov2$Sval
               adj.pval2 <- prov2$adjusted.pval
               significant2 <- which(adj.pval2 < alpha)
@@ -550,9 +562,19 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both",
                   type = type, types = types, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
                   purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
-                  group = GROUP, Data = DATA,
+                  group = GROUP, Data = DATA, method = method,
                   conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
+    }
+    if (PROV$conv.fail > 0) {
+      warning(paste("Convergence failure in item", PROV$conv.fail.which, "\n"))
+    }
+    if (purify){
+      if (!noLoop){
+        warning(paste("Item purification process not converged after ",
+                      nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
+                      "Results are based on last iteration of the item purification.\n", sep = ""))
+      }
     }
     class(RES) <- "difNLR"
     return(RES)
@@ -593,15 +615,12 @@ print.difNLR <- function (x, ...){
                    paste(" with constraints on",
                          paste(unique(unlist(strsplit(x$constraints, split = ""))), collapse = ", "),
                          "parameter")), sep = ""), "\n")
-  if (x$purification) word.iteration <- ifelse(x$nrPur <= 1, " iteration", " iterations")
-  cat(paste("\nItem purification was", ifelse(x$purification, " ", " not "), "applied",
-      ifelse(x$purification, paste(" with ", x$nrPur, word.iteration, sep = ""), ""), "\n", sep = ""))
-  if (x$purification){
-    if (!x$conv.puri){
-      cat(paste("WARNING: Item purification process not converged after "), x$nrPur, word.iteration, "\n",
-          "         Results are based on last iteration of the item purification.\n", sep = "")
-    }
-  }
+  cat(paste("\nParameters were estimated with", ifelse(x$method == "nls",
+                                                       "non-linear least squares\n",
+                                                       "maximum likelihood method\n")))
+  cat(paste("\nItem purification was",
+            ifelse(x$purification, " ", " not "), "applied",
+            ifelse(x$purification, paste(" with ", x$nrPur, ifelse(x$nrPurnrPur <= 1, " iteration.", " iterations."), sep = ""), ""), "\n", sep = ""))
   if (x$p.adjust.method == "none") {
     cat("No p-value adjustment for multiple comparisons\n\n")
   } else {
@@ -713,25 +732,25 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     m <- nrow(x$nlrPAR)
     if (class(item) == "character"){
       if (item != "all")
-        stop("'item' must be either numeric vector or character string 'all' ",
+        stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
              call. = FALSE)
     } else {
       if (class(item) != "integer" & class(item) != "numeric")
-        stop("'item' must be either numeric vector or character string 'all' ",
+        stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
              call. = FALSE)
     }
     if (class(item) == "numeric" & !all(item %in% 1:m))
-      stop("invalid number of 'item'",
+      stop("Invalid number for 'item'.",
            call. = FALSE)
     if (class(item) == "integer" & !all(item %in% 1:m))
-      stop("'item' must be either numeric vector or character string 'all' ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
            call. = FALSE)
     if (length(col) == 1){
       col <- rep(col, 2)
     } else {
       if (length(col) > 2){
         col <- col[1:2]
-        warning("Length of 'col' is greater than 2. Only first two values are used",
+        warning("Length of 'col' is greater than 2. Only first two values are used.",
                 call. = FALSE)
       }
     }
@@ -742,11 +761,11 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     }
     if (any(x$conv.fail.which %in% items)){
       if (length(setdiff(items, x$conv.fail.which)) == 0){
-        stop(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted",
+        stop(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
                    sep = "", collapse = "\n"),
              call. = FALSE)
       } else {
-        warning(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted",
+        warning(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
                       sep = "", collapse = "\n"),
                 call. = FALSE)
         items <- setdiff(items, x$conv.fail.which)
@@ -757,7 +776,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         linetype <- rep(linetype, 2)
       } else {
         linetype <- linetype[1:2]
-        warning("Length of 'linetype' is greater than 2. Only first two values are used",
+        warning("Length of 'linetype' is greater than 2. Only first two values are used.",
                 call. = FALSE)
       }
     }
@@ -876,7 +895,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   }
   ### checking input
   if (!(plot.type %in% c("cc", "stat"))){
-    stop("Possible values of 'plot.type' is 'cc' or 'stat'.",
+    stop("Invalid value for 'plot.type'. Possible values of 'plot.type' is 'cc' or 'stat'.",
          call. = FALSE)
   } else {
     if (plot.type == "cc"){
@@ -897,18 +916,18 @@ fitted.difNLR <- function(object, item = "all", ...){
   m <- nrow(object$nlrPAR)
   if (class(item) == "character"){
     if (item != "all")
-      stop("'item' must be either numeric vector or character string 'all' ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("'item' must be either numeric vector or character string 'all' ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
-    stop("invalid number of 'item'",
+    stop("Invalid number for 'item'.",
          call. = FALSE)
   if (class(item) == "integer" & !all(item %in% 1:m))
-    stop("'item' must be either numeric vector or character string 'all' ",
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
     items <- 1:m
@@ -917,11 +936,11 @@ fitted.difNLR <- function(object, item = "all", ...){
   }
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed",
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
                  sep = "", collapse = "\n"),
            call. = FALSE)
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed",
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
                     sep = "", collapse = "\n"),
               call. = FALSE)
       items <- setdiff(items, object$conv.fail.which)
@@ -972,18 +991,18 @@ predict.difNLR <- function(object, item = "all",
   m <- nrow(object$nlrPAR)
   if (class(item) == "character"){
     if (item != "all")
-      stop("'item' must be either numeric vector or character string 'all' ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("'item' must be either numeric vector or character string 'all' ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
-    stop("invalid number of 'item'",
+    stop("Invalid number for 'item'.",
          call. = FALSE)
   if (class(item) == "integer" & !all(item %in% 1:m))
-    stop("'item' must be either numeric vector or character string 'all' ",
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (missing(score)){
     if (length(object$match) > 1){
@@ -1002,7 +1021,7 @@ predict.difNLR <- function(object, item = "all",
     group <- object$group
   }
   if(length(score) != length(group)){
-    stop("'score' and 'group' must be the same length",
+    stop("Arguments 'score' and 'group' must be of the same length.",
          call. = FALSE)
   }
   if (class(item) == "character"){
@@ -1012,11 +1031,11 @@ predict.difNLR <- function(object, item = "all",
   }
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed",
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
                  sep = "", collapse = "\n"),
            call. = FALSE)
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed",
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
                     sep = "", collapse = "\n"),
               call. = FALSE)
       items <- setdiff(items, object$conv.fail.which)

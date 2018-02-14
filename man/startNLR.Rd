@@ -2,7 +2,7 @@
 % Please edit documentation in R/startNLR.R
 \name{startNLR}
 \alias{startNLR}
-\title{Calculates starting values for \code{difNLR} function.}
+\title{Calculates starting values for Non-Linear Regression DIF models.}
 \usage{
 startNLR(Data, group, model, match = "zscore", parameterization = "alternative")
 }

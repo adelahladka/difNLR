@@ -1,4 +1,4 @@
-#' Calculates starting values for \code{difNLR} function.
+#' Calculates starting values for Non-Linear Regression DIF models.
 #'
 #' @param Data numeric: a matrix or data.frame of binary data.
 #' @param group numeric: binary vector of group membership.

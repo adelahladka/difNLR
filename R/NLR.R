@@ -1,4 +1,4 @@
-#' Non-Linear Regression DIF statistic
+#' Non-Linear Regression DIF statistic.
 #'
 #' @aliases NLR
 #'
@@ -10,6 +10,8 @@
 #' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param constraints character: which parameters should be the same for both groups. Default value is \code{NULL}. See \strong{Details}.
+#' @param method character: what method should be used for estimation of parameters in \code{model}. The options are
+#' \code{"nls"} for non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
 #' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
@@ -24,8 +26,9 @@
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage NLR(Data, group, model, constraints = NULL, type = "both", match = "zscore",
-#' anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR", alpha = 0.05)
+#' @usage NLR(Data, group, model, constraints = NULL, type = "both", method = "nls",
+#' match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
+#' alpha = 0.05)
 #'
 #' @details
 #' DIF detection procedure based on Non-Linear Regression is the extension
@@ -157,6 +160,8 @@
 #' # to test difference in b
 #' NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
 #'
+#' # using maximum likelihood estimation method
+#' NLR(Data, group, model = "3PLcg", method = "likelihood")
 #' }
 #' @keywords DIF
 #' @export
@@ -165,7 +170,7 @@
 
 
 NLR <- function(Data, group, model, constraints = NULL, type = "both",
-                match = "zscore", anchor = 1:ncol(Data),
+                method = "nls", match = "zscore", anchor = 1:ncol(Data),
                 start, p.adjust.method = "none", test = "LR", alpha = 0.05){
 
   if (match[1] == "zscore"){
@@ -197,46 +202,35 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   n <- nrow(Data)
 
   M <- formulaNLR(model = model, type = type, constraints, parameterization = parameterization)
-  m0 <- lapply(1:m, function(i) tryCatch(nls(formula = M$M0$formula,
-                                             data = data.frame(y = Data[, i], g = group, x = x),
-                                             algorithm = "port",
-                                             start = start[i, M$M0$parameters],
-                                             lower = M$M0$lower,
-                                             upper = M$M0$upper),
-                                         error = function(e){cat("ERROR : ", conditionMessage(e), "\n")},
-                                         finally = ""))
 
-  m1 <- lapply(1:m, function(i) tryCatch(nls(formula = M$M1$formula,
-                                             data = data.frame(y = Data[, i], g = group, x = x),
-                                             algorithm = "port",
-                                             start = start[i, M$M1$parameters],
-                                             lower = M$M1$lower,
-                                             upper = M$M1$upper),
-                                         error = function(e){cat("ERROR : ", conditionMessage(e), "\n")},
-                                         finally = ""))
+  m0 <- lapply(1:m, function(i) estimNLR(y = Data[, i], match = x, group = group,
+                                         formula = M$M0$formula, method = method,
+                                         start = start[i, M$M0$parameters],
+                                         lower = M$M0$lower, upper = M$M0$upper))
+  m1 <- lapply(1:m, function(i) estimNLR(y = Data[, i], match = x, group = group,
+                                         formula = M$M1$formula, method = method,
+                                         start = start[i, M$M1$parameters],
+                                         lower = M$M1$lower, upper = M$M1$upper))
   # convergence failures
   cfM0 <- unlist(lapply(m0, is.null)); cfM1 <- unlist(lapply(m1, is.null))
   conv.fail <- sum(cfM0, cfM1)
   conv.fail.which <- which(cfM0 | cfM1)
 
   if (conv.fail > 0) {
-    warning("Convergence failure")
+    warning(paste("Convergence failure in item", conv.fail.which, "\n"))
   }
   # test
   if (test == "F"){
     pval <- Fval <- rep(NA, m)
 
-    df <- c(length(M$M0$parameters) - length(M$M1$parameters), n -  length(M$M0$parameters))
-    Fval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 |  cfM0)),
-                                          function(l) ((m1[[l]]$m$deviance() - m0[[l]]$m$deviance())/df[1])/(m0[[l]]$m$deviance()/df[2]))
-    pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
-                                          function(l) (1 - pf(Fval[l], df[1], df[2])))
-    # RSS0 <- rep(NA, m); RSS1 <- rep(NA, m)
-    # RSS0[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(resid(m0[[l]])^2))
-    # RSS1[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(resid(m1[[l]])^2))
-    #
-    # Fval <- ((RSS1 - RSS0)/df[1])/(RSS0/df[2])
-    # pval <- 1 - pf(Fval, df[1], df[2])
+    df <- c(length(M$M0$parameters) - length(M$M1$parameters), n - length(M$M0$parameters))
+
+    RSS0 <- rep(NA, m); RSS1 <- rep(NA, m)
+    RSS0[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m0[[l]])^2))
+    RSS1[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
+
+    Fval <- ((RSS1 - RSS0)/df[1])/(RSS0/df[2])
+    pval <- 1 - pf(Fval, df[1], df[2])
   } else {
     pval <- LRval <- rep(NA, m)
 
@@ -247,9 +241,9 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
                                           function(l) (1 - pchisq(LRval[l], df)))
   }
   # likelihood
-  ll.m0 <- ll.m1 <- lapply(1:m, function(i) NA)
-  ll.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], logLik)
-  ll.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], logLik)
+  ll.m0 <- ll.m1 <- rep(NA, m)
+  ll.m0[which(!cfM0)] <- sapply(m0[which(!cfM0)], logLik)
+  ll.m1[which(!cfM1)] <- sapply(m1[which(!cfM1)], logLik)
   # adjusted p-values
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
   # parameters

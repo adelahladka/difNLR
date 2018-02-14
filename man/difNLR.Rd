@@ -19,9 +19,9 @@
 \alias{resid.difNLR}
 \title{Performs DIF detection using Non-Linear Regression method.}
 \usage{
-difNLR(Data, group, focal.name, model, constraints, type = "both",
-match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-alpha = 0.05, p.adjust.method = "none", start)
+difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
+match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
+p.adjust.method = "none", start)
 
 \method{print}{difNLR}(x, ...)
 
@@ -59,6 +59,9 @@ focal group}
 
 \item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
 \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}
+
+\item{method}{character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
+squares (default) and \code{"likelihood"} for maximum likelihood method.}
 
 \item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.}
@@ -140,6 +143,7 @@ A list of class 'difNLR' with the following arguments:
   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{group}}{the vector of group membership.}
   \item{\code{Data}}{the data matrix.}
+  \item{\code{method}}{used estimation method.}
   \item{\code{conv.fail}}{numeric: number of convergence issues.}
   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
   \item{\code{llM0}}{log-likelihood of null model.}
@@ -279,6 +283,11 @@ difNLR(Data, group, focal.name = 1, model = "2PL", type = "nudif")
 # Testing difference in parameter b using 4PL model with fixed
 # a and c parameters
 difNLR(Data, group, focal.name = 1, model = "4PL", constraints = "ac", type = "b")
+
+# Testing both DIF effects using LR test,
+# 3PL model with fixed guessing for groups
+# with maximum likelihood estimation method
+difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
 
 # Graphical devices
 plot(x)
