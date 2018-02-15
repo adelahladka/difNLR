@@ -2,54 +2,116 @@
 % Please edit documentation in R/genNLR.R
 \name{genNLR}
 \alias{genNLR}
-\title{Generates binary data set based on Non-Linear Regression model (generalized logistic regression).}
+\title{Generates data set based on Non-Linear Regression DIF a DDF models.}
 \usage{
-genNLR(N = 1000, ratio = 1, parameters)
+genNLR(N = 1000, ratio = 1, itemtype = "dich", a, b, c, d, mu = 0, sigma = 1)
 }
 \arguments{
 \item{N}{numeric: number of rows representing correspondents.}
 
 \item{ratio}{numeric: ratio of number of rows for reference and focal group.}
 
-\item{parameters}{numeric: matrix representing with n rows (where n is number of items) and 8 columns
-representing true parameters of generalized logistic regression model . See \strong{Details}.}
+\item{itemtype}{character: type of items to be generated. Options are "dich" for
+dichotomous item (default) and "nominal" for nominal items. See \strong{Details}.}
+
+\item{a}{numeric: matrix representing discriminations with m rows
+(where m is number of items). Need to be provided. See \strong{Details}.}
+
+\item{b}{numeric: numeric: matrix representing difficulties with m rows
+(where m is number of items). Need to be provided. See \strong{Details}.}
+
+\item{c}{numeric: matrix representing guessings (lower asymptotes) with m rows
+(where m is number of items). Default is NULL. See \strong{Details}.}
+
+\item{d}{numeric: matrix representing inattentions (upper asymptotes) with m rows
+(where m is number of items). Default is NULL. See \strong{Details}.}
+
+\item{mu}{numeric: a mean vector of the underlying distribution. The first value corresponds to
+reference group, the second to focal group. Default is 0 value for both groups. See \strong{Details}.}
+
+\item{sigma}{numeric: a standard deviation vector of the underlying distribution. The first value corresponds to
+reference group, the second to focal group. Default is 1 value for both groups. See \strong{Details}.}
 }
 \value{
-A data.frame containing \code{N} rows representing correspondents and n+1 columns representing n items.
+A data.frame containing \code{N} rows representing correspondents and m+1 columns representing m items.
 Last column is group membership variable with coding 0 for reference group and 1 for focal group.
 }
 \description{
-Generates binary data set based on generalized logistic model.
+Generates dichotomous and nominal data set based on non-linear regression
+models for DIF and DDF detection.
 }
 \details{
-The \code{parameters} is a numeric matrix with 8 columns. First 4 columns represent parameters (a, b, c, d)
-of generalized logistic regression model for reference group. Last 4 columns represent differences of
-parameters (aDif, bDif, cDif, dDif) of generalized logistic regression model between reference and focal
-group. Rows represent items and their number (n) corresponds to number of columns of resultant data set.
+The \code{itemtype} argument specify what type of item should be generated. In case
+\code{itemtype = "dich"}, dichotomous items are generated with non-linear regression models
+for DIF detection specified in \code{\link[difNLR]{difNLR}}. In case \code{itemtype = "nominal"}, nominal items are generated with
+nominal model specified in \code{\link[difNLR]{ddfMLR}}.
+
+The \code{a}, \code{b}, \code{c} and \code{d} are numeric matrices with m rows
+(where m is number of items) representing parameters of non-linear regression model for
+DIF detection.
+
+For option \code{itemtype = "dich"}, matrices should have two columns.
+The first column represents parameters of the reference group and the second of the focal group.
+In case that only one column is provided, parameters are set to be the same for both groups.
+
+For option \code{itemtype = "nominal"}, matrices \code{c} and \code{d} are ignored. Matrices
+\code{a} and \code{b} contain parameters for distractors. For example, when
+item with 4 different choices is supposed to be generated, user provide matrices with 6 columns.
+First 3 columns correspond to distractors parameters for reference group and last three columns
+for focal group. The number of choices can differ for items. Matrices \code{a} and \code{b}
+need to consist of as many columns as is the maximum number of distractors. Items with less
+choices can containt NAs.
+
+Single value for \code{mu} means that reference and focal group have underlying distribution with the same mean.
+Single value for \code{sigma} means that reference and focal group have underlying distribution with the same
+standard deviation. In case that \code{mu} or \code{sigma} are vectors of length grater than two, only
+first two values are taken.
 }
 \examples{
 \dontrun{
 # seed
 set.seed(123)
-# generating parameters without DIF, 10 items
-parameters <- data.frame(a = runif(10, 0.8, 2),
-                         b = rnorm(10),
-                         c = runif(10, 0, 0.4),
-                         d = 1,
-                         aDif = 0, bDif = 0,
-                         cDif = 0, dDif = 0)
+# generating parameters for dichotomous data with DIF, 5 items
+a <- matrix(runif(10, 0.8, 2), ncol = 2)
+b <- matrix(runif(10, -2, 2), ncol = 2)
+c <- matrix(runif(10, 0, 0.25), ncol = 2)
+d <- matrix(runif(10, 0.8, 1), ncol = 2)
+# generating dichotomous data set with 300 observations (150 each group)
+genNLR(N = 300, a = a, b = b, c = c, d = d)
+# generating dichotomous data set with 300 observations (150 each group)
+# and different mean and standard deviation for underlying distribution
+genNLR(N = 300, a = a, b = b, c = c, d = d, mu = c(1, 0), sigma = c(1, 2))
+# generating dichotomous data set with 300 observations (250 reference group, 50 focal)
+genNLR(N = 300, ratio = 5, a = a, b = b, c = c, d = d)
 
-# generating data set with 300 observations (150 each group)
-genNLR(N = 300, parameters = parameters)
+# generating parameters for nominal data with DDF, 5 items,
+# each item 3 choices
+a <- matrix(runif(20, 0.8, 2), ncol = 4)
+b <- matrix(runif(20, -2, 2), ncol = 4)
+# generating nominal data set with 300 observations (150 each group)
+genNLR(N = 300, itemtype = "nominal", a = a, b = b)
+# generating nominal data set with 300 observations (250 reference group, 50 focal)
+genNLR(N = 300, itemtype = "nominal", ratio = 5, a = a, b = b)
 
-# generating data set with 300 observations (250 reference group, 50 focal)
-genNLR(N = 300, ratio = 5, parameters = parameters)
+# generating parameters for nominal data with DDF, 5 items,
+# items 1 and 2 have 2 choices, items 3, 4 and 5 have 3 choices
+a <- matrix(runif(20, 0.8, 2), ncol = 4)
+a[1:2, c(2, 4)] <- NA
+b <- matrix(runif(20, -2, 2), ncol = 4)
+b[1:2, c(2, 4)] <- NA
+# generating nominal data set with 300 observations (150 each group)
+genNLR(N = 300, itemtype = "nominal", a = a, b = b)
+# generating nominal data set with 300 observations (250 reference group, 50 focal)
+genNLR(N = 300, itemtype = "nominal", ratio = 5, a = a, b = b)
 
 }
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+}
+\seealso{
+\code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}
 }
 \author{
 Adela Drabinova \cr

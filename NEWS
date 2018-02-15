@@ -4,11 +4,23 @@
 *                                                  *
 ****************************************************
 ----------------------------------------
-- Changes in difNLR 1.2.0 (2018-02-14) -
+- Changes in difNLR 1.2.0 (2018-02-15) -
 ----------------------------------------
 
+1.2.0.-2. (2018-02-15)
 MAJOR UPDATES
+  o Function 'genNLR()' can now also generate nominal data based on
+    model specified in 'ddfMLR()'.
+  o Argument 'parameters' in 'genNLR()' is no longer applicable.
+  o Arguments 'a', 'b', 'c', 'd' were added into 'genNLR()' as parameters -
+    discrimination, difficulty, guessing, inattention
+  o Function 'genNLR()' can now also generate different underlying
+    distributions for reference and focal group with arguments 'mu' and 'sigma'.
+MINOR UPDATES
+  o Email address of maintainer was changed.
 
+1.2.0.-1. (2018-02-14)
+MAJOR UPDATES
   o New function 'estimNLR()' to estimate parameters of NLR models
     was added. This function uses non-linear least squares or maximum
     likelihood method.
@@ -25,9 +37,7 @@ MAJOR UPDATES
     - Bug in 'startNLR()' was fixed. Function runs even if there are not
       unique cuts for total scores/match.
     - Bug in log-likelihood calculation in 'estimNLR()' was fixed.
-
 MINOR UPDATES
-
   o Some preparation for new estimation methods for F test in 'NLR()' was done.
   o Convergence failure warning is now item specific.
   o Warning and error messages were improved.
