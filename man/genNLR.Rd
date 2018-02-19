@@ -7,9 +7,9 @@
 genNLR(N = 1000, ratio = 1, itemtype = "dich", a, b, c, d, mu = 0, sigma = 1)
 }
 \arguments{
-\item{N}{numeric: number of rows representing correspondents.}
+\item{N}{numeric: number of rows representing respondents.}
 
-\item{ratio}{numeric: ratio of number of rows for reference and focal group.}
+\item{ratio}{numeric: ratio of respondents number in reference and focal group.}
 
 \item{itemtype}{character: type of items to be generated. Options are "dich" for
 dichotomous item (default) and "nominal" for nominal items. See \strong{Details}.}
@@ -33,7 +33,7 @@ reference group, the second to focal group. Default is 0 value for both groups. 
 reference group, the second to focal group. Default is 1 value for both groups. See \strong{Details}.}
 }
 \value{
-A data.frame containing \code{N} rows representing correspondents and m+1 columns representing m items.
+A \code{data.frame} containing \code{N} rows representing respondents and m+1 columns representing m items.
 Last column is group membership variable with coding 0 for reference group and 1 for focal group.
 }
 \description{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/formulaNLR.R
 \name{formulaNLR}
 \alias{formulaNLR}
-\title{Formula for Non-Linear Regression Model}
+\title{Formula for Non-Linear Regression DIF model.}
 \usage{
 formulaNLR(model, constraints = NULL, type = "both", parameterization = "classic",
 outcome)
@@ -24,8 +24,8 @@ and "alternative". See \strong{Details}.}
 A list of two models. Both includes formula, parameters to be estimated and their lower and upper constraints.
 }
 \description{
-Based on model specification and DIF type to be tester function returns the formula of the non-linear
-models.
+Function returns the formula of the non-linear
+models based on model specification and DIF type to be tested.
 }
 \details{
 The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
@@ -80,17 +80,17 @@ formulaNLR(model = "4PLcgdg", type = "udif")
 formulaNLR(model = "2PL", type = "nudif")
 
 # 4PL model to test all possible DIF
-formulaNLR(model = "4PL", type = "all")
-
-# 4PL model with fixed a and c parameter
-# to test difference in b
-formulaNLR(model = "4PL", constraints = "ac", type = "b")
+# with alternative parameterization
+formulaNLR(model = "4PL", type = "all", parameterization = "alternative")
 
 # 4PL model with fixed a and c parameter
 # to test difference in b with alternative parameterization
 formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "alternative")
 }
 
+}
+\seealso{
+\code{\link[difNLR]{difNLR}}
 }
 \author{
 Adela Drabinova \cr

@@ -4,8 +4,18 @@
 *                                                  *
 ****************************************************
 ----------------------------------------
-- Changes in difNLR 1.2.0 (2018-02-15) -
+- Changes in difNLR 1.2.0 (2018-02-19) -
 ----------------------------------------
+
+1.2.0.-3. (2018-02-19)
+MAJOR UPDATES
+  o Bug fixing:
+    - Starting values in input of 'estimNLR()' in 'NLR()' are now properly
+      named.
+    - Bug in alternative parameterization for testing differences in parameters
+      c and d in function 'formulaNLR()' was fixed.
+MINOR UPDATES
+  o Descriptions of 'formulaNLR()' and 'estimNLR()' were improved.
 
 1.2.0.-2. (2018-02-15)
 MAJOR UPDATES

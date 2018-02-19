@@ -205,11 +205,11 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
 
   m0 <- lapply(1:m, function(i) estimNLR(y = Data[, i], match = x, group = group,
                                          formula = M$M0$formula, method = method,
-                                         start = start[i, M$M0$parameters],
+                                         start = structure(start[i, M$M0$parameters], names = M$M0$parameters),
                                          lower = M$M0$lower, upper = M$M0$upper))
   m1 <- lapply(1:m, function(i) estimNLR(y = Data[, i], match = x, group = group,
                                          formula = M$M1$formula, method = method,
-                                         start = start[i, M$M1$parameters],
+                                         start = structure(start[i, M$M1$parameters], names = M$M1$parameters),
                                          lower = M$M1$lower, upper = M$M1$upper))
   # convergence failures
   cfM0 <- unlist(lapply(m0, is.null)); cfM1 <- unlist(lapply(m1, is.null))

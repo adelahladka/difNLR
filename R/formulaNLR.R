@@ -1,9 +1,9 @@
-#' Formula for Non-Linear Regression Model
+#' Formula for Non-Linear Regression DIF model.
 #'
 #' @aliases formulaNLR
 #'
-#' @description Based on model specification and DIF type to be tester function returns the formula of the non-linear
-#' models.
+#' @description Function returns the formula of the non-linear
+#' models based on model specification and DIF type to be tested.
 #'
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param type character: type of DIF to be tested. Possible values are "both" (default), "udif", "nudif", "all",
@@ -68,6 +68,8 @@
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' martinkova@cs.cas.cz \cr
 #'
+#' @seealso \code{\link[difNLR]{difNLR}}
+#'
 #' @examples
 #' \dontrun{
 #' # 3PL model with the same guessing for both groups
@@ -82,11 +84,8 @@
 #' formulaNLR(model = "2PL", type = "nudif")
 #'
 #' # 4PL model to test all possible DIF
-#' formulaNLR(model = "4PL", type = "all")
-#'
-#' # 4PL model with fixed a and c parameter
-#' # to test difference in b
-#' formulaNLR(model = "4PL", constraints = "ac", type = "b")
+#' # with alternative parameterization
+#' formulaNLR(model = "4PL", type = "all", parameterization = "alternative")
 #'
 #' # 4PL model with fixed a and c parameter
 #' # to test difference in b with alternative parameterization
@@ -144,7 +143,6 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
   mod <- apply(cbind(mod, cons), 1, all)
 
   # type of DIF to be tested
-  # typ <- logical(8); names(typ) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
   typ <- typcons <- mod
 
   if (!(type %in% c("udif", "nudif", "both", "all"))){
@@ -199,8 +197,12 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
     names(mod0)[3:4] <- names(mod1)[3:4] <- c("cR", "dR")
     names(mod0)[7:8] <- names(mod1)[7:8] <- c("cF", "dF")
     for (i in 3:4){
-      param0[[i]] <- paste(names(which(mod0[c(i, i + 4)])), c("* (1 - g)", "* g")[mod0[c(i, i + 4)]], collapse = " + ")
-      param1[[i]] <- paste(names(which(mod1[c(i, i + 4)])), c("* (1 - g)", "* g")[mod1[c(i, i + 4)]], collapse = " + ")
+      param0[[i]] <- ifelse(length(which(mod0[c(i, i + 4)])) == 1,
+                            names(which(mod0[c(i, i + 4)])),
+                            paste(names(which(mod0[c(i, i + 4)])), c("* (1 - g)", "* g")[mod0[c(i, i + 4)]], collapse = " + "))
+      param1[[i]] <- ifelse(length(which(mod1[c(i, i + 4)])) == 1,
+                            names(which(mod1[c(i, i + 4)])),
+                            paste(names(which(mod1[c(i, i + 4)])), c("* (1 - g)", "* g")[mod1[c(i, i + 4)]], collapse = " + "))
     }
   }
 
@@ -215,15 +217,15 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
 
   # formulas for model 0 and model 1
 
-  param0 <- paste("(", param0, ")", sep = "")
-  param1 <- paste("(", param1, ")", sep = "")
+  param0[grepl(" ", param0)] <- paste("(", param0[grepl(" ", param0)], ")", sep = "")
+  param1[grepl(" ", param1)] <- paste("(", param1[grepl(" ", param1)], ")", sep = "")
 
 
   ### (d - c)
   part_dc0  <- paste(c(param0[4], param0[3]), collapse = " - ")
-  part_dc0  <- paste("(", part_dc0, ")", sep = "")
+  part_dc0[grepl(" ", part_dc0)]  <- paste("(", part_dc0[grepl(" ", part_dc0)], ")", sep = "")
   part_dc1  <- paste(c(param1[4], param1[3]), collapse = " - ")
-  part_dc1  <- paste("(", part_dc1, ")", sep = "")
+  part_dc1[grepl(" ", part_dc1)]  <- paste("(", part_dc1[grepl(" ", part_dc1)], ")", sep = "")
 
   ### c + (d - c)
   part_cdc0 <- paste(c(param0[3], part_dc0), collapse = " + ")
