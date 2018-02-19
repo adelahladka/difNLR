@@ -4,7 +4,8 @@
 \alias{startNLR}
 \title{Calculates starting values for Non-Linear Regression DIF models.}
 \usage{
-startNLR(Data, group, model, match = "zscore", parameterization = "alternative")
+startNLR(Data, group, model, match = "zscore", parameterization = "alternative",
+simplify = F)
 }
 \arguments{
 \item{Data}{numeric: a matrix or data.frame of binary data.}
@@ -22,6 +23,9 @@ of observations in \code{Data}.}
 coefficients. Possible options are \code{"classic"} (IRT parameterization),
 \code{"alternative"} (default) and \code{"logistic"} (logistic regression).
 See \strong{Details}.}
+
+\item{simplify}{logical: whether initial values should be simplified into the table.
+This is only applicable when parameterization is the same for all items.}
 }
 \value{
 A data.frame containing rows representing items and 5 columns representing parameters of \code{difNLR} model. First column represents discrimination (a), second difficulty (b), third guessing (c), fourth difference in discrimination between reference and focal group (aDif) and fifth difference in difficulty between reference and focal group (bDif).
@@ -62,14 +66,26 @@ group <- GMAT[, "group"]
 startNLR(Data, group, model = "3PL")
 
 # starting values for 3PL model
+# simplified into single table
+startNLR(Data, group, model = "3PL", simplify = T)
+
+# starting values for 3PL model
 # with score as matching criterion
 startNLR(Data, group, model = "3PL", match = "score")
+
+# starting values for model specified for each item
+startNLR(Data, group,
+         model = c(rep("1PL", 5), rep("2PL", 5),
+                   rep("3PL", 5), rep("4PL", 5)))
 
 }
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+}
+\seealso{
+\code{\link[difNLR]{difNLR}}
 }
 \author{
 Adela Drabinova \cr

@@ -188,29 +188,50 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     }
   }
 
-  if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
-    parameterization <- "alternative"
-  } else {
-    parameterization <- "classic"
+  m <- ncol(Data)
+  n <- nrow(Data)
+
+  if (length(model) == 1){
+    model <- rep(model, m)
+  }
+  if (is.null(constraints)){
+    constraints <- as.list(rep(NA, m))
+  }
+  if (length(constraints) == 1){
+      constraints <- rep(constraints, m)
+  }
+  if (length(type) == 1){
+    type <- rep(type, m)
   }
 
+  parameterization <- ifelse(model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg",
+                                          "4PLc", "4PL"),
+                             "alternative",
+                             "classic")
   if (missing(start)){
     start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
   }
 
-  m <- ncol(Data)
-  n <- nrow(Data)
-
-  M <- formulaNLR(model = model, type = type, constraints, parameterization = parameterization)
+  M <- lapply(1:m,
+              function(i) formulaNLR(model = model[i],
+                                     type = type[i],
+                                     constraints = constraints[i],
+                                     parameterization = parameterization[i]))
 
   m0 <- lapply(1:m, function(i) estimNLR(y = Data[, i], match = x, group = group,
-                                         formula = M$M0$formula, method = method,
-                                         start = structure(start[i, M$M0$parameters], names = M$M0$parameters),
-                                         lower = M$M0$lower, upper = M$M0$upper))
+                                         formula = M[[i]]$M0$formula,
+                                         method = method,
+                                         start = structure(start[[i]][M[[i]]$M0$parameters],
+                                                           names = M[[i]]$M0$parameters),
+                                         lower = M[[i]]$M0$lower,
+                                         upper = M[[i]]$M0$upper))
   m1 <- lapply(1:m, function(i) estimNLR(y = Data[, i], match = x, group = group,
-                                         formula = M$M1$formula, method = method,
-                                         start = structure(start[i, M$M1$parameters], names = M$M1$parameters),
-                                         lower = M$M1$lower, upper = M$M1$upper))
+                                         formula = M[[i]]$M1$formula,
+                                         method = method,
+                                         start = structure(start[[i]][M[[i]]$M1$parameters],
+                                                           names = M[[i]]$M1$parameters),
+                                         lower = M[[i]]$M1$lower,
+                                         upper = M[[i]]$M1$upper))
   # convergence failures
   cfM0 <- unlist(lapply(m0, is.null)); cfM1 <- unlist(lapply(m1, is.null))
   conv.fail <- sum(cfM0, cfM1)

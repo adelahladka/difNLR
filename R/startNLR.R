@@ -11,11 +11,14 @@
 #' coefficients. Possible options are \code{"classic"} (IRT parameterization),
 #' \code{"alternative"} (default) and \code{"logistic"} (logistic regression).
 #' See \strong{Details}.
+#' @param simplify logical: whether initial values should be simplified into the table.
+#' This is only applicable when parameterization is the same for all items.
 #'
 #' @description Calculates starting values for \code{difNLR} function based
 #' on linear approximation.
 #'
-#' @usage startNLR(Data, group, model, match = "zscore", parameterization = "alternative")
+#' @usage startNLR(Data, group, model, match = "zscore", parameterization = "alternative",
+#' simplify = F)
 #'
 #' @details
 #' The \code{model} argument offers several predefined models. The options are as follows:
@@ -54,6 +57,8 @@
 #' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 #' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
 #'
+#' @seealso \code{\link[difNLR]{difNLR}}
+#'
 #' @examples
 #' \dontrun{
 #' # loading data based on GMAT
@@ -66,22 +71,49 @@
 #' startNLR(Data, group, model = "3PL")
 #'
 #' # starting values for 3PL model
+#' # simplified into single table
+#' startNLR(Data, group, model = "3PL", simplify = T)
+#'
+#' # starting values for 3PL model
 #' # with score as matching criterion
 #' startNLR(Data, group, model = "3PL", match = "score")
+#'
+#' # starting values for model specified for each item
+#' startNLR(Data, group,
+#'          model = c(rep("1PL", 5), rep("2PL", 5),
+#'                    rep("3PL", 5), rep("4PL", 5)))
 #'
 #' }
 #' @export
 
-startNLR <- function(Data, group, model, match = "zscore", parameterization = "alternative"){
+startNLR <- function(Data, group, model, match = "zscore", parameterization = "alternative",
+                     simplify = F){
   if (missing(model)) {
     stop("'model' is missing",
          call. = FALSE)
   } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL",
+    if (!all(model %in% c("Rasch", "1PL", "2PL",
                        "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
                        "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"))){
       stop("Invalid value for 'model'",
            call. = FALSE)
+    }
+  }
+
+  if (length(model) == 1){
+    model <- rep(model, ncol(Data))
+  } else {
+    if (length(model) != ncol(Data)){
+      stop("Invalid length of 'model'. Model needs to be specified for each item or
+           by single string. ", call. = FALSE)
+    }
+  }
+  if (length(parameterization) == 1){
+    parameterization <- rep(parameterization, ncol(Data))
+  } else {
+    if (length(parameterization) != ncol(Data)){
+      stop("Invalid length of 'parameterization'. Parameterization for initial values needs to be specified
+           for each item or by single string. ", call. = FALSE)
     }
   }
 
@@ -131,50 +163,77 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
   line_R <- startNLR_line(MATCH[group == 0], DATA = data_R)
   line_F <- startNLR_line(MATCH[group == 1], DATA = data_F)
 
-  if (model %in% c("Rasch", "1PL", "2PL", "3PLdg", "3PLd")){
-    c_R <- c_F <- 0
-  } else {
-    if (grepl("cg", model)){
-      c_R <- c_F <- checkInterval(line$k * (-4) + line$q, c(0, 0.99))
-    } else {
-      c_R <- checkInterval(line_R$k * (-4) + line_R$q, c(0, 0.99))
-      c_F <- checkInterval(line_F$k * (-4) + line_F$q, c(0, 0.99))
-    }
-  }
+  a_R <- a_F <- b_R <- b_F <- c_R <- c_F <- d_R <- d_F <- c()
 
+  c <- sapply(1:ncol(Data),
+              function(i){
+                if (model[i] %in% c("Rasch", "1PL", "2PL", "3PLdg", "3PLd")){
+                  c_R[i] <- c_F[i] <- 0
+                } else {
+                  if (grepl("cg", model[i])){
+                    c_R[i] <- c_F[i] <- checkInterval(line$k * (-4) + line$q, c(0, 0.99))[i]
+                  } else {
+                    c_R[i] <- checkInterval(line_R$k * (-4) + line_R$q, c(0, 0.99))[i]
+                    c_F[i] <- checkInterval(line_F$k * (-4) + line_F$q, c(0, 0.99))[i]
+                  }
+                }
+                return(c(c_R[i], c_F[i]))})
+  c_R <- t(c)[, 1]
+  c_F <- t(c)[, 2]
 
-  if (model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLc", "3PL")){
-    d_R <- d_F <- 1
-  } else {
-    if (grepl("dg", model)){
-      d_R <- d_F <- checkInterval(line$k * 4 + line$q, c(0.01, 1))
-    } else {
-      d_R <- checkInterval(line_R$k * 4 + line_R$q, c(0.01, 1))
-      d_F <- checkInterval(line_F$k * 4 + line_F$q, c(0.01, 1))
-    }
-  }
+  d <- sapply(1:ncol(Data),
+              function(i){
+                if (model[i] %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLc", "3PL")){
+                  d_R[i] <- d_F[i] <- 1
+                } else {
+                  if (grepl("dg", model[i])){
+                    d_R[i] <- d_F[i] <- checkInterval(line$k * 4 + line$q, c(0.01, 1))[i]
+                  } else {
+                    d_R[i] <- checkInterval(line_R$k * 4 + line_R$q, c(0.01, 1))[i]
+                    d_F[i] <- checkInterval(line_F$k * 4 + line_F$q, c(0.01, 1))[i]
+                  }
+                }
+                return(c(d_R[i], d_F[i]))})
+  d_R <- t(d)[, 1]
+  d_F <- t(d)[, 2]
 
-  if (model == "Rasch"){
-    a_R <- a_F <- 1
-  } else {
-    if (model == "1PL") {
-      a_R <- a_F <- 4 * line$k/(d_R - c_R)
-    } else {
-      a_R <- 4 * line_R$k/(d_R - c_R)
-      a_F <- 4 * line_F$k/(d_F - c_F)
-    }
-  }
+  a <- sapply(1:ncol(Data),
+              function(i){
+                if (model[i] == "Rasch"){
+                  a_R[i] <- a_F[i] <- 1
+                } else {
+                  if (model[i] == "1PL") {
+                    a_R[i] <- a_F[i] <- (4 * line$k/(d_R - c_R))[i]
+                  } else {
+                    a_R[i] <- (4 * line_R$k/(d_R - c_R))[i]
+                    a_F[i] <- (4 * line_F$k/(d_F - c_F))[i]
+                  }
+                }
+                return(c(a_R[i], a_F[i]))})
+  a_R <- t(a)[, 1]
+  a_F <- t(a)[, 2]
 
   b_R <- ((d_R + c_R)/2 - line_R$q)/line_R$k
   b_F <- ((d_F + c_F)/2 - line_F$q)/line_F$k
 
-  results <- switch(parameterization,
-                    classic = data.frame("a" = a_R, "b" = b_R, "c" = c_R, "d" = d_R,
-                                         "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cDif" = c_F - c_R, "dDif" = d_F - d_R),
-                    alternative = data.frame("a" = a_R, "b" = b_R, "cR" = c_R, "dR" = d_R,
-                                             "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cF" = c_F, "dF" = d_F),
-                    logistic = data.frame("b1" = a_R, "b0" = -a_R * b_R, "c" = c_R, "d" = d_R,
-                                          "b3" = a_F - a_R, "b2" = -a_R * b_R + a_F * b_F, "cDif" = c_F - c_R, "dDif" = d_F - d_R))
+
+  if (length(unique(parameterization)) == 1 & simplify){
+    results <- switch(unique(parameterization),
+                      classic = data.frame("a" = a_R, "b" = b_R, "c" = c_R, "d" = d_R,
+                                           "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cDif" = c_F - c_R, "dDif" = d_F - d_R),
+                      alternative = data.frame("a" = a_R, "b" = b_R, "cR" = c_R, "dR" = d_R,
+                                               "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cF" = c_F, "dF" = d_F),
+                      logistic = data.frame("b1" = a_R, "b0" = -a_R * b_R, "c" = c_R, "d" = d_R,
+                                            "b3" = a_F - a_R, "b2" = -a_R * b_R + a_F * b_F, "cDif" = c_F - c_R, "dDif" = d_F - d_R))
+  } else {
+    results <- lapply(1:ncol(Data), function(i) switch(parameterization[i],
+                                                       classic = data.frame("a" = a_R, "b" = b_R, "c" = c_R, "d" = d_R,
+                                                                            "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cDif" = c_F - c_R, "dDif" = d_F - d_R)[i, ],
+                                                       alternative = data.frame("a" = a_R, "b" = b_R, "cR" = c_R, "dR" = d_R,
+                                                                                "aDif" = a_F - a_R, "bDif" = b_F - b_R, "cF" = c_F, "dF" = d_F)[i, ],
+                                                       logistic = data.frame("b1" = a_R, "b0" = -a_R * b_R, "c" = c_R, "d" = d_R,
+                                                                             "b3" = a_F - a_R, "b2" = -a_R * b_R + a_F * b_F, "cDif" = c_F - c_R, "dDif" = d_F - d_R)[i, ]))
+  }
 
   return(results)
 }

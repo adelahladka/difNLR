@@ -7,6 +7,19 @@
 - Changes in difNLR 1.2.0 (2018-02-19) -
 ----------------------------------------
 
+1.2.0.-4. (2018-02-19)
+MAJOR UPDATES
+  o Function 'startNLR()' now handles item-specific arguments ('model' and
+    'parameterization'). Its output is now in the form of list. It can be
+    simplified with argument 'simplify' into table when all parameterizations
+    are the same.
+  o Function 'NLR()' now handles item-specific arguments ('model', 'type' and
+    'constraints').
+  o Function 'difNLR()' now handles item-specific arguments ('model', 'type'
+    and 'constraints').
+MINOR UPDATES
+  o README file was updated.
+
 1.2.0.-3. (2018-02-19)
 MAJOR UPDATES
   o Bug fixing:

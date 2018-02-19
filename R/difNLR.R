@@ -284,34 +284,6 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
   ### model
   if (missing(model)) {
     stop("'model' is missing", call. = FALSE)
-  } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd", "4PLcgdg", "4PLcgd",
-                       "4PLd", "4PLcdg", "4PLc", "4PL"))){
-      stop("Invalid value for 'model'.", call. = FALSE)
-    }
-  }
-  ### constraints
-  if (!(missing(constraints))){
-    constraints <- unique(unlist(strsplit(constraints, split = "")))
-    if (!all(constraints %in% letters[1:4])){
-      stop("Constraints can be only 'a', 'b', 'c' or 'd'.")
-    }
-    if (!(type %in% c("udif", "nudif", "both", "all"))){
-      types <- unlist(strsplit(type, split = ""))
-      if (length(intersect(types, constraints)) > 0){
-        stop("The difference in constrained parameters cannot be tested.")
-      }
-    }
-  } else {
-    constraints <- NULL
-  }
-  ### type of DIF to be tested
-  if (!(type %in% c("udif", "nudif", "both", "all"))){
-    types <- unique(unlist(strsplit(type, split = "")))
-    if (!all(types %in% letters[1:4])){
-      stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
-           or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.")
-    }
   }
   ### matching criterion
   if (!(match[1] %in% c("score", "zscore"))){
@@ -397,6 +369,63 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       match <- df[, "match"]
     }
 
+    ### model
+    if (length(model) == 1){
+      model <- rep(model, ncol(DATA))
+    } else {
+      if (length(model) != ncol(DATA)){
+        stop("Invalid length of 'model'. Model needs to be specified for each item or
+             by single string. ", call. = FALSE)
+      }
+    }
+    if (!all(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd", "4PLcgdg", "4PLcgd",
+                            "4PLd", "4PLcdg", "4PLc", "4PL"))){
+        stop("Invalid value for 'model'.", call. = FALSE)
+    }
+
+    ### type of DIF to be tested
+    if (length(type) == 1){
+      type <- rep(type, ncol(DATA))
+    } else {
+      if (length(type) != ncol(DATA)){
+        stop("Invalid length of 'type'. Type of DIF need to be specified for each item or
+             by single string. ", call. = FALSE)
+      }
+    }
+    tmptype <- type[!(type %in% c("udif", "nudif", "both", "all"))]
+    if (length(tmptype) > 0){
+      tmptypes <- unique(unlist(sapply(1:length(tmptype),
+                                       function(i) unique(unlist(strsplit(tmptype[i], split = ""))))))
+      if (!all(tmptypes %in% letters[1:4])){
+        stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
+             or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.")
+      }
+    }
+
+    ### constraints
+    if (!(missing(constraints))){
+      if (length(constraints) == 1){
+        constraints <- rep(constraints, ncol(DATA))
+      } else {
+        if (length(constraints) != ncol(DATA)){
+          stop("Invalid length of 'constraints'. Constraints need to be specified for each item or
+             by single string. ", call. = FALSE)
+        }
+      }
+      constraints <- lapply(1:ncol(DATA), function(i) unique(unlist(strsplit(constraints[i], split = ""))))
+      if (!all(sapply(1:ncol(DATA), function(i) all(constraints[[i]] %in% letters[1:4])))){
+        stop("Constraints can be only 'a', 'b', 'c' or 'd'.")
+      }
+      if (!(type %in% c("udif", "nudif", "both", "all"))){
+        types <- unlist(strsplit(type, split = ""))
+        if (length(intersect(types, constraints)) > 0){
+          stop("The difference in constrained parameters cannot be tested.")
+        }
+      }
+    } else {
+      constraints <- as.list(rep(NA, ncol(DATA)))
+    }
+    ### anchors
     if (!is.null(anchor)) {
       if (is.numeric(anchor)){
         ANCHOR <- anchor
@@ -408,14 +437,13 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
     } else {
       ANCHOR <- 1:ncol(DATA)
     }
+    ### parameterization
+    parameterization <- ifelse(model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd",
+                                            "4PLcdg", "4PLc", "4PL"),
+                               "alternative",
+                               "classic")
     if (is.null(start)){
-      if (model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL")){
-        parameterization <- "alternative"
-        start <- startNLR(DATA, GROUP, model, match = match, parameterization = parameterization)
-        } else {
-          parameterization <- "classic"
-          start <- startNLR(DATA, GROUP, model, match = match, parameterization = parameterization)
-        }
+      start <- startNLR(DATA, GROUP, model, match = match, parameterization = parameterization)
     } else {
       if (ncol(start) != 8 | nrow(start) != ncol(DATA)){
         stop("Invalid value for 'start'. Initial values must be a data frame or matrix with 8 columns and the number of
