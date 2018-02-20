@@ -243,23 +243,29 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   # test
   if (test == "F"){
     pval <- Fval <- rep(NA, m)
+    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
+    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
 
-    df <- c(length(M$M0$parameters) - length(M$M1$parameters), n - length(M$M0$parameters))
+    df <- cbind(n0 - n1, n - n0)
 
     RSS0 <- rep(NA, m); RSS1 <- rep(NA, m)
     RSS0[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m0[[l]])^2))
     RSS1[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
 
-    Fval <- ((RSS1 - RSS0)/df[1])/(RSS0/df[2])
+    Fval <- ((RSS1 - RSS0)/df[, 1])/(RSS0/df[, 2])
     pval <- 1 - pf(Fval, df[1], df[2])
   } else {
     pval <- LRval <- rep(NA, m)
 
-    df <- length(M$M0$parameters) - length(M$M1$parameters)
+    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
+    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
+
+    df <- n0 - n1
+
     LRval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 |  cfM0)),
                                            function(l) -2 * c(logLik(m1[[l]]) - logLik(m0[[l]])))
     pval[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)),
-                                          function(l) (1 - pchisq(LRval[l], df)))
+                                          function(l) (1 - pchisq(LRval[l], df[l])))
   }
   # likelihood
   ll.m0 <- ll.m1 <- rep(NA, m)
@@ -268,80 +274,103 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   # adjusted p-values
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
   # parameters
-  par.m1 <- se.m1 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(M$M1$parameters))),
-                               .Names = M$M1$parameters)
-  par.m0 <- se.m0 <- structure(data.frame(matrix(NA, nrow = m, ncol = length(M$M0$parameters))),
-                               .Names = M$M0$parameters)
+  par.m1 <- se.m1 <- lapply(1:m, function(i) structure(rep(NA, length(M[[i]]$M1$parameters)),
+                                                       names = M[[i]]$M1$parameters))
 
-  if (dim(par.m1)[2] == 1){
-    par.m1[which(!cfM1), ] <- sapply(m1[which(!cfM1)], coef)
-    par.m1 <- structure(data.frame(par.m1), names = unique(names(par.m1)))
-  } else {
-    par.m1[which(!cfM1), ] <- t(sapply(m1[which(!cfM1)], coef))
-  }
-  par.m0[which(!cfM0), ] <- t(sapply(m0[which(!cfM0)], coef))
+  par.m0 <- se.m0 <- lapply(1:m, function(i) structure(rep(NA, length(M[[i]]$M0$parameters)),
+                                                       names = M[[i]]$M0$parameters))
+  par.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], coef)
+  par.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], coef)
+
+  # if (dim(par.m1)[2] == 1){
+  #   par.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], coef)
+  #   par.m1 <- structure(data.frame(par.m1), names = unique(names(par.m1)))
+  # } else {
+  #   par.m1[which(!cfM1), ] <- t(sapply(m1[which(!cfM1)], coef))
+  # }
+  # par.m0[which(!cfM0), ] <- t(sapply(m0[which(!cfM0)], coef))
 
   # covariance structure
-  cov.m0 <- cov.m1 <- lapply(1:m, function(i) NA)
+  cov.m0 <- cov.m1 <- as.list(rep(NA, m))
   cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
   cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
-
   # se
-  if (dim(par.m1)[2] == 1){
-    se.m1[which(!cfM1), ] <- sqrt(sapply(cov.m1[which(!cfM1)], diag))
-    se.m1 <- structure(data.frame(se.m1), names = unique(names(se.m1)))
-  } else {
-    se.m1[which(!cfM1), ] <- sqrt(t(sapply(cov.m1[which(!cfM1)], diag)))
-  }
-  se.m0[which(!cfM0), ] <- sqrt(t(sapply(cov.m0[which(!cfM0)] , diag)))
+  se.m1[which(!cfM1)] <- lapply(cov.m1[which(!cfM1)] , diag)
+  se.m0[which(!cfM0)] <- lapply(cov.m0[which(!cfM0)] , diag)
+
+  # if (dim(par.m1)[2] == 1){
+  #   se.m1[which(!cfM1), ] <- sqrt(sapply(cov.m1[which(!cfM1)], diag))
+  #   se.m1 <- structure(data.frame(se.m1), names = unique(names(se.m1)))
+  # } else {
+  #   se.m1[which(!cfM1), ] <- sqrt(t(sapply(cov.m1[which(!cfM1)], diag)))
+  # }
+  # se.m0[which(!cfM0), ] <- sqrt(t(sapply(cov.m0[which(!cfM0)] , diag)))
 
   # delta method
-  if ("cR" %in% colnames(par.m0)){
-    if ("cF" %in% colnames(par.m0)){
-      cDif0 <- par.m0$cF - par.m0$cR
-      se.cDif0 <- sapply(which(!cfM0), function(i) deltamethod(~ x2 - x1, par.m0[i, c("cR", "cF")],
-                                                               cov.m0[[i]][c("cR", "cF"), c("cR", "cF")]))
-      par.m0$cF <- cDif0
-      se.m0$cF[which(!cfM0)] <- se.cDif0
-      colnames(par.m0)[colnames(par.m0) == "cF"] <- colnames(se.m0)[colnames(se.m0) == "cF"] <- "cDif"
+  for (i in 1:m){
+    if ("cR" %in% names(par.m0[[i]])){
+      if ("cF" %in% names(par.m0[[i]])){
+        cDif0 <- par.m0[[i]]['cF'] - par.m0[[i]]['cR']
+
+        if (!cfM0[i]){
+          se.cDif0 <- deltamethod(~ x2 - x1, par.m0[[i]][c("cR", "cF")],
+                                  cov.m0[[i]][c("cR", "cF"), c("cR", "cF")])
+          se.m0[[i]]['cF'] <- se.cDif0
+        }
+        par.m0[[i]]['cF'] <- cDif0
+
+        names(par.m0[[i]])[names(par.m0[[i]]) == "cF"] <- names(se.m0[[i]])[names(se.m0[[i]]) == "cF"] <- "cDif"
+      }
+      names(par.m0[[i]])[names(par.m0[[i]]) == "cR"] <- names(se.m0[[i]])[names(se.m0[[i]]) == "cR"] <- "c"
     }
-    colnames(par.m0)[colnames(par.m0) == "cR"] <- colnames(se.m0)[colnames(se.m0) == "cR"] <- "c"
-  }
-  if ("dR" %in% colnames(par.m0)){
-    if ("dF" %in% colnames(par.m0)){
-      dDif0 <- par.m0$dF - par.m0$dR
-      se.dDif0 <- sapply(which(!cfM0), function(i) deltamethod(~ x2 - x1, par.m0[i, c("dR", "dF")],
-                                                               cov.m0[[i]][c("dR", "dF"), c("dR", "dF")]))
-      par.m0$dF <- dDif0
-      se.m0$dF[which(!cfM0)] <- se.dDif0
-      colnames(par.m0)[colnames(par.m0) == "dF"] <- colnames(se.m0)[colnames(se.m0) == "dF"] <- "dDif"
+    if ("dR" %in% names(par.m0[[i]])){
+      if ("dF" %in% names(par.m0[[i]])){
+        cDif0 <- par.m0[[i]]['dF'] - par.m0[[i]]['dR']
+
+        if (!cfM0[i]){
+          se.cDif0 <- deltamethod(~ x2 - x1, par.m0[[i]][c("dR", "dF")],
+                                  cov.m0[[i]][c("dR", "dF"), c("dR", "dF")])
+          se.m0[[i]]['dF'] <- se.cDif0
+        }
+        par.m0[[i]]['dF'] <- cDif0
+
+        names(par.m0[[i]])[names(par.m0[[i]]) == "dF"] <- names(se.m0[[i]])[names(se.m0[[i]]) == "dF"] <- "dDif"
+      }
+      names(par.m0[[i]])[names(par.m0[[i]]) == "dR"] <- names(se.m0[[i]])[names(se.m0[[i]]) == "dR"] <- "d"
     }
-    colnames(par.m0)[colnames(par.m0) == "dR"] <- colnames(se.m0)[colnames(se.m0) == "dR"] <- "d"
-  }
-  if ("cR" %in% colnames(par.m1)){
-    if ("cF" %in% colnames(par.m1)){
-      cDif1 <- par.m1$cF - par.m1$cR
-      se.cDif1 <- sapply(1:m, function(i) deltamethod(~ x2 - x1, par.m1[i, c("cR", "cF")],
-                                                      cov.m1[[i]][c("cR", "cF"), c("cR", "cF")]))
-      par.m1$cF <- cDif1
-      se.m1$cF[which(!cfM1)] <- se.cDif1
-      colnames(par.m1)[colnames(par.m1) == "cF"] <- colnames(se.m1)[colnames(se.m1) == "cF"] <- "cDif"
+    if ("cR" %in% names(par.m1[[i]])){
+      if ("cF" %in% names(par.m1[[i]])){
+        cDif1 <- par.m1[[i]]['cF'] - par.m1[[i]]['cR']
+
+        if (!cfM1[i]){
+          se.cDif1 <- deltamethod(~ x2 - x1, par.m1[[i]][c("cR", "cF")],
+                                  cov.m1[[i]][c("cR", "cF"), c("cR", "cF")])
+          se.m1[[i]]['cF'] <- se.cDif1
+        }
+        par.m1[[i]]['cF'] <- cDif1
+
+        names(par.m1[[i]])[names(par.m1[[i]]) == "cF"] <- names(se.m1[[i]])[names(se.m1[[i]]) == "cF"] <- "cDif"
+      }
+      names(par.m1[[i]])[names(par.m1[[i]]) == "cR"] <- names(se.m1[[i]])[names(se.m1[[i]]) == "cR"] <- "c"
     }
-    colnames(par.m1)[colnames(par.m1) == "cR"] <- colnames(se.m1)[colnames(se.m1) == "cR"] <- "c"
-  }
-  if ("dR" %in% colnames(par.m1)){
-    if ("dF" %in% colnames(par.m1)){
-      dDif1 <- par.m1$dF - par.m1$dR
-      se.dDif1 <- sapply(1:m, function(i) deltamethod(~ x2 - x1, par.m1[i, c("dR", "dF")],
-                                                      cov.m1[[i]][c("dR", "dF"), c("dR", "dF")]))
-      par.m1$dF <- dDif1
-      se.m1$dF[which(!cfM1)] <- se.dDif1
-      colnames(par.m1)[colnames(par.m1) == "dF"] <- colnames(se.m1)[colnames(se.m1) == "dF"] <- "dDif"
+    if ("dR" %in% names(par.m1[[i]])){
+      if ("dF" %in% names(par.m1[[i]])){
+        cDif1 <- par.m1[[i]]['dF'] - par.m1[[i]]['dR']
+
+        if (!cfM1[i]){
+          se.cDif1 <- deltamethod(~ x2 - x1, par.m1[[i]][c("dR", "dF")],
+                                  cov.m1[[i]][c("dR", "dF"), c("dR", "dF")])
+          se.m1[[i]]['dF'] <- se.cDif1
+        }
+        par.m1[[i]]['dF'] <- cDif1
+
+        names(par.m1[[i]])[names(par.m1[[i]]) == "dF"] <- names(se.m1[[i]])[names(se.m1[[i]]) == "dF"] <- "dDif"
+      }
+      names(par.m1[[i]])[names(par.m1[[i]]) == "dR"] <- names(se.m1[[i]])[names(se.m1[[i]]) == "dR"] <- "d"
     }
-    colnames(par.m1)[colnames(par.m1) == "dR"] <- colnames(se.m1)[colnames(se.m1) == "dR"] <- "d"
   }
 
-  rownames(par.m1) <- rownames(par.m0) <- rownames(se.m1) <- rownames(se.m0) <- colnames(Data)
+  names(par.m1) <- names(par.m0) <- names(se.m1) <- names(se.m0) <- colnames(Data)
 
   results <- list(Sval = switch(test, "F" = Fval, "LR" = LRval),
                   pval = pval, adjusted.pval = adjusted.pval,

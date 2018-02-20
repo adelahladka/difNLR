@@ -1,6 +1,6 @@
 #' Performs DIF detection using Non-Linear Regression method.
 #'
-#' @aliases difNLR print.difNLR plot.difNLR fitted.difNLR predict.difNLR coef.difNLR
+#' @aliases difNLR print.difNLR
 #'
 #' @description Performs DIF detection procedure based on Non-Linear Regression model (generalized logistic
 #' regression) and either likelihood-ratio or F test of submodel.
@@ -30,19 +30,6 @@
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
 #' @param start numeric: matrix with n rows (where n is the number of items) and 8 columns
 #' containing initial item parameters estimates. See \strong{Details}.
-#' @param x an object of 'difNLR' class
-#' @param object an object of 'difNLR' class
-#' @param plot.type character: type of plot to be plotted (either \code{"cc"} for characteristic curve
-#' (default), or \code{"stat"} for test statistics). See \strong{Details}.
-#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
-#' @param col character: single value, or vector of two values representing colors for plot.
-#' @param shape integer: shape parameter for plot.
-#' @param size numeric: single number, or vector of two numbers representing line width in plot.
-#' @param linetype numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.
-#' @param title string: title of plot.
-#' @param score numeric: standardized total score of subject.
-#' @param ... other generic parameters for \code{print()}, \code{plot()}, \code{fitted()},
-#' \code{predict()} or \code{coef()} functions.
 #'
 #' @usage difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
 #' match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
@@ -113,15 +100,6 @@
 #'
 #' The output of the difNLR is displayed by the \code{print.difNLR()} function.
 #'
-#' Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
-#' (default). The characteristic curve for item specified in \code{item} option is plotted. For default
-#' option \code{"all"} of item, characteristic curves of all converged items are plotted. The drawn
-#' curves represent best model.
-#' The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
-#' (either LR-test, or F-test, depends on argument \code{test}) are displayed on the Y axis,
-#' for each coverged item. The detection threshold is displayed by a horizontal line and items
-#' detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
-#' are used.
 #'
 #' Fitted values are extracted by the \code{fitted.difNLR()} function for item(s) specified in
 #' \code{item} argument.
@@ -254,6 +232,11 @@
 #' # Fitted values
 #' fitted(x)
 #' fitted(x, item = 1)
+#'
+#' # Residuals
+#' residuals(x)
+#' residuals(x, item = 1)
+#'
 #' # Predicted values
 #' predict(x)
 #' predict(x, item = 1)
@@ -270,20 +253,24 @@
 #'
 #' @keywords DIF
 #' @export
-
+#' @importFrom stats fitted
 
 difNLR <- function(Data, group, focal.name, model, constraints, type = "both", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start)
 {
-  if (type == "nudif" & model == "1PL")
+  if (any(type == "nudif" & model == "1PL"))
     stop("Detection of non-uniform DIF is not possible with 1PL model.", call. = FALSE)
-  if (type == "nudif" & model == "Rasch")
+  if (any(type == "nudif" & model == "Rasch"))
     stop("Detection of non-uniform DIF is not possible with Rasch model.", call. = FALSE)
   # input check
   ### model
   if (missing(model)) {
     stop("'model' is missing", call. = FALSE)
+  }
+  ###constraints
+  if (missing(constraints)){
+    constraints <- NULL
   }
   ### matching criterion
   if (!(match[1] %in% c("score", "zscore"))){
@@ -378,8 +365,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
              by single string. ", call. = FALSE)
       }
     }
-    if (!all(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd", "4PLcgdg", "4PLcgd",
-                            "4PLd", "4PLcdg", "4PLc", "4PL"))){
+    if (!all(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
+                          "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"))){
         stop("Invalid value for 'model'.", call. = FALSE)
     }
 
@@ -403,7 +390,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
     }
 
     ### constraints
-    if (!(missing(constraints))){
+    if (!(is.null(constraints))){
       if (length(constraints) == 1){
         constraints <- rep(constraints, ncol(DATA))
       } else {
@@ -416,7 +403,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       if (!all(sapply(1:ncol(DATA), function(i) all(constraints[[i]] %in% letters[1:4])))){
         stop("Constraints can be only 'a', 'b', 'c' or 'd'.")
       }
-      if (!(type %in% c("udif", "nudif", "both", "all"))){
+      if (any(!(type %in% c("udif", "nudif", "both", "all")))){
         types <- unlist(strsplit(type, split = ""))
         if (length(intersect(types, constraints)) > 0){
           stop("The difference in constrained parameters cannot be tested.")
@@ -459,22 +446,25 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       ADJ.PVAL <- PROV$adjusted.pval
       significant <- which(ADJ.PVAL < alpha)
 
-      nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
-                                   .Names = colnames(PROV$par.m0))
-      nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
-      nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
+      nlrPAR <- nlrSE <- lapply(1:length(PROV$par.m0),
+                                function(i) structure(rep(0, length(PROV$par.m0[[i]])),
+                                                      names = names(PROV$par.m0[[i]])))
+      for (i in 1:length(PROV$par.m0)){
+        nlrPAR[[i]][names(PROV$par.m1[[i]])] <- PROV$par.m1[[i]]
+        nlrSE[[i]][names(PROV$se.m1[[i]])] <- PROV$se.m1[[i]]
+      }
 
       if (length(significant) > 0) {
         DIFitems <- significant
         for (idif in 1:length(DIFitems)) {
-          nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
-          nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
+          nlrPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
+          nlrSE[[DIFitems[idif]]] <- PROV$se.m0[[DIFitems[idif]]]
         }
       } else {
         DIFitems <- "No DIF item detected"
       }
       types <- NULL
-      if (!(type %in% c("udif", "nudif", "both", "all"))){
+      if (any(!(type %in% c("udif", "nudif", "both", "all")))){
         types <- unlist(strsplit(type, split = ""))
         type <- "other"
       }
@@ -555,15 +545,19 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         PROV <- prov2
         STATS <- stats2
         significant1 <- significant2
-        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
-                                     .Names = colnames(PROV$par.m0))
-        nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
-        nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
+        nlrPAR <- nlrSE <- lapply(1:length(PROV$par.m0),
+                                  function(i) structure(rep(0, length(PROV$par.m0[[i]])),
+                                                        names = names(PROV$par.m0[[i]])))
+        for (i in 1:length(PROV$par.m0)){
+          nlrPAR[[i]][names(PROV$par.m1[[i]])] <- PROV$par.m1[[i]]
+          nlrSE[[i]][names(PROV$se.m1[[i]])] <- PROV$se.m1[[i]]
+        }
+
         if (length(significant1) > 0) {
           DIFitems <- significant1
           for (idif in 1:length(DIFitems)) {
-            nlrPAR[DIFitems[idif], ] <- PROV$par.m0[DIFitems[idif], ]
-            nlrSE[DIFitems[idif], ] <- PROV$se.m0[DIFitems[idif], ]
+            nlrPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
+            nlrSE[[DIFitems[idif]]] <- PROV$se.m0[[DIFitems[idif]]]
           }
         } else {
           DIFitems <- "No DIF item detected"
@@ -577,10 +571,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         colnames(difPur) <- co
       }
       types <- NULL
-      if (!(type %in% c("udif", "nudif", "both", "all"))){
-        types <- unlist(strsplit(type, split = ""))
-        type <- "other"
-      }
+      # if (any(!(type %in% c("udif", "nudif", "both", "all")))){
+      #   types <- unlist(strsplit(type, split = ""))
+      #   type <- "other"
+      # }
       RES <- list(Sval = STATS,
                   nlrPAR = nlrPAR, nlrSE = nlrSE,
                   parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
@@ -614,35 +608,44 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
 }
 
 
-#' @rdname difNLR
-#' @export
+#' @method print difNLR
+#' @aliases difNLR
+#' @param x an object of 'difNLR' class
 print.difNLR <- function (x, ...){
-  cat(paste("Detection of",
-            switch(x$type,
-                   both = " both types of ", udif = " uniform ", nudif = " non-uniform ", all = " all types of ",
-                   other = " "),
-            "Differential Item Functioning\n",
-            switch(x$type,
-                   both = "", udif = "", nudif = "", all = "",
-                   other = paste("caused by difference in", x$types, "parameter\n")),
-            "using Generalized Logistic Regression Model", sep = ""))
-  cat(paste("\n\nGeneralized Logistic Regression", switch(x$test, "F" = " F-test ", "LR" = " Likelihood Ratio chi-square "),
-            "statistics \nbased on ",
-            switch(x$model,
-                   "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
-                   "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
-                   "3PLdg" = "3PL model with fixed inattention parameter for groups",
-                   "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
-                   "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
-                   "4PLcgd" = "4PL model with fixed guessing for groups",
-                   "4PLd" = "4PL model with fixed guessing for groups",
-                   "4PLcdg" = "4PL model with fixed inattention parameter for groups",
-                   "4PLc" = "4PL model with fixed inattention parameter for groups",
-                   "4PL" = "4PL model"),
-            ifelse(is.null(x$constraints), "",
-                   paste(" with constraints on",
-                         paste(unique(unlist(strsplit(x$constraints, split = ""))), collapse = ", "),
-                         "parameter")), sep = ""), "\n")
+  cat(paste("Detection of ",
+            ifelse(length(unique(x$type)) == 1,
+                   switch(unique(x$type),
+                          both = "both types of ",
+                          udif = "uniform ",
+                          nudif = "non-uniform ",
+                          all = "all types of ",
+                          other = ""),
+                   ""),
+            "differential item functioning\n",
+            "using generalized logistic regression model", sep = ""))
+  cat(paste("\n\nGeneralized logistic regression ",
+            switch(x$test,
+                   "F" = "F-test",
+                   "LR" = "likelihood ratio chi-square"),
+            " statistics",
+            ifelse(length(unique(x$model)) == 1,
+                   paste("\nbased on",
+                   switch(unique(x$model),
+                          "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
+                          "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
+                          "3PLdg" = "3PL model with fixed inattention parameter for groups",
+                          "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
+                          "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
+                          "4PLcgd" = "4PL model with fixed guessing for groups",
+                          "4PLd" = "4PL model with fixed guessing for groups",
+                          "4PLcdg" = "4PL model with fixed inattention parameter for groups",
+                          "4PLc" = "4PL model with fixed inattention parameter for groups",
+                          "4PL" = "4PL model")),
+                   ""), sep = ""))
+            # ifelse(length(unique(x$constraints)) == 1,
+            #        paste(" with constraints on",
+            #              paste(unique(unlist(strsplit(x$constraints, split = ""))), collapse = ", "),
+            #              "parameter")), sep = ""), "\n"),
   cat(paste("\nParameters were estimated with", ifelse(x$method == "nls",
                                                        "non-linear least squares\n",
                                                        "maximum likelihood method\n")))
@@ -682,8 +685,23 @@ print.difNLR <- function (x, ...){
   print(tab, quote = F, digits = 4, zero.print = F)
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
 
-  critical <- ifelse(x$test == "F", qf(1 - x$alpha, x$df[1], x$df[2]), qchisq(1 - x$alpha, x$df))
-  cat(paste("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")", sep = ""))
+  if (x$test == "F"){
+    if (dim(unique(x$df))[1] == 1){
+      critical <- unique(qf(1 - x$alpha, x$df[, 1], x$df[, 2]))
+    } else {
+      critical <- NULL
+    }
+  } else {
+    if (length(unique(x$df)) == 1){
+      critical <- unique(qchisq(1 - x$alpha, x$df))
+    } else {
+      critical <- NULL
+    }
+  }
+  if (!is.null(critical)){
+    cat(paste("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")", sep = ""))
+  }
+
   if (is.character(x$DIFitems)) {
     cat("\nNone of items is detected as DIF")
   }
@@ -693,13 +711,33 @@ print.difNLR <- function (x, ...){
   }
 }
 
-#' @rdname difNLR
-#' @export
-plot.difNLR <- function(x, plot.type = "cc", item = "all",
-                        col = c("dodgerblue2", "goldenrod2"),
-                        shape = 21, size = .8,
-                        linetype = c(2, 1), title,
-                        ...){
+#' ICC and test statistics plots for difNLR object
+#'
+#' @method plot difNLR
+#'
+#' @description Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
+#' (default). The characteristic curve for item specified in \code{item} option is plotted. For default
+#' option \code{"all"} of item, characteristic curves of all converged items are plotted. The drawn
+#' curves represent best model.
+#'
+#' The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
+#' (either LR-test, or F-test, depends on argument \code{test}) are displayed on the Y axis,
+#' for each coverged item. The detection threshold is displayed by a horizontal line and items
+#' detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
+#' are used.
+#'
+#' @param x an object of 'difNLR' class
+#' @param plot.type character: type of plot to be plotted (either \code{"cc"} for characteristic curve
+#' (default), or \code{"stat"} for test statistics). See \strong{Details}.
+#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+#' @param col character: single value, or vector of two values representing colors for plot.
+#' @param shape integer: shape parameter for plot.
+#' @param size numeric: single number, or vector of two numbers representing line width in plot.
+#' @param linetype numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.
+#' @param title string: title of plot.
+#' @param ... other generic parameters for \code{plot()} function.
+plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2", "goldenrod2"),
+                        shape = 21, size = .8, linetype = c(2, 1), title, ...){
 
   plotstat <- function(x, size = size, title = title){
     if (x$conv.fail != 0){
@@ -718,13 +756,27 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       }
     }
 
-    if(missing(title)){
+    if (missing(title)){
       title <- "Non-linear regression DIF detection with none multiple comparison correction"
     }
     n <- nrow(x$Data)
-    Sval_critical <- switch(x$test,
-                            "F" = qf(1 - x$alpha, x$df[1], x$df[2]),
-                            "LR" = qchisq(1 - x$alpha, x$df))
+    if (x$test == "F"){
+      if (dim(unique(x$df))[1] == 1){
+        Sval_critical <- unique(qf(1 - x$alpha, x$df[, 1], x$df[, 2]))
+      } else {
+        Sval_critical <- NULL
+      }
+    } else {
+      if (length(unique(x$df)) == 1){
+        Sval_critical <- unique(qchisq(1 - x$alpha, x$df))
+      } else {
+        Sval_critical <- NULL
+      }
+    }
+    if (is.null(Sval_critical)){
+      stop("Critical values are different for different items. Plot cannot be rendered.")
+    }
+
     g <- as.factor(ifelse(x$Sval > Sval_critical, 1, 0))
     items <- setdiff(1:length(x$Sval), x$conv.fail.which)
     hv <- na.omit(as.data.frame(cbind(1:length(x$Sval), x$Sval, g)))
@@ -757,7 +809,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   plotCC <- function(x, item = item,
                      col = col, shape = shape, size = size,
                      linetype = linetype, title = title){
-    m <- nrow(x$nlrPAR)
+    m <- length(x$nlrPAR)
     if (class(item) == "character"){
       if (item != "all")
         stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
@@ -811,10 +863,9 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
 
     ### functions
-    gNLR <- deriv3( ~ (c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) /
-                      (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))),
-                    namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
-                    function.arg = function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){})
+    gNLR <- function(x, a, b, c, d){
+      c + (d - c)/(1 + exp(-a*(x - b)))
+    }
 
     ### Data
     if (length(x$match) > 1){
@@ -858,13 +909,11 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         TITLE <- colnames(x$Data)[i]
       }
 
-      if (dim(x$nlrPAR)[2] != 8){
-        PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1,
-                          aDif = 0, bDif = 0, cDif = 0, dDif = 0)
-        PAR[, colnames(x$nlrPAR)] <- x$nlrPAR
-      } else {
-        PAR <- x$nlrPAR
-      }
+      PAR <- data.frame(a = 1, b = 0, c = 0, d = 1,
+                        aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+      PAR[names(x$nlrPAR[[i]])] <- x$nlrPAR[[i]]
+      PARR <- PAR[1:4]
+      PARF <- PAR[1:4] + PAR[5:8]
 
       plot_CC[[i]] <- ggplot(hv, aes_string("X1", "X2")) +
                       ### points
@@ -876,20 +925,12 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
                       stat_function(aes(colour = "Reference",
                                         linetype = "Reference"),
                                     fun = gNLR,
-                                    args = list(g = 0,
-                                                a = PAR[i, "a"], b = PAR[i, "b"],
-                                                c = PAR[i, "c"], d = PAR[i, "d"],
-                                                aDif = PAR[i, "aDif"], bDif = PAR[i, "bDif"],
-                                                cDif = PAR[i, "cDif"], dDif = PAR[i, "dDif"]),
+                                    args = as.list(PARR),
                                     size = size,
                                     geom = "line") +
                       stat_function(aes(colour = "Focal", linetype = "Focal"),
                                     fun = gNLR,
-                                    args = list(g = 1,
-                                                a = PAR[i, "a"], b = PAR[i, "b"],
-                                                c = PAR[i, "c"], d = PAR[i, "d"],
-                                                aDif = PAR[i, "aDif"], bDif = PAR[i, "bDif"],
-                                                cDif = PAR[i, "cDif"], dDif = PAR[i, "dDif"]),
+                                    args = as.list(PARF),
                                     size = size,
                                     geom = "line") +
                       ### style
@@ -936,12 +977,13 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   }
 }
 
-#' @rdname difNLR
-#' @export
+#' @method fitted difNLR
+#' @param object an object of 'difNLR' class
+#' @param score numeric: standardized total score of subject.
 fitted.difNLR <- function(object, item = "all", ...){
 
   ### checking input
-  m <- nrow(object$nlrPAR)
+  m <- length(object$nlrPAR)
   if (class(item) == "character"){
     if (item != "all")
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
@@ -964,15 +1006,17 @@ fitted.difNLR <- function(object, item = "all", ...){
   }
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
                  sep = "", collapse = "\n"),
            call. = FALSE)
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
                     sep = "", collapse = "\n"),
               call. = FALSE)
-      items <- setdiff(items, object$conv.fail.which)
+      ITEMS <- setdiff(items, object$conv.fail.which)
     }
+  } else {
+    ITEMS <- items
   }
 
 
@@ -981,12 +1025,12 @@ fitted.difNLR <- function(object, item = "all", ...){
     return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
   }
 
-  if (dim(object$nlrPAR)[2] != 8){
-    PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1, aDif = 0, bDif = 0, cDif = 0, dDif = 0)
-    PAR[, colnames(object$nlrPAR)] <- object$nlrPAR
-  } else {
-    PAR <- object$nlrPAR
+  PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1,
+                    aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+  for (i in ITEMS){
+    PAR[i, names(object$nlrPAR[[i]])] <- object$nlrPAR[[i]]
   }
+
   ### data
   if (length(object$match) > 1){
     match <- object$match
@@ -999,24 +1043,28 @@ fitted.difNLR <- function(object, item = "all", ...){
   }
 
   ### fitted values
-  FV <- lapply(items, function(i) gNLR(match, object$group,
+  FV <- as.list(rep(NA, m))
+  FV[ITEMS] <- lapply(ITEMS, function(i) gNLR(match, object$group,
                                        PAR[i, "a"], PAR[i, "b"],
                                        PAR[i, "c"], PAR[i, "d"],
                                        PAR[i, "aDif"], PAR[i, "bDif"],
                                        PAR[i, "cDif"], PAR[i, "dDif"]))
-  FV <- lapply(FV, setNames, NULL)
-  names(FV) <- paste("Item", items)
-  return(FV)
+  FV <- do.call(cbind, FV)
+  colnames(FV) <- colnames(object$Data)
+  rownames(FV) <- rownames(object$Data)
+  FV <- FV[, items]
 
+  return(FV)
 }
 
-#' @rdname difNLR
-#' @export
-predict.difNLR <- function(object, item = "all",
-                           score, group, ...){
+#' @method predict difNLR
+#' @param object an object of 'difNLR' class
+#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+#' @param score numeric: standardized total score of subject.
+predict.difNLR <- function(object, item = "all", score, group, ...){
 
   ### checking input
-  m <- nrow(object$nlrPAR)
+  m <- length(object$nlrPAR)
   if (class(item) == "character"){
     if (item != "all")
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
@@ -1032,6 +1080,7 @@ predict.difNLR <- function(object, item = "all",
   if (class(item) == "integer" & !all(item %in% 1:m))
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
+
   if (missing(score)){
     if (length(object$match) > 1){
       match <- object$match
@@ -1048,7 +1097,7 @@ predict.difNLR <- function(object, item = "all",
   if (missing(group)){
     group <- object$group
   }
-  if(length(score) != length(group)){
+  if(length(match) != length(group)){
     stop("Arguments 'score' and 'group' must be of the same length.",
          call. = FALSE)
   }
@@ -1059,15 +1108,17 @@ predict.difNLR <- function(object, item = "all",
   }
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
                  sep = "", collapse = "\n"),
            call. = FALSE)
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. No values displayed.",
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
                     sep = "", collapse = "\n"),
               call. = FALSE)
-      items <- setdiff(items, object$conv.fail.which)
+      ITEMS <- setdiff(items, object$conv.fail.which)
     }
+  } else {
+    ITEMS <- items
   }
 
   ### functions
@@ -1075,63 +1126,245 @@ predict.difNLR <- function(object, item = "all",
     return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
   }
 
-
-  if (dim(object$nlrPAR)[2] != 8){
-    PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1, aDif = 0, bDif = 0, cDif = 0, dDif = 0)
-    PAR[, colnames(object$nlrPAR)] <- object$nlrPAR
-  } else {
-    PAR <- object$nlrPAR
+  PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1,
+                    aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+  for (i in ITEMS){
+    PAR[i, names(object$nlrPAR[[i]])] <- object$nlrPAR[[i]]
   }
 
-
   ### predicted values
-  PV <- lapply(items, function(i) gNLR(match, group, PAR[i, "a"], PAR[i, "b"],
-                                      PAR[i, "c"], PAR[i, "d"],
-                                      PAR[i, "aDif"], PAR[i, "bDif"],
-                                      PAR[i, "cDif"], PAR[i, "dDif"]))
-  PV <- lapply(PV, setNames, NULL)
-  names(PV) <- paste("Item", items)
-  return(predict = PV)
+  PV <- as.list(rep(NA, m))
+  PV[ITEMS] <- lapply(ITEMS, function(i) gNLR(match, group, PAR[i, "a"], PAR[i, "b"],
+                                       PAR[i, "c"], PAR[i, "d"],
+                                       PAR[i, "aDif"], PAR[i, "bDif"],
+                                       PAR[i, "cDif"], PAR[i, "dDif"]))
+  PV <- do.call(cbind, PV)
+  colnames(PV) <- colnames(object$Data)
+  rownames(PV) <- rownames(object$Data)
+  PV <- PV[, items]
+
+  return(PV)
 }
 
-#' @rdname difNLR
-#' @export
+#' @method coef difNLR
+#' @param object an object of 'difNLR' class
 coef.difNLR <- function(object, ...){
-  return(object$nlrPAR)
+
+  if (length(unique(lapply(object$nlrPAR, names))) == 1){
+    coef <- do.call(rbind, object$nlrPAR)
+    rownames(coef) <- colnames(object$Data)
+  } else {
+    coef <- object$nlrPAR
+  }
+
+  return(coef)
 }
 
-#' @rdname difNLR
-#' @export
-logLik.difNLR <- function(object, ...){
-  m <- nrow(object$nlrPAR)
-  LL <- ifelse(1:m %in% object$DIFitems, object$llM0, object$llM1)
-  return(LL)
+
+#' @method logLik difNLR
+#' @param object an object of 'difNLR' class
+#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+logLik.difNLR <- function(object, item = "all", ...){
+  ### checking input
+  m <- length(object$nlrPAR)
+  if (class(item) == "character"){
+    if (item != "all")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    items <- 1:m
+  } else {
+    items <- item
+  }
+  if (any(object$conv.fail.which %in% items)){
+    if (length(setdiff(items, object$conv.fail.which)) == 0){
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                 sep = "", collapse = "\n"),
+           call. = FALSE)
+    } else {
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                    sep = "", collapse = "\n"),
+              call. = FALSE)
+      ITEMS <- setdiff(items, object$conv.fail.which)
+    }
+  } else {
+    ITEMS <- items
+  }
+
+  val <- df <- rep(NA, m)
+
+  val[ITEMS] <- ifelse(ITEMS %in% object$DIFitems, object$llM0, object$llM1)
+  df[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
+               sapply(object$parM0, length),
+               sapply(object$parM1, length))
+  val <- val[items]
+  if (length(items) == 1){
+    attr(val, "df") <- df
+    class(val) <- "logLik"
+  }
+
+  return(val)
 }
 
-#' @rdname difNLR
-#' @export
-AIC.difNLR <- function(object, ...){
-  m <- nrow(object$nlrPAR)
-  k <- ifelse(1:m %in% object$DIFitems, ncol(object$parM0), ncol(object$parM1))
-  AIC <- 2*k - 2*unlist(logLik.difNLR(object))
+#' @method AIC difNLR
+#' @param object an object of 'difNLR' class
+#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+AIC.difNLR <- function(object, item = "all", ...){
+  ### checking input
+  m <- length(object$nlrPAR)
+  if (class(item) == "character"){
+    if (item != "all")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    items <- 1:m
+  } else {
+    items <- item
+  }
+  if (any(object$conv.fail.which %in% items)){
+    if (length(setdiff(items, object$conv.fail.which)) == 0){
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                 sep = "", collapse = "\n"),
+           call. = FALSE)
+    } else {
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                    sep = "", collapse = "\n"),
+              call. = FALSE)
+      ITEMS <- setdiff(items, object$conv.fail.which)
+    }
+  } else {
+    ITEMS <- items
+  }
+
+  k <- rep(NA, m)
+  k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
+                     sapply(object$parM0, length),
+                     sapply(object$parM1, length))
+  AIC[ITEMS] <- 2*k[ITEMS] - 2*logLik(object, item = ITEMS)
+  AIC <- AIC[items]
+
   return(AIC)
 }
 
-#' @rdname difNLR
-#' @export
-BIC.difNLR <- function(object, ...){
-  m <- nrow(object$nlrPAR)
-  k <- ifelse(1:m %in% object$DIFitems, ncol(object$parM0), ncol(object$parM1))
+#' @method BIC difNLR
+#' @param object an object of 'difNLR' class
+#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+BIC.difNLR <- function(object, item = "all", ...){
+  ### checking input
+  m <- length(object$nlrPAR)
+  if (class(item) == "character"){
+    if (item != "all")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    items <- 1:m
+  } else {
+    items <- item
+  }
+  if (any(object$conv.fail.which %in% items)){
+    if (length(setdiff(items, object$conv.fail.which)) == 0){
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                 sep = "", collapse = "\n"),
+           call. = FALSE)
+    } else {
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                    sep = "", collapse = "\n"),
+              call. = FALSE)
+      ITEMS <- setdiff(items, object$conv.fail.which)
+    }
+  } else {
+    ITEMS <- items
+  }
+  k <- rep(NA, m)
+  k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
+                     sapply(object$parM0, length),
+                     sapply(object$parM1, length))
   n <- nrow(object$Data)
-  BIC <- log(n)*k - 2*unlist(logLik.difNLR(object))
+  BIC[ITEMS] <- log(n)*k[ITEMS] - 2*logLik(object, item = ITEMS)
+  BIC <- BIC[items]
+
   return(BIC)
 }
 
-#' @rdname difNLR
+#' @method residuals difNLR
 #' @aliases resid.difNLR
-#' @export
-residuals.difNLR <- function(object, ...){
-  m <- nrow(object$nlrPAR)
-  residuals <- object$Data - fitted.difNLR(object)
+#' @param object an object of 'difNLR' class
+#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+residuals.difNLR <- function(object, item = "all", ...){
+  ### checking input
+  m <- length(object$nlrPAR)
+  if (class(item) == "character"){
+    if (item != "all")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    items <- 1:m
+  } else {
+    items <- item
+  }
+  if (any(object$conv.fail.which %in% items)){
+    if (length(setdiff(items, object$conv.fail.which)) == 0){
+      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                 sep = "", collapse = "\n"),
+           call. = FALSE)
+    } else {
+      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+                    sep = "", collapse = "\n"),
+              call. = FALSE)
+      ITEMS <- setdiff(items, object$conv.fail.which)
+    }
+  } else {
+    ITEMS <- items
+  }
+
+  n <- nrow(object$Data)
+  residuals <- matrix(NA, nrow = n, ncol = m)
+  residuals[, ITEMS] <- object$Data[, ITEMS] - fitted(object, item = ITEMS)
+  residuals <- residuals[, items]
+
   return(residuals)
 }

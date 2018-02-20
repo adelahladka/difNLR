@@ -150,23 +150,18 @@ print.lkl <- function(x, ...){
 }
 
 #' @rdname lkl
-#' @export
 vcov.lkl <- function(object, ...){object$hessian}
 
 #' @rdname lkl
-#' @export
 logLik.lkl <- function(object, ...){-object$value}
 
 #' @rdname lkl
-#' @export
 coef.lkl <- function(object, ...){object$par}
 
 #' @rdname lkl
-#' @export
 fitted.lkl <- function(object, ...){object$fitted}
 
 #' @rdname lkl
-#' @export
 residuals.lkl <- function(object, ...){object$data$y - object$fitted}
 
 

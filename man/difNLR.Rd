@@ -3,45 +3,11 @@
 \name{difNLR}
 \alias{difNLR}
 \alias{print.difNLR}
-\alias{plot.difNLR}
-\alias{fitted.difNLR}
-\alias{predict.difNLR}
-\alias{coef.difNLR}
-\alias{print.difNLR}
-\alias{plot.difNLR}
-\alias{fitted.difNLR}
-\alias{predict.difNLR}
-\alias{coef.difNLR}
-\alias{logLik.difNLR}
-\alias{AIC.difNLR}
-\alias{BIC.difNLR}
-\alias{residuals.difNLR}
-\alias{resid.difNLR}
 \title{Performs DIF detection using Non-Linear Regression method.}
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
 match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
 p.adjust.method = "none", start)
-
-\method{print}{difNLR}(x, ...)
-
-\method{plot}{difNLR}(x, plot.type = "cc", item = "all",
-  col = c("dodgerblue2", "goldenrod2"), shape = 21, size = 0.8,
-  linetype = c(2, 1), title, ...)
-
-\method{fitted}{difNLR}(object, item = "all", ...)
-
-\method{predict}{difNLR}(object, item = "all", score, group, ...)
-
-\method{coef}{difNLR}(object, ...)
-
-\method{logLik}{difNLR}(object, ...)
-
-\method{AIC}{difNLR}(object, ...)
-
-\method{BIC}{difNLR}(object, ...)
-
-\method{residuals}{difNLR}(object, ...)
 }
 \arguments{
 \item{Data}{numeric: either the scored data matrix only, or the scored data
@@ -83,30 +49,6 @@ See \strong{Details}.}
 
 \item{start}{numeric: matrix with n rows (where n is the number of items) and 8 columns
 containing initial item parameters estimates. See \strong{Details}.}
-
-\item{x}{an object of 'difNLR' class}
-
-\item{...}{other generic parameters for \code{print()}, \code{plot()}, \code{fitted()},
-\code{predict()} or \code{coef()} functions.}
-
-\item{plot.type}{character: type of plot to be plotted (either \code{"cc"} for characteristic curve
-(default), or \code{"stat"} for test statistics). See \strong{Details}.}
-
-\item{item}{either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.}
-
-\item{col}{character: single value, or vector of two values representing colors for plot.}
-
-\item{shape}{integer: shape parameter for plot.}
-
-\item{size}{numeric: single number, or vector of two numbers representing line width in plot.}
-
-\item{linetype}{numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.}
-
-\item{title}{string: title of plot.}
-
-\item{object}{an object of 'difNLR' class}
-
-\item{score}{numeric: standardized total score of subject.}
 }
 \value{
 A list of class 'difNLR' with the following arguments:
@@ -219,15 +161,6 @@ values are calculated with \code{startNLR()} function.
 
 The output of the difNLR is displayed by the \code{print.difNLR()} function.
 
-Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
-(default). The characteristic curve for item specified in \code{item} option is plotted. For default
-option \code{"all"} of item, characteristic curves of all converged items are plotted. The drawn
-curves represent best model.
-The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
-(either LR-test, or F-test, depends on argument \code{test}) are displayed on the Y axis,
-for each coverged item. The detection threshold is displayed by a horizontal line and items
-detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
-are used.
 
 Fitted values are extracted by the \code{fitted.difNLR()} function for item(s) specified in
 \code{item} argument.
@@ -297,6 +230,11 @@ plot(x, plot.type = "stat")
 # Fitted values
 fitted(x)
 fitted(x, item = 1)
+
+# Residuals
+residuals(x)
+residuals(x, item = 1)
+
 # Predicted values
 predict(x)
 predict(x, item = 1)

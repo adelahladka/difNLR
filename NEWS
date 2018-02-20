@@ -4,8 +4,25 @@
 *                                                  *
 ****************************************************
 ----------------------------------------
-- Changes in difNLR 1.2.0 (2018-02-19) -
+- Changes in difNLR 1.2.0 (2018-02-20) -
 ----------------------------------------
+
+1.2.0.-5. (2018-02-20)
+MAJOR UPDATES
+  o 'print()', 'plot()','fitted()', 'predict()', 'logLik()', 'AIC()', 'BIC()'
+    and 'residuals()' for 'difNLR' class now handles item specific arguments
+    ('model', 'type' and 'constraints').
+  o 'residuals' for 'difNLR' class now uses argument 'item'.
+  o Bug fixing:
+    - Checking inputs in 'difNLR' was fixed and improved.
+    - Fixing degrees of freedom and p-values calculations in 'NLR()'.
+    - Fixing parameters, SE and covariances calculations in 'NLR()'.
+    - S3 methods for 'difNLR' class can now handle convergence issues.
+
+MINOR UPDATES
+  o Documentation of 'difNLR-package' was updated.
+  o Syntax in 'plot()' and 'residuals()' for 'difNLR' was slightly improved.
+  o 'logLik()' for 'difNLR' now returns list of 'logLik' class values.
 
 1.2.0.-4. (2018-02-19)
 MAJOR UPDATES
