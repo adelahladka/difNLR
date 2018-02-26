@@ -4,8 +4,21 @@
 *                                                  *
 ****************************************************
 ----------------------------------------
-- Changes in difNLR 1.2.0 (2018-02-20) -
+- Changes in difNLR 1.2.0 (2018-02-26) -
 ----------------------------------------
+
+1.2.0.-6. (2018-02-26)
+MAJOR UPDATES
+  o S3 methods for 'difNLR' class are now properly describedm, especially,
+    'plot.difNLR()' and 'predict.difNLR()'.
+  o 'difNLR()' documentation was improved.
+  o Bug fixing:
+    - S3 methods for class 'difNLR' can now properly handle items with
+      convergence issues.
+    - 'NLR()' now detects DIF correctly with F test.
+
+MINOR UPDATES
+  o Typos were fixed.
 
 1.2.0.-5. (2018-02-20)
 MAJOR UPDATES

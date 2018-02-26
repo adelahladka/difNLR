@@ -253,7 +253,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     RSS1[which(!(cfM1 | cfM0))]  <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
 
     Fval <- ((RSS1 - RSS0)/df[, 1])/(RSS0/df[, 2])
-    pval <- 1 - pf(Fval, df[1], df[2])
+    pval <- 1 - pf(Fval, df[, 1], df[, 2])
   } else {
     pval <- LRval <- rep(NA, m)
 

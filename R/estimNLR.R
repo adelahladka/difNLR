@@ -41,12 +41,12 @@
 #'
 #' # starting values for 3PL model with the same guessing for item 1
 #' start <- startNLR(GMAT[, 1:20], group, model = "3PLcg", parameterization = "classic")
-#' start <- start[1, M$M0$parameters]
+#' start <- start[[1]][M$M0$parameters]
 #'
 #' # Non-linear least squares
 #' fitNLSM0 <- estimNLR(y = y, match = match, group = group,
-#' formula = M$M0$formula, method = "nls",
-#' lower = M$M0$lower, upper = M$M0$upper, start = start)
+#'                      formula = M$M0$formula, method = "nls",
+#'                      lower = M$M0$lower, upper = M$M0$upper, start = start)
 #' fitNLSM0
 #'
 #' coef(fitNLSM0)
@@ -57,8 +57,8 @@
 #'
 #' # Maximum likelihood
 #' fitLKLM0 <- estimNLR(y = y, match = match, group = group,
-#' formula = M$M0$formula, method = "likelihood",
-#' lower = M$M0$lower, upper = M$M0$upper, start = start)
+#'                      formula = M$M0$formula, method = "likelihood",
+#'                      lower = M$M0$lower, upper = M$M0$upper, start = start)
 #' fitLKLM0
 #'
 #' coef(fitLKLM0)
@@ -150,18 +150,23 @@ print.lkl <- function(x, ...){
 }
 
 #' @rdname lkl
+#' @export
 vcov.lkl <- function(object, ...){object$hessian}
 
 #' @rdname lkl
+#' @export
 logLik.lkl <- function(object, ...){-object$value}
 
 #' @rdname lkl
+#' @export
 coef.lkl <- function(object, ...){object$par}
 
 #' @rdname lkl
+#' @export
 fitted.lkl <- function(object, ...){object$fitted}
 
 #' @rdname lkl
+#' @export
 residuals.lkl <- function(object, ...){object$data$y - object$fitted}
 
 

@@ -3,11 +3,33 @@
 \name{difNLR}
 \alias{difNLR}
 \alias{print.difNLR}
+\alias{print.difNLR}
+\alias{fitted.difNLR}
+\alias{coef.difNLR}
+\alias{logLik.difNLR}
+\alias{AIC.difNLR}
+\alias{BIC.difNLR}
+\alias{residuals.difNLR}
+\alias{resid.difNLR}
 \title{Performs DIF detection using Non-Linear Regression method.}
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
 match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
 p.adjust.method = "none", start)
+
+\method{print}{difNLR}(x, ...)
+
+\method{fitted}{difNLR}(object, item = "all", ...)
+
+\method{coef}{difNLR}(object, ...)
+
+\method{logLik}{difNLR}(object, item = "all", ...)
+
+\method{AIC}{difNLR}(object, item = "all", ...)
+
+\method{BIC}{difNLR}(object, item = "all", ...)
+
+\method{residuals}{difNLR}(object, item = "all", ...)
 }
 \arguments{
 \item{Data}{numeric: either the scored data matrix only, or the scored data
@@ -24,13 +46,13 @@ focal group}
 \item{constraints}{character: which parameters should be the same for both groups. See \strong{Details}.}
 
 \item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-\code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}
+\code{"nudif"}, \code{"all"}, or combination of parameters "a", "b", "c" and "d". See \strong{Details}.}
 
 \item{method}{character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
 squares (default) and \code{"likelihood"} for maximum likelihood method.}
 
-\item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-\code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.}
+\item{match}{character or numeric: specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
+\code{"score"} (total test score), or numeric vector of the same length as number of observations in "Data". See \strong{Details}.}
 
 \item{anchor}{Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
 currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
@@ -40,7 +62,7 @@ See \strong{Details}.}
 
 \item{nrIter}{numeric: the maximal number of iterations in the item purification (default is 10).}
 
-\item{test}{character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
+\item{test}{character: test to be performed for DIF detection. Can be either \code{"LR"} (default), or \code{"F"}.
 See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
@@ -49,11 +71,40 @@ See \strong{Details}.}
 
 \item{start}{numeric: matrix with n rows (where n is the number of items) and 8 columns
 containing initial item parameters estimates. See \strong{Details}.}
+
+\item{x}{an object of "difNLR" class}
+
+\item{...}{other generic parameters for S3 methods.}
+
+\item{object}{an object of "difNLR" class}
+
+\item{item}{either character (\code{"all"}), or numeric vector, or single number
+corresponding to column indicators.}
 }
 \value{
-A list of class 'difNLR' with the following arguments:
+The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
+is displayed by the \code{print()} method.
+
+Item characteristic curves and graphical representation of DIF statistics can be displayed
+with \code{plot()} method. For more details see \code{\link[difNLR]{plot.difNLR}}.
+
+Fitted values can be extracted by the \code{fitted()} method for converged item(s)
+specified in \code{item} argument.
+
+Predicted values are produced by the \code{predict()} method for converged item(s)
+specified in \code{item} argument. New data can be introduced with \code{match} and \code{group} arguments.
+For more details see \code{\link[difNLR]{predict.difNLR}}.
+
+Residuals are extracted with the \code{residuals()} method for converged item(s)
+specified in \code{item} argument.
+
+Log-likelihood, Akaike's information criterion and Schwarz's Bayesian criterion can be
+extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
+specified in \code{item} argument.
+
+Object of class \code{"difNLR"} is a list with the following components:
 \describe{
-  \item{\code{Sval}}{the values of likelihood ratio test statistics.}
+  \item{\code{Sval}}{the values of test statistics.}
   \item{\code{nlrPAR}}{the estimates of final model.}
   \item{\code{nlrSE}}{the standard errors of estimates of final model.}
   \item{\code{parM0}}{the estimates of null model.}
@@ -81,7 +132,7 @@ A list of class 'difNLR' with the following arguments:
   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
   "1" in i-th row and j-th column means that j-th item was identified as DIF in i-1-th iteration. Returned only
   if \code{purify} is \code{TRUE}.}
-  \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
+  \item{\code{conv.puri}}{logical: indicating whether item purification process converged before the maximal number
   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{group}}{the vector of group membership.}
   \item{\code{Data}}{the data matrix.}
@@ -93,23 +144,27 @@ A list of class 'difNLR' with the following arguments:
 }
 }
 \description{
-Performs DIF detection procedure based on Non-Linear Regression model (generalized logistic
+Performs DIF detection procedure based on non-linear regression model (generalized logistic
 regression) and either likelihood-ratio or F test of submodel.
 }
 \details{
-DIF detection procedure based on Non-Linear Regression is the extension of Logistic Regression
+DIF detection procedure based on non-linear regression is the extension of logistic regression
 procedure (Swaminathan and Rogers, 1990).
 
-The \code{Data} is a matrix whose rows represents scored examinee answers ("1" correct,
-"0" incorrect) and columns correspond to the items. In addition, \code{Data} can hold
+The \code{Data} is a matrix which rows represents scored examinee answers (\code{"1"} correct,
+\code{"0"} incorrect) and columns correspond to the items. In addition, \code{Data} can hold
 the vector of group membership. If so, \code{group} is a column indicator of \code{Data}.
-Otherwise, \code{group} must be either a vector of the same length as \code{nrow(Data)}.
+Otherwise, \code{group} must be a dichotomous vector of the same length as \code{nrow(Data)}.
 
-The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
+The unconstrained form of 4PL generalized logistic regression model for probability of correct
+answer (i.e., y = 1) is
+
 P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
-where x is standardized total score (also called Z-score) and g is group membership. Parameters a, b, c and d
-are discrimination, difficulty, guessing and inattention. Parameters aDif, bDif, cDif and dDif
-then represetn differences between two groups in discrimination, difficulty, guessing and inattention.
+
+where x is by default standardized total score (also called Z-score) and g is group membership.
+Parameters a, b, c and d are discrimination, difficulty, guessing and inattention.
+Terms aDif, bDif, cDif and dDif then represent differences between two groups in relevant
+parameters.
 
 This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
 The arguments \code{model} and \code{constraints} can be also combined.
@@ -128,7 +183,7 @@ The \code{model} argument offers several predefined models. The options are as f
 or \code{4PL} for 4PL model.
 
 The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
-arguments should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
+parameters should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
 inattention (d) are fixed for both groups and other parameters (b and c) are not.
 
 The \code{type} corresponds to type of DIF to be tested. Possible values are
@@ -141,7 +196,7 @@ of DIF can be also specified in more detail by using combination of parameters a
 
 Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
 total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
-in \code{Data}. Matching criterion is used in \code{NLR()} function as a covariate in non-linear regression model.
+in \code{Data}.
 
 A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
 item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
@@ -149,25 +204,16 @@ In case anchor items are provided, only these items are used to compute matching
 argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored. When anchor items are
 provided, purification is not applied.
 
-The \code{p.adjust.method} is a character for \code{p.adjust()} function from the \code{stats}
+The \code{p.adjust.method} is a character for \code{\link[stats]{p.adjust}} function from the \code{stats}
 package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
+See also \code{\link[stats]{p.adjust.methods}}.
 
 The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
 First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
 for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
 of generalized logistic regression model between reference and focal group. If not specified, starting
-values are calculated with \code{startNLR()} function.
-
-The output of the difNLR is displayed by the \code{print.difNLR()} function.
-
-
-Fitted values are extracted by the \code{fitted.difNLR()} function for item(s) specified in
-\code{item} argument.
-
-Predicted values are produced by the \code{predict.difNLR()} function for item(s) specified in
-\code{item} argument. \code{score} represents standardized total score of new subject and
-\code{group} argument represents group membership of new subject.
+values are calculated with \code{\link[difNLR]{startNLR}} function.
 
 Missing values are allowed but discarded for item estimation. They must be coded as
 \code{NA} for both, \code{data} and \code{group} parameters.
@@ -240,8 +286,8 @@ predict(x)
 predict(x, item = 1)
 
 # Predicted values for new subjects
-predict(x, item = 1, score = 0, group = 1)
-predict(x, item = 1, score = 0, group = 0)
+predict(x, item = 1, match = 0, group = 1)
+predict(x, item = 1, match = 0, group = 0)
 
 # AIC, BIC, logLik
 AIC(x)
@@ -258,7 +304,7 @@ Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning 
 Journal of Educational Measurement, 27, 361-370.
 }
 \seealso{
-\code{\link[stats]{p.adjust}}
+\code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
 }
 \author{
 Adela Drabinova \cr

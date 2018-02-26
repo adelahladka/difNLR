@@ -9,7 +9,7 @@
   linetype = c(2, 1), title, ...)
 }
 \arguments{
-\item{x}{an object of 'difNLR' class}
+\item{x}{an object of "difNLR" class}
 
 \item{plot.type}{character: type of plot to be plotted (either \code{"cc"} for characteristic curve
 (default), or \code{"stat"} for test statistics). See \strong{Details}.}
@@ -36,7 +36,48 @@ curves represent best model.
 
 The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
 (either LR-test, or F-test, depends on argument \code{test}) are displayed on the Y axis,
-for each coverged item. The detection threshold is displayed by a horizontal line and items
+for each converged item. The detection threshold is displayed by a horizontal line and items
 detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
 are used.
+}
+\examples{
+\dontrun{
+# loading data based on GMAT
+data(GMAT)
+
+Data  <- GMAT[, 1:20]
+group <- GMAT[, "group"]
+
+# Testing both DIF effects using likelihood-ratio test and
+# 3PL model with fixed guessing for groups
+(x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
+
+# Graphical devices
+plot(x)
+plot(x, item = x$DIFitems)
+plot(x, plot.type = "stat")
+}
+}
+\references{
+Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+
+Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
+Journal of Educational Measurement, 27, 361-370.
+}
+\seealso{
+\code{\link[difNLR]{difNLR}}
+}
+\author{
+Adela Drabinova \cr
+Institute of Computer Science, The Czech Academy of Sciences \cr
+Faculty of Mathematics and Physics, Charles University \cr
+drabinova@cs.cas.cz \cr
+
+Patricia Martinkova \cr
+Institute of Computer Science, The Czech Academy of Sciences \cr
+martinkova@cs.cas.cz \cr
+
+Karel Zvara \cr
+Faculty of Mathematics and Physics, Charles University \cr
 }
