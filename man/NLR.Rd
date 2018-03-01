@@ -6,7 +6,7 @@
 \usage{
 NLR(Data, group, model, constraints = NULL, type = "both", method = "nls",
 match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
-alpha = 0.05)
+alpha = 0.05, initboot = T, nrBo = 20)
 }
 \arguments{
 \item{Data}{numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
@@ -40,6 +40,12 @@ item parameters estimates. See \strong{Details}.}
 See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
+
+\item{initboot}{logical: in case of convergence issues, should be starting values recalculated based on
+bootstraped samples? (default is \code{TRUE}). See \strong{Details}.}
+
+\item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
+bootstraped samples (default is 20).}
 }
 \value{
 A list with the following arguments:
@@ -59,6 +65,12 @@ A list with the following arguments:
   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
   \item{\code{ll.m0}}{log-likelihood of m0 model.}
   \item{\code{ll.m1}}{log-likelihood of m1 model.}
+  \item{\code{startBo0}}{the binary matrix. Columns represents iterations of initial values
+  recalculations, rows represents items. The value of 0 means no convergence issue in m0 model,
+  1 means convergence issue in m0 model.}
+  \item{\code{startBo1}}{the binary matrix. Columns represents iterations of initial values
+  recalculations, rows represents items. The value of 0 means no convergence issue in m1 model,
+  1 means convergence issue in m1 model.}
 }
 }
 \description{
@@ -73,11 +85,15 @@ The \code{Data} is a matrix whose rows represents examinee scored answers
 ("1" correct, "0" incorrect) and columns correspond to the items.
 The \code{group} must be a vector of the same length as \code{nrow(data)}.
 
-The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
+The unconstrained form of 4PL generalized logistic regression model for probability of
+correct answer (i.e., y = 1) is
+
 P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
-where x is standardized total score (also called Z-score) and g is group membership. Parameters a, b, c and d
-are discrimination, difficulty, guessing and inattention. Parameters aDif, bDif, cDif and dDif
-then represetn differences between two groups in discrimination, difficulty, guessing and inattention.
+
+where x is standardized total score (also called Z-score) and g is group membership.
+Parameters a, b, c and d are discrimination, difficulty, guessing and inattention.
+Parameters aDif, bDif, cDif and dDif then represent differences between two groups in
+discrimination, difficulty, guessing and inattention.
 
 This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
 The arguments \code{model} and \code{constraints} can be also combined.
@@ -111,16 +127,21 @@ Argument \code{match} represents the matching criterion. It can be either the st
 total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
 in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
 
-The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
-First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
-for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
-of generalized logistic regression model between reference and focal group.  If not specified, starting
-values are calculated with \code{startNLR} function.
+The \code{start} is a list with as many elements as number of items. Each element is a named numeric
+vector representing initial values for parameter estimation. Specifically, parameters
+a, b, c, and d are initial values for discrimination, difficulty, guessing and inattention
+for reference group. Parameters aDif, bDif, cDif and dDif are then differences in these
+parameters between reference and focal group. If not specified, starting
+values are calculated with \code{\link[difNLR]{startNLR}} function.
 
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"},
 \code{"none"}.
+
+In case of convergence issues, with an option \code{initboot = TRUE}, the starting values are
+re-calculated based on bootstraped samples. Newly calculated initial values are applied only to
+items/models with convergence issues.
 
 In case that model considers difference in guessing or inattention parameter, the different parameterization is
 used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with

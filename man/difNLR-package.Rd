@@ -15,8 +15,8 @@ model.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.2.0\cr
-Date: 2018-02-26\cr
+Version: 1.2.1\cr
+Date: 2018-03-01\cr
 Depends: R (>= 3.4.3), CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats\cr
 License: GPL-3\cr
 BugReports: https://github.com/drabinova/difNLR/issues
