@@ -1,9 +1,14 @@
 # difNLR
-Detection of Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by non-linear regression models.
+DIF and DDF Detection by Non-Linear Regression Models.
 
 ![GHversion](https://img.shields.io/github/release/drabinova/difNLR.svg)
 [![version](https://www.r-pkg.org/badges/version/difNLR)](https://CRAN.R-project.org/package=difNLR)
 ![cranlogs](https://cranlogs.r-pkg.org/badges/difNLR)
+
+## Description
+
+The difNLR package containts method for detection of differential item functioning (DIF)
+based on non-linear regression. Both uniform and non-uniform DIF effects can be detected when considering one focal group. The method also allows to test the difference in guessing or inattention parameters between reference and focal group. DIF detection method is based either on likelihood-ratio test, or on F-test of submodel. Package also offers method for detection of differential distractor functioning (DDF) based on multinomial log-linear regression model.
 
 ## Installation
 The easiest way to get `difNLR` package is to install it from CRAN:
@@ -22,9 +27,8 @@ Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.2.
 
 To cite `difNLR` package in publications, please, use:
 
-  Drabinova A., Martinkova P., & Zvara K. (2018). difNLR: Detection of differential
-  item functioning (DIF) and differential distractor functioning (DDF) by non-linear
-  regression models. R package version 1.2.1.
+  Drabinova A., Martinkova P., & Zvara K. (2018). difNLR: DIF and DDF detection by non-linear
+  regression models. R package version 1.2.1. [https://CRAN.R-project.org/package=difNLR]( https://CRAN.R-project.org/package=difNLR)
 
   Drabinova A., & Martinkova P. (2017). Detection of Differential Item Functioning with
   Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. Journal of
