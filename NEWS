@@ -20,7 +20,7 @@ MINOR UPDATES
   o Warning messages do not include the call.
 
 ----------------------------------------
-- Changes in difNLR 1.2.1 (2018-02-27) -
+- Changes in difNLR 1.2.1 (2018-03-01) -
 ----------------------------------------
 
 * Version 1.2.1 is CRAN version.
@@ -40,6 +40,11 @@ MAJOR UPDATES
 MINOR UPDATES
   o Minor bug fixing:
     - Typos were fixed in 'print()' method for 'difNLR' class.
+  o Title was shorten.
+  o Description of package was updated.
+  o Description file was updated, reference was added.
+  o README file was updated.
+  o CITATION file was updated.
 
 1.2.0.-6. (2018-02-26)
 MAJOR UPDATES

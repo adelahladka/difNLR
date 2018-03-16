@@ -236,6 +236,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     } else {
       for (i in 1:m){
         if (parameterization[i] == "alternative"){
+          start[[i]]["cDif"] <- start[[i]]["c"] + start[[i]]["cDif"]
+          start[[i]]["dDif"] <- start[[i]]["d"] + start[[i]]["dDif"]
           names(start[[i]]) <- c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
         } else {
           names(start[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
@@ -310,6 +312,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
         }
         conv.fail <- sum(cfM0, cfM1)
         conv.fail.which <- which(cfM0 | cfM1)
+
         if (conv.fail > 0) {
           warning(paste("Convergence failure in item", conv.fail.which, "\n",
                         "Trying re-calculate starting values based on bootstraped samples. "),

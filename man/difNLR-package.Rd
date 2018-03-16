@@ -4,19 +4,20 @@
 \name{difNLR-package}
 \alias{difNLR-package}
 \alias{_PACKAGE}
-\title{Detection of Differential Item Functioning (DIF) and Differential Distractor Functioning (DDF) by Non-Linear Regression Models}
+\title{DIF and DDF Detection by Non-Linear Regression Models.}
 \description{
-The difNLR package containts DIF detection method based on non-linear
-regression. Both uniform and non-uniform DIF effects can be detected when considering
-one focal group. DIF detection method is based either on likelihood-ratio test, or on F-test
-of submodel. Package also offers DDF detection method based on multinomial log-linear regression
-model.
+The difNLR package containts method for detection of differential item functioning (DIF)
+based on non-linear regression. Both uniform and non-uniform DIF effects can be detected when considering
+one focal group. The method also allows to test the difference in guessing or inattention parameters
+between reference and focal group. DIF detection method is based either on likelihood-ratio test, or on F-test
+of submodel. Package also offers method for detection of differential distractor functioning (DDF)
+based on multinomial log-linear regression model.
 }
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.2.0\cr
-Date: 2018-02-26\cr
+Version: 1.2.1\cr
+Date: 2018-03-01\cr
 Depends: R (>= 3.4.3), CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats\cr
 License: GPL-3\cr
 BugReports: https://github.com/drabinova/difNLR/issues
