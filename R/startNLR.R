@@ -41,7 +41,8 @@
 #' parameterization.
 #'
 #' @return
-#' A data.frame containing rows representing items and 5 columns representing parameters of \code{difNLR} model. First column represents discrimination (a), second difficulty (b), third guessing (c), fourth difference in discrimination between reference and focal group (aDif) and fifth difference in difficulty between reference and focal group (bDif).
+#' A list containing elements representing items. Each element is a named numeric vector of length 8
+#' with initial values for \code{difNLR} model.
 #'
 #' @author
 #' Adela Drabinova \cr

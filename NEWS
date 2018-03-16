@@ -3,9 +3,43 @@
 *  Changes and Developments in the difNLR Package  *
 *                                                  *
 ****************************************************
+
+
+1.2.1.-1. (2018-03-16)
+BUG FIXING
+  o difNLR:
+    - P-value adjustment is now performed in the last iteration of purification
+      as described.
+    - In difPur output columns are properly named.
+  o ddfMLR:
+    - P-value adjustment is now performed in the last iteration of purification
+      as described.
+    - In difPur output columns are properly named.
+
+MINOR UPDATES
+  o Warning messages do not include the call.
+
 ----------------------------------------
-- Changes in difNLR 1.2.0 (2018-02-26) -
+- Changes in difNLR 1.2.1 (2018-02-27) -
 ----------------------------------------
+
+* Version 1.2.1 is CRAN version.
+* It includes version 1.2.0.-1. - 1.2.0.-7.
+
+
+1.2.0.-7. (2018-02-27)
+MAJOR UPDATES
+  o Argument 'start' in 'difNLR()' function is now item-specific. The input is
+    correctly checked.
+  o In case that some items do not converge, starting values are recalculated
+    from bootstraped sample and problematic models are fitted again. This is done
+    20 times at most.
+    The options were added into 'difNLR()' and 'NLR()' functions.
+  o Argument 'constraints' in 'difNLR()' function is now item-specific.
+
+MINOR UPDATES
+  o Minor bug fixing:
+    - Typos were fixed in 'print()' method for 'difNLR' class.
 
 1.2.0.-6. (2018-02-26)
 MAJOR UPDATES

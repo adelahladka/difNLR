@@ -287,8 +287,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
       prov1 <- suppressWarnings(MLR(DATA, GROUP, key = key, type = type,
                                     p.adjust.method = p.adjust.method, alpha = alpha))
       stats1 <- prov1$Sval
-      adj.pval1 <- prov1$adjusted.pval
-      significant1 <- which(adj.pval1 < alpha)
+      pval1 <- prov1$pval
+      significant1 <- which(pval1 < alpha)
       if (length(significant1) == 0) {
         PROV <- prov1
         STATS <- stats1
@@ -319,8 +319,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
             prov2 <- suppressWarnings(MLR(DATA, GROUP, key = key, anchor = nodif, type = type,
                                           p.adjust.method = p.adjust.method, alpha = alpha))
             stats2 <- prov2$Sval
-            adj.pval2 <- prov2$adjusted.pval
-            significant2 <- which(adj.pval2 < alpha)
+            pval2 <- prov2$pval
+            significant2 <- which(pval2 < alpha)
             if (length(significant2) == 0)
               dif2 <- NULL
             else dif2 <- significant2
@@ -341,7 +341,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
         }
         PROV <- prov2
         STATS <- stats2
-        significant1 <- significant2
+        significant1 <- which(PROV$adjusted.pval < alpha)
         se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
         se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
         mlrPAR <- PROV$par.m1
@@ -356,14 +356,10 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
           DDFitems <- "No DIF item detected"
         }
       }
-      if (is.null(difPur) == FALSE) {
-        ro <- co <- NULL
-        for (ir in 1:nrow(difPur)) ro[ir] <- paste("Step", ir - 1, sep = "")
-        for (ic in 1:ncol(difPur)) co[ic] <- paste("Item", ic, sep = "")
-        rownames(difPur) <- ro
-        colnames(difPur) <- co
+      if (!is.null(difPur)) {
+        rownames(difPur) <- paste("Step", 0:(nrow(difPur) - 1), sep = "")
+        colnames(difPur) <- colnames(DATA)
       }
-
       RES <- list(Sval = STATS,
                   mlrPAR = mlrPAR,
                   mlrSE = mlrSE,

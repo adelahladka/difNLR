@@ -113,7 +113,7 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
     if (!is.na(constraints)){
       constr <- unlist(strsplit(constraints, split = ""))
       if (!all(constr %in% letters[1:4])){
-        warning("Constraints can be only 'a', 'b', 'c' or 'd'!")
+        warning("Constraints can be only 'a', 'b', 'c' or 'd'!", call. = F)
       }
       cons[paste(constr, "Dif", sep = "")] <- F
     }
@@ -175,10 +175,10 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
   if (model %in% c("Rasch", "1PL")){
     typ["aDif"] <- F
     if (type == "both"){
-      warning("Only uniform DIF can be tested with specified model!")
+      warning("Only uniform DIF can be tested with specified model!", call. = F)
     }
     if (type == "nudif"){
-      stop("It is not possible to test non-uniform DIF in specified model!")
+      stop("It is not possible to test non-uniform DIF in specified model!", call. = F)
     }
   }
 

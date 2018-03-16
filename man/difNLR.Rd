@@ -15,7 +15,7 @@
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
 match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
-p.adjust.method = "none", start)
+p.adjust.method = "none", start, initboot = T, nrBo = 20)
 
 \method{print}{difNLR}(x, ...)
 
@@ -69,8 +69,14 @@ See \strong{Details}.}
 
 \item{p.adjust.method}{character: method for multiple comparison correction. See \strong{Details}.}
 
-\item{start}{numeric: matrix with n rows (where n is the number of items) and 8 columns
-containing initial item parameters estimates. See \strong{Details}.}
+\item{start}{numeric: list with as many elements as number of items. Each element is a named
+numeric vector with values representing initial values for parameter estimation. See \strong{Details}.}
+
+\item{initboot}{logical: in case of convergence issues, should be starting values recalculated based on
+bootstraped samples? (default is \code{TRUE}). See \strong{Details}.}
+
+\item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
+bootstraped samples (default is 20).}
 
 \item{x}{an object of "difNLR" class}
 
@@ -87,6 +93,7 @@ is displayed by the \code{print()} method.
 
 Item characteristic curves and graphical representation of DIF statistics can be displayed
 with \code{plot()} method. For more details see \code{\link[difNLR]{plot.difNLR}}.
+Estimated parameters can be displayed with \code{coef()} method.
 
 Fitted values can be extracted by the \code{fitted()} method for converged item(s)
 specified in \code{item} argument.
@@ -207,16 +214,20 @@ provided, purification is not applied.
 The \code{p.adjust.method} is a character for \code{\link[stats]{p.adjust}} function from the \code{stats}
 package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
-See also \code{\link[stats]{p.adjust.methods}}.
 
-The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
-First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
-for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
-of generalized logistic regression model between reference and focal group. If not specified, starting
+The \code{start} is a list with as many elements as number of items. Each element is a named numeric
+vector of length 8 representing initial values for parameter estimation. Specifically, parameters
+a, b, c, and d are initial values for discrimination, difficulty, guessing and inattention
+for reference group. Parameters aDif, bDif, cDif and dDif are then differences in these
+parameters between reference and focal group. If not specified, starting
 values are calculated with \code{\link[difNLR]{startNLR}} function.
 
 Missing values are allowed but discarded for item estimation. They must be coded as
 \code{NA} for both, \code{data} and \code{group} parameters.
+
+In case of convergence issues, with an option \code{initboot = TRUE}, the starting values are
+re-calculated based on bootstraped samples. Newly calculated initial values are applied only to
+items/models with convergence issues.
 
 In case that model considers difference in guessing or inattention parameter, the different parameterization is
 used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
@@ -273,6 +284,9 @@ plot(x)
 plot(x, item = x$DIFitems)
 plot(x, plot.type = "stat")
 
+# Coefficients
+coef(x)
+
 # Fitted values
 fitted(x)
 fitted(x, item = 1)
@@ -290,9 +304,9 @@ predict(x, item = 1, match = 0, group = 1)
 predict(x, item = 1, match = 0, group = 0)
 
 # AIC, BIC, logLik
-AIC(x)
-BIC(x)
-logLik(x)
+AIC(x); AIC(x, item = 1)
+BIC(x); BIC(x, item = 1)
+logLik(x); logLik(x, item = 1)
 }
 
 }

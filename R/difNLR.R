@@ -28,15 +28,19 @@
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
-#' @param start numeric: matrix with n rows (where n is the number of items) and 8 columns
-#' containing initial item parameters estimates. See \strong{Details}.
+#' @param start numeric: list with as many elements as number of items. Each element is a named
+#' numeric vector with values representing initial values for parameter estimation. See \strong{Details}.
+#' @param initboot logical: in case of convergence issues, should be starting values recalculated based on
+#' bootstraped samples? (default is \code{TRUE}). See \strong{Details}.
+#' @param nrBo numeric: the maximal number of iterations for calculation of starting values using
+#' bootstraped samples (default is 20).
 #' @param item either character (\code{"all"}), or numeric vector, or single number
 #' corresponding to column indicators.
 #' @param ... other generic parameters for S3 methods.
 #'
 #' @usage difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
 #' match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
-#' p.adjust.method = "none", start)
+#' p.adjust.method = "none", start, initboot = T, nrBo = 20)
 #'
 #' @details
 #' DIF detection procedure based on non-linear regression is the extension of logistic regression
@@ -98,27 +102,31 @@
 #' The \code{p.adjust.method} is a character for \code{\link[stats]{p.adjust}} function from the \code{stats}
 #' package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
 #' \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
-#' See also \code{\link[stats]{p.adjust.methods}}.
 #'
-#' The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
-#' First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
-#' for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
-#' of generalized logistic regression model between reference and focal group. If not specified, starting
+#' The \code{start} is a list with as many elements as number of items. Each element is a named numeric
+#' vector of length 8 representing initial values for parameter estimation. Specifically, parameters
+#' a, b, c, and d are initial values for discrimination, difficulty, guessing and inattention
+#' for reference group. Parameters aDif, bDif, cDif and dDif are then differences in these
+#' parameters between reference and focal group. If not specified, starting
 #' values are calculated with \code{\link[difNLR]{startNLR}} function.
 #'
 #' Missing values are allowed but discarded for item estimation. They must be coded as
 #' \code{NA} for both, \code{data} and \code{group} parameters.
 #'
+#' In case of convergence issues, with an option \code{initboot = TRUE}, the starting values are
+#' re-calculated based on bootstraped samples. Newly calculated initial values are applied only to
+#' items/models with convergence issues.
+#'
 #' In case that model considers difference in guessing or inattention parameter, the different parameterization is
 #' used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
 #' alternative parameterization.
-#'
 #'
 #' @return The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
 #' is displayed by the \code{print()} method.
 #'
 #' Item characteristic curves and graphical representation of DIF statistics can be displayed
 #' with \code{plot()} method. For more details see \code{\link[difNLR]{plot.difNLR}}.
+#' Estimated parameters can be displayed with \code{coef()} method.
 #'
 #' Fitted values can be extracted by the \code{fitted()} method for converged item(s)
 #' specified in \code{item} argument.
@@ -248,6 +256,9 @@
 #' plot(x, item = x$DIFitems)
 #' plot(x, plot.type = "stat")
 #'
+#' # Coefficients
+#' coef(x)
+#'
 #' # Fitted values
 #' fitted(x)
 #' fitted(x, item = 1)
@@ -265,9 +276,9 @@
 #' predict(x, item = 1, match = 0, group = 0)
 #'
 #' # AIC, BIC, logLik
-#' AIC(x)
-#' BIC(x)
-#' logLik(x)
+#' AIC(x); AIC(x, item = 1)
+#' BIC(x); BIC(x, item = 1)
+#' logLik(x); logLik(x, item = 1)
 #' }
 #'
 #' @keywords DIF
@@ -276,7 +287,8 @@
 
 difNLR <- function(Data, group, focal.name, model, constraints, type = "both", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
-                   test = "LR", alpha = 0.05, p.adjust.method = "none", start)
+                   test = "LR", alpha = 0.05, p.adjust.method = "none", start,
+                   initboot = T, nrBo = 20)
 {
   if (any(type == "nudif" & model == "1PL"))
     stop("Detection of non-uniform DIF is not possible with 1PL model.", call. = FALSE)
@@ -287,7 +299,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
   if (missing(model)) {
     stop("'model' is missing", call. = FALSE)
   }
-  ###constraints
+  ### constraints
   if (missing(constraints)){
     constraints <- NULL
   }
@@ -315,6 +327,13 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
   ### starting values
   if (missing(start)) {
     start <- NULL
+  }
+  ### starting values with bootstraped samples
+  if (initboot){
+    if (nrBo < 1){
+      stop("The maximal number of iterations for calculation of starting values using bootstraped
+           samples 'nrBo' need to be greater than 1. ")
+    }
   }
   ### estimation method
   if (!(method %in% c("nls", "likelihood"))){
@@ -419,17 +438,22 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         }
       }
       constraints <- lapply(1:ncol(DATA), function(i) unique(unlist(strsplit(constraints[i], split = ""))))
-      if (!all(sapply(1:ncol(DATA), function(i) all(constraints[[i]] %in% letters[1:4])))){
-        stop("Constraints can be only 'a', 'b', 'c' or 'd'.")
+      if (!all(sapply(1:ncol(DATA), function(i) {
+        all(constraints[[i]] %in% letters[1:4]) | all(is.na(constraints[[i]]))
+        }))){
+        stop("Constraints can be only 'a', 'b', 'c' or 'd'. ")
       }
       if (any(!(type %in% c("udif", "nudif", "both", "all")))){
-        types <- unlist(strsplit(type, split = ""))
-        if (length(intersect(types, constraints)) > 0){
+        types <- as.list(rep(NA, ncol(DATA)))
+        wht <- !(type %in% c("udif", "nudif", "both", "all"))
+        types[wht] <- unlist(strsplit(type[wht], split = ""))
+        if (any(sapply(1:ncol(DATA), function(i) length(intersect(types[[i]], constraints[[i]]))) > 0)){
           stop("The difference in constrained parameters cannot be tested.")
         }
       }
     } else {
       constraints <- as.list(rep(NA, ncol(DATA)))
+      types <- NULL
     }
     ### anchors
     if (!is.null(anchor)) {
@@ -448,19 +472,18 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
                                             "4PLcdg", "4PLc", "4PL"),
                                "alternative",
                                "classic")
-    if (is.null(start)){
-      start <- startNLR(DATA, GROUP, model, match = match, parameterization = parameterization)
-    } else {
-      if (ncol(start) != 8 | nrow(start) != ncol(DATA)){
-        stop("Invalid value for 'start'. Initial values must be a data frame or matrix with 8 columns and the number of
-              its rows need to correspond to number of items.", call. = FALSE)
-      }
-      colnames(start) <- c(letters[1:4], paste(letters[1:4], "Dif", sep = ""))
+    if (!is.null(start)){
+      if (length(start) != ncol(DATA))
+        stop("Invalid value for 'start'. Initial values must be a list with as many elements
+             as number of items in Data. ", call. = FALSE)
+      if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste(letters[1:4], "Dif", sep = ""))))
+        stop("Invalid names in 'start'. Each element of 'start' need to be a numeric vector
+             with names 'a', 'b', 'c', 'd', 'aDif', 'bDif', 'cDif' and 'dDif'.", call. = FALSE)
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
                                    match = match, anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method,
-                                   test = test, alpha = alpha))
+                                   test = test, alpha = alpha, initboot = initboot, nrBo = nrBo))
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
       significant <- which(ADJ.PVAL < alpha)
@@ -482,10 +505,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       } else {
         DIFitems <- "No DIF item detected"
       }
-      types <- NULL
+
       if (any(!(type %in% c("udif", "nudif", "both", "all")))){
-        types <- unlist(strsplit(type, split = ""))
-        type <- "other"
+        wht <- (!(type %in% c("udif", "nudif", "both", "all")))
+        type[wht] <- "other"
       }
       RES <- list(Sval = STATS,
                   nlrPAR = nlrPAR, nlrSE = nlrSE,
@@ -505,10 +528,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       noLoop <- FALSE
       prov1 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
                                     match = match, start = start, p.adjust.method = p.adjust.method, test = test,
-                                    alpha = alpha))
+                                    alpha = alpha, initboot = initboot, nrBo = nrBo))
       stats1 <- prov1$Sval
-      adj.pval1 <- prov1$adjusted.pval
-      significant1 <- which(adj.pval1 < alpha)
+      pval1 <- prov1$pval
+      significant1 <- which(pval1 < alpha)
 
       if (length(significant1) == 0) {
         PROV <- prov1
@@ -539,10 +562,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
                 }
               prov2 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
                                             match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
-                                            test = test, alpha = alpha))
+                                            test = test, alpha = alpha, initboot = initboot, nrBo = nrBo))
               stats2 <- prov2$Sval
-              adj.pval2 <- prov2$adjusted.pval
-              significant2 <- which(adj.pval2 < alpha)
+              pval2 <- prov2$pval
+              significant2 <- which(pval2 < alpha)
               if (length(significant2) == 0)
                 dif2 <- NULL
               else dif2 <- significant2
@@ -563,7 +586,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         }
         PROV <- prov2
         STATS <- stats2
-        significant1 <- significant2
+        significant1 <- which(PROV$adjusted.pval < alpha)
         nlrPAR <- nlrSE <- lapply(1:length(PROV$par.m0),
                                   function(i) structure(rep(0, length(PROV$par.m0[[i]])),
                                                         names = names(PROV$par.m0[[i]])))
@@ -582,18 +605,15 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
           DIFitems <- "No DIF item detected"
         }
       }
-      if (is.null(difPur) == FALSE) {
-        ro <- co <- NULL
-        for (ir in 1:nrow(difPur)) ro[ir] <- paste("Step", ir - 1, sep = "")
-        for (ic in 1:ncol(difPur)) co[ic] <- paste("Item", ic, sep = "")
-        rownames(difPur) <- ro
-        colnames(difPur) <- co
+      if (!is.null(difPur)) {
+        rownames(difPur) <- paste("Step", 0:(nrow(difPur) - 1), sep = "")
+        colnames(difPur) <- colnames(DATA)
       }
-      types <- NULL
-      # if (any(!(type %in% c("udif", "nudif", "both", "all")))){
-      #   types <- unlist(strsplit(type, split = ""))
-      #   type <- "other"
-      # }
+
+      if (any(!(type %in% c("udif", "nudif", "both", "all")))){
+        wht <- (!(type %in% c("udif", "nudif", "both", "all")))
+        type[wht] <- "other"
+      }
       RES <- list(Sval = STATS,
                   nlrPAR = nlrPAR, nlrSE = nlrSE,
                   parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
@@ -608,13 +628,14 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
     }
     if (PROV$conv.fail > 0) {
-      warning(paste("Convergence failure in item", PROV$conv.fail.which, "\n"))
+      warning(paste("Convergence failure in item", PROV$conv.fail.which, "\n"), call. = F)
     }
     if (purify){
       if (!noLoop){
         warning(paste("Item purification process not converged after ",
                       nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
-                      "Results are based on last iteration of the item purification.\n", sep = ""))
+                      "Results are based on last iteration of the item purification.\n", sep = ""),
+                call. = F)
       }
     }
     class(RES) <- "difNLR"
@@ -661,21 +682,24 @@ print.difNLR <- function (x, ...){
                           "4PLcdg" = "4PL model with fixed inattention parameter for groups",
                           "4PLc" = "4PL model with fixed inattention parameter for groups",
                           "4PL" = "4PL model")),
-                   ""), sep = ""))
-            # ifelse(length(unique(x$constraints)) == 1,
-            #        paste(" with constraints on",
-            #              paste(unique(unlist(strsplit(x$constraints, split = ""))), collapse = ", "),
-            #              "parameter")), sep = ""), "\n"),
+                   ""), sep = ""),
+            ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
+                   paste("with constraints on",
+                         ifelse(length(unique(unlist(x$constraints))) == 1, "parameter", "parameters"),
+                         paste(unique(unlist(x$constraints)), collapse = ", "), "\n"),
+                   "\n"))
   cat(paste("\nParameters were estimated with", ifelse(x$method == "nls",
                                                        "non-linear least squares\n",
                                                        "maximum likelihood method\n")))
   cat(paste("\nItem purification was",
             ifelse(x$purification, " ", " not "), "applied",
-            ifelse(x$purification, paste(" with ", x$nrPur, ifelse(x$nrPurnrPur <= 1, " iteration.", " iterations."), sep = ""), ""), "\n", sep = ""))
+            ifelse(x$purification, paste(" with ", x$nrPur,
+                                         ifelse(x$nrPur <= 1, " iteration.", " iterations."),
+                                         sep = ""), ""), "\n", sep = ""))
   if (x$p.adjust.method == "none") {
     cat("No p-value adjustment for multiple comparisons\n\n")
   } else {
-    cat(paste("\nMultiple comparisons made with",
+    cat(paste("Multiple comparisons made with",
               switch(x$p.adjust.method,
                      holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
                      bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
@@ -723,7 +747,7 @@ print.difNLR <- function (x, ...){
   }
 
   if (is.character(x$DIFitems)) {
-    cat("\nNone of items is detected as DIF")
+    cat("\nNone of items is detected as DIF \n")
   }
   else {
     cat("\n\nItems detected as DIF items:")
@@ -1326,6 +1350,7 @@ logLik.difNLR <- function(object, item = "all", ...){
                sapply(object$parM0, length)[ITEMS],
                sapply(object$parM1, length)[ITEMS])
   val <- val[items]
+  df <- df[items]
   if (length(items) == 1){
     attr(val, "df") <- df
     class(val) <- "logLik"

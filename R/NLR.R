@@ -25,10 +25,14 @@
 #' @param test character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
+#' @param initboot logical: in case of convergence issues, should be starting values recalculated based on
+#' bootstraped samples? (default is \code{TRUE}). See \strong{Details}.
+#' @param nrBo numeric: the maximal number of iterations for calculation of starting values using
+#' bootstraped samples (default is 20).
 #'
 #' @usage NLR(Data, group, model, constraints = NULL, type = "both", method = "nls",
 #' match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
-#' alpha = 0.05)
+#' alpha = 0.05, initboot = T, nrBo = 20)
 #'
 #' @details
 #' DIF detection procedure based on Non-Linear Regression is the extension
@@ -38,11 +42,15 @@
 #' ("1" correct, "0" incorrect) and columns correspond to the items.
 #' The \code{group} must be a vector of the same length as \code{nrow(data)}.
 #'
-#' The unconstrained form of 4PL generalized logistic regression model for probability of correct answer (i.e., y = 1) is
+#' The unconstrained form of 4PL generalized logistic regression model for probability of
+#' correct answer (i.e., y = 1) is
+#'
 #' P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
-#' where x is standardized total score (also called Z-score) and g is group membership. Parameters a, b, c and d
-#' are discrimination, difficulty, guessing and inattention. Parameters aDif, bDif, cDif and dDif
-#' then represetn differences between two groups in discrimination, difficulty, guessing and inattention.
+#'
+#' where x is standardized total score (also called Z-score) and g is group membership.
+#' Parameters a, b, c and d are discrimination, difficulty, guessing and inattention.
+#' Parameters aDif, bDif, cDif and dDif then represent differences between two groups in
+#' discrimination, difficulty, guessing and inattention.
 #'
 #' This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
 #' The arguments \code{model} and \code{constraints} can be also combined.
@@ -76,16 +84,21 @@
 #' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
 #' in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
 #'
-#' The \code{start} is a matrix with a number of rows equal to number of items and with 8 columns.
-#' First 4 columns represent parameters (a, b, c, d) of generalized logistic regression model
-#' for reference group. Last 4 columns represent differences of parameters (aDif, bDif, cDif, dDif)
-#' of generalized logistic regression model between reference and focal group.  If not specified, starting
-#' values are calculated with \code{startNLR} function.
+#' The \code{start} is a list with as many elements as number of items. Each element is a named numeric
+#' vector representing initial values for parameter estimation. Specifically, parameters
+#' a, b, c, and d are initial values for discrimination, difficulty, guessing and inattention
+#' for reference group. Parameters aDif, bDif, cDif and dDif are then differences in these
+#' parameters between reference and focal group. If not specified, starting
+#' values are calculated with \code{\link[difNLR]{startNLR}} function.
 #'
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 #' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"},
 #' \code{"none"}.
+#'
+#' In case of convergence issues, with an option \code{initboot = TRUE}, the starting values are
+#' re-calculated based on bootstraped samples. Newly calculated initial values are applied only to
+#' items/models with convergence issues.
 #'
 #' In case that model considers difference in guessing or inattention parameter, the different parameterization is
 #' used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
@@ -108,6 +121,12 @@
 #'   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
 #'   \item{\code{ll.m0}}{log-likelihood of m0 model.}
 #'   \item{\code{ll.m1}}{log-likelihood of m1 model.}
+#'   \item{\code{startBo0}}{the binary matrix. Columns represents iterations of initial values
+#'   recalculations, rows represents items. The value of 0 means no convergence issue in m0 model,
+#'   1 means convergence issue in m0 model.}
+#'   \item{\code{startBo1}}{the binary matrix. Columns represents iterations of initial values
+#'   recalculations, rows represents items. The value of 0 means no convergence issue in m1 model,
+#'   1 means convergence issue in m1 model.}
 #' }
 #' @author
 #' Adela Drabinova \cr
@@ -171,7 +190,8 @@
 
 NLR <- function(Data, group, model, constraints = NULL, type = "both",
                 method = "nls", match = "zscore", anchor = 1:ncol(Data),
-                start, p.adjust.method = "none", test = "LR", alpha = 0.05){
+                start, p.adjust.method = "none", test = "LR", alpha = 0.05,
+                initboot = T, nrBo = 20){
 
   if (match[1] == "zscore"){
     x <- scale(apply(as.data.frame(Data[, anchor]), 1, sum))
@@ -210,12 +230,25 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
                              "classic")
   if (missing(start)){
     start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+  } else {
+    if (is.null(start)){
+      start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+    } else {
+      for (i in 1:m){
+        if (parameterization[i] == "alternative"){
+          names(start[[i]]) <- c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+        } else {
+          names(start[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+        }
+      }
+    }
   }
+
 
   M <- lapply(1:m,
               function(i) formulaNLR(model = model[i],
                                      type = type[i],
-                                     constraints = constraints[i],
+                                     constraints = constraints[[i]],
                                      parameterization = parameterization[i]))
 
   m0 <- lapply(1:m, function(i) estimNLR(y = Data[, i], match = x, group = group,
@@ -237,8 +270,63 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   conv.fail <- sum(cfM0, cfM1)
   conv.fail.which <- which(cfM0 | cfM1)
 
+  # using starting values for bootstraped samples
+
+  if (initboot){
+    startM0 <- startM1 <- start
+    startBo0 <- rep(0, m); startBo1 <- rep(0, m)
+    startBo0[which(cfM0)] <- 1; startBo1[which(cfM1)] <- 1
+    for (i in 1:nrBo){
+      if (conv.fail > 0){
+        samp <- sample(1:nrow(Data), size = nrow(Data), replace = T)
+        startalt <- startNLR(Data[samp, ], group[samp], model, match = x,
+                             parameterization = parameterization)
+        if (sum(cfM0) > 0){
+          startM0[which(cfM0)] <- startalt[which(cfM0)]
+          m0[which(cfM0)] <- lapply(which(cfM0), function(i) estimNLR(y = Data[, i], match = x, group = group,
+                                                                      formula = M[[i]]$M0$formula,
+                                                                      method = method,
+                                                                      start = structure(startM0[[i]][M[[i]]$M0$parameters],
+                                                                                        names = M[[i]]$M0$parameters),
+                                                                      lower = M[[i]]$M0$lower,
+                                                                      upper = M[[i]]$M0$upper))
+          cfM0 <- unlist(lapply(m0, is.null))
+          startBo0 <- cbind(startBo0, rep(0, m))
+          startBo0[which(cfM0), i+1] <- 1
+        }
+        if (sum(cfM1) > 0){
+          startM1[which(cfM1)] <- startalt[which(cfM1)]
+          m1[which(cfM1)] <- lapply(which(cfM1), function(i) estimNLR(y = Data[, i], match = x, group = group,
+                                                                      formula = M[[i]]$M1$formula,
+                                                                      method = method,
+                                                                      start = structure(startM1[[i]][M[[i]]$M1$parameters],
+                                                                                        names = M[[i]]$M1$parameters),
+                                                                      lower = M[[i]]$M1$lower,
+                                                                      upper = M[[i]]$M1$upper))
+          cfM1 <- unlist(lapply(m1, is.null))
+          startBo1 <- cbind(startBo1, rep(0, m))
+          startBo1[which(cfM1), i+1] <- 1
+
+        }
+        conv.fail <- sum(cfM0, cfM1)
+        conv.fail.which <- which(cfM0 | cfM1)
+        if (conv.fail > 0) {
+          warning(paste("Convergence failure in item", conv.fail.which, "\n",
+                        "Trying re-calculate starting values based on bootstraped samples. "),
+                  call. = F)
+        }
+      } else {
+        break
+      }
+    }
+  } else {
+    startBo0 <- startBo1 <- NULL
+  }
+  if (i > 1)
+    message("Starting values were calculated based on bootstraped samples. ")
+
   if (conv.fail > 0) {
-    warning(paste("Convergence failure in item", conv.fail.which, "\n"))
+    warning(paste("Convergence failure in item", conv.fail.which, "\n"), call. = F)
   }
   # test
   if (test == "F"){
@@ -282,14 +370,6 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   par.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], coef)
   par.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], coef)
 
-  # if (dim(par.m1)[2] == 1){
-  #   par.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], coef)
-  #   par.m1 <- structure(data.frame(par.m1), names = unique(names(par.m1)))
-  # } else {
-  #   par.m1[which(!cfM1), ] <- t(sapply(m1[which(!cfM1)], coef))
-  # }
-  # par.m0[which(!cfM0), ] <- t(sapply(m0[which(!cfM0)], coef))
-
   # covariance structure
   cov.m0 <- cov.m1 <- as.list(rep(NA, m))
   cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
@@ -297,14 +377,6 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   # se
   se.m1[which(!cfM1)] <- lapply(cov.m1[which(!cfM1)] , diag)
   se.m0[which(!cfM0)] <- lapply(cov.m0[which(!cfM0)] , diag)
-
-  # if (dim(par.m1)[2] == 1){
-  #   se.m1[which(!cfM1), ] <- sqrt(sapply(cov.m1[which(!cfM1)], diag))
-  #   se.m1 <- structure(data.frame(se.m1), names = unique(names(se.m1)))
-  # } else {
-  #   se.m1[which(!cfM1), ] <- sqrt(t(sapply(cov.m1[which(!cfM1)], diag)))
-  # }
-  # se.m0[which(!cfM0), ] <- sqrt(t(sapply(cov.m0[which(!cfM0)] , diag)))
 
   # delta method
   for (i in 1:m){
@@ -378,6 +450,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
                   par.m0 = par.m0, se.m0 = se.m0, cov.m0 = cov.m0,
                   par.m1 = par.m1, se.m1 = se.m1, cov.m1 = cov.m1,
                   conv.fail = conv.fail, conv.fail.which = conv.fail.which,
-                  ll.m0 = ll.m0, ll.m1 = ll.m1)
+                  ll.m0 = ll.m0, ll.m1 = ll.m1,
+                  startBo0 = startBo0, startBo1 = startBo1)
   return(results)
 }
