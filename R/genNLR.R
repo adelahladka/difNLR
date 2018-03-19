@@ -219,7 +219,7 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
       pR <- pR/sumR; pF <- pF/sumF
       p <- rbind(pR, pF)
       for (j in 1:N) {
-        answer[j, i] <- rbinom(1, size = L+1, prob = p[j, ])
+        answer[j, i] <- rbinom(1, size = L, prob = p[j, ])
       }
     }
   }

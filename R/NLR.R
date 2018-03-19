@@ -324,6 +324,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     }
   } else {
     startBo0 <- startBo1 <- NULL
+    i = 1
   }
   if (i > 1)
     message("Starting values were calculated based on bootstraped samples. ")

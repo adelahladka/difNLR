@@ -191,7 +191,9 @@ or \code{4PL} for 4PL model.
 
 The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
 parameters should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
-inattention (d) are fixed for both groups and other parameters (b and c) are not.
+inattention (d) are fixed for both groups and other parameters (b and c) are not. The arguments
+\code{model} and \code{constraints} can be also item specific if they take a form of vector, where
+each element correspond to one item. The \code{NA} value for \code{constraints} means no constraints.
 
 The \code{type} corresponds to type of DIF to be tested. Possible values are
 \code{"both"} to detect any DIF caused by difference in difficulty or discrimination (i.e., uniform and/or non-uniform),
@@ -199,7 +201,8 @@ The \code{type} corresponds to type of DIF to be tested. Possible values are
 \code{"nudif"} to detect only non-uniform DIF (i.e., difference in discrimination a), or
 \code{"all"} to detect DIF caused by difference caused by any parameter that can differed between groups. The \code{type}
 of DIF can be also specified in more detail by using combination of parameters a, b, c and d. For example, with an option
-\code{"c"} for 4PL model only the difference in parameter c is tested.
+\code{"c"} for 4PL model only the difference in parameter c is tested. The \code{type} argument is
+also item specific.
 
 Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
 total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations

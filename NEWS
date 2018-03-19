@@ -4,6 +4,12 @@
 *                                                  *
 ****************************************************
 
+1.2.1.-2. (2018-03-19)
+BUG FIXING
+  o difNLR
+    - Check for constraints was fixed.
+  o NLR
+    - initboot = F now works properly.
 
 1.2.1.-1. (2018-03-16)
 BUG FIXING
