@@ -21,11 +21,11 @@ purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 
 \method{coef}{ddfMLR}(object, ...)
 
-\method{logLik}{ddfMLR}(object, ...)
+\method{logLik}{ddfMLR}(object, item = "all", ...)
 
-\method{AIC}{ddfMLR}(object, ...)
+\method{AIC}{ddfMLR}(object, item = "all", ...)
 
-\method{BIC}{ddfMLR}(object, ...)
+\method{BIC}{ddfMLR}(object, item = "all", ...)
 }
 \arguments{
 \item{Data}{character: either the unscored data matrix only, or the unscored data

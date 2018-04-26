@@ -605,24 +605,93 @@ coef.ddfMLR <- function(object, ...){
 
 #' @rdname ddfMLR
 #' @export
-logLik.ddfMLR <- function(object, ...){
+logLik.ddfMLR <- function(object, item = "all", ...){
   m <- length(object$mlrPAR)
-  LL <- ifelse(1:m %in% object$DDFitems, object$llM0, object$llM1)
-  return(LL)
+  if (class(item) == "character"){
+    if (item != "all")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    items <- 1:m
+  } else {
+    items <- item
+  }
+  val <- ifelse(items %in% object$DDFitems,
+                object$llM0[[items]],
+                object$llM1[[items]])
+  df <- ifelse(items %in% object$DDFitems,
+               sapply(object$parM0, length)[items],
+               sapply(object$parM1, length)[items])
+  if (length(items) == 1){
+    attr(val, "df") <- df
+    class(val) <- "logLik"
+  }
+  return(val)
 }
 
 #' @rdname ddfMLR
 #' @export
-AIC.ddfMLR <- function(object, ...){
+AIC.ddfMLR <- function(object, item = "all", ...){
   m <- length(object$mlrPAR)
-  AIC <- ifelse(1:m %in% object$DDFitems, object$AICM0, object$AICM1)
+  if (class(item) == "character"){
+    if (item != "all")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    items <- 1:m
+  } else {
+    items <- item
+  }
+  AIC <- ifelse(items %in% object$DDFitems, object$AICM0[items], object$AICM1[items])
   return(AIC)
 }
 
 #' @rdname ddfMLR
 #' @export
-BIC.ddfMLR <- function(object, ...){
+BIC.ddfMLR <- function(object, item = "all", ...){
   m <- length(object$mlrPAR)
-  BIC <- ifelse(1:m %in% object$DDFitems, object$BICM0, object$BICM1)
+  if (class(item) == "character"){
+    if (item != "all")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    items <- 1:m
+  } else {
+    items <- item
+  }
+  BIC <- ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
   return(BIC)
 }

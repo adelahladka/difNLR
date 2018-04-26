@@ -4,6 +4,10 @@
 *                                                  *
 ****************************************************
 
+1.2.1.-3. (2018-04-26)
+MAJOR UPDATES
+  o S3 methods 'AIC()', 'BIC()', 'logLik()' of 'ddfMLR()' are now item specific.
+
 1.2.1.-2. (2018-03-19)
 BUG FIXING
   o difNLR
