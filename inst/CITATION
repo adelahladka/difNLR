@@ -4,7 +4,7 @@ note <- sprintf("R package version %s", meta$Version)
 citHeader("To cite package 'difNLR' in publications use:")
 
 citEntry(entry = "Manual",
-         title = "difNLR: DIF and DDF Detection by Non-Linear Regression Models.",
+         title = "{difNLR}: {DIF} and {DDF} Detection by Non-Linear Regression Models.",
          author = personList(as.person("Adela Drabinova"),
                              as.person("Patricia Martinkova"),
                              as.person("Karel Zvara")),
@@ -17,7 +17,7 @@ citEntry(entry = "Manual",
                ".", sep = ""))
 
 citEntry(entry = "Article",
-         title = "{D}etection of Differential Item Functioning with Nonlinear Regression: A Non-{IRT} Approach Accounting for Guessing",
+         title = "{D}etection of Differential Item Functioning with Nonlinear Regression: {A} Non-{IRT} Approach Accounting for Guessing",
          author = personList(as.person("Adela Drabinova"), as.person("Patricia Martinkova")),
          year = "2017",
          journal = "Journal of Educational Measurement",

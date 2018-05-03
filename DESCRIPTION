@@ -1,8 +1,8 @@
 Package: difNLR
 Type: Package
 Title: DIF and DDF Detection by Non-Linear Regression Models
-Version: 1.2.1
-Date: 2018-03-01
+Version: 1.2.2
+Date: 2018-05-03
 Authors@R: c(person("Adela", "Drabinova", role = c("aut", "cre"), email = "drabinova@cs.cas.cz"), person("Patricia", "Martinkova", role = "aut"), person("Karel", "Zvara", role = "aut"))
 Author: Adela Drabinova [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]
 Maintainer: Adela Drabinova <drabinova@cs.cas.cz>
