@@ -83,7 +83,8 @@ startNLR(Data, group,
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+\url{https://doi.org/10.1111/jedm.12158}.
 }
 \seealso{
 \code{\link[difNLR]{difNLR}}

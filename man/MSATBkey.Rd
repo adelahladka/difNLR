@@ -15,7 +15,8 @@ The \code{MSATBkey} is a vector of factors representing correct answers of
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+\url{https://doi.org/10.1111/jedm.12158}.
 
 Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 }

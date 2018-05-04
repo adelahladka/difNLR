@@ -19,12 +19,15 @@
 #' Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
 #'
 #' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' \url{https://doi.org/10.1111/jedm.12158}.
 #'
 #' @keywords datasets
 #'
 #' @seealso \code{\link{GMAT2test}}, \code{\link{GMAT2key}}
 #'
-#' @format A \code{GMAT2} data frame consists of 1,000 observations on the following 21 variables. The first 20 columns represent dichotomously scored items of the test. The 21st column is vector of group membership; values 0 and 1 refer to reference and focal group.
+#' @format A \code{GMAT2} data frame consists of 1,000 observations on the following 21 variables. The first 20 columns represent
+#' dichotomously scored items of the test. The 21st column is vector of group membership; values 0 and 1 refer to reference and
+#' focal group.
 "GMAT2"
 #> [1] "GMAT2"

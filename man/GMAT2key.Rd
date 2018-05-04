@@ -18,7 +18,8 @@ Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Appl
 Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
 
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+\url{https://doi.org/10.1111/jedm.12158}.
 }
 \seealso{
 \code{\link{GMAT2}}, \code{\link{GMAT2test}}

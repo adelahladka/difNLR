@@ -4,7 +4,9 @@
 \name{GMAT2}
 \alias{GMAT2}
 \title{Dichotomous Data Set Based on Graduate Management Admission Test}
-\format{A \code{GMAT2} data frame consists of 1,000 observations on the following 21 variables. The first 20 columns represent dichotomously scored items of the test. The 21st column is vector of group membership; values 0 and 1 refer to reference and focal group.}
+\format{A \code{GMAT2} data frame consists of 1,000 observations on the following 21 variables. The first 20 columns represent
+dichotomously scored items of the test. The 21st column is vector of group membership; values 0 and 1 refer to reference and
+focal group.}
 \usage{
 data(GMAT2)
 }
@@ -16,7 +18,8 @@ Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Appl
 Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
 
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+\url{https://doi.org/10.1111/jedm.12158}.
 }
 \seealso{
 \code{\link{GMAT2test}}, \code{\link{GMAT2key}}

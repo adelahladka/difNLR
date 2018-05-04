@@ -41,14 +41,15 @@
 #'
 #' @references
 #' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' \url{https://doi.org/10.1111/jedm.12158}.
 #'
 #' Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory
 #' Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
 #'
 #' Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
 #' Checking equity: Why Differential Item Functioning Analysis Should Be a Routine Part of Developing Conceptual
-#' Assessments. CBE-Life Sciences Education, 16(2), \url{http://www.lifescied.org/content/16/2/rm2}.
+#' Assessments. CBE-Life Sciences Education, 16(2), \url{https://doi.org/10.1187/cbe.16-10-0307}.
 #'
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
 #' Journal of Educational Measurement, 27, 361-370.

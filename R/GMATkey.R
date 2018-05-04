@@ -23,7 +23,7 @@
 #'
 #' Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
 #' Checking equity: Why Differential Item Functioning Analysis Should Be a Routine Part of Developing Conceptual
-#' Assessments. CBE-Life Sciences Education, 16(2), \url{http://www.lifescied.org/content/16/2/rm2}.
+#' Assessments. CBE-Life Sciences Education, 16(2), \url{https://doi.org/10.1187/cbe.16-10-0307}.
 #'
 #' @keywords datasets
 #'
