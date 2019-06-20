@@ -102,10 +102,10 @@
 #'   }
 #'
 #' @author
-#' Adela Drabinova \cr
+#' Adela Hladka \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' drabinova@cs.cas.cz \cr
+#' hladka@cs.cas.cz \cr
 #'
 #' Patricia Martinkova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -487,7 +487,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     }
   }
 
-  sq <- seq(min(score, na.rm = T), max(score, na.rm = T), by = 0.1)
+  sq <- seq(min(score, na.rm = T), max(score, na.rm = T), length.out = 300)
   sqR <- as.matrix(data.frame(1, sq, 0, 0))
   sqF <- as.matrix(data.frame(1, sq, 1, sq))
 
@@ -511,34 +511,29 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
       TITLE <- colnames(x$Data)[i]
     }
 
-    if(ncol(x$mlrPAR[[i]]) == 2)
+    if (is.null(dim(x$mlrPAR[[i]]))) x$mlrPAR[[i]] <- matrix(x$mlrPAR[[i]], ncol = length(x$mlrPAR[[i]]))
+    if (ncol(x$mlrPAR[[i]]) == 2)
       x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0, 0))
-    if(ncol(x$mlrPAR[[i]]) == 3)
+    if (ncol(x$mlrPAR[[i]]) == 3)
       x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0))
 
-    prR <- prF <- c()
-
-    for (j in 1:nrow(x$mlrPAR[[i]])){
-      prR <- rbind(prR, exp(x$mlrPAR[[i]][j, ] %*% t(sqR)))
-      prF <- rbind(prF, exp(x$mlrPAR[[i]][j, ] %*% t(sqF)))
-    }
-
-    prR <- as.data.frame(t(prR)); prF <- as.data.frame(t(prF))
+    prR <- as.data.frame(t(exp(x$mlrPAR[[i]] %*% t(sqR))))
+    prF <- as.data.frame(t(exp(x$mlrPAR[[i]] %*% t(sqF))))
     colnames(prR) <- colnames(prF) <- rownames(x$mlrPAR[[i]])
-    prR$sum <- apply(prR, 1, sum) + 1; prF$sum <- apply(prF, 1, sum) + 1
 
-    for (j in 1:nrow(x$mlrPAR[[i]])){
-      prR <- data.frame(prR, prR[, j]/prR[, "sum"])
-      prF <- data.frame(prF, prF[, j]/prF[, "sum"])
+    prR <- sapply(prR, function(x) x/(rowSums(prR) + 1))
+    prF <- sapply(prF, function(x) x/(rowSums(prF) + 1))
+
+    hvR <- data.frame(1 - rowSums(prR), prR, "R", sq)
+    hvF <- data.frame(1 - rowSums(prF), prF, "F", sq)
+
+    if (is.null(rownames(x$mlrPAR[[i]]))){
+      nams <- levels(x$Data[, i])[levels(x$Data[, i]) != x$key[i]]
+    } else {
+      nams <- rownames(x$mlrPAR[[i]])
     }
 
-    hvR <- data.frame(1 - apply(prR[, (nrow(x$mlrPAR[[i]])+2):ncol(prR)], 1, sum),
-                      prR[, (nrow(x$mlrPAR[[i]])+2):ncol(prR)], "R")
-    hvF <- data.frame(1 - apply(prF[, (nrow(x$mlrPAR[[i]])+2):ncol(prF)], 1, sum),
-                      prF[, (nrow(x$mlrPAR[[i]])+2):ncol(prF)], "F")
-    hvR <- data.frame(hvR, score = sq)
-    hvF <- data.frame(hvF, score = sq)
-    colnames(hvR) <- colnames(hvF) <- c(paste(x$key[i]), rownames(x$mlrPAR[[i]]), "group", "score")
+    colnames(hvR) <- colnames(hvF) <- c(paste(x$key[i]), nams, "group", "score")
     hv <- rbind(hvR, hvF)
 
     df <- reshape2::melt(hv, id = c("score", "group"))

@@ -4,7 +4,6 @@
 \alias{ddfMLR}
 \alias{print.ddfMLR}
 \alias{plot.ddfMR}
-\alias{print.ddfMLR}
 \alias{plot.ddfMLR}
 \alias{coef.ddfMLR}
 \alias{logLik.ddfMLR}
@@ -182,10 +181,10 @@ logLik(x)
 \code{\link[stats]{p.adjust}}
 }
 \author{
-Adela Drabinova \cr
+Adela Hladka \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-drabinova@cs.cas.cz \cr
+hladka@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

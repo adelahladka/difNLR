@@ -28,10 +28,10 @@ Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 \code{\link{MSATB}}, \code{\link{MSATBkey}}
 }
 \author{
-Adela Drabinova \cr
+Adela Hladka \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-drabinova@cs.cas.cz \cr
+hladka@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

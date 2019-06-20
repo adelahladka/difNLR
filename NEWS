@@ -5,6 +5,20 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.2.3 (2019-06-20) -
+----------------------------------------
+
+BUG FIXING
+  o plot.ddfMLR() now handles also binary data.
+
+MAJOR UPDATES
+  o Matching criterion for plot.ddfMLR() was improved for displaying
+    more smooth curves.
+
+MINOR UPDATES
+  o Authors' details were updated.
+
+----------------------------------------
 - Changes in difNLR 1.2.2 (2018-05-03) -
 ----------------------------------------
 

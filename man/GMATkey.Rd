@@ -26,10 +26,10 @@ Assessments. CBE-Life Sciences Education, 16(2), \url{https://doi.org/10.1187/cb
 \code{\link{GMAT}}, \code{\link{GMATtest}}
 }
 \author{
-Adela Drabinova \cr
+Adela Hladka \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-drabinova@cs.cas.cz \cr
+hladka@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

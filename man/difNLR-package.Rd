@@ -16,11 +16,12 @@ based on multinomial log-linear regression model.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.2.2\cr
-Date: 2018-05-03\cr
+Version: 1.2.3\cr
+Date: 2019-06-20\cr
 Depends: R (>= 3.1), CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats\cr
 License: GPL-3\cr
 BugReports: https://github.com/drabinova/difNLR/issues
+Encoding: UTF-8
 }
 \note{
 This package was supported by grant funded by Czech Science foundation under number GJ15-15856Y.
@@ -50,10 +51,10 @@ Useful links:
 
 }
 \author{
-Adela Drabinova \cr
+Adela Hladka \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-drabinova@cs.cas.cz \cr
+hladka@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

@@ -3,7 +3,6 @@
 \name{difNLR}
 \alias{difNLR}
 \alias{print.difNLR}
-\alias{print.difNLR}
 \alias{fitted.difNLR}
 \alias{coef.difNLR}
 \alias{logLik.difNLR}
