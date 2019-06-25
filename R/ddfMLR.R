@@ -292,7 +292,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
       if (length(significant1) == 0) {
         PROV <- prov1
         STATS <- stats1
-        DDFitems <- "No DIF item detected"
+        DDFitems <- "No DDF item detected"
         se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
         se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
         mlrPAR <- PROV$par.m1
@@ -353,7 +353,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
             mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
           }
         } else {
-          DDFitems <- "No DIF item detected"
+          DDFitems <- "No DDF item detected"
         }
       }
       if (!is.null(difPur)) {

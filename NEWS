@@ -10,6 +10,8 @@
 
 BUG FIXING
   o plot.ddfMLR() now handles also binary data.
+  o ddfMLR() returns consistently "No DDF item detected" when no DDF
+    item was detected.
 
 MAJOR UPDATES
   o Matching criterion for plot.ddfMLR() was improved for displaying
