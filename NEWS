@@ -5,6 +5,20 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.2.4 (2019-07-02) -
+----------------------------------------
+
+MAJOR UPDATES
+  o New functions ddfOrd() and ORD() for DDF detection for ordinal data
+    with adjacent and cumulative logistic regression models were added.
+    Output is displayed via S3 method print.ddfOrd()
+
+MINOR UPDATES
+  o Authors' details were updated.
+  o Some typos were fixed.
+  o Helps for ddfMLR(), MLR() and difNLR() were updated.
+
+----------------------------------------
 - Changes in difNLR 1.2.3 (2019-06-20) -
 ----------------------------------------
 

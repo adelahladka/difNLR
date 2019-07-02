@@ -81,7 +81,7 @@ likelihood ratio test or F-test of submodel.
 DIF detection procedure based on Non-Linear Regression is the extension
 of Logistic Regression procedure (Swaminathan and Rogers, 1990).
 
-The \code{Data} is a matrix whose rows represents examinee scored answers
+The \code{Data} is a matrix which rows represents examinee scored answers
 ("1" correct, "0" incorrect) and columns correspond to the items.
 The \code{group} must be a vector of the same length as \code{nrow(data)}.
 
@@ -192,7 +192,7 @@ Journal of Educational Measurement, 27, 361-370.
 \code{\link[stats]{p.adjust}}
 }
 \author{
-Adela Hladka \cr
+Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
 hladka@cs.cas.cz \cr

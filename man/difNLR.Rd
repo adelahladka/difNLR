@@ -45,7 +45,8 @@ focal group}
 \item{constraints}{character: which parameters should be the same for both groups. See \strong{Details}.}
 
 \item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-\code{"nudif"}, \code{"all"}, or combination of parameters "a", "b", "c" and "d". See \strong{Details}.}
+\code{"nudif"}, \code{"all"}, or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}.
+See \strong{Details}.}
 
 \item{method}{character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
 squares (default) and \code{"likelihood"} for maximum likelihood method.}
@@ -324,10 +325,10 @@ Journal of Educational Measurement, 27, 361-370.
 \code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
 }
 \author{
-Adela Drabinova \cr
+Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-drabinova@cs.cas.cz \cr
+hladka@cs.cas.cz \cr
 
 Patricia Martinkova \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr

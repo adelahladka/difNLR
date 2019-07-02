@@ -55,7 +55,7 @@
 #' Last column is group membership variable with coding 0 for reference group and 1 for focal group.
 #'
 #' @author
-#' Adela Hladka \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
 #' hladka@cs.cas.cz \cr

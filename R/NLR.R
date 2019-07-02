@@ -38,7 +38,7 @@
 #' DIF detection procedure based on Non-Linear Regression is the extension
 #' of Logistic Regression procedure (Swaminathan and Rogers, 1990).
 #'
-#' The \code{Data} is a matrix whose rows represents examinee scored answers
+#' The \code{Data} is a matrix which rows represents examinee scored answers
 #' ("1" correct, "0" incorrect) and columns correspond to the items.
 #' The \code{group} must be a vector of the same length as \code{nrow(data)}.
 #'
@@ -129,7 +129,7 @@
 #'   1 means convergence issue in m1 model.}
 #' }
 #' @author
-#' Adela Hladka \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
 #' hladka@cs.cas.cz \cr
@@ -209,8 +209,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     }
   }
 
-  m <- ncol(Data)
-  n <- nrow(Data)
+  m <- dim(Data)[2]
+  n <- dim(Data)[1]
 
   if (length(model) == 1){
     model <- rep(model, m)
@@ -281,7 +281,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     startBo0[which(cfM0)] <- 1; startBo1[which(cfM1)] <- 1
     for (i in 1:nrBo){
       if (conv.fail > 0){
-        samp <- sample(1:nrow(Data), size = nrow(Data), replace = T)
+        samp <- sample(1:dim(Data)[1], size = dim(Data)[1], replace = T)
         startalt <- startNLR(Data[samp, ], group[samp], model, match = x,
                              parameterization = parameterization)
         if (sum(cfM0) > 0){

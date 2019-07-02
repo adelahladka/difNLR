@@ -115,7 +115,7 @@ Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54
 \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}
 }
 \author{
-Adela Hladka \cr
+Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science, The Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
 hladka@cs.cas.cz \cr

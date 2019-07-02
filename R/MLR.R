@@ -7,7 +7,7 @@
 #' @param Data character: the unscored data matrix.
 #' @param group numeric or character: the binary vector of group membership
 #' @param key character: the answer key.
-#' @param type character: type of DDF to be tested (either "both" (default), "udif", or "nudif").
+#' @param type character: type of DDF to be tested (either \code{"both"} (default), \code{"udif"}, or \code{"nudif"}).
 #' See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
@@ -24,7 +24,7 @@
 #' @details
 #' Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
 #'
-#' The \code{Data} is a matrix whose rows represents examinee unscored answers and
+#' The \code{Data} is a matrix which rows represents examinee unscored answers and
 #' columns correspond to the items. The \code{group} must be a vector of the same
 #' length as \code{nrow(data)}. The \code{key} must be a vector of correct answers
 #' corresponding to columns of \code{Data}.
@@ -40,7 +40,7 @@
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 #' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
-#'
+#' See also \code{\link[stats]{p.adjust}} for more information.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -61,7 +61,7 @@
 #'   }
 #'
 #' @author
-#' Adela Hladka \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
 #' hladka@cs.cas.cz \cr
@@ -69,7 +69,6 @@
 #' Patricia Martinkova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' martinkova@cs.cas.cz \cr
-#'
 #'
 #' @seealso \code{\link[stats]{p.adjust}}
 #'
@@ -115,8 +114,8 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     }
   }
 
-  m <- ncol(Data)
-  n <- nrow(Data)
+  m <- dim(Data)[2]
+  n <- dim(Data)[1]
 
   m0 <- lapply(1:m, function(i) switch(type,
                                        "both" = nnet::multinom(relevel(as.factor(Data[, i]),
@@ -150,9 +149,6 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
 
   cov.m1 <- lapply(m1, vcov)
   cov.m0 <- lapply(m0, vcov)
-
-  # se.m1 <- sqrt(t(sapply(cov.m1, diag)))
-  # se.m0 <- sqrt(t(sapply(cov.m0, diag)))
 
   ll.m0 <- sapply(m0, logLik)
   ll.m1 <- sapply(m0, logLik)

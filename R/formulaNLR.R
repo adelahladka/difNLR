@@ -59,7 +59,7 @@
 #' @return A list of two models. Both includes formula, parameters to be estimated and their lower and upper constraints.
 #'
 #' @author
-#' Adela Hladka \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
 #' hladka@cs.cas.cz \cr

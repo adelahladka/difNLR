@@ -20,15 +20,16 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.2.3\cr
-#' Date: 2019-06-20\cr
-#' Depends: R (>= 3.1), CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats\cr
+#' Version: 1.2.4\cr
+#' Date: 2019-07-02\cr
+#' Depends: R (>= 3.1)
+#' Imports: CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats, VGAM\cr
 #' License: GPL-3\cr
 #' BugReports: https://github.com/drabinova/difNLR/issues
 #' Encoding: UTF-8
 #'
 #' @author
-#' Adela Hladka \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
 #' hladka@cs.cas.cz \cr

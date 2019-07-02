@@ -14,7 +14,8 @@
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
 #' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-#' \code{"nudif"}, \code{"all"}, or combination of parameters "a", "b", "c" and "d". See \strong{Details}.
+#' \code{"nudif"}, \code{"all"}, or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}.
+#' See \strong{Details}.
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
 #' squares (default) and \code{"likelihood"} for maximum likelihood method.
 #' @param match character or numeric: specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
@@ -187,10 +188,10 @@
 #' }
 #'
 #' @author
-#' Adela Drabinova \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' drabinova@cs.cas.cz \cr
+#' hladka@cs.cas.cz \cr
 #'
 #' Patricia Martinkova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -286,9 +287,8 @@
 #' }
 #'
 #' @keywords DIF
-#' @export
 #' @importFrom stats fitted
-
+#' @export
 difNLR <- function(Data, group, focal.name, model, constraints, type = "both", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start,
@@ -348,8 +348,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
     if (length(group) == 1) {
       if (is.numeric(group)) {
         GROUP <- Data[, group]
-        DATA <- Data[, (1:ncol(Data)) != group]
-        colnames(DATA) <- colnames(Data)[(1:ncol(Data)) !=  group]
+        DATA <- Data[, (1:dim(Data)[2]) != group]
+        colnames(DATA) <- colnames(Data)[(1:dim(Data)[2]) !=  group]
       } else {
         GROUP <- Data[, colnames(Data) == group]
         DATA <- Data[, colnames(Data) != group]
@@ -364,7 +364,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
     if (is.matrix(DATA) | is.data.frame(DATA)) {
       if (!all(apply(DATA, 2, function(i) { length(levels(as.factor(i))) == 2 })))
         stop("'Data' must be data frame or matrix of binary vectors.", call. = FALSE)
-      if (nrow(DATA) != length(GROUP))
+      if (dim(DATA)[1] != length(GROUP))
         stop("'Data' must have the same number of rows as is length of vector 'group'.", call. = FALSE)
     } else {
       if (is.vector(DATA)){
@@ -400,9 +400,9 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
 
     ### model
     if (length(model) == 1){
-      model <- rep(model, ncol(DATA))
+      model <- rep(model, dim(DATA)[2])
     } else {
-      if (length(model) != ncol(DATA)){
+      if (length(model) != dim(DATA)[2]){
         stop("Invalid length of 'model'. Model needs to be specified for each item or
              by single string. ", call. = FALSE)
       }
@@ -414,9 +414,9 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
 
     ### type of DIF to be tested
     if (length(type) == 1){
-      type <- rep(type, ncol(DATA))
+      type <- rep(type, dim(DATA)[2])
     } else {
-      if (length(type) != ncol(DATA)){
+      if (length(type) != dim(DATA)[2]){
         stop("Invalid length of 'type'. Type of DIF need to be specified for each item or
              by single string. ", call. = FALSE)
       }
@@ -434,29 +434,29 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
     ### constraints
     if (!(is.null(constraints))){
       if (length(constraints) == 1){
-        constraints <- rep(constraints, ncol(DATA))
+        constraints <- rep(constraints, dim(DATA)[2])
       } else {
-        if (length(constraints) != ncol(DATA)){
+        if (length(constraints) != dim(DATA)[2]){
           stop("Invalid length of 'constraints'. Constraints need to be specified for each item or
              by single string. ", call. = FALSE)
         }
       }
-      constraints <- lapply(1:ncol(DATA), function(i) unique(unlist(strsplit(constraints[i], split = ""))))
-      if (!all(sapply(1:ncol(DATA), function(i) {
+      constraints <- lapply(1:dim(DATA)[2], function(i) unique(unlist(strsplit(constraints[i], split = ""))))
+      if (!all(sapply(1:dim(DATA)[2], function(i) {
         all(constraints[[i]] %in% letters[1:4]) | all(is.na(constraints[[i]]))
         }))){
         stop("Constraints can be only 'a', 'b', 'c' or 'd'. ")
       }
       if (any(!(type %in% c("udif", "nudif", "both", "all")))){
-        types <- as.list(rep(NA, ncol(DATA)))
+        types <- as.list(rep(NA, dim(DATA)[2]))
         wht <- !(type %in% c("udif", "nudif", "both", "all"))
         types[wht] <- unlist(strsplit(type[wht], split = ""))
-        if (any(sapply(1:ncol(DATA), function(i) (all(!is.na(constraints[[i]])) & (types[[i]] %in% constraints[[i]]))))){
+        if (any(sapply(1:dim(DATA)[2], function(i) (all(!is.na(constraints[[i]])) & (types[[i]] %in% constraints[[i]]))))){
           stop("The difference in constrained parameters cannot be tested.")
         }
       }
     } else {
-      constraints <- as.list(rep(NA, ncol(DATA)))
+      constraints <- as.list(rep(NA, dim(DATA)[2]))
       types <- NULL
     }
     ### anchors
@@ -466,10 +466,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         } else {
         ANCHOR <- NULL
         for (i in 1:length(anchor))
-          ANCHOR[i] <- (1:ncol(DATA))[colnames(DATA) == anchor[i]]
+          ANCHOR[i] <- (1:dim(DATA)[2])[colnames(DATA) == anchor[i]]
       }
     } else {
-      ANCHOR <- 1:ncol(DATA)
+      ANCHOR <- 1:dim(DATA)[2]
     }
     ### parameterization
     parameterization <- ifelse(model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd",
@@ -477,7 +477,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
                                "alternative",
                                "classic")
     if (!is.null(start)){
-      if (length(start) != ncol(DATA))
+      if (length(start) != dim(DATA)[2])
         stop("Invalid value for 'start'. Initial values must be a list with as many elements
              as number of items in Data. ", call. = FALSE)
       if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste(letters[1:4], "Dif", sep = ""))))
@@ -541,7 +541,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         PROV <- prov1
         STATS <- stats1
         DIFitems <- "No DIF item detected"
-        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = ncol(PROV$par.m0), nrow = nrow(PROV$par.m0))),
+        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = dim(PROV$par.m0)[2], nrow = dim(PROV$par.m0)[1])),
                                      .Names = colnames(PROV$par.m0))
         nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
         nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
@@ -557,9 +557,9 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
               nrPur <- nrPur + 1
               nodif <- NULL
               if (is.null(dif)) {
-                nodif <- 1:ncol(DATA)
+                nodif <- 1:dim(DATA)[2]
                 } else {
-                  for (i in 1:ncol(DATA)) {
+                  for (i in 1:dim(DATA)[2]) {
                     if (sum(i == dif) == 0)
                       nodif <- c(nodif, i)
                   }
@@ -573,7 +573,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
               if (length(significant2) == 0)
                 dif2 <- NULL
               else dif2 <- significant2
-              difPur <- rbind(difPur, rep(0, ncol(DATA)))
+              difPur <- rbind(difPur, rep(0, dim(DATA)[2]))
               difPur[nrPur + 1, dif2] <- 1
               if (length(dif) != length(dif2))
                 dif <- dif2
@@ -610,7 +610,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         }
       }
       if (!is.null(difPur)) {
-        rownames(difPur) <- paste("Step", 0:(nrow(difPur) - 1), sep = "")
+        rownames(difPur) <- paste("Step", 0:(dim(difPur)[1] - 1), sep = "")
         colnames(difPur) <- colnames(DATA)
       }
 
@@ -710,10 +710,9 @@ print.difNLR <- function (x, ...){
                      BY = "Benjamini-Yekutieli", fdr = "FDR"), "adjustment of p-values\n\n"))
   }
   sign <- ifelse(is.na(x$adj.pval), " ",
-                 ifelse(x$adj.pval < 0.001, "***",
-                        ifelse(x$adj.pval < 0.01, "**",
-                               ifelse(x$adj.pval < 0.05, "*",
-                                      ifelse(x$adj.pval < 0.1, ".", " ")))))
+                 symnum(x$adj.pval,
+                        c(0, 0.001, 0.01, 0.05, 0.1, 1),
+                        symbols = c("***", "**", "*", ".", "")))
   if (x$p.adjust.method == "none"){
     tab <- format(round(cbind(x$Sval, x$pval), 4))
     tab <- matrix(cbind(tab, sign), ncol = 3)
@@ -784,10 +783,10 @@ print.difNLR <- function (x, ...){
 #' @param ... other generic parameters for \code{plot()} function.
 #'
 #' @author
-#' Adela Drabinova \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' drabinova@cs.cas.cz \cr
+#' hladka@cs.cas.cz \cr
 #'
 #' Patricia Martinkova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -846,7 +845,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
     if (missing(title)){
       title <- "Non-linear regression DIF detection with none multiple comparison correction"
     }
-    n <- nrow(x$Data)
+    n <- dim(x$Data)[1]
     if (x$test == "F"){
       if (dim(unique(x$df))[1] == 1){
         Sval_critical <- unique(qf(1 - x$alpha, x$df[, 1], x$df[, 2]))
@@ -1161,10 +1160,10 @@ fitted.difNLR <- function(object, item = "all", ...){
 #' group membership of new observations and need to have the same length.
 #'
 #' @author
-#' Adela Drabinova \cr
+#' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' drabinova@cs.cas.cz \cr
+#' hladka@cs.cas.cz \cr
 #'
 #' Patricia Martinkova \cr
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
@@ -1281,7 +1280,7 @@ predict.difNLR <- function(object, item = "all", match, group, ...){
                                        PAR[i, "cDif"], PAR[i, "dDif"]))
   PV <- do.call(cbind, PV)
   colnames(PV) <- colnames(object$Data)
-  if (nrow(PV) == nrow(object$Data)){
+  if (dim(PV)[1] == dim(object$Data)[1]){
     rownames(PV) <- rownames(object$Data)
   }
 
@@ -1456,7 +1455,7 @@ BIC.difNLR <- function(object, item = "all", ...){
   k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
                      sapply(object$parM0, length)[ITEMS],
                      sapply(object$parM1, length)[ITEMS])
-  n <- nrow(object$Data)
+  n <- dim(object$Data)[1]
   BIC[ITEMS] <- log(n)*k[ITEMS] - 2*logLik(object, item = ITEMS)
   BIC <- BIC[items]
 
@@ -1504,7 +1503,7 @@ residuals.difNLR <- function(object, item = "all", ...){
     ITEMS <- items
   }
 
-  n <- nrow(object$Data)
+  n <- dim(object$Data)[1]
   residuals <- matrix(NA, nrow = n, ncol = m)
   residuals[, ITEMS] <- as.matrix(object$Data[, ITEMS] - fitted(object, item = ITEMS))
 
