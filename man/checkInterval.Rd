@@ -23,6 +23,7 @@ checkInterval(x = 0.5, vec = c(0, 1))
 checkInterval(x = 1.5, vec = c(0, 1))
 checkInterval(x = -0.5, vec = c(0, 1))
 }
+
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

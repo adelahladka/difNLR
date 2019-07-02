@@ -88,6 +88,7 @@ ORD(Data, group, key, type = "udif")
 # Testing non-uniform DDF effects
 ORD(Data, group, key, type = "nudif")
 }
+
 }
 \seealso{
 \code{\link[stats]{p.adjust}} \code{\link[VGAM]{vglm}}

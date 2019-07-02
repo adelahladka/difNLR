@@ -20,7 +20,7 @@ p.adjust.method = "none", start, initboot = T, nrBo = 20)
 
 \method{fitted}{difNLR}(object, item = "all", ...)
 
-\method{coef}{difNLR}(object, ...)
+\method{coef}{difNLR}(object, SE = FALSE, simplify = FALSE, ...)
 
 \method{logLik}{difNLR}(object, item = "all", ...)
 
@@ -82,10 +82,14 @@ bootstraped samples (default is 20).}
 
 \item{...}{other generic parameters for S3 methods.}
 
-\item{object}{an object of "difNLR" class}
+\item{object}{an object of 'difNLR' class}
 
 \item{item}{either character (\code{"all"}), or numeric vector, or single number
 corresponding to column indicators.}
+
+\item{SE}{logical: should be standard errors also returned? Default is \code{FALSE}.}
+
+\item{simplify}{logical: should the result be simplified to a matrix? Default value is \code{FALSE}.}
 }
 \value{
 The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
@@ -289,6 +293,8 @@ plot(x, plot.type = "stat")
 
 # Coefficients
 coef(x)
+coef(x, SE = T)
+coef(x, SE = T, simplify = T)
 
 # Fitted values
 fitted(x)

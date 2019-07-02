@@ -90,13 +90,9 @@
 #' # Testing non-uniform DDF effects
 #' MLR(Data, group, key, type = "nudif")
 #' }
+#'
 #' @keywords DDF
 #' @export
-#' @importFrom stats coef vcov p.adjust.methods anova
-#' @importFrom nnet multinom
-#' @importFrom CTT score
-
-
 MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data), p.adjust.method = "none", alpha = 0.05){
 
   if (match[1] == "zscore"){
@@ -169,6 +165,3 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
                   BIC.m0 = BIC.m0, BIC.m1 = BIC.m1)
   return(results)
 }
-
-
-

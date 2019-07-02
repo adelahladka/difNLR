@@ -80,6 +80,7 @@ startNLR(Data, group,
                    rep("3PL", 5), rep("4PL", 5)))
 
 }
+
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:

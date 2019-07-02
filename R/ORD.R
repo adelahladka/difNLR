@@ -88,10 +88,9 @@
 #' # Testing non-uniform DDF effects
 #' ORD(Data, group, key, type = "nudif")
 #' }
+#'
 #' @keywords DDF
 #' @export
-#' @importFrom VGAM cumulative acat lrtest_vglm
-
 ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore",
                 anchor = 1:ncol(Data), p.adjust.method = "none", alpha = 0.05){
 
@@ -140,20 +139,20 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
 
   adjusted.pval <- p.adjust(ORDstat[2, ], method = p.adjust.method)
 
-  par.m1 <- lapply(m1, coef)
   par.m0 <- lapply(m0, coef)
+  par.m1 <- lapply(m1, coef)
 
-  cov.m1 <- lapply(m1, vcov)
   cov.m0 <- lapply(m0, vcov)
+  cov.m1 <- lapply(m1, vcov)
 
   ll.m0 <- sapply(m0, logLik)
-  ll.m1 <- sapply(m0, logLik)
+  ll.m1 <- sapply(m1, logLik)
 
-  AIC.m0 <- sapply(m0, AIC)
-  AIC.m1 <- sapply(m1, AIC)
+  AIC.m0 <- sapply(m0, VGAM::AICvlm)
+  AIC.m1 <- sapply(m1, VGAM::AICvlm)
 
-  BIC.m0 <- sapply(m0, BIC)
-  BIC.m1 <- sapply(m1, BIC)
+  BIC.m0 <- sapply(m0, VGAM::BICvlm)
+  BIC.m1 <- sapply(m1, VGAM::BICvlm)
 
   results <- list(Sval = ORDstat[1, ],
                   pval = ORDstat[2, ], adjusted.pval = adjusted.pval,

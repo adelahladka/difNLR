@@ -1,7 +1,7 @@
 Package: difNLR
 Type: Package
 Title: DIF and DDF Detection by Non-Linear Regression Models
-Version: 1.2.4
+Version: 1.2.5
 Date: 2019-07-02
 Authors@R: c(person("Adela", "Hladka", role = c("aut", "cre"), email = "hladka@cs.cas.cz"), person("Patricia", "Martinkova", role = "aut"), person("Karel", "Zvara", role = "aut"))
 Author: Adela Hladka [aut, cre], Patricia Martinkova [aut], Karel Zvara [aut]
@@ -14,6 +14,7 @@ Imports:
     methods,
     msm,
     nnet,
+    plyr,
     reshape2,
     stats,
     VGAM

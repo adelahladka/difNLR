@@ -26,8 +26,8 @@
 #' checkInterval(x = 1.5, vec = c(0, 1))
 #' checkInterval(x = -0.5, vec = c(0, 1))
 #' }
+#'
 #' @export
-
 checkInterval <- function(x, vec){
   ifelse(x >= vec[1] & x <= vec[2], x,
          ifelse(x > vec[2], vec[2], vec[1]))

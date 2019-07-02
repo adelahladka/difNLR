@@ -90,6 +90,7 @@ MLR(Data, group, key, type = "udif")
 # Testing non-uniform DDF effects
 MLR(Data, group, key, type = "nudif")
 }
+
 }
 \seealso{
 \code{\link[stats]{p.adjust}}

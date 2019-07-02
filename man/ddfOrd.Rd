@@ -4,12 +4,24 @@
 \alias{ddfOrd}
 \alias{print.ddfOrd}
 \alias{plot.ddfOrd}
+\alias{coef.ddfOrd}
+\alias{logLik.ddfOrd}
+\alias{AIC.ddfOrd}
+\alias{BIC.ddfOrd}
 \title{Performs DDF detection for ordinal data.}
 \usage{
 ddfOrd(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 
 \method{print}{ddfOrd}(x, ...)
+
+\method{coef}{ddfOrd}(object, SE = FALSE, simplify = FALSE, ...)
+
+\method{logLik}{ddfOrd}(object, item = "all", ...)
+
+\method{AIC}{ddfOrd}(object, item = "all", ...)
+
+\method{BIC}{ddfOrd}(object, item = "all", ...)
 }
 \arguments{
 \item{Data}{matrix or data.frame: the ordinarily scored data matrix only or the ordinarily scored
@@ -45,6 +57,15 @@ See \strong{Details}.}
 \item{x}{an object of 'ddfOrd' class}
 
 \item{...}{other generic parameters for \code{print} function.}
+
+\item{object}{an object of 'ddfOrd' class}
+
+\item{SE}{logical: should be standard errors also returned? Default is \code{FALSE}.}
+
+\item{simplify}{logical: should the result be simplified to a matrix? Default value is \code{FALSE}.}
+
+\item{item}{numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
+(default) for all items.}
 }
 \value{
 A list of class 'ddfOrd' with the following arguments:
@@ -126,11 +147,21 @@ for both, \code{data} and \code{group} parameters.
 \examples{
 \dontrun{
 data(dataMedicalgraded, package = "ShinyItemAnalysis")
-Data <- dataMedicalgraded[, 1:100]
+Data <- dataMedicalgraded[, 1:5]
 group <- dataMedicalgraded[, 101]
 
 # Testing both DDF effects with adjacent logistic model
-ddfOrd(Data, group, focal.name = 1, model = "adjacent")
+x <- ddfOrd(Data, group, focal.name = 1, model = "adjacent")
+
+# estimated parameters
+coef(x)
+coef(x, SE = T) # with SE
+coef(x, SE = T, simplify = T) # with SE, simplified
+
+# AIC, BIC, log-likelihood
+AIC(x); BIC(x); logLik(x)
+# AIC, BIC, log-likelihood for the first item
+AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
 
 # Testing both DDF effects with Benjamini-Hochberg adjustment method
 ddfOrd(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")

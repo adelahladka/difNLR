@@ -86,8 +86,8 @@
 #'                    rep("3PL", 5), rep("4PL", 5)))
 #'
 #' }
+#'
 #' @export
-
 startNLR <- function(Data, group, model, match = "zscore", parameterization = "alternative",
                      simplify = F){
   if (missing(model)) {

@@ -25,8 +25,8 @@
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param x an object of 'ddfMLR' class
 #' @param object an object of 'ddfMLR' class
-#' @param item either character ("all"), or numeric vector, or single number
-#'corresponding to column indicators. See \strong{Details}.
+#' @param item numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
+#' (default) for all items. See \strong{Details}.
 #' @param title string: title of plot.
 #' @param ... other generic parameters for \code{print} or \code{plot} functions.
 #'
@@ -62,9 +62,9 @@
 #'
 #' The output of the \code{ddfMLR} function is displayed by the \code{print.ddfMLR} function.
 #'
-#' The characteristic curve for item specified in \code{item} option can be plotted. For default
-#' option \code{"all"} of item, characteristic curves of all converged items are plotted.
-#' The drawn curves represent best model.
+#' The characteristic curve for item specified in \code{item} option can be plotted. \code{item} can be
+#' column indicator (numeric or character - column name) or \code{"all"} (default). For option \code{"all"},
+#' characteristic curves of all converged items are plotted. The drawn curves represent best model.
 #'
 #' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 #' for both, \code{data} and \code{group} parameters.
@@ -148,12 +148,15 @@
 #' AIC(x)
 #' BIC(x)
 #' logLik(x)
+#'
+#' # estimates
+#' coef(x)
+#' coef(x, SE = TRUE)
+#' coef(x, SE = TRUE, simplify = TRUE)
 #' }
+#'
 #' @keywords DDF
 #' @export
-#' @importFrom reshape2 melt
-#' @importFrom stats relevel
-
 ddfMLR <- function(Data, group, focal.name, key, type = "both",
                    match = "zscore", anchor = NULL, purify = FALSE,
                    nrIter = 10, alpha = 0.05, p.adjust.method = "none")
@@ -265,8 +268,13 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
         DDFitems <- "No DDF item detected"
         mlrPAR <- PROV$par.m1
         mlrSE <- se.m1
-        }
+      }
 
+      nrow <- sapply(mlrPAR, nrow)
+      colnams <- lapply(mlrPAR, colnames)
+      rownams <- lapply(mlrPAR, rownames)
+      mlrSE <- lapply(1:length(mlrSE), function(x) matrix(mlrSE[[x]], nrow = nrow[[x]],
+                                                          dimnames = list(rownams[[x]], colnams[[x]])))
       RES <- list(Sval = STATS,
                   mlrPAR = mlrPAR,
                   mlrSE = mlrSE,
@@ -541,11 +549,11 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     plot_CC[[i]] <-  ggplot() +
       geom_line(data = df,
                 aes_string(x = "score" , y = "value",
-                    colour = "variable", linetype = "group")) +
+                           colour = "variable", linetype = "group")) +
       geom_point(data = df2,
                  aes_string(x = "score", y = "Freq",
-                     colour = "answ", fill = "answ",
-                     size = "Freq.1"),
+                            colour = "answ", fill = "answ",
+                            size = "Freq.1"),
                  alpha = 0.5, shape = 21) +
 
       ylim(0, 1) +
@@ -578,23 +586,65 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
   return(plot_CC)
 }
 
+#' @param SE logical: should be standard errors also returned? Default is \code{FALSE}.
+#' @param simplify logical: should the result be simplified to a matrix? Default value is \code{FALSE}.
 #' @rdname ddfMLR
 #' @export
-coef.ddfMLR <- function(object, ...){
-  return(object$mlrPAR)
+coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...){
+  if (class(SE) != "logical")
+    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+         call. = FALSE)
+  if (class(simplify) != "logical")
+    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+         call. = FALSE)
+
+  m = dim(object$Data)[2]
+  nams = colnames(object$Data)
+
+  coefs = object$mlrPAR
+  names(coefs) = nams
+
+  if (SE){
+    se = object$mlrSE
+    names(se) = nams
+
+    coefs = lapply(nams, function(i) rbind(coefs[[i]], se[[i]])[order(c(rownames(coefs[[i]]), rownames(se[[i]]))), ])
+    rownams = lapply(coefs, function(x) paste(rownames(x), c("estimate", "SE")))
+    coefs = lapply(coefs, function(x) {
+      i = which(coefs %in% list(x))
+      rownames(x) = rownams[[i]]
+      return(x)
+    })
+  }
+
+  if (simplify){
+    catnams = unlist(lapply(coefs, rownames))
+    resnams = unlist(lapply(1:m, function(i) rep(nams[i], sapply(coefs, nrow)[i])))
+    resnams = paste(resnams, catnams)
+    res = as.data.frame(plyr::ldply(coefs, rbind))
+    rownames(res) = resnams
+    res[is.na(res)] = 0
+    if (!SE) res = res[, -1]
+  } else {
+    res = coefs
+  }
+
+  return(res)
 }
 
 #' @rdname ddfMLR
 #' @export
 logLik.ddfMLR <- function(object, item = "all", ...){
-  m <- length(object$mlrPAR)
+  m = length(object$mlrPAR)
+  nams = colnames(object$Data)
+
   if (class(item) == "character"){
-    if (item != "all")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
@@ -604,19 +654,24 @@ logLik.ddfMLR <- function(object, item = "all", ...){
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
-    items <- 1:m
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
   } else {
-    items <- item
+    items = item
   }
-  val <- ifelse(items %in% object$DDFitems,
-                object$llM0[[items]],
-                object$llM1[[items]])
-  df <- ifelse(items %in% object$DDFitems,
-               sapply(object$parM0, length)[items],
-               sapply(object$parM1, length)[items])
+
+  val = ifelse(items %in% object$DDFitems,
+               object$llM0[[items]],
+               object$llM1[[items]])
+  df = ifelse(items %in% object$DDFitems,
+              sapply(object$parM0, length)[items],
+              sapply(object$parM1, length)[items])
   if (length(items) == 1){
-    attr(val, "df") <- df
-    class(val) <- "logLik"
+    attr(val, "df") = df
+    class(val) = "logLik"
   }
   return(val)
 }
@@ -624,14 +679,16 @@ logLik.ddfMLR <- function(object, item = "all", ...){
 #' @rdname ddfMLR
 #' @export
 AIC.ddfMLR <- function(object, item = "all", ...){
-  m <- length(object$mlrPAR)
+  m = length(object$mlrPAR)
+  nams = colnames(object$Data)
+
   if (class(item) == "character"){
-    if (item != "all")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
@@ -641,25 +698,32 @@ AIC.ddfMLR <- function(object, item = "all", ...){
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
-    items <- 1:m
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
   } else {
-    items <- item
+    items = item
   }
-  AIC <- ifelse(items %in% object$DDFitems, object$AICM0[items], object$AICM1[items])
+
+  AIC = ifelse(items %in% object$DDFitems, object$AICM0[items], object$AICM1[items])
   return(AIC)
 }
 
 #' @rdname ddfMLR
 #' @export
 BIC.ddfMLR <- function(object, item = "all", ...){
-  m <- length(object$mlrPAR)
+  m = length(object$mlrPAR)
+  nams = colnames(object$Data)
+
   if (class(item) == "character"){
-    if (item != "all")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
@@ -669,10 +733,15 @@ BIC.ddfMLR <- function(object, item = "all", ...){
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
-    items <- 1:m
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
   } else {
-    items <- item
+    items = item
   }
-  BIC <- ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
+
+  BIC = ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
   return(BIC)
 }

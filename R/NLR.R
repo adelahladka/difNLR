@@ -183,12 +183,9 @@
 #' # using maximum likelihood estimation method
 #' NLR(Data, group, model = "3PLcg", method = "likelihood")
 #' }
+#'
 #' @keywords DIF
 #' @export
-#' @importFrom stats logLik
-#' @importFrom msm deltamethod
-
-
 NLR <- function(Data, group, model, constraints = NULL, type = "both",
                 method = "nls", match = "zscore", anchor = 1:ncol(Data),
                 start, p.adjust.method = "none", test = "LR", alpha = 0.05,

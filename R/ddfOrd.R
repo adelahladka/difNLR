@@ -24,8 +24,6 @@
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
-#' @param x an object of 'ddfOrd' class
-#' @param ... other generic parameters for \code{print} function.
 #'
 #' @usage ddfOrd(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 #' anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
@@ -117,11 +115,21 @@
 #' @examples
 #' \dontrun{
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:100]
+#' Data <- dataMedicalgraded[, 1:5]
 #' group <- dataMedicalgraded[, 101]
 #'
 #' # Testing both DDF effects with adjacent logistic model
-#' ddfOrd(Data, group, focal.name = 1, model = "adjacent")
+#' x <- ddfOrd(Data, group, focal.name = 1, model = "adjacent")
+#'
+#' # estimated parameters
+#' coef(x)
+#' coef(x, SE = T) # with SE
+#' coef(x, SE = T, simplify = T) # with SE, simplified
+#'
+#' # AIC, BIC, log-likelihood
+#' AIC(x); BIC(x); logLik(x)
+#' # AIC, BIC, log-likelihood for the first item
+#' AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
 #'
 #' # Testing both DDF effects with Benjamini-Hochberg adjustment method
 #' ddfOrd(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
@@ -141,7 +149,6 @@
 #' ddfOrd(Data, group, focal.name = 1, model = "cumulative")
 #' }
 #'
-#' @importFrom stats symnum
 #' @keywords DDF
 #' @export
 ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
@@ -370,6 +377,8 @@ ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
   return(resToReturn)
 }
 
+#' @param x an object of 'ddfOrd' class
+#' @param ... other generic parameters for \code{print} function.
 #' @rdname ddfOrd
 #' @export
 print.ddfOrd <- function (x, ...){
@@ -433,4 +442,164 @@ print.ddfOrd <- function (x, ...){
            nudif = cat("\n\nItems detected as non-uniform DDF items:"))
     cat("\n", paste(colnames(x$Data)[x$DDFitems], "\n", sep = ""))
   }
+}
+
+#' @param object an object of 'ddfOrd' class
+#' @param SE logical: should be standard errors also returned? Default is \code{FALSE}.
+#' @param simplify logical: should the result be simplified to a matrix? Default value is \code{FALSE}.
+#' @rdname ddfOrd
+#' @export
+coef.ddfOrd <- function(object, SE = FALSE, simplify = FALSE, ...){
+  if (class(SE) != "logical")
+    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+         call. = FALSE)
+  if (class(simplify) != "logical")
+    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+         call. = FALSE)
+
+  m = dim(object$Data)[2]
+  nams = colnames(object$Data)
+
+  coefs = object$ordPAR
+  names(coefs) = nams
+
+  if (SE){
+    se = object$ordSE
+    names(se) = nams
+    coefs = lapply(nams, function(i) rbind(coefs[[i]], se[[i]]))
+    coefs = lapply(coefs, "rownames<-", c("estimate", "SE"))
+    names(coefs) = nams
+  }
+
+  if (simplify){
+    res = as.data.frame(plyr::ldply(coefs, rbind))
+    if (SE) {
+      resnams = paste(res[, 1], c("estimate", "SE"))
+    } else {
+      resnams = res[, 1]
+    }
+    res = res[, -1]
+    rownames(res) = resnams
+    res[is.na(res)] = 0
+  } else {
+    res = coefs
+  }
+
+  return(res)
+}
+
+#' @param item numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
+#' (default) for all items.
+#' @rdname ddfOrd
+#' @export
+logLik.ddfOrd <- function(object, item = "all", ...){
+  m = length(object$ordPAR)
+  nams = colnames(object$Data)
+
+  if (class(item) == "character"){
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
+  } else {
+    items = item
+  }
+
+  val = ifelse(items %in% object$DDFitems,
+                object$llM0[items],
+                object$llM1[items])
+  df = ifelse(items %in% object$DDFitems,
+               sapply(object$parM0, length)[items],
+               sapply(object$parM1, length)[items])
+  if (length(items) == 1){
+    attr(val, "df") = df
+    class(val) = "logLik"
+  }
+  return(val)
+}
+
+#' @rdname ddfOrd
+#' @export
+AIC.ddfOrd <- function(object, item = "all", ...){
+  m = length(object$ordPAR)
+  nams = colnames(object$Data)
+
+  if (class(item) == "character"){
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
+  } else {
+    items = item
+  }
+
+  AIC = ifelse(items %in% object$DDFitems, object$AICM0[items], object$AICM1[items])
+  return(AIC)
+}
+
+#' @rdname ddfOrd
+#' @export
+BIC.ddfOrd <- function(object, item = "all", ...){
+  m = length(object$ordPAR)
+  nams = colnames(object$Data)
+
+  if (class(item) == "character"){
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
+  } else {
+    items = item
+  }
+
+  BIC = ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
+  return(BIC)
 }

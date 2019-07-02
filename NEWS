@@ -5,6 +5,22 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.2.5 (2019-07-02) -
+----------------------------------------
+
+MAJOR UPDATES
+  o S3 methods AIC(), BIC(), logLik(), coef() for ddfOrd were implemented.
+  o S3 methods AIC(), BIC(), logLik(), residuals() for difNLR and ddfMLR
+    objects now handle column names as 'item' argument.
+  o S3 method coef() for difNLR and dfMLR object were updated. Their now
+    includes arguments SE (logical) to print standard errors and simplify
+    (logical) whether list of estimates should be simplified into matrix.
+
+MINOR UPDATES
+  o CITATION was updated.
+  o All static DOI links were updated.
+
+----------------------------------------
 - Changes in difNLR 1.2.4 (2019-07-02) -
 ----------------------------------------
 

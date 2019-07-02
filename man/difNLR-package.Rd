@@ -11,15 +11,16 @@ based on non-linear regression. Both uniform and non-uniform DIF effects can be 
 one focal group. The method also allows to test the difference in guessing or inattention parameters
 between reference and focal group. DIF detection method is based either on likelihood-ratio test, or on F-test
 of submodel. Package also offers method for detection of differential distractor functioning (DDF)
-based on multinomial log-linear regression model.
+based on multinomial log-linear regression model and newly for ordinal data via adjacent and cumulative
+logistic regression models.
 }
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.2.4\cr
+Version: 1.2.5\cr
 Date: 2019-07-02\cr
 Depends: R (>= 3.1)
-Imports: CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, reshape2, stats, VGAM\cr
+Imports: CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 License: GPL-3\cr
 BugReports: https://github.com/drabinova/difNLR/issues
 Encoding: UTF-8

@@ -179,6 +179,7 @@ NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
 # using maximum likelihood estimation method
 NLR(Data, group, model = "3PLcg", method = "likelihood")
 }
+
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:

@@ -5,16 +5,16 @@ citHeader("To cite package 'difNLR' in publications use:")
 
 citEntry(entry = "Manual",
          title = "{difNLR}: {DIF} and {DDF} Detection by Non-Linear Regression Models.",
-         author = personList(as.person("Adela Drabinova"),
+         author = personList(as.person("Adela Hladka"),
                              as.person("Patricia Martinkova"),
                              as.person("Karel Zvara")),
          year = year,
          note = note,
          url = "https://CRAN.R-project.org/package=difNLR",
          textVersion =
-         paste("Drabinova A., Martinkova P., & Zvara K. (",
+         paste0("Hladka A., Martinkova P., & Zvara K. (",
                year, "). difNLR: DIF and DDF detection by non-linear regression models. ", note,
-               ".", sep = ""))
+               "."))
 
 citEntry(entry = "Article",
          title = "{D}etection of Differential Item Functioning with Nonlinear Regression: {A} Non-{IRT} Approach Accounting for Guessing",
@@ -24,5 +24,6 @@ citEntry(entry = "Article",
          volume = "54",
          number = "4",
          pages = "498-517",
+         doi = "10.1111/jedm.12158",
          publisher = "Wiley Online Library",
          textVersion = "Drabinova A., & Martinkova P. (2017). Detection of Differential Item Functioning with Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.")

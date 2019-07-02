@@ -17,7 +17,7 @@ purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 
 \method{plot}{ddfMLR}(x, item = "all", title, ...)
 
-\method{coef}{ddfMLR}(object, ...)
+\method{coef}{ddfMLR}(object, SE = FALSE, simplify = FALSE, ...)
 
 \method{logLik}{ddfMLR}(object, item = "all", ...)
 
@@ -59,12 +59,16 @@ See \strong{Details}.}
 
 \item{...}{other generic parameters for \code{print} or \code{plot} functions.}
 
-\item{item}{either character ("all"), or numeric vector, or single number
-corresponding to column indicators. See \strong{Details}.}
+\item{item}{numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
+(default) for all items. See \strong{Details}.}
 
 \item{title}{string: title of plot.}
 
 \item{object}{an object of 'ddfMLR' class}
+
+\item{SE}{logical: should be standard errors also returned? Default is \code{FALSE}.}
+
+\item{simplify}{logical: should the result be simplified to a matrix? Default value is \code{FALSE}.}
 }
 \value{
 A list of class 'ddfMLR' with the following arguments:
@@ -133,9 +137,9 @@ See also \code{\link[stats]{p.adjust}} for more information.
 
 The output of the \code{ddfMLR} function is displayed by the \code{print.ddfMLR} function.
 
-The characteristic curve for item specified in \code{item} option can be plotted. For default
-option \code{"all"} of item, characteristic curves of all converged items are plotted.
-The drawn curves represent best model.
+The characteristic curve for item specified in \code{item} option can be plotted. \code{item} can be
+column indicator (numeric or character - column name) or \code{"all"} (default). For option \code{"all"},
+characteristic curves of all converged items are plotted. The drawn curves represent best model.
 
 Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 for both, \code{data} and \code{group} parameters.
@@ -175,7 +179,13 @@ plot(x, item = "all")
 AIC(x)
 BIC(x)
 logLik(x)
+
+# estimates
+coef(x)
+coef(x, SE = TRUE)
+coef(x, SE = TRUE, simplify = TRUE)
 }
+
 }
 \seealso{
 \code{\link[stats]{p.adjust}}

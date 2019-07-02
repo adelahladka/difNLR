@@ -263,6 +263,8 @@
 #'
 #' # Coefficients
 #' coef(x)
+#' coef(x, SE = T)
+#' coef(x, SE = T, simplify = T)
 #'
 #' # Fitted values
 #' fitted(x)
@@ -287,7 +289,6 @@
 #' }
 #'
 #' @keywords DIF
-#' @importFrom stats fitted
 #' @export
 difNLR <- function(Data, group, focal.name, model, constraints, type = "both", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
@@ -1289,33 +1290,66 @@ predict.difNLR <- function(object, item = "all", match, group, ...){
   return(PV)
 }
 
-#' @param object an object of "difNLR" class
+#' @param object an object of 'difNLR' class
+#' @param SE logical: should be standard errors also returned? Default is \code{FALSE}.
+#' @param simplify logical: should the result be simplified to a matrix? Default value is \code{FALSE}.
 #' @rdname difNLR
 #' @export
-coef.difNLR <- function(object, ...){
+coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...){
+  if (class(SE) != "logical")
+    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+         call. = FALSE)
+  if (class(simplify) != "logical")
+    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+         call. = FALSE)
 
-  if (length(unique(lapply(object$nlrPAR, names))) == 1){
-    coef <- do.call(rbind, object$nlrPAR)
-    rownames(coef) <- colnames(object$Data)
-  } else {
-    coef <- object$nlrPAR
+  m = dim(object$Data)[2]
+  nams = colnames(object$Data)
+
+  coefs = object$nlrPAR
+  names(coefs) = nams
+
+  if (SE){
+    se = object$nlrSE
+    names(se) = nams
+    coefs = lapply(nams, function(i) rbind(coefs[[i]], se[[i]]))
+    coefs = lapply(coefs, "rownames<-", c("estimate", "SE"))
+    names(coefs) = nams
   }
 
-  return(coef)
+  if (simplify){
+    res = as.data.frame(plyr::ldply(coefs, rbind))
+    if (SE) {
+      resnams = paste(res[, 1], c("estimate", "SE"))
+    } else {
+      resnams = res[, 1]
+    }
+    res = res[, -1]
+    rownames(res) = resnams
+    res[is.na(res)] = 0
+  } else {
+    res = coefs
+  }
+
+  return(res)
 }
+
+
+
 
 #' @rdname difNLR
 #' @export
 logLik.difNLR <- function(object, item = "all", ...){
-  ### checking input
-  m <- length(object$nlrPAR)
+  m = length(object$nlrPAR)
+  nams = colnames(object$Data)
+
   if (class(item) == "character"){
-    if (item != "all")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
@@ -1325,10 +1359,15 @@ logLik.difNLR <- function(object, item = "all", ...){
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
-    items <- 1:m
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
   } else {
-    items <- item
+    items = item
   }
+
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
@@ -1365,15 +1404,16 @@ logLik.difNLR <- function(object, item = "all", ...){
 #' @rdname difNLR
 #' @export
 AIC.difNLR <- function(object, item = "all", ...){
-  ### checking input
-  m <- length(object$nlrPAR)
+  m = length(object$nlrPAR)
+  nams = colnames(object$Data)
+
   if (class(item) == "character"){
-    if (item != "all")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
@@ -1383,10 +1423,15 @@ AIC.difNLR <- function(object, item = "all", ...){
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
-    items <- 1:m
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
   } else {
-    items <- item
+    items = item
   }
+
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
@@ -1415,15 +1460,16 @@ AIC.difNLR <- function(object, item = "all", ...){
 #' @rdname difNLR
 #' @export
 BIC.difNLR <- function(object, item = "all", ...){
-  ### checking input
-  m <- length(object$nlrPAR)
+  m = length(object$nlrPAR)
+  nams = colnames(object$Data)
+
   if (class(item) == "character"){
-    if (item != "all")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
@@ -1433,10 +1479,15 @@ BIC.difNLR <- function(object, item = "all", ...){
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
-    items <- 1:m
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
   } else {
-    items <- item
+    items = item
   }
+
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
@@ -1467,14 +1518,17 @@ BIC.difNLR <- function(object, item = "all", ...){
 #' @export
 residuals.difNLR <- function(object, item = "all", ...){
   ### checking input
-  m <- length(object$nlrPAR)
+  m = length(object$nlrPAR)
+  n = dim(object$Data)[1]
+  nams = colnames(object$Data)
+
   if (class(item) == "character"){
-    if (item != "all")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
     if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   }
   if (class(item) == "numeric" & !all(item %in% 1:m))
@@ -1484,10 +1538,15 @@ residuals.difNLR <- function(object, item = "all", ...){
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
          call. = FALSE)
   if (class(item) == "character"){
-    items <- 1:m
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
   } else {
-    items <- item
+    items = item
   }
+
   if (any(object$conv.fail.which %in% items)){
     if (length(setdiff(items, object$conv.fail.which)) == 0){
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
@@ -1497,17 +1556,16 @@ residuals.difNLR <- function(object, item = "all", ...){
       warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
                     sep = "", collapse = "\n"),
               call. = FALSE)
-      ITEMS <- setdiff(items, object$conv.fail.which)
+      ITEMS = setdiff(items, object$conv.fail.which)
     }
   } else {
-    ITEMS <- items
+    ITEMS = items
   }
 
-  n <- dim(object$Data)[1]
-  residuals <- matrix(NA, nrow = n, ncol = m)
-  residuals[, ITEMS] <- as.matrix(object$Data[, ITEMS] - fitted(object, item = ITEMS))
+  residuals = matrix(NA, nrow = n, ncol = m)
+  residuals[, ITEMS] = as.matrix(object$Data[, ITEMS] - fitted(object, item = ITEMS))
 
-  residuals <- residuals[, items]
+  residuals = residuals[, items]
 
   return(residuals)
 }
