@@ -10,7 +10,7 @@
 \alias{BIC.difNLR}
 \alias{residuals.difNLR}
 \alias{resid.difNLR}
-\title{Performs DIF detection using Non-Linear Regression method.}
+\title{DIF detection using Non-Linear Regression method.}
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
 match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,

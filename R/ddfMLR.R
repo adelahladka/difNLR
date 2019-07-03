@@ -1,4 +1,4 @@
-#' Performs DDF detection using Multinomial Log-linear Regression model.
+#' DDF detection using Multinomial Log-linear Regression model.
 #'
 #' @aliases ddfMLR print.ddfMLR plot.ddfMLR
 #'

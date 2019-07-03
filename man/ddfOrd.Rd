@@ -8,7 +8,7 @@
 \alias{logLik.ddfOrd}
 \alias{AIC.ddfOrd}
 \alias{BIC.ddfOrd}
-\title{Performs DDF detection for ordinal data.}
+\title{DDF detection for ordinal data.}
 \usage{
 ddfOrd(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
@@ -22,6 +22,8 @@ anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "non
 \method{AIC}{ddfOrd}(object, item = "all", ...)
 
 \method{BIC}{ddfOrd}(object, item = "all", ...)
+
+\method{plot}{ddfOrd}(x, item = "all", title, plot.type, ...)
 }
 \arguments{
 \item{Data}{matrix or data.frame: the ordinarily scored data matrix only or the ordinarily scored
@@ -66,6 +68,12 @@ See \strong{Details}.}
 
 \item{item}{numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
 (default) for all items.}
+
+\item{title}{string: title of plot.}
+
+\item{plot.type}{character: which plot should be displayed for cumulative logistic
+regression model. Either \code{"category"} for category probabilities or
+\code{"cumulative"} for cumulative probabilities.}
 }
 \value{
 A list of class 'ddfOrd' with the following arguments:

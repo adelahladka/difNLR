@@ -1,4 +1,4 @@
-#' Performs DIF detection using Non-Linear Regression method.
+#' DIF detection using Non-Linear Regression method.
 #'
 #' @aliases difNLR print.difNLR
 #'

@@ -8,7 +8,7 @@
 \alias{logLik.ddfMLR}
 \alias{AIC.ddfMLR}
 \alias{BIC.ddfMLR}
-\title{Performs DDF detection using Multinomial Log-linear Regression model.}
+\title{DDF detection using Multinomial Log-linear Regression model.}
 \usage{
 ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
 purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")

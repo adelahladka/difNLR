@@ -17,10 +17,10 @@ logistic regression models.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.2.5\cr
-Date: 2019-07-02\cr
+Version: 1.2.6\cr
+Date: 2019-07-03\cr
 Depends: R (>= 3.1)
-Imports: CTT, ggplot2 (>= 2.2.1), methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
+Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 License: GPL-3\cr
 BugReports: https://github.com/drabinova/difNLR/issues
 Encoding: UTF-8

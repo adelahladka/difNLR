@@ -1,4 +1,4 @@
-#' Performs DDF detection for ordinal data.
+#' DDF detection for ordinal data.
 #'
 #' @aliases ddfOrd print.ddfOrd plot.ddfOrd
 #'
@@ -602,4 +602,361 @@ BIC.ddfOrd <- function(object, item = "all", ...){
 
   BIC = ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
   return(BIC)
+}
+
+#' @param title string: title of plot.
+#' @param plot.type character: which plot should be displayed for cumulative logistic
+#' regression model. Either \code{"category"} for category probabilities or
+#' \code{"cumulative"} for cumulative probabilities.
+#' @rdname ddfOrd
+#' @export
+plot.ddfOrd <- function(x, item = "all", title, plot.type, ...){
+  m = length(x$ordPAR)
+  nams = colnames(x$Data)
+
+  if (class(item) == "character"){
+    if (item != "all" | !item %in% nams)
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric")
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+           call. = FALSE)
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m))
+    stop("Invalid number for 'item'.",
+         call. = FALSE)
+  if (class(item) == "integer" & !all(item %in% 1:m))
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+         call. = FALSE)
+  if (class(item) == "character"){
+    if (item[1] == "all"){
+      items = 1:m
+    } else {
+      items = which(nams %in% item)
+    }
+  } else {
+    items = item
+  }
+
+  if (missing(plot.type))
+    if (x$model == "cumulative") {
+      plot.type = "category"
+    } else {
+      plot.type = NULL
+    }
+
+  if (x$model == "adjacent" & !is.null(plot.type)){
+    warning("Argument 'plot.type' is ignored for adjacent logistic regression model. ")
+  }
+  if (!is.null(plot.type))
+    if (!plot.type %in% c("category", "cumulative")){
+      stop("'plot.type' can be either 'category' or 'cumulative'.  ")
+    }
+
+  if (x$match[1] == "zscore"){
+    matching = c(unlist(scale(rowSums(x$Data))))
+    xlab = "Standardized total score"
+  } else {
+    if (x$match[1] == "score"){
+      matching = rowSums(x$Data)
+      xlab = "Total score"
+    } else {
+      if (length(x$match) == dim(x$Data)[1]){
+        matching = x$match
+        xlab = "Matching criterion"
+      } else {
+        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
+             of observations in 'Data'!")
+      }
+      }
+    }
+
+  match = seq(min(matching, na.rm = T), max(matching, na.rm = T), length.out = 300)
+
+  mat0 = switch(x$type,
+                "both"  = cbind("intercept" = 1, "match" = match, "group" = 0, "x:match" = 0),
+                "udif"  = cbind("intercept" = 1, "match" = match, "group" = 0, "x:match" = 0),
+                "nudif" = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = 0))
+  mat1 = switch(x$type,
+                "both"  = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = match),
+                "udif"  = cbind("intercept" = 1, "match" = match, 'group' = 1, "x:match" = 0),
+                "nudif" = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = match))
+
+  I = length(items)
+  plot_CC = as.list(rep(NA, I))
+  if (x$model == "adjacent"){
+    for (k in 1:I){
+      i <- items[k]
+      if (!missing(title)){
+        TITLE = title
+      } else {
+        TITLE = colnames(x$Data)[i]
+      }
+
+      cat = unique(sort(x$Data[, i]))
+      num.cat = length(cat)
+      num.cat.est = num.cat - 1
+      cat.est = cat[-1]
+
+      coefs = x$ordPAR[[i]]
+      if (length(coefs) == num.cat){
+        coefs = c(coefs, "group" = 0, "x:group" = 0)
+      } else {
+        if (length(coefs) == num.cat + 1){
+          coefs = c(coefs, "x:group" = 0)
+        }
+      }
+      coefs = sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
+
+      # calculation probabilities on formula exp(\sum_{t = 0}^{k} b_{0t} + b1X)/(\sum_{r = 0}^{K}exp(\sum_{t=0}^{r}b_{0t} + b1X))
+      df.probs.cat = matrix(0, nrow = 2*length(match), ncol = num.cat,
+                            dimnames = list(NULL, cat))
+      df.probs.cat[, as.character(cat.est)] = rbind(mat0 %*% coefs,
+                                                    mat1 %*% coefs)
+      # cumulative sum
+      df.probs.cat = t(apply(df.probs.cat, 1, cumsum))
+      # exponential
+      df.probs.cat = exp(df.probs.cat)
+      # norming
+      df.probs.cat = df.probs.cat/rowSums(df.probs.cat)
+      summary(df.probs.cat)
+
+      # melting data
+      df.probs.cat = data.frame(match, group = rep(c(0, 1), each = length(match)), df.probs.cat)
+      colnames(df.probs.cat) = c("matching", "group", paste0("P = ", cat))
+      df.probs.cat = reshape2::melt(df.probs.cat, id.vars = c("matching", "group"),
+                                    variable.name = "category", value.name = "probability")
+      df.probs.cat$group = as.factor(df.probs.cat$group)
+
+      # empirical category values
+      df.emp.cat0 = data.frame(table(matching[x$group == 0], x$Data[x$group == 0, i]),
+                               prop.table(table(matching[x$group == 0], x$Data[x$group == 0, i]), 1),
+                               group = 0)[, c(1, 2, 3, 6, 7)]
+      df.emp.cat1 = data.frame(table(matching[x$group == 1], x$Data[x$group == 1, i]),
+                               prop.table(table(matching[x$group == 1], x$Data[x$group == 1, i]), 1),
+                               group = 1)[, c(1, 2, 3, 6, 7)]
+      df.emp.cat = rbind(df.emp.cat0, df.emp.cat1)
+      colnames(df.emp.cat) = c("matching", "category", "size", "probability", "group")
+
+      df.emp.cat$matching = as.numeric(paste(df.emp.cat$matching))
+      df.emp.cat$category = as.factor(df.emp.cat$category)
+      df.emp.cat$group = as.factor(df.emp.cat$group)
+      levels(df.emp.cat$category) = paste0("P = ", levels(df.emp.cat$category))
+
+      plot_CC[[k]] = ggplot() +
+        geom_point(data = df.emp.cat,
+                   aes_string(x = "matching", y = "probability", group = "category",
+                              size = "size", col = "category", fill = "category"),
+                   shape = 21, alpha = 0.5) +
+        geom_line(data = df.probs.cat,
+                  aes_string(x = "matching", y = "probability",
+                             col = "category", linetype = "group"),
+                  size = 1) +
+        xlab(xlab) +
+        ylab("Category probability") +
+        ylim(0, 1) +
+        ggtitle(TITLE) +
+        scale_linetype_discrete(name = "Group", labels = c("Reference", "Focal")) +
+        scale_size_continuous(name = "Counts")  +
+        scale_colour_discrete(name = "Answer", breaks = df.probs.cat$category) +
+        scale_fill_discrete(name = "Answer", breaks = df.probs.cat$category) +
+        guides(colour = guide_legend(title = "Answer", order = 1)) +
+        guides(fill = guide_legend(title = "Answer", order = 1)) +
+        guides(size = guide_legend(title = "Counts", order = 2)) +
+        guides(linetype = guide_legend(title = "Group", order = 3)) +
+        theme_bw() +
+        theme(plot.title = element_text(face = "bold"),
+              axis.line  = element_line(colour = "black"),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.background = element_blank(),
+              plot.background = element_rect(fill = "transparent", colour = NA)) +
+        ### legend
+        theme(legend.box.just = "top",
+              legend.justification = c("left", "top"),
+              legend.position = c(0, 1),
+              legend.box = "horizontal",
+              legend.box.margin = margin(3, 3, 3, 3),
+              legend.key = element_rect(fill = "white", colour = NA))
+
+    }
+  } else {
+
+    for (k in 1:I){
+      i <- items[k]
+      if (!missing(title)){
+        TITLE = title
+      } else {
+        TITLE = colnames(x$Data)[i]
+      }
+
+      cat = sort(unique(x$Data[, i]))
+      num.cat = length(cat)
+
+      num.cat.est = num.cat - 1
+      cat.est = cat[-1]
+
+
+      coefs = x$ordPAR[[i]]
+      if (length(coefs) == num.cat.est + 1){
+        coefs = c(coefs, "group" = 0, "x:group" = 0)
+      } else {
+        if (length(coefs) == num.cat.est + 2){
+          coefs = c(coefs, "x:group" = 0)
+        }
+      }
+      coefs = sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
+
+      # cumulative probabilities
+      df.probs.cum = matrix(1, nrow = 2*length(match), ncol = num.cat,
+                            dimnames = list(NULL, cat))
+
+      # calculation of cumulative probabilities based on formula P(Y >= k) = exp(b0 + b1*x)/(1 + exp(b0 + b1*x))
+      df.probs.cum[, as.character(cat.est)] = exp(rbind(mat0 %*% coefs, mat1 %*% coefs)) / (1 + exp(rbind(mat0 %*% coefs, mat1 %*% coefs)))
+
+      # if column between non-ones valued columns consist of ones, it has to be changed to value on the left side
+      need.correction = which(sapply(2:num.cat, function(i) (all(df.probs.cum[, i] == 1) & all(df.probs.cum[, i - 1] != 1))))
+      df.probs.cum[, need.correction + 1] = df.probs.cum[, need.correction]
+
+      # category probabilities
+      df.probs.cat = data.frame(sapply(1:(num.cat - 1), function(i) df.probs.cum[, i] - df.probs.cum[, i + 1]),
+                                df.probs.cum[, num.cat])
+
+
+      # melting data
+      df.probs.cum = data.frame(match, group = rep(c(0, 1), each = length(match)), df.probs.cum)
+      colnames(df.probs.cum) = c("matching", "group", paste0("P >= ", cat))
+      df.probs.cum = reshape2::melt(df.probs.cum, id.vars = c("matching", "group"),
+                                    variable.name = "category", value.name = "probability")
+      df.probs.cum$group = as.factor(df.probs.cum$group)
+
+      df.probs.cat = data.frame(match, group = rep(c(0, 1), each = length(match)), df.probs.cat)
+      colnames(df.probs.cat) = c("matching", "group", paste0("P = ", cat))
+      df.probs.cat = reshape2::melt(df.probs.cat, id.vars = c("matching", "group"),
+                                    variable.name = "category", value.name = "probability")
+      df.probs.cat$group = as.factor(df.probs.cat$group)
+
+      # empirical category values
+      df.emp.cat0 = data.frame(table(matching[x$group == 0], x$Data[x$group == 0, i]),
+                               prop.table(table(matching[x$group == 0], x$Data[x$group == 0, i]), 1),
+                               group = 0)[, c(1, 2, 3, 6, 7)]
+      df.emp.cat1 = data.frame(table(matching[x$group == 1], x$Data[x$group == 1, i]),
+                               prop.table(table(matching[x$group == 1], x$Data[x$group == 1, i]), 1),
+                               group = 1)[, c(1, 2, 3, 6, 7)]
+
+      df.emp.cat = rbind(df.emp.cat0, df.emp.cat1)
+      colnames(df.emp.cat) = c("matching", "category", "size", "probability", "group")
+
+      df.emp.cat$matching = as.numeric(paste(df.emp.cat$matching))
+      df.emp.cat$category = as.factor(df.emp.cat$category)
+      df.emp.cat$group = as.factor(df.emp.cat$group)
+      levels(df.emp.cat$category) = paste0("P = ", levels(df.emp.cat$category))
+
+
+      # empirical cumulative values
+      tmp0 = table(matching[x$group == 0], x$Data[x$group == 0, i])
+      df.emp.cum0 = prop.table(table(matching[x$group == 0], x$Data[x$group == 0, i]), 1)
+      df.emp.cum0 = cbind(t(apply(tmp0, 1, function(x) sum(x) - cumsum(x) + x)),
+                          t(apply(prop.table(tmp0, 1), 1, function(x) sum(x) - cumsum(x) + x)))
+      df.emp.cum0 = data.frame(matching = as.numeric(rownames(tmp0)), group = 0, df.emp.cum0)
+
+      tmp1 = table(matching[x$group == 1], x$Data[x$group == 1, i])
+      df.emp.cum1 = prop.table(table(matching[x$group == 1], x$Data[x$group == 1, i]), 1)
+      df.emp.cum1 = cbind(t(apply(tmp1, 1, function(x) sum(x) - cumsum(x) + x)),
+                          t(apply(prop.table(tmp1, 1), 1, function(x) sum(x) - cumsum(x) + x)))
+      df.emp.cum1 = data.frame(matching = as.numeric(rownames(tmp1)), group = 1, df.emp.cum1)
+
+      df.emp.cum = rbind(df.emp.cum0, df.emp.cum1)
+
+      df.emp.cum.count = reshape2::melt(df.emp.cum[, c(1:2, 3:(2 + num.cat))],
+                                        id.vars = c("matching", "group"),
+                                        variable.name = "category", value.name = "size")
+      levels(df.emp.cum.count$category) = paste0("P >= ", cat)
+
+      df.emp.cum.prob = reshape2::melt(df.emp.cum[, c(1:2, (3 + num.cat):dim(df.emp.cum)[2])],
+                                       id.vars = c("matching", "group"),
+                                       variable.name = "category", value.name = "probability")
+      levels(df.emp.cum.prob$category) = paste0("P >= ", cat)
+      df.emp.cum = merge(df.emp.cum.count, df.emp.cum.prob, by = c("matching", "group", "category"))
+
+      # colours
+      hues = seq(15, 375, length = num.cat)
+      cols  = c("black", hcl(h = hues, l = 65, c = 100)[1:(num.cat - 1)])
+
+      if (plot.type == "cumulative") {
+        df.emp.cum = df.emp.cum[df.emp.cum$category != paste0("P >= ", cat[1]), ]
+        df.probs.cum = df.probs.cum[df.probs.cum$category != paste0("P >= ", cat[1]), ]
+        cols = cols[-1]
+
+        plot_CC[[k]] <- ggplot() +
+          geom_point(data = df.emp.cum,
+                     aes_string(x = "matching", y = "probability",
+                                size = "size", colour = "category", fill = "category"),
+                     shape = 21, alpha = 0.5) +
+          geom_line(data = df.probs.cum,
+                    aes_string(x = "matching", y = "probability",
+                               col = "category", linetype = "group"),
+                    size = 1) +
+          scale_fill_manual(values = cols) +
+          scale_colour_manual(values = cols) +
+          xlab(xlab) +
+          ylab("Cumulative probability") +
+          ggtitle(TITLE) +
+          ylim(0, 1) +
+          theme_bw() +
+          theme(plot.title = element_text(face = "bold"),
+                axis.line  = element_line(colour = "black"),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(),
+                plot.background = element_rect(fill = "transparent", colour = NA)) +
+          ### legend
+          theme(legend.box.just = "top",
+                legend.justification = c("right", "bottom"),
+                legend.position = c(1, 0),
+                legend.box = "horizontal",
+                legend.box.margin = margin(3, 3, 3, 3),
+                legend.key = element_rect(fill = "white", colour = NA)) +
+          guides(size = guide_legend(order = 3),
+                 colour = guide_legend(order = 2),
+                 fill = guide_legend(order = 2),
+                 linetype = guide_legend(order = 1))
+      } else {
+
+        plot_CC[[k]] <- ggplot() +
+          geom_point(data = df.emp.cat,
+                     aes_string(x = "matching", y = "probability",
+                                size = "size", col = "category", fill = "category"),
+                     shape = 21, alpha = 0.5) +
+          geom_line(data = df.probs.cat,
+                    aes_string(x = "matching", y = "probability",
+                               col = "category", linetype = "group"),
+                    size = 1) +
+          scale_fill_manual(values = cols) +
+          scale_colour_manual(values = cols) +
+          xlab(xlab) +
+          ggtitle(TITLE) +
+          ylab("Category probability") +
+          ylim(0, 1) +
+          theme_bw() +
+          theme(plot.title = element_text(face = "bold"),
+                axis.line  = element_line(colour = "black"),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank(),
+                panel.background = element_blank(),
+                plot.background = element_rect(fill = "transparent", colour = NA)) +
+          theme(legend.box = "horizontal",
+                legend.position = c(0.03, 0.97),
+                legend.justification = c(0.03, 0.97)) +
+          guides(size = guide_legend(order = 1),
+                 colour = guide_legend(order = 2),
+                 fill = guide_legend(order = 2),
+                 linetype = guide_legend(order = 3))
+      }
+    }
+
+  }
+  plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
+  return(plot_CC)
 }
