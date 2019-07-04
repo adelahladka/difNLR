@@ -550,7 +550,8 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
     plot_CC[[i]] <-  ggplot() +
       geom_line(data = df,
                 aes_string(x = "score" , y = "value",
-                           colour = "variable", linetype = "group")) +
+                           colour = "variable", linetype = "group"),
+                size = 0.8) +
       geom_point(data = df2,
                  aes_string(x = "score", y = "Freq",
                             colour = "answ", fill = "answ",
@@ -562,7 +563,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
       labs(x = xlab,
            y = "Probability of answer") +
       scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
-                            values = c("solid", "dashed"))
+                            values = c("solid", "dashed")) +
       theme_bw() +
       theme(axis.line  = element_line(colour = "black"),
             panel.grid.major = element_blank(),

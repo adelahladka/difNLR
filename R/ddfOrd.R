@@ -760,7 +760,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
         geom_line(data = df.probs.cat,
                   aes_string(x = "matching", y = "probability",
                              col = "category", linetype = "group"),
-                  size = 1) +
+                  size = 0.8) +
         xlab(xlab) +
         ylab("Category probability") +
         ylim(0, 1) +
@@ -845,11 +845,15 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
       df.probs.cat$group = as.factor(df.probs.cat$group)
 
       # empirical category values
-      df.emp.cat0 = data.frame(table(matching[x$group == 0], x$Data[x$group == 0, i]),
-                               prop.table(table(matching[x$group == 0], x$Data[x$group == 0, i]), 1),
+      tmp = table(matching, x$Data[, i], x$group)
+      tmp0 = tmp[, , 1]
+      tmp1 = tmp[, , 2]
+
+      df.emp.cat0 = data.frame(tmp0,
+                               prop.table(tmp0, 1),
                                group = 0)[, c(1, 2, 3, 6, 7)]
-      df.emp.cat1 = data.frame(table(matching[x$group == 1], x$Data[x$group == 1, i]),
-                               prop.table(table(matching[x$group == 1], x$Data[x$group == 1, i]), 1),
+      df.emp.cat1 = data.frame(tmp1,
+                               prop.table(tmp1, 1),
                                group = 1)[, c(1, 2, 3, 6, 7)]
 
       df.emp.cat = rbind(df.emp.cat0, df.emp.cat1)
@@ -862,19 +866,18 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
 
 
       # empirical cumulative values
-      tmp0 = table(matching[x$group == 0], x$Data[x$group == 0, i])
-      df.emp.cum0 = prop.table(table(matching[x$group == 0], x$Data[x$group == 0, i]), 1)
+      df.emp.cum0 = prop.table(tmp0, 1)
       df.emp.cum0 = cbind(t(apply(tmp0, 1, function(x) sum(x) - cumsum(x) + x)),
                           t(apply(prop.table(tmp0, 1), 1, function(x) sum(x) - cumsum(x) + x)))
       df.emp.cum0 = data.frame(matching = as.numeric(rownames(tmp0)), group = 0, df.emp.cum0)
 
-      tmp1 = table(matching[x$group == 1], x$Data[x$group == 1, i])
-      df.emp.cum1 = prop.table(table(matching[x$group == 1], x$Data[x$group == 1, i]), 1)
+      df.emp.cum1 = prop.table(tmp1, 1)
       df.emp.cum1 = cbind(t(apply(tmp1, 1, function(x) sum(x) - cumsum(x) + x)),
                           t(apply(prop.table(tmp1, 1), 1, function(x) sum(x) - cumsum(x) + x)))
       df.emp.cum1 = data.frame(matching = as.numeric(rownames(tmp1)), group = 1, df.emp.cum1)
 
       df.emp.cum = rbind(df.emp.cum0, df.emp.cum1)
+      df.emp.cum = df.emp.cum[complete.cases(df.emp.cum), ]
 
       df.emp.cum.count = reshape2::melt(df.emp.cum[, c(1:2, 3:(2 + num.cat))],
                                         id.vars = c("matching", "group"),
@@ -904,7 +907,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
           geom_line(data = df.probs.cum,
                     aes_string(x = "matching", y = "probability",
                                col = "category", linetype = "group"),
-                    size = 1) +
+                    size = 0.8) +
           scale_fill_manual(values = cols) +
           scale_colour_manual(values = cols) +
           xlab(xlab) +
@@ -941,7 +944,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
           geom_line(data = df.probs.cat,
                     aes_string(x = "matching", y = "probability",
                                col = "category", linetype = "group"),
-                    size = 1) +
+                    size = 0.8) +
           scale_fill_manual(values = cols) +
           scale_colour_manual(values = cols) +
           xlab(xlab) +
@@ -962,7 +965,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
                 legend.justification = c("left", "top"),
                 legend.position = c(0.02, 0.98),
                 legend.box = "horizontal",
-                legend.box.margin = margin(3, 3, 3, 3))+
+                legend.box.margin = margin(3, 3, 3, 3)) +
           guides(size = guide_legend(title = "Counts", order = 1),
                  colour = guide_legend(title = "Score", order = 2),
                  fill = guide_legend(title = "Score", order = 2),
