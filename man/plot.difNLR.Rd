@@ -48,11 +48,11 @@ data(GMAT)
 Data  <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
-# Testing both DIF effects using likelihood-ratio test and
+# testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
-# Graphical devices
+# graphical devices
 plot(x)
 plot(x, item = x$DIFitems)
 plot(x, plot.type = "stat")

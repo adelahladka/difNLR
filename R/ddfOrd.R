@@ -1,9 +1,9 @@
 #' DDF detection for ordinal data.
 #'
-#' @aliases ddfOrd print.ddfOrd plot.ddfOrd
+#' @aliases ddfORD print.ddfORD plot.ddfORD
 #'
 #' @description Performs DDF detection procedure for ordinal data based either on adjacent logistic regression model
-#' or on cumulative logistic regression model.
+#' or on cumulative logistic regression model and likelihood ratio test of submodel.
 #'
 #' @param Data matrix or data.frame: the ordinarily scored data matrix only or the ordinarily scored
 #' data matrix plus the vector of group. See \strong{Details}.
@@ -16,16 +16,16 @@
 #' @param type character: type of DDF to be tested (either \code{"both"} (default), \code{"udif"}, or \code{"nudif"}).
 #' See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-#' \code{"score"} (total test score), or vector of the same length as number of observations in "Data". See \strong{Details}.
+#' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
 #' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
-#' currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' currently considered as anchor (DDF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' @param purify logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage ddfOrd(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
+#' @usage ddfORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 #' anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 #'
 #' @details
@@ -37,7 +37,7 @@
 #' or column indicator of \code{Data}.
 #'
 #' The \code{model} corresponds to model to be used for DDF detection. Options are \code{"adjacent"}
-#' for adjacent logistic regression model or \code{cumulative} for cumulative logistic regression model.
+#' for adjacent logistic regression model or \code{"cumulative"} for cumulative logistic regression model.
 #'
 #' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
 #' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
@@ -47,7 +47,7 @@
 #' \code{"zscore"}), total test score (\code{"score"}), or any other continuous or discrete variable of the same
 #' length as number of observations in \code{Data}.
 #'
-#' A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
+#' A set of anchor items (DDF free) can be specified through the \code{anchor} argument. It need to be a vector of either
 #' item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
 #' In case anchor items are provided, only these items are used to compute matching criterion \code{match}. If the \code{match}
 #' argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored.  When anchor items are
@@ -57,31 +57,31 @@
 #' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
 #' \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
 #'
-#' The output of the \code{ddfOrd()} function is displayed by the \code{print.ddfOrd} function.
+#' The output of the \code{ddfORD()} function is displayed by the \code{print.ddfORD} function.
 #'
 #' The characteristic curve for item specified in \code{item} option can be plotted. For default
 #' option \code{"all"} of item, characteristic curves of all converged items are plotted.
 #' The drawn curves represent best model.
 #'
 #' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
-#' for both, \code{data} and \code{group} parameters.
+#' for both, \code{Data} and \code{group} parameters.
 #'
-#' @return A list of class 'ddfOrd' with the following arguments:
+#' @return A list of class 'ddfORD' with the following arguments:
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
 #'   \item{\code{ordPAR}}{the estimates of the final model.}
 #'   \item{\code{ordSE}}{standard errors of the estimates of the final model.}
 #'   \item{\code{parM0}}{the estimates of null model.}
 #'   \item{\code{parM1}}{the estimates of alternative model.}
-#'   \item{\code{model}}{model used for DIF detection.}
+#'   \item{\code{model}}{model used for DDF detection.}
 #'   \item{\code{alpha}}{numeric: significance level.}
 #'   \item{\code{DDFitems}}{either the column indicators of the items which were detected as DDF, or \code{"No DDF item detected"}.}
 #'   \item{\code{type}}{character: type of DDF that was tested.}
 #'   \item{\code{purification}}{\code{purify} value.}
 #'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
 #'   is \code{TRUE}.}
-#'   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
-#'   "1" in i-th row and j-th column means that j-th item was identified as DIF in i-1-th iteration. Returned only
+#'   \item{\code{ddfPur}}{a binary matrix with one row per iteration of item purification and one column per item.
+#'   "1" in i-th row and j-th column means that j-th item was identified as DDF in i-1-th iteration. Returned only
 #'   if \code{purify} is \code{TRUE}.}
 #'   \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
 #'   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
@@ -119,7 +119,11 @@
 #' group <- dataMedicalgraded[, 101]
 #'
 #' # Testing both DDF effects with adjacent logistic model
-#' x <- ddfOrd(Data, group, focal.name = 1, model = "adjacent")
+#' x <- ddfORD(Data, group, focal.name = 1, model = "adjacent")
+#'
+#' # graphical devices
+#' plot(x, item = 1)
+#' plot(x, item = "X2001")
 #'
 #' # estimated parameters
 #' coef(x)
@@ -132,26 +136,30 @@
 #' AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
 #'
 #' # Testing both DDF effects with Benjamini-Hochberg adjustment method
-#' ddfOrd(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
+#' ddfORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 #'
 #' # Testing both DDF effects with item purification
-#' ddfOrd(Data, group, focal.name = 1, model = "adjacent", purify = T)
+#' ddfORD(Data, group, focal.name = 1, model = "adjacent", purify = T)
 #'
 #' # Testing uniform DDF effects
-#' ddfOrd(Data, group, focal.name = 1, model = "adjacent", type = "udif")
+#' ddfORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")
 #' # Testing non-uniform DDF effects
-#' ddfOrd(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
+#' ddfORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 #'
 #' # Testing both DDF effects with total score as matching criterion
-#' ddfOrd(Data, group, focal.name = 1, model = "adjacent", match = "score")
+#' ddfORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 #'
 #' # Testing both DDF effects with cumulative logistic model
-#' ddfOrd(Data, group, focal.name = 1, model = "cumulative")
+#' x <- ddfORD(Data, group, focal.name = 1, model = "cumulative")
+#'
+#' # graphical devices
+#' plot(x, item = 1, plot.type = "cumulative")
+#' plot(x, item = 1, plot.type = "category")
 #' }
 #'
 #' @keywords DDF
 #' @export
-ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
+ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
                    match = "zscore", anchor = NULL, purify = FALSE,
                    nrIter = 10, alpha = 0.05, p.adjust.method = "none")
 {
@@ -278,7 +286,7 @@ ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
                   BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
     } else {
       nrPur <- 0
-      difPur <- NULL
+      ddfPur <- NULL
       noLoop <- FALSE
       prov1 <- suppressWarnings(ORD(DATA, GROUP, model = model, type = type, match = match,
                                     p.adjust.method = p.adjust.method, alpha = alpha))
@@ -296,8 +304,8 @@ ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
         noLoop <- TRUE
       } else {
         dif <- significant1
-        difPur <- rep(0, length(stats1))
-        difPur[dif] <- 1
+        ddfPur <- rep(0, length(stats1))
+        ddfPur[dif] <- 1
         repeat {
           if (nrPur >= nrIter){
             break
@@ -320,8 +328,8 @@ ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
             if (length(significant2) == 0)
               dif2 <- NULL
             else dif2 <- significant2
-            difPur <- rbind(difPur, rep(0, dim(DATA)[2]))
-            difPur[nrPur + 1, dif2] <- 1
+            ddfPur <- rbind(ddfPur, rep(0, dim(DATA)[2]))
+            ddfPur[nrPur + 1, dif2] <- 1
             if (length(dif) != length(dif2))
               dif <- dif2
             else {
@@ -352,9 +360,9 @@ ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
           DDFitems <- "No DDF item detected"
         }
       }
-      if (!is.null(difPur)) {
-        rownames(difPur) <- paste("Step", 0:(dim(difPur)[1] - 1), sep = "")
-        colnames(difPur) <- colnames(DATA)
+      if (!is.null(ddfPur)) {
+        rownames(ddfPur) <- paste("Step", 0:(dim(ddfPur)[1] - 1), sep = "")
+        colnames(ddfPur) <- colnames(DATA)
       }
       RES <- list(Sval = STATS,
                   ordPAR = ordPAR,
@@ -363,25 +371,25 @@ ddfOrd <- function(Data, group, focal.name, model = "adjacent", type = "both",
                   parM1 = PROV$par.m1,
                   model = model,
                   alpha = alpha, DDFitems = DDFitems,
-                  type = type, purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
+                  type = type, purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
                   p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
                   group = GROUP, Data = DATA, match = match,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                   AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
                   BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
     }
-    class(RES) <- "ddfOrd"
+    class(RES) <- "ddfORD"
     return(RES)
   }
   resToReturn <- internalORD()
   return(resToReturn)
 }
 
-#' @param x an object of 'ddfOrd' class
+#' @param x an object of 'ddfORD' class
 #' @param ... other generic parameters for \code{print} function.
-#' @rdname ddfOrd
+#' @rdname ddfORD
 #' @export
-print.ddfOrd <- function (x, ...){
+print.ddfORD <- function (x, ...){
   title <- paste0("Detection of ",
                   switch(x$type,
                          both = "both types of ",
@@ -444,12 +452,12 @@ print.ddfOrd <- function (x, ...){
   }
 }
 
-#' @param object an object of 'ddfOrd' class
-#' @param SE logical: should be standard errors also returned? Default is \code{FALSE}.
-#' @param simplify logical: should the result be simplified to a matrix? Default value is \code{FALSE}.
-#' @rdname ddfOrd
+#' @param object an object of 'ddfORD' class
+#' @param SE logical: should be standard errors also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the result be simplified to a matrix? (default is \code{FALSE}).
+#' @rdname ddfORD
 #' @export
-coef.ddfOrd <- function(object, SE = FALSE, simplify = FALSE, ...){
+coef.ddfORD <- function(object, SE = FALSE, simplify = FALSE, ...){
   if (class(SE) != "logical")
     stop("Invalid value for 'SE'. 'SE' need to be logical. ",
          call. = FALSE)
@@ -490,14 +498,14 @@ coef.ddfOrd <- function(object, SE = FALSE, simplify = FALSE, ...){
 
 #' @param item numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
 #' (default) for all items.
-#' @rdname ddfOrd
+#' @rdname ddfORD
 #' @export
-logLik.ddfOrd <- function(object, item = "all", ...){
+logLik.ddfORD <- function(object, item = "all", ...){
   m = length(object$ordPAR)
   nams = colnames(object$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
@@ -534,14 +542,14 @@ logLik.ddfOrd <- function(object, item = "all", ...){
   return(val)
 }
 
-#' @rdname ddfOrd
+#' @rdname ddfORD
 #' @export
-AIC.ddfOrd <- function(object, item = "all", ...){
+AIC.ddfORD <- function(object, item = "all", ...){
   m = length(object$ordPAR)
   nams = colnames(object$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
@@ -569,14 +577,14 @@ AIC.ddfOrd <- function(object, item = "all", ...){
   return(AIC)
 }
 
-#' @rdname ddfOrd
+#' @rdname ddfORD
 #' @export
-BIC.ddfOrd <- function(object, item = "all", ...){
+BIC.ddfORD <- function(object, item = "all", ...){
   m = length(object$ordPAR)
   nams = colnames(object$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
@@ -608,14 +616,14 @@ BIC.ddfOrd <- function(object, item = "all", ...){
 #' @param plot.type character: which plot should be displayed for cumulative logistic
 #' regression model. Either \code{"category"} for category probabilities or
 #' \code{"cumulative"} for cumulative probabilities.
-#' @rdname ddfOrd
+#' @rdname ddfORD
 #' @export
-plot.ddfOrd <- function(x, item = "all", title, plot.type, ...){
+plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
   m = length(x$ordPAR)
   nams = colnames(x$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
@@ -757,28 +765,27 @@ plot.ddfOrd <- function(x, item = "all", title, plot.type, ...){
         ylab("Category probability") +
         ylim(0, 1) +
         ggtitle(TITLE) +
-        scale_linetype_discrete(name = "Group", labels = c("Reference", "Focal")) +
-        scale_size_continuous(name = "Counts")  +
-        scale_colour_discrete(name = "Answer", breaks = df.probs.cat$category) +
-        scale_fill_discrete(name = "Answer", breaks = df.probs.cat$category) +
-        guides(colour = guide_legend(title = "Answer", order = 1)) +
-        guides(fill = guide_legend(title = "Answer", order = 1)) +
-        guides(size = guide_legend(title = "Counts", order = 2)) +
-        guides(linetype = guide_legend(title = "Group", order = 3)) +
+        scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
+                              values = c("solid", "dashed")) +
         theme_bw() +
-        theme(plot.title = element_text(face = "bold"),
-              axis.line  = element_line(colour = "black"),
+        theme(axis.line  = element_line(colour = "black"),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(),
-              panel.background = element_blank(),
-              plot.background = element_rect(fill = "transparent", colour = NA)) +
+              plot.background = element_rect(fill = "transparent", colour = NA),
+              legend.key = element_rect(fill = "white", colour = NA),
+              legend.background = element_rect(fill = "transparent", colour = NA),
+              legend.box.background = element_rect(fill = "transparent", colour = NA)) +
         ### legend
         theme(legend.box.just = "top",
               legend.justification = c("left", "top"),
               legend.position = c(0, 1),
               legend.box = "horizontal",
               legend.box.margin = margin(3, 3, 3, 3),
-              legend.key = element_rect(fill = "white", colour = NA))
+              legend.key = element_rect(fill = "white", colour = NA)) +
+        guides(size = guide_legend(title = "Counts", order = 1),
+               colour = guide_legend(title = "Score", order = 2),
+               fill = guide_legend(title = "Score", order = 2),
+               linetype = guide_legend(title = "Group", order = 3))
 
     }
   } else {
@@ -904,24 +911,26 @@ plot.ddfOrd <- function(x, item = "all", title, plot.type, ...){
           ylab("Cumulative probability") +
           ggtitle(TITLE) +
           ylim(0, 1) +
+          scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
+                                values = c("solid", "dashed")) +
           theme_bw() +
-          theme(plot.title = element_text(face = "bold"),
-                axis.line  = element_line(colour = "black"),
+          theme(axis.line  = element_line(colour = "black"),
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank(),
-                panel.background = element_blank(),
-                plot.background = element_rect(fill = "transparent", colour = NA)) +
+                plot.background = element_rect(fill = "transparent", colour = NA),
+                legend.key = element_rect(fill = "white", colour = NA),
+                legend.background = element_rect(fill = "transparent", colour = NA),
+                legend.box.background = element_rect(fill = "transparent", colour = NA)) +
           ### legend
           theme(legend.box.just = "top",
                 legend.justification = c("right", "bottom"),
-                legend.position = c(1, 0),
+                legend.position = c(0.98, 0.02),
                 legend.box = "horizontal",
-                legend.box.margin = margin(3, 3, 3, 3),
-                legend.key = element_rect(fill = "white", colour = NA)) +
-          guides(size = guide_legend(order = 3),
-                 colour = guide_legend(order = 2),
-                 fill = guide_legend(order = 2),
-                 linetype = guide_legend(order = 1))
+                legend.box.margin = margin(3, 3, 3, 3)) +
+          guides(size = guide_legend(title = "Counts", order = 3),
+                 colour = guide_legend(title = "Score", order = 2),
+                 fill = guide_legend(title = "Score", order = 2),
+                 linetype = guide_legend(title = "Group", order = 1))
       } else {
 
         plot_CC[[k]] <- ggplot() +
@@ -939,20 +948,25 @@ plot.ddfOrd <- function(x, item = "all", title, plot.type, ...){
           ggtitle(TITLE) +
           ylab("Category probability") +
           ylim(0, 1) +
+          scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
+                                values = c("solid", "dashed")) +
           theme_bw() +
-          theme(plot.title = element_text(face = "bold"),
-                axis.line  = element_line(colour = "black"),
+          theme(axis.line  = element_line(colour = "black"),
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank(),
-                panel.background = element_blank(),
-                plot.background = element_rect(fill = "transparent", colour = NA)) +
-          theme(legend.box = "horizontal",
-                legend.position = c(0.03, 0.97),
-                legend.justification = c(0.03, 0.97)) +
-          guides(size = guide_legend(order = 1),
-                 colour = guide_legend(order = 2),
-                 fill = guide_legend(order = 2),
-                 linetype = guide_legend(order = 3))
+                plot.background = element_rect(fill = "transparent", colour = NA),
+                legend.key = element_rect(fill = "white", colour = NA),
+                legend.background = element_rect(fill = "transparent", colour = NA),
+                legend.box.background = element_rect(fill = "transparent", colour = NA)) +
+          theme(legend.box.just = "top",
+                legend.justification = c("left", "top"),
+                legend.position = c(0.02, 0.98),
+                legend.box = "horizontal",
+                legend.box.margin = margin(3, 3, 3, 3))+
+          guides(size = guide_legend(title = "Counts", order = 1),
+                 colour = guide_legend(title = "Score", order = 2),
+                 fill = guide_legend(title = "Score", order = 2),
+                 linetype = guide_legend(title = "Group", order = 3))
       }
     }
 

@@ -1,9 +1,10 @@
-#' DIF detection using Non-Linear Regression method.
+#' DIF detection using non-linear regression method.
 #'
 #' @aliases difNLR print.difNLR
 #'
-#' @description Performs DIF detection procedure based on non-linear regression model (generalized logistic
-#' regression) and either likelihood-ratio or F test of submodel.
+#' @description Performs DIF detection procedure for dichotomous data based on non-linear
+#' regression model (generalized logistic regression) and either likelihood-ratio or F test
+#' of submodel.
 #'
 #' @param Data numeric: either the scored data matrix only, or the scored data
 #' matrix plus the vector of group. See \strong{Details}.
@@ -19,7 +20,7 @@
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
 #' squares (default) and \code{"likelihood"} for maximum likelihood method.
 #' @param match character or numeric: specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-#' \code{"score"} (total test score), or numeric vector of the same length as number of observations in "Data". See \strong{Details}.
+#' \code{"score"} (total test score), or numeric vector of the same length as number of observations in \code{Data}. See \strong{Details}.
 #' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
 #' currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' See \strong{Details}.
@@ -208,7 +209,7 @@
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
 #' Journal of Educational Measurement, 27, 361-370.
 #'
-#' @seealso \code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
+#' @seealso \code{\link[stats]{nls}} \code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
 #'
 #' @examples
 #' \dontrun{
@@ -319,7 +320,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
            of observations in 'Data'.")
     }
-  }
+    }
   ### purification
   if (purify & !(match[1] %in% c("score", "zscore")))
     stop("Purification not allowed when matching variable is not 'zscore' or 'score'.",  call. = FALSE)
@@ -339,7 +340,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       stop("The maximal number of iterations for calculation of starting values using bootstraped
            samples 'nrBo' need to be greater than 1. ")
     }
-  }
+    }
   ### estimation method
   if (!(method %in% c("nls", "likelihood"))){
     stop("Invalid value for 'method'. Estimation method must be either 'nls' or 'likelihood'.", call. = FALSE)
@@ -407,10 +408,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         stop("Invalid length of 'model'. Model needs to be specified for each item or
              by single string. ", call. = FALSE)
       }
-    }
+      }
     if (!all(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
                           "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"))){
-        stop("Invalid value for 'model'.", call. = FALSE)
+      stop("Invalid value for 'model'.", call. = FALSE)
     }
 
     ### type of DIF to be tested
@@ -421,7 +422,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         stop("Invalid length of 'type'. Type of DIF need to be specified for each item or
              by single string. ", call. = FALSE)
       }
-    }
+      }
     tmptype <- type[!(type %in% c("udif", "nudif", "both", "all"))]
     if (length(tmptype) > 0){
       tmptypes <- unique(unlist(sapply(1:length(tmptype),
@@ -430,7 +431,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
              or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.")
       }
-    }
+      }
 
     ### constraints
     if (!(is.null(constraints))){
@@ -439,13 +440,13 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       } else {
         if (length(constraints) != dim(DATA)[2]){
           stop("Invalid length of 'constraints'. Constraints need to be specified for each item or
-             by single string. ", call. = FALSE)
+               by single string. ", call. = FALSE)
         }
-      }
+        }
       constraints <- lapply(1:dim(DATA)[2], function(i) unique(unlist(strsplit(constraints[i], split = ""))))
       if (!all(sapply(1:dim(DATA)[2], function(i) {
         all(constraints[[i]] %in% letters[1:4]) | all(is.na(constraints[[i]]))
-        }))){
+      }))){
         stop("Constraints can be only 'a', 'b', 'c' or 'd'. ")
       }
       if (any(!(type %in% c("udif", "nudif", "both", "all")))){
@@ -456,15 +457,15 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
           stop("The difference in constrained parameters cannot be tested.")
         }
       }
-    } else {
-      constraints <- as.list(rep(NA, dim(DATA)[2]))
-      types <- NULL
-    }
+      } else {
+        constraints <- as.list(rep(NA, dim(DATA)[2]))
+        types <- NULL
+      }
     ### anchors
     if (!is.null(anchor)) {
       if (is.numeric(anchor)){
         ANCHOR <- anchor
-        } else {
+      } else {
         ANCHOR <- NULL
         for (i in 1:length(anchor))
           ANCHOR[i] <- (1:dim(DATA)[2])[colnames(DATA) == anchor[i]]
@@ -554,38 +555,38 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         repeat {
           if (nrPur >= nrIter){
             break
+          } else {
+            nrPur <- nrPur + 1
+            nodif <- NULL
+            if (is.null(dif)) {
+              nodif <- 1:dim(DATA)[2]
             } else {
-              nrPur <- nrPur + 1
-              nodif <- NULL
-              if (is.null(dif)) {
-                nodif <- 1:dim(DATA)[2]
-                } else {
-                  for (i in 1:dim(DATA)[2]) {
-                    if (sum(i == dif) == 0)
-                      nodif <- c(nodif, i)
-                  }
-                }
-              prov2 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
-                                            match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
-                                            test = test, alpha = alpha, initboot = initboot, nrBo = nrBo))
-              stats2 <- prov2$Sval
-              pval2 <- prov2$pval
-              significant2 <- which(pval2 < alpha)
-              if (length(significant2) == 0)
-                dif2 <- NULL
-              else dif2 <- significant2
-              difPur <- rbind(difPur, rep(0, dim(DATA)[2]))
-              difPur[nrPur + 1, dif2] <- 1
-              if (length(dif) != length(dif2))
-                dif <- dif2
-              else {
-                dif <- sort(dif)
-                dif2 <- sort(dif2)
-                if (sum(dif == dif2) == length(dif)) {
-                  noLoop <- TRUE
-                  break
-                  }
-                else dif <- dif2
+              for (i in 1:dim(DATA)[2]) {
+                if (sum(i == dif) == 0)
+                  nodif <- c(nodif, i)
+              }
+            }
+            prov2 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
+                                          match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
+                                          test = test, alpha = alpha, initboot = initboot, nrBo = nrBo))
+            stats2 <- prov2$Sval
+            pval2 <- prov2$pval
+            significant2 <- which(pval2 < alpha)
+            if (length(significant2) == 0)
+              dif2 <- NULL
+            else dif2 <- significant2
+            difPur <- rbind(difPur, rep(0, dim(DATA)[2]))
+            difPur[nrPur + 1, dif2] <- 1
+            if (length(dif) != length(dif2))
+              dif <- dif2
+            else {
+              dif <- sort(dif)
+              dif2 <- sort(dif2)
+              if (sum(dif == dif2) == length(dif)) {
+                noLoop <- TRUE
+                break
+              }
+              else dif <- dif2
             }
           }
         }
@@ -645,12 +646,12 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
     }
     class(RES) <- "difNLR"
     return(RES)
-  }
+    }
 
 
   resToReturn <- internalNLR()
   return(resToReturn)
-}
+    }
 
 
 
@@ -676,23 +677,23 @@ print.difNLR <- function (x, ...){
             " statistics",
             ifelse(length(unique(x$model)) == 1,
                    paste("\nbased on",
-                   switch(unique(x$model),
-                          "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
-                          "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
-                          "3PLdg" = "3PL model with fixed inattention parameter for groups",
-                          "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
-                          "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
-                          "4PLcgd" = "4PL model with fixed guessing for groups",
-                          "4PLd" = "4PL model with fixed guessing for groups",
-                          "4PLcdg" = "4PL model with fixed inattention parameter for groups",
-                          "4PLc" = "4PL model with fixed inattention parameter for groups",
-                          "4PL" = "4PL model")),
+                         switch(unique(x$model),
+                                "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
+                                "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
+                                "3PLdg" = "3PL model with fixed inattention parameter for groups",
+                                "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
+                                "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
+                                "4PLcgd" = "4PL model with fixed guessing for groups",
+                                "4PLd" = "4PL model with fixed guessing for groups",
+                                "4PLcdg" = "4PL model with fixed inattention parameter for groups",
+                                "4PLc" = "4PL model with fixed inattention parameter for groups",
+                                "4PL" = "4PL model")),
                    ""), sep = ""),
-            ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
-                   paste("with constraints on",
-                         ifelse(length(unique(unlist(x$constraints))) == 1, "parameter", "parameters"),
-                         paste(unique(unlist(x$constraints)), collapse = ", "), "\n"),
-                   "\n"))
+      ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
+             paste("with constraints on",
+                   ifelse(length(unique(unlist(x$constraints))) == 1, "parameter", "parameters"),
+                   paste(unique(unlist(x$constraints)), collapse = ", "), "\n"),
+             "\n"))
   cat(paste("\nParameters were estimated with", ifelse(x$method == "nls",
                                                        "non-linear least squares\n",
                                                        "maximum likelihood method\n")))
@@ -813,11 +814,11 @@ print.difNLR <- function (x, ...){
 #' Data  <- GMAT[, 1:20]
 #' group <- GMAT[, "group"]
 #'
-#' # Testing both DIF effects using likelihood-ratio test and
+#' # testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # Graphical devices
+#' # graphical devices
 #' plot(x)
 #' plot(x, item = x$DIFitems)
 #' plot(x, plot.type = "stat")
@@ -831,15 +832,15 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
       if (length(x$conv.fail) == sum(!is.na(x$Sval))){
         switch(x$test, "F" = stop("None of items does converge.
                                   F-statistic values not plotted", call. = FALSE),
-                       "LR" = stop("None of items does converge.
-                                   LR-statistic values not plotted", call. = FALSE))
+               "LR" = stop("None of items does converge.
+                           LR-statistic values not plotted", call. = FALSE))
       } else {
         switch(x$test, "F" = warning(paste("Item ", x$conv.fail.which,
                                            " does not converge. F-statistic value not plotted",
                                            sep = "", collapse = "\n"), call. = FALSE),
-                       "LR" = warning(paste("Item ", x$conv.fail.which,
-                                            " does not converge. LR-statistic value not plotted",
-                                           sep = "", collapse = "\n"), call. = FALSE))
+               "LR" = warning(paste("Item ", x$conv.fail.which,
+                                    " does not converge. LR-statistic value not plotted",
+                                    sep = "", collapse = "\n"), call. = FALSE))
       }
     }
 
@@ -872,25 +873,25 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
     plot_stat <- ggplot(hv, aes_string(x = "V1", y = "V2",
                                        label = "V1",
                                        col = "g")) +
-                  ### points
-                  geom_text() +
-                  scale_color_manual(values = c("black", "red")) +
-                  ### critical value
-                  geom_hline(yintercept = Sval_critical, size = size) +
-                  ### theme
-                  ggtitle(title) +
-                  labs(x = "Item", y = switch(x$test,
-                                              "F" = "F-statistic",
-                                              "LR" = "Chisq-statistic")) +
-                  theme_bw() +
-                  theme(plot.title = element_text(face = "bold", vjust = 1.5),
-                        axis.line  = element_line(colour = "black"),
-                        panel.grid.major = element_blank(),
-                        panel.grid.minor = element_blank(),
-                        plot.background = element_rect(fill = "transparent", colour = NA),
-                        axis.text.x = element_blank(),
-                        axis.ticks.x = element_blank(),
-                        legend.position = "none")
+      ### points
+      geom_text() +
+      scale_color_manual(values = c("black", "red")) +
+      ### critical value
+      geom_hline(yintercept = Sval_critical, size = size) +
+      ### theme
+      ggtitle(title) +
+      labs(x = "Item", y = switch(x$test,
+                                  "F" = "F-statistic",
+                                  "LR" = "Chisq-statistic")) +
+      theme_bw() +
+      theme(plot.title = element_text(face = "bold", vjust = 1.5),
+            axis.line  = element_line(colour = "black"),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            plot.background = element_rect(fill = "transparent", colour = NA),
+            axis.text.x = element_blank(),
+            axis.ticks.x = element_blank(),
+            legend.position = "none")
 
     return(plot_stat)
   }
@@ -1005,48 +1006,49 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
       PARF <- PAR[1:4] + PAR[5:8]
 
       plot_CC[[i]] <- ggplot(hv, aes_string("X1", "X2")) +
-                      ### points
-                      geom_point(aes_string(colour = "Group",
-                                            fill = "Group",
-                                            size = "size"),
-                                 alpha = alpha, shape = shape) +
-                      ### lines
-                      stat_function(aes(colour = "Reference",
-                                        linetype = "Reference"),
-                                    fun = gNLR,
-                                    args = as.list(PARR),
-                                    size = size,
-                                    geom = "line") +
-                      stat_function(aes(colour = "Focal", linetype = "Focal"),
-                                    fun = gNLR,
-                                    args = as.list(PARF),
-                                    size = size,
-                                    geom = "line") +
-                      ### style
-                      scale_size_continuous(name = "Counts")  +
-                      scale_colour_manual(breaks = hv$Group, values = col, name = "Group") +
-                      scale_fill_manual(breaks = hv$Group, values = col, name = "Group") +
-                      scale_linetype_manual(breaks = hv$Group, values = linetype, name = "Group") +
-                      guides(colour = guide_legend(title = "Group", order = 1)) +
-                      guides(fill = guide_legend(title = "Group", order = 1)) +
-                      guides(linetype = guide_legend(title = "Group", order = 1)) +
-                      guides(size = guide_legend(title = "Counts", order = 2)) +
-                      ### theme
-                      ggtitle(TITLE) +
-                      labs(x = xlab, y = "Probability of correct answer") +
-                      scale_y_continuous(limits = c(0, 1)) +
-                      theme_bw() +
-                      theme(plot.title = element_text(face = "bold", vjust = 1.5),
-                            axis.line  = element_line(colour = "black"),
-                            panel.grid.major = element_blank(),
-                            panel.grid.minor = element_blank(),
-                            plot.background = element_rect(fill = "transparent", colour = NA)) +
-                      ### legend
-                      theme(legend.box.just = "top",
-                            legend.justification = c(1, 0),
-                            legend.position = c(1, 0),
-                            legend.box = "horizontal",
-                            legend.box.margin = margin(3, 3, 3, 3))
+        ### points
+        geom_point(aes_string(colour = "Group",
+                              fill = "Group",
+                              size = "size"),
+                   alpha = alpha, shape = shape) +
+        ### lines
+        stat_function(aes(colour = "Reference",
+                          linetype = "Reference"),
+                      fun = gNLR,
+                      args = as.list(PARR),
+                      size = size,
+                      geom = "line") +
+        stat_function(aes(colour = "Focal", linetype = "Focal"),
+                      fun = gNLR,
+                      args = as.list(PARF),
+                      size = size,
+                      geom = "line") +
+        ### style
+        scale_colour_manual(breaks = hv$Group, values = col, name = "Group") +
+        scale_fill_manual(breaks = hv$Group, values = col, name = "Group") +
+        scale_linetype_manual(breaks = hv$Group, values = linetype, name = "Group") +
+        ### theme
+        ggtitle(TITLE) +
+        labs(x = xlab, y = "Probability of correct answer") +
+        scale_y_continuous(limits = c(0, 1)) +
+        theme_bw() +
+        theme(axis.line  = element_line(colour = "black"),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              plot.background = element_rect(fill = "transparent", colour = NA),
+              legend.key = element_rect(fill = "white", colour = NA),
+              legend.background = element_rect(fill = "transparent", colour = NA),
+              legend.box.background = element_rect(fill = "transparent", colour = NA)) +
+        ### legend
+        theme(legend.box.just = "top",
+              legend.justification = c("left", "top"),
+              legend.position = c(0.02, 0.98),
+              legend.box = "horizontal",
+              legend.box.margin = margin(3, 3, 3, 3)) +
+        guides(size = guide_legend(title = "Count", order = 1),
+               colour = guide_legend(title = "Group", order = 2),
+               fill = guide_legend(title = "Group", order = 2),
+               linetype = guide_legend(title = "Group", order = 2))
     }
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     return(plot_CC)
@@ -1107,7 +1109,6 @@ fitted.difNLR <- function(object, item = "all", ...){
     ITEMS <- items
   }
 
-
   ### functions
   gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
     return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
@@ -1133,10 +1134,10 @@ fitted.difNLR <- function(object, item = "all", ...){
   ### fitted values
   FV <- as.list(rep(NA, m))
   FV[ITEMS] <- lapply(ITEMS, function(i) gNLR(match, object$group,
-                                       PAR[i, "a"], PAR[i, "b"],
-                                       PAR[i, "c"], PAR[i, "d"],
-                                       PAR[i, "aDif"], PAR[i, "bDif"],
-                                       PAR[i, "cDif"], PAR[i, "dDif"]))
+                                              PAR[i, "a"], PAR[i, "b"],
+                                              PAR[i, "c"], PAR[i, "d"],
+                                              PAR[i, "aDif"], PAR[i, "bDif"],
+                                              PAR[i, "cDif"], PAR[i, "dDif"]))
   FV <- do.call(cbind, FV)
   colnames(FV) <- colnames(object$Data)
   rownames(FV) <- rownames(object$Data)
@@ -1144,7 +1145,6 @@ fitted.difNLR <- function(object, item = "all", ...){
 
   return(FV)
 }
-
 
 #' Predicted values for difNLR object
 #'
@@ -1202,6 +1202,7 @@ fitted.difNLR <- function(object, item = "all", ...){
 #' predict(x, item = 1, match = 0, group = 1)
 #' predict(x, item = 1, match = 0, group = 0)
 #' }
+#'
 #' @export
 predict.difNLR <- function(object, item = "all", match, group, ...){
 
@@ -1276,9 +1277,9 @@ predict.difNLR <- function(object, item = "all", match, group, ...){
   ### predicted values
   PV <- as.list(rep(NA, m))
   PV[ITEMS] <- lapply(ITEMS, function(i) gNLR(match, group, PAR[i, "a"], PAR[i, "b"],
-                                       PAR[i, "c"], PAR[i, "d"],
-                                       PAR[i, "aDif"], PAR[i, "bDif"],
-                                       PAR[i, "cDif"], PAR[i, "dDif"]))
+                                              PAR[i, "c"], PAR[i, "d"],
+                                              PAR[i, "aDif"], PAR[i, "bDif"],
+                                              PAR[i, "cDif"], PAR[i, "dDif"]))
   PV <- do.call(cbind, PV)
   colnames(PV) <- colnames(object$Data)
   if (dim(PV)[1] == dim(object$Data)[1]){
@@ -1291,8 +1292,8 @@ predict.difNLR <- function(object, item = "all", match, group, ...){
 }
 
 #' @param object an object of 'difNLR' class
-#' @param SE logical: should be standard errors also returned? Default is \code{FALSE}.
-#' @param simplify logical: should the result be simplified to a matrix? Default value is \code{FALSE}.
+#' @param SE logical: should be standard errors also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the result be simplified to a matrix? (default is \code{FALSE}).
 #' @rdname difNLR
 #' @export
 coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...){
@@ -1334,9 +1335,6 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...){
   return(res)
 }
 
-
-
-
 #' @rdname difNLR
 #' @export
 logLik.difNLR <- function(object, item = "all", ...){
@@ -1344,7 +1342,7 @@ logLik.difNLR <- function(object, item = "all", ...){
   nams = colnames(object$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
@@ -1389,8 +1387,8 @@ logLik.difNLR <- function(object, item = "all", ...){
                        object$llM0[ITEMS],
                        object$llM1[ITEMS])
   df[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-               sapply(object$parM0, length)[ITEMS],
-               sapply(object$parM1, length)[ITEMS])
+                      sapply(object$parM0, length)[ITEMS],
+                      sapply(object$parM1, length)[ITEMS])
   val <- val[items]
   df <- df[items]
   if (length(items) == 1){
@@ -1408,7 +1406,7 @@ AIC.difNLR <- function(object, item = "all", ...){
   nams = colnames(object$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
@@ -1464,7 +1462,7 @@ BIC.difNLR <- function(object, item = "all", ...){
   nams = colnames(object$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {
@@ -1523,7 +1521,7 @@ residuals.difNLR <- function(object, item = "all", ...){
   nams = colnames(object$Data)
 
   if (class(item) == "character"){
-    if (item != "all" | !item %in% nams)
+    if (item != "all" & !item %in% nams)
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
            call. = FALSE)
   } else {

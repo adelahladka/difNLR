@@ -1,8 +1,9 @@
-#' DDF likelihood ratio statistics based on Multinomial Log-linear Regression model.
+#' DDF likelihood ratio statistics based on multinomial log-linear regression model.
 #'
 #' @aliases MLR
 #'
-#' @description Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
+#' @description Calculates DDF likelihood ratio statistics for nominal data based on
+#' multinomial log-linear model.
 #'
 #' @param Data character: the unscored data matrix.
 #' @param group numeric or character: the binary vector of group membership
@@ -11,7 +12,7 @@
 #' See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
-#' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+#' @param anchor a vector of integers specifying which items are currently considered as anchor (DDF free) items. By
 #' default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction.
@@ -26,7 +27,7 @@
 #'
 #' The \code{Data} is a matrix which rows represents examinee unscored answers and
 #' columns correspond to the items. The \code{group} must be a vector of the same
-#' length as \code{nrow(data)}. The \code{key} must be a vector of correct answers
+#' length as \code{nrow(Data)}. The \code{key} must be a vector of correct answers
 #' corresponding to columns of \code{Data}.
 #'
 #' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}

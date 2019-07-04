@@ -13,7 +13,7 @@
 #' See \strong{Details}.
 #' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 #' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
-#' @param anchor a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+#' @param anchor a vector of integers specifying which items are currently considered as anchor (DDF free) items. By
 #' default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction.

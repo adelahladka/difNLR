@@ -2,7 +2,7 @@
 % Please edit documentation in R/MLR.R
 \name{MLR}
 \alias{MLR}
-\title{DDF likelihood ratio statistics based on Multinomial Log-linear Regression model.}
+\title{DDF likelihood ratio statistics based on multinomial log-linear regression model.}
 \usage{
 MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
 p.adjust.method = "none", alpha = 0.05)
@@ -20,7 +20,7 @@ See \strong{Details}.}
 \item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
 \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.}
 
-\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
+\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DDF free) items. By
 default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 See \strong{Details}.}
 
@@ -49,14 +49,15 @@ A list with the following arguments:
   }
 }
 \description{
-Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
+Calculates DDF likelihood ratio statistics for nominal data based on
+multinomial log-linear model.
 }
 \details{
 Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
 
 The \code{Data} is a matrix which rows represents examinee unscored answers and
 columns correspond to the items. The \code{group} must be a vector of the same
-length as \code{nrow(data)}. The \code{key} must be a vector of correct answers
+length as \code{nrow(Data)}. The \code{key} must be a vector of correct answers
 corresponding to columns of \code{Data}.
 
 The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}

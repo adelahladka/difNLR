@@ -10,7 +10,7 @@
 \alias{BIC.difNLR}
 \alias{residuals.difNLR}
 \alias{resid.difNLR}
-\title{DIF detection using Non-Linear Regression method.}
+\title{DIF detection using non-linear regression method.}
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
 match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
@@ -52,7 +52,7 @@ See \strong{Details}.}
 squares (default) and \code{"likelihood"} for maximum likelihood method.}
 
 \item{match}{character or numeric: specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-\code{"score"} (total test score), or numeric vector of the same length as number of observations in "Data". See \strong{Details}.}
+\code{"score"} (total test score), or numeric vector of the same length as number of observations in \code{Data}. See \strong{Details}.}
 
 \item{anchor}{Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
 currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
@@ -87,9 +87,9 @@ bootstraped samples (default is 20).}
 \item{item}{either character (\code{"all"}), or numeric vector, or single number
 corresponding to column indicators.}
 
-\item{SE}{logical: should be standard errors also returned? Default is \code{FALSE}.}
+\item{SE}{logical: should be standard errors also returned? (default is \code{FALSE}).}
 
-\item{simplify}{logical: should the result be simplified to a matrix? Default value is \code{FALSE}.}
+\item{simplify}{logical: should the result be simplified to a matrix? (default is \code{FALSE}).}
 }
 \value{
 The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
@@ -155,8 +155,9 @@ Object of class \code{"difNLR"} is a list with the following components:
 }
 }
 \description{
-Performs DIF detection procedure based on non-linear regression model (generalized logistic
-regression) and either likelihood-ratio or F test of submodel.
+Performs DIF detection procedure for dichotomous data based on non-linear
+regression model (generalized logistic regression) and either likelihood-ratio or F test
+of submodel.
 }
 \details{
 DIF detection procedure based on non-linear regression is the extension of logistic regression
@@ -328,7 +329,7 @@ Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning 
 Journal of Educational Measurement, 27, 361-370.
 }
 \seealso{
-\code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
+\code{\link[stats]{nls}} \code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

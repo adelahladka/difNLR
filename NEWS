@@ -5,6 +5,20 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.2.7 (2019-07-04) -
+----------------------------------------
+
+BUG FIXING
+  o Check for input 'item' in S3 methods for difNLR, ddfMLR and ddfOrd
+    was fixed.
+
+MAJOR UDPATES
+  o S3 methods plot() outputs for difNLR, ddfMLR and ddfOrd were unified.
+
+MINOR UPDATES
+  o Help pages were updated.
+
+----------------------------------------
 - Changes in difNLR 1.2.6 (2019-07-03) -
 ----------------------------------------
 

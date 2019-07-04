@@ -45,6 +45,7 @@ predict(x, item = 1)
 predict(x, item = 1, match = 0, group = 1)
 predict(x, item = 1, match = 0, group = 0)
 }
+
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:

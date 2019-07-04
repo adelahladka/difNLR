@@ -2,7 +2,7 @@
 % Please edit documentation in R/NLR.R
 \name{NLR}
 \alias{NLR}
-\title{Non-Linear Regression DIF statistic.}
+\title{DIF statistics based on non-linear regression model.}
 \usage{
 NLR(Data, group, model, constraints = NULL, type = "both", method = "nls",
 match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
@@ -19,7 +19,7 @@ See \strong{Details}.}
 \item{constraints}{character: which parameters should be the same for both groups. Default value is \code{NULL}. See \strong{Details}.}
 
 \item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-\code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.}
+\code{"nudif"}, \code{"all"}, or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}. See \strong{Details}.}
 
 \item{method}{character: what method should be used for estimation of parameters in \code{model}. The options are
 \code{"nls"} for non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.}
@@ -74,16 +74,16 @@ A list with the following arguments:
 }
 }
 \description{
-Performs DIF detection procedure based on Non-Linear Regression and either
-likelihood ratio test or F-test of submodel.
+Calculates either DIF likelihood ratio or F statistics for dichotomous data
+based on non-linear regression model (generalized logistic regression model).
 }
 \details{
 DIF detection procedure based on Non-Linear Regression is the extension
 of Logistic Regression procedure (Swaminathan and Rogers, 1990).
 
 The \code{Data} is a matrix which rows represents examinee scored answers
-("1" correct, "0" incorrect) and columns correspond to the items.
-The \code{group} must be a vector of the same length as \code{nrow(data)}.
+(1 - correct, 0 - incorrect) and columns correspond to the items.
+The \code{group} must be a vector of the same length as \code{nrow(Data)}.
 
 The unconstrained form of 4PL generalized logistic regression model for probability of
 correct answer (i.e., y = 1) is

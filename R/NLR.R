@@ -1,9 +1,9 @@
-#' Non-Linear Regression DIF statistic.
+#' DIF statistics based on non-linear regression model.
 #'
 #' @aliases NLR
 #'
-#' @description Performs DIF detection procedure based on Non-Linear Regression and either
-#' likelihood ratio test or F-test of submodel.
+#' @description Calculates either DIF likelihood ratio or F statistics for dichotomous data
+#' based on non-linear regression model (generalized logistic regression model).
 #'
 #' @param Data numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
 #' See \strong{Details}.
@@ -18,7 +18,7 @@
 #' default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' See \strong{Details}.
 #' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-#' \code{"nudif"}, \code{"all"}, or combination of parameters 'a', 'b', 'c' and 'd'. See \strong{Details}.
+#' \code{"nudif"}, \code{"all"}, or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}. See \strong{Details}.
 #' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
 #' @param start numeric: matrix with n rows (where n is the number of items) and 8 columns containing initial
 #' item parameters estimates. See \strong{Details}.
@@ -39,8 +39,8 @@
 #' of Logistic Regression procedure (Swaminathan and Rogers, 1990).
 #'
 #' The \code{Data} is a matrix which rows represents examinee scored answers
-#' ("1" correct, "0" incorrect) and columns correspond to the items.
-#' The \code{group} must be a vector of the same length as \code{nrow(data)}.
+#' (1 - correct, 0 - incorrect) and columns correspond to the items.
+#' The \code{group} must be a vector of the same length as \code{nrow(Data)}.
 #'
 #' The unconstrained form of 4PL generalized logistic regression model for probability of
 #' correct answer (i.e., y = 1) is
