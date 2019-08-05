@@ -5,7 +5,8 @@
 \title{DDF likelihood ratio statistics for ordinal data.}
 \usage{
 ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
-anchor = 1:ncol(Data), p.adjust.method = "none", alpha = 0.05)
+anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "classic",
+alpha = 0.05)
 }
 \arguments{
 \item{Data}{matrix or data.frame: the ordinarily scored data matrix.}
@@ -28,6 +29,9 @@ See \strong{Details}.}
 \item{p.adjust.method}{character: method for multiple comparison correction.
 See \strong{Details}.}
 
+\item{parametrization}{character: parametrization of regression coefficients. Possible options are
+\code{"classic"} and \code{"irt"}. See \strong{Details}.}
+
 \item{alpha}{numeric: significance level (default is 0.05).}
 }
 \value{
@@ -39,8 +43,8 @@ A list with the following arguments:
   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
   \item{\code{par.m0}}{the estimates of null model.}
   \item{\code{par.m1}}{the estimates of alternative model.}
-  \item{\code{cov.m0}}{the estimates of covariance structure of null model.}
-  \item{\code{cov.m1}}{the estimates of covariance structure of alternative model.}
+  \item{\code{se.m0}}{standard errors of parameters in null model.}
+  \item{\code{se.m1}}{standard errors of parameters in alternative model.}
   \item{\code{ll.m0}}{log-likelihood of null model.}
   \item{\code{ll.m1}}{log-likelihood of alternative model.}
   \item{\code{AIC.m0}}{AIC of null model.}
@@ -74,6 +78,10 @@ in \code{Data}.
 The \code{p.adjust.method} is a character for \code{p.adjust} function from the \code{stats} package. Possible values are
 \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
 \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
+
+Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
+is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
+Option \code{"irt"} returns IRT parametrization.
 }
 \examples{
 \dontrun{

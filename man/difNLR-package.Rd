@@ -17,8 +17,8 @@ logistic regression models.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.2.7\cr
-Date: 2019-07-04\cr
+Version: 1.2.8\cr
+Date: 2019-08-05\cr
 Depends: R (>= 3.1)
 Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 License: GPL-3\cr
@@ -29,6 +29,8 @@ Encoding: UTF-8
 This package was supported by grant funded by Czech Science foundation under number GJ15-15856Y.
 }
 \references{
+Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
+
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 \url{https://doi.org/10.1111/jedm.12158}.

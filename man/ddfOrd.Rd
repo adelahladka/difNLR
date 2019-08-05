@@ -11,7 +11,8 @@
 \title{DDF detection for ordinal data.}
 \usage{
 ddfORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
-anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
+anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
+parametrization = "classic", alpha = 0.05)
 
 \method{print}{ddfORD}(x, ...)
 
@@ -23,7 +24,8 @@ anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "non
 
 \method{BIC}{ddfORD}(object, item = "all", ...)
 
-\method{plot}{ddfORD}(x, item = "all", title, plot.type, ...)
+\method{plot}{ddfORD}(x, item = "all", title, plot.type, group.names,
+  ...)
 }
 \arguments{
 \item{Data}{matrix or data.frame: the ordinarily scored data matrix only or the ordinarily scored
@@ -51,10 +53,13 @@ currently considered as anchor (DDF free) items. Argument is ignored if \code{ma
 
 \item{nrIter}{numeric: the maximal number of iterations in the item purification (default is 10).}
 
-\item{alpha}{numeric: significance level (default is 0.05).}
-
 \item{p.adjust.method}{character: method for multiple comparison correction.
 See \strong{Details}.}
+
+\item{parametrization}{character: parametrization of regression coefficients. Possible options are
+\code{"classic"} and \code{"irt"}. See \strong{Details}.}
+
+\item{alpha}{numeric: significance level (default is 0.05).}
 
 \item{x}{an object of 'ddfORD' class}
 
@@ -74,6 +79,8 @@ See \strong{Details}.}
 \item{plot.type}{character: which plot should be displayed for cumulative logistic
 regression model. Either \code{"category"} for category probabilities or
 \code{"cumulative"} for cumulative probabilities.}
+
+\item{group.names}{character: names of reference and focal group.}
 }
 \value{
 A list of class 'ddfORD' with the following arguments:
@@ -102,28 +109,30 @@ A list of class 'ddfORD' with the following arguments:
   \item{\code{group}}{the vector of group membership.}
   \item{\code{Data}}{the data matrix.}
   \item{\code{match}}{matching criterion.}
+  \item{\code{group.names}}{levels of grouping variable.}
   \item{\code{llM0}}{log-likelihood of null model.}
   \item{\code{llM1}}{log-likelihood of alternative model.}
   \item{\code{AICM0}}{AIC of null model.}
   \item{\code{AICM1}}{AIC of alternative model.}
   \item{\code{BICM0}}{BIC of null model.}
   \item{\code{BICM1}}{BIC of alternative model.}
+  \item{\code{parametrization}}{Parameters' parametrization.}
   }
 }
 \description{
-Performs DDF detection procedure for ordinal data based either on adjacent logistic regression model
-or on cumulative logistic regression model and likelihood ratio test of submodel.
+Performs DDF detection procedure for ordinal data based either on adjacent category logit model
+or on cumulative logit model and likelihood ratio test of submodel.
 }
 \details{
-DDF detection procedure for ordinal data based either on adjacent logistic regression model
-or on cumulative logistic regression model.
+DDF detection procedure for ordinal data based either on adjacent category logit model
+or on cumulative logit model.
 
 The \code{Data} is a matrix or data.frame which rows represents examinee ordinarily scored answers and
 columns correspond to the items. The \code{group} must be either a vector of the same length as \code{nrow(Data)}
 or column indicator of \code{Data}.
 
 The \code{model} corresponds to model to be used for DDF detection. Options are \code{"adjacent"}
-for adjacent logistic regression model or \code{"cumulative"} for cumulative logistic regression model.
+for adjacent category logit model or \code{"cumulative"} for cumulative logit model.
 
 The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
 to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
@@ -143,6 +152,10 @@ The \code{p.adjust.method} is a character for \code{p.adjust} function from the 
 \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
 \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
 
+Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
+is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
+Option \code{"irt"} returns IRT parametrization.
+
 The output of the \code{ddfORD()} function is displayed by the \code{print.ddfORD} function.
 
 The characteristic curve for item specified in \code{item} option can be plotted. For default
@@ -158,12 +171,12 @@ data(dataMedicalgraded, package = "ShinyItemAnalysis")
 Data <- dataMedicalgraded[, 1:5]
 group <- dataMedicalgraded[, 101]
 
-# Testing both DDF effects with adjacent logistic model
+# Testing both DDF effects with adjacent category logit model
 x <- ddfORD(Data, group, focal.name = 1, model = "adjacent")
 
 # graphical devices
-plot(x, item = 1)
-plot(x, item = "X2001")
+plot(x, item = 3)
+plot(x, item = "X2003")
 
 # estimated parameters
 coef(x)
@@ -189,14 +202,21 @@ ddfORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 # Testing both DDF effects with total score as matching criterion
 ddfORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 
-# Testing both DDF effects with cumulative logistic model
-x <- ddfORD(Data, group, focal.name = 1, model = "cumulative")
+# Testing both DDF effects with cumulative logit model
+# using IRT parametrization
+x <- ddfORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt")
 
 # graphical devices
-plot(x, item = 1, plot.type = "cumulative")
-plot(x, item = 1, plot.type = "category")
+plot(x, item = 3, plot.type = "cumulative")
+plot(x, item = 3, plot.type = "category")
+
+# estimated parameters in IRT parametrization
+coef(x, simplify = T)
 }
 
+}
+\references{
+Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 }
 \seealso{
 \code{\link[stats]{p.adjust}} \code{\link[VGAM]{vglm}}

@@ -5,6 +5,21 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.2.8 (2019-08-05) -
+----------------------------------------
+
+MAJOR UPDATES
+  o ddfOrd() function was renamed. Now ddfORD().
+  o IRT parametrization now available in ddfORD() function with
+    argument 'parametrization'. SE calculated with delta method.
+  o Names of reference and focal group in plot.ddfORD() can be
+    changed with 'group.name' argument.
+
+MINOR UPDATES
+  o Help page for ddfORD() was updated.
+  o Reference for ddfORD() was added.
+
+----------------------------------------
 - Changes in difNLR 1.2.7 (2019-07-04) -
 ----------------------------------------
 

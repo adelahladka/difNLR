@@ -2,8 +2,8 @@
 #'
 #' @aliases ddfORD print.ddfORD plot.ddfORD
 #'
-#' @description Performs DDF detection procedure for ordinal data based either on adjacent logistic regression model
-#' or on cumulative logistic regression model and likelihood ratio test of submodel.
+#' @description Performs DDF detection procedure for ordinal data based either on adjacent category logit model
+#' or on cumulative logit model and likelihood ratio test of submodel.
 #'
 #' @param Data matrix or data.frame: the ordinarily scored data matrix only or the ordinarily scored
 #' data matrix plus the vector of group. See \strong{Details}.
@@ -23,21 +23,24 @@
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
+#' @param parametrization character: parametrization of regression coefficients. Possible options are
+#' \code{"classic"} and \code{"irt"}. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
 #' @usage ddfORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
-#' anchor = NULL, purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
+#' anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
+#' parametrization = "classic", alpha = 0.05)
 #'
 #' @details
-#' DDF detection procedure for ordinal data based either on adjacent logistic regression model
-#' or on cumulative logistic regression model.
+#' DDF detection procedure for ordinal data based either on adjacent category logit model
+#' or on cumulative logit model.
 #'
 #' The \code{Data} is a matrix or data.frame which rows represents examinee ordinarily scored answers and
 #' columns correspond to the items. The \code{group} must be either a vector of the same length as \code{nrow(Data)}
 #' or column indicator of \code{Data}.
 #'
 #' The \code{model} corresponds to model to be used for DDF detection. Options are \code{"adjacent"}
-#' for adjacent logistic regression model or \code{"cumulative"} for cumulative logistic regression model.
+#' for adjacent category logit model or \code{"cumulative"} for cumulative logit model.
 #'
 #' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
 #' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
@@ -56,6 +59,10 @@
 #' The \code{p.adjust.method} is a character for \code{p.adjust} function from the \code{stats} package. Possible values are
 #' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
 #' \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
+#'
+#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
+#' is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
+#' Option \code{"irt"} returns IRT parametrization.
 #'
 #' The output of the \code{ddfORD()} function is displayed by the \code{print.ddfORD} function.
 #'
@@ -92,12 +99,14 @@
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{Data}}{the data matrix.}
 #'   \item{\code{match}}{matching criterion.}
+#'   \item{\code{group.names}}{levels of grouping variable.}
 #'   \item{\code{llM0}}{log-likelihood of null model.}
 #'   \item{\code{llM1}}{log-likelihood of alternative model.}
 #'   \item{\code{AICM0}}{AIC of null model.}
 #'   \item{\code{AICM1}}{AIC of alternative model.}
 #'   \item{\code{BICM0}}{BIC of null model.}
 #'   \item{\code{BICM1}}{BIC of alternative model.}
+#'   \item{\code{parametrization}}{Parameters' parametrization.}
 #'   }
 #'
 #' @author
@@ -110,6 +119,9 @@
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' martinkova@cs.cas.cz \cr
 #'
+#' @references
+#' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
+#'
 #' @seealso \code{\link[stats]{p.adjust}} \code{\link[VGAM]{vglm}}
 #'
 #' @examples
@@ -118,12 +130,12 @@
 #' Data <- dataMedicalgraded[, 1:5]
 #' group <- dataMedicalgraded[, 101]
 #'
-#' # Testing both DDF effects with adjacent logistic model
+#' # Testing both DDF effects with adjacent category logit model
 #' x <- ddfORD(Data, group, focal.name = 1, model = "adjacent")
 #'
 #' # graphical devices
-#' plot(x, item = 1)
-#' plot(x, item = "X2001")
+#' plot(x, item = 3)
+#' plot(x, item = "X2003")
 #'
 #' # estimated parameters
 #' coef(x)
@@ -149,19 +161,23 @@
 #' # Testing both DDF effects with total score as matching criterion
 #' ddfORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 #'
-#' # Testing both DDF effects with cumulative logistic model
-#' x <- ddfORD(Data, group, focal.name = 1, model = "cumulative")
+#' # Testing both DDF effects with cumulative logit model
+#' # using IRT parametrization
+#' x <- ddfORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt")
 #'
 #' # graphical devices
-#' plot(x, item = 1, plot.type = "cumulative")
-#' plot(x, item = 1, plot.type = "category")
+#' plot(x, item = 3, plot.type = "cumulative")
+#' plot(x, item = 3, plot.type = "category")
+#'
+#' # estimated parameters in IRT parametrization
+#' coef(x, simplify = T)
 #' }
 #'
 #' @keywords DDF
 #' @export
-ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
-                   match = "zscore", anchor = NULL, purify = FALSE,
-                   nrIter = 10, alpha = 0.05, p.adjust.method = "none")
+ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
+                   anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
+                   parametrization = "classic", alpha = 0.05)
 {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
     stop("'type' must be either 'udif', 'nudif' or 'both'",
@@ -181,7 +197,7 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
     }
     if (length(match) != no){
       stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
-           of observations in 'Data'!")
+           of observations in 'Data'!",  call. = FALSE)
     }
   }
   ### purification
@@ -214,6 +230,9 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
            call. = FALSE)
     }
 
+    group.names = unique(GROUP)[!is.na(unique(GROUP))]
+    if (group.names[1] == focal.name)
+      group.names = rev(group.names)
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
     if (length(match) == dim(DATA)[1]){
@@ -249,12 +268,13 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(ORD(DATA, GROUP, model = model, match = match, anchor = ANCHOR,
-                                   type = type, p.adjust.method = p.adjust.method, alpha = alpha))
+                                   type = type, p.adjust.method = p.adjust.method, parametrization = parametrization,
+                                   alpha = alpha))
 
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
-      se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
-      se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+      se.m1 <- PROV$se.m1
+      se.m0 <- PROV$se.m0
       significant <- which(ADJ.PVAL < alpha)
 
       if (length(significant) > 0) {
@@ -280,16 +300,18 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
                   alpha = alpha, DDFitems = DDFitems,
                   type = type, purification = purify, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                  group = GROUP, Data = DATA, match = match,
+                  group = GROUP, Data = DATA, match = match, group.names = group.names,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                   AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
-                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
+                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
+                  parametrization = parametrization)
     } else {
       nrPur <- 0
       ddfPur <- NULL
       noLoop <- FALSE
       prov1 <- suppressWarnings(ORD(DATA, GROUP, model = model, type = type, match = match,
-                                    p.adjust.method = p.adjust.method, alpha = alpha))
+                                    p.adjust.method = p.adjust.method, parametrization = parametrization,
+                                    alpha = alpha))
       stats1 <- prov1$Sval
       pval1 <- prov1$pval
       significant1 <- which(pval1 < alpha)
@@ -297,8 +319,8 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
         PROV <- prov1
         STATS <- stats1
         DDFitems <- "No DDF item detected"
-        se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
-        se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+        se.m1 <- PROV$se.m1
+        se.m0 <- PROV$se.m0
         ordPAR <- PROV$par.m1
         ordSE <- se.m1
         noLoop <- TRUE
@@ -321,7 +343,8 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
               }
             }
             prov2 <- suppressWarnings(ORD(DATA, GROUP, model = model, anchor = nodif, type = type, match = match,
-                                          p.adjust.method = p.adjust.method, alpha = alpha))
+                                          p.adjust.method = p.adjust.method, parametrization = parametrization,
+                                          alpha = alpha))
             stats2 <- prov2$Sval
             pval2 <- prov2$pval
             significant2 <- which(pval2 < alpha)
@@ -346,8 +369,8 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
         PROV <- prov2
         STATS <- stats2
         significant1 <- which(PROV$adjusted.pval < alpha)
-        se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
-        se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+        se.m1 <- PROV$se.m1
+        se.m0 <- PROV$se.m0
         ordPAR <- PROV$par.m1
         ordSE <- se.m1
         if (length(significant1) > 0) {
@@ -373,10 +396,11 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both",
                   alpha = alpha, DDFitems = DDFitems,
                   type = type, purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
                   p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                  group = GROUP, Data = DATA, match = match,
+                  group = GROUP, Data = DATA, match = match, group.names = group.names,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                   AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
-                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
+                  BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
+                  parametrization = parametrization)
     }
     class(RES) <- "ddfORD"
     return(RES)
@@ -481,6 +505,7 @@ coef.ddfORD <- function(object, SE = FALSE, simplify = FALSE, ...){
 
   if (simplify){
     res = as.data.frame(plyr::ldply(coefs, rbind))
+
     if (SE) {
       resnams = paste(res[, 1], c("estimate", "SE"))
     } else {
@@ -616,9 +641,10 @@ BIC.ddfORD <- function(object, item = "all", ...){
 #' @param plot.type character: which plot should be displayed for cumulative logistic
 #' regression model. Either \code{"category"} for category probabilities or
 #' \code{"cumulative"} for cumulative probabilities.
+#' @param group.names character: names of reference and focal group.
 #' @rdname ddfORD
 #' @export
-plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
+plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
   m = length(x$ordPAR)
   nams = colnames(x$Data)
 
@@ -655,12 +681,26 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
     }
 
   if (x$model == "adjacent" & !is.null(plot.type)){
-    warning("Argument 'plot.type' is ignored for adjacent logistic regression model. ")
+    warning("Argument 'plot.type' is ignored for adjacent category logit model. ")
   }
   if (!is.null(plot.type))
     if (!plot.type %in% c("category", "cumulative")){
       stop("'plot.type' can be either 'category' or 'cumulative'.  ")
     }
+
+  if (missing(group.names)){
+    group.names = x$group.names
+    if (all(group.names %in% c(0, 1))) group.names = c("Reference", "Focal")
+  }
+  if (length(group.names) > 2){
+    group.names = group.names[1:2]
+    warning("Only first two values for 'group.names' argument are used. ")
+  } else {
+    if (length(group.names) < 2){
+      group.names = c("Reference", "Focal")
+      warning("Argument 'group.names' need to have length of two. Default value is used.")
+    }
+  }
 
   if (x$match[1] == "zscore"){
     matching = c(unlist(scale(rowSums(x$Data))))
@@ -677,8 +717,8 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
         stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
              of observations in 'Data'!")
       }
-      }
     }
+  }
 
   match = seq(min(matching, na.rm = T), max(matching, na.rm = T), length.out = 300)
 
@@ -695,7 +735,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
   plot_CC = as.list(rep(NA, I))
   if (x$model == "adjacent"){
     for (k in 1:I){
-      i <- items[k]
+      i = items[k]
       if (!missing(title)){
         TITLE = title
       } else {
@@ -707,13 +747,13 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
       num.cat.est = num.cat - 1
       cat.est = cat[-1]
 
-      coefs = x$ordPAR[[i]]
-      if (length(coefs) == num.cat){
-        coefs = c(coefs, "group" = 0, "x:group" = 0)
-      } else {
-        if (length(coefs) == num.cat + 1){
-          coefs = c(coefs, "x:group" = 0)
-        }
+      coefs = sapply(coef(x, simplify = T)[i, ], function(x) +x)
+      if (x$parametrization == "irt"){
+        a = coefs["a"]
+        b = coefs[cat.est]
+        aDIF = coefs["aDIF"]
+        bDIF = coefs[length(coefs) - rev(cat.est)]
+        coefs = c(-a*b, a, unique(round(-a*bDIF - aDIF*b - aDIF*bDIF, 7)), aDIF)
       }
       coefs = sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
 
@@ -765,7 +805,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
         ylab("Category probability") +
         ylim(0, 1) +
         ggtitle(TITLE) +
-        scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
+        scale_linetype_manual(breaks = c(0, 1), labels = group.names,
                               values = c("solid", "dashed")) +
         theme_bw() +
         theme(axis.line  = element_line(colour = "black"),
@@ -791,7 +831,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
   } else {
 
     for (k in 1:I){
-      i <- items[k]
+      i = items[k]
       if (!missing(title)){
         TITLE = title
       } else {
@@ -805,13 +845,13 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
       cat.est = cat[-1]
 
 
-      coefs = x$ordPAR[[i]]
-      if (length(coefs) == num.cat.est + 1){
-        coefs = c(coefs, "group" = 0, "x:group" = 0)
-      } else {
-        if (length(coefs) == num.cat.est + 2){
-          coefs = c(coefs, "x:group" = 0)
-        }
+      coefs = sapply(coef(x, simplify = T)[i, ], function(x) +x)
+      if (x$parametrization == "irt"){
+        a = coefs["a"]
+        b = coefs[cat.est]
+        aDIF = coefs["aDIF"]
+        bDIF = coefs[length(coefs) - rev(cat.est)]
+        coefs = c(-a*b, a, unique(round(-a*bDIF - aDIF*b - aDIF*bDIF, 7)), aDIF)
       }
       coefs = sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
 
@@ -895,9 +935,13 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
       cols  = c("black", hcl(h = hues, l = 65, c = 100)[1:(num.cat - 1)])
 
       if (plot.type == "cumulative") {
+
         df.emp.cum = df.emp.cum[df.emp.cum$category != paste0("P >= ", cat[1]), ]
         df.probs.cum = df.probs.cum[df.probs.cum$category != paste0("P >= ", cat[1]), ]
         cols = cols[-1]
+
+        df.emp.cum <- df.emp.cum[complete.cases(df.emp.cum), ]
+        df.probs.cum <- df.probs.cum[complete.cases(df.probs.cum), ]
 
         plot_CC[[k]] <- ggplot() +
           geom_point(data = df.emp.cum,
@@ -914,7 +958,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
           ylab("Cumulative probability") +
           ggtitle(TITLE) +
           ylim(0, 1) +
-          scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
+          scale_linetype_manual(breaks = c(0, 1), labels = group.names,
                                 values = c("solid", "dashed")) +
           theme_bw() +
           theme(axis.line  = element_line(colour = "black"),
@@ -936,6 +980,9 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
                  linetype = guide_legend(title = "Group", order = 1))
       } else {
 
+        df.emp.cat <- df.emp.cat[complete.cases(df.emp.cat), ]
+        df.probs.cat <- df.probs.cat[complete.cases(df.probs.cat), ]
+
         plot_CC[[k]] <- ggplot() +
           geom_point(data = df.emp.cat,
                      aes_string(x = "matching", y = "probability",
@@ -951,7 +998,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, ...){
           ggtitle(TITLE) +
           ylab("Category probability") +
           ylim(0, 1) +
-          scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
+          scale_linetype_manual(breaks = c(0, 1), labels = group.names,
                                 values = c("solid", "dashed")) +
           theme_bw() +
           theme(axis.line  = element_line(colour = "black"),
