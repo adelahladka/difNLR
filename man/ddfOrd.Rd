@@ -177,6 +177,7 @@ x <- ddfORD(Data, group, focal.name = 1, model = "adjacent")
 # graphical devices
 plot(x, item = 3)
 plot(x, item = "X2003")
+plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 
 # estimated parameters
 coef(x)

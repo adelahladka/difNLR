@@ -22,6 +22,8 @@
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
+#' @param parametrization character: parametrization of regression coefficients. Possible options are
+#' \code{"classic"} and \code{"irt"}. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param x an object of 'ddfMLR' class
 #' @param object an object of 'ddfMLR' class
@@ -31,7 +33,8 @@
 #' @param ... other generic parameters for \code{print} or \code{plot} functions.
 #'
 #' @usage ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-#' purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
+#' purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "classic",
+#' alpha = 0.05)
 #'
 #' @details
 #' Performs DDF detection procedure for nominal data based on multinomial
@@ -60,6 +63,10 @@
 #' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
 #' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
 #' See also \code{\link[stats]{p.adjust}} for more information.
+#'
+#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
+#' is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
+#' Option \code{"irt"} returns IRT parametrization.
 #'
 #' The output of the \code{ddfMLR} function is displayed by the \code{print.ddfMLR} function.
 #'
@@ -95,6 +102,7 @@
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{Data}}{the data matrix.}
 #'   \item{\code{match}}{matching criterion.}
+#'   \item{\code{group.names}}{levels of grouping variable.}
 #'   \item{\code{llM0}}{log-likelihood of null model.}
 #'   \item{\code{llM1}}{log-likelihood of alternative model.}
 #'   \item{\code{AICM0}}{AIC of null model.}
@@ -142,13 +150,14 @@
 #'
 #' # Graphical devices
 #' plot(x, item = 1)
+#' plot(x, item = 1, group.names = c("Group 1", "Group 2"))
 #' plot(x, item = x$DDFitems)
 #' plot(x, item = "all")
 #'
-#' # AIC, BIC, logLik
-#' AIC(x)
-#' BIC(x)
-#' logLik(x)
+#' # AIC, BIC, log-likelihood
+#' AIC(x); BIC(x); logLik(x)
+#' # AIC, BIC, log-likelihood for the first item
+#' AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
 #'
 #' # estimates
 #' coef(x)
@@ -158,15 +167,18 @@
 #'
 #' @keywords DDF
 #' @export
-ddfMLR <- function(Data, group, focal.name, key, type = "both",
-                   match = "zscore", anchor = NULL, purify = FALSE,
-                   nrIter = 10, alpha = 0.05, p.adjust.method = "none")
+ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
+                   purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "classic",
+                   alpha = 0.05)
 {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
     stop("'type' must be either 'udif', 'nudif' or 'both'",
          call. = FALSE)
   if (alpha > 1 | alpha < 0)
     stop("'alpha' must be between 0 and 1",
+         call. = FALSE)
+  if (!parametrization %in% c("classic", "irt"))
+    stop("Invalid value for 'parametrization'. Possible values are 'classic' and 'irt'.",
          call. = FALSE)
   ### matching criterion
   if (!(match[1] %in% c("score", "zscore"))){
@@ -213,7 +225,9 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
       stop("Number of items in 'Data' is not equal to the length of 'key'.",
            call. = FALSE)
     }
-
+    group.names = unique(GROUP)[!is.na(unique(GROUP))]
+    if (group.names[1] == focal.name)
+      group.names = rev(group.names)
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
     if (length(match) == dim(DATA)[1]){
@@ -249,12 +263,13 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(MLR(DATA, GROUP, key = key, match = match, anchor = ANCHOR,
-                                   type = type, p.adjust.method = p.adjust.method, alpha = alpha))
+                                   type = type, p.adjust.method = p.adjust.method, parametrization = parametrization,
+                                   alpha = alpha))
 
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
-      se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
-      se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+      se.m1 <- PROV$se.m1
+      se.m0 <- PROV$se.m0
       significant <- which(ADJ.PVAL < alpha)
 
       if (length(significant) > 0) {
@@ -283,8 +298,9 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
                   parM1 = PROV$par.m1,
                   alpha = alpha, DDFitems = DDFitems,
                   type = type, purification = purify, p.adjust.method = p.adjust.method,
+                  parametrization = parametrization,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                  group = GROUP, Data = DATA, key = key, match = match,
+                  group = GROUP, Data = DATA, key = key, match = match, group.names = group.names,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                   AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
                   BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
@@ -293,7 +309,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
       ddfPur <- NULL
       noLoop <- FALSE
       prov1 <- suppressWarnings(MLR(DATA, GROUP, key = key, type = type,
-                                    p.adjust.method = p.adjust.method, alpha = alpha))
+                                    p.adjust.method = p.adjust.method, parametrization = parametrization,
+                                    alpha = alpha))
       stats1 <- prov1$Sval
       pval1 <- prov1$pval
       significant1 <- which(pval1 < alpha)
@@ -301,8 +318,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
         PROV <- prov1
         STATS <- stats1
         DDFitems <- "No DDF item detected"
-        se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
-        se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+        se.m1 <- PROV$se.m1
+        se.m0 <- PROV$se.m0
         mlrPAR <- PROV$par.m1
         mlrSE <- se.m1
         noLoop <- TRUE
@@ -325,7 +342,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
               }
             }
             prov2 <- suppressWarnings(MLR(DATA, GROUP, key = key, anchor = nodif, type = type,
-                                          p.adjust.method = p.adjust.method, alpha = alpha))
+                                          p.adjust.method = p.adjust.method, parametrization = parametrization,
+                                          alpha = alpha))
             stats2 <- prov2$Sval
             pval2 <- prov2$pval
             significant2 <- which(pval2 < alpha)
@@ -350,8 +368,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
         PROV <- prov2
         STATS <- stats2
         significant1 <- which(PROV$adjusted.pval < alpha)
-        se.m1 <- lapply(lapply(PROV$cov.m1, diag), sqrt)
-        se.m0 <- lapply(lapply(PROV$cov.m0, diag), sqrt)
+        se.m1 <- PROV$se.m1
+        se.m0 <- PROV$se.m0
         mlrPAR <- PROV$par.m1
         mlrSE <- se.m1
         if (length(significant1) > 0) {
@@ -375,8 +393,10 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both",
                   parM1 = PROV$par.m1,
                   alpha = alpha, DDFitems = DDFitems,
                   type = type, purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
-                  p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-                  group = GROUP, Data = DATA, key = key, match = match,
+                  p.adjust.method = p.adjust.method,
+                  parametrization = parametrization,
+                  pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
+                  group = GROUP, Data = DATA, key = key, match = match, group.names = group.names,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
                   AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
                   BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1)
@@ -449,10 +469,11 @@ print.ddfMLR <- function (x, ...){
   }
 }
 
+#' @param group.names character: names of reference and focal group.
 #' @rdname ddfMLR
 #' @export
-plot.ddfMLR <- function(x, item = "all", title, ...){
-  m <- length(x$mlrPAR)
+plot.ddfMLR <- function(x, item = "all", title, group.names, ...){
+  m = length(x$mlrPAR)
   if (class(item) == "character"){
     if (item != "all")
       stop("'item' must be either numeric vector or character string 'all' ",
@@ -470,9 +491,23 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
          call. = FALSE)
 
   if (class(item) == "character"){
-    items <- 1:m
+    items = 1:m
   } else {
-    items <- item
+    items = item
+  }
+
+  if (missing(group.names)){
+    group.names = x$group.names
+    if (all(group.names %in% c(0, 1))) group.names = c("Reference", "Focal")
+  }
+  if (length(group.names) > 2){
+    group.names = group.names[1:2]
+    warning("Only first two values for 'group.names' argument are used. ")
+  } else {
+    if (length(group.names) < 2){
+      group.names = c("Reference", "Focal")
+      warning("Argument 'group.names' need to have length of two. Default value is used.")
+    }
   }
 
   if (x$match[1] == "zscore"){
@@ -490,64 +525,73 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
         stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
              of observations in 'Data'!")
       }
-      }
     }
+  }
 
-  sq <- seq(min(score, na.rm = T), max(score, na.rm = T), length.out = 300)
-  sqR <- as.matrix(data.frame(1, sq, 0, 0))
-  sqF <- as.matrix(data.frame(1, sq, 1, sq))
+  sq = seq(min(score, na.rm = T), max(score, na.rm = T), length.out = 300)
+  sqR = as.matrix(data.frame(1, sq, 0, 0))
+  sqF = as.matrix(data.frame(1, sq, 1, sq))
 
-  plot_CC <- list()
+  plot_CC = list()
   for (i in items){
 
     if (!missing(title)){
-      TITLE <- title
+      TITLE = title
     } else {
-      TITLE <- colnames(x$Data)[i]
+      TITLE = colnames(x$Data)[i]
     }
 
-    if (is.null(dim(x$mlrPAR[[i]]))) x$mlrPAR[[i]] <- matrix(x$mlrPAR[[i]], ncol = length(x$mlrPAR[[i]]))
-    if (dim(x$mlrPAR[[i]])[2] == 2)
-      x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0, 0))
-    if (dim(x$mlrPAR[[i]])[2] == 3)
-      x$mlrPAR[[i]] <- as.matrix(data.frame(x$mlrPAR[[i]], 0))
-
-    prR <- as.data.frame(t(exp(x$mlrPAR[[i]] %*% t(sqR))))
-    prF <- as.data.frame(t(exp(x$mlrPAR[[i]] %*% t(sqF))))
-    colnames(prR) <- colnames(prF) <- rownames(x$mlrPAR[[i]])
-
-    prR <- sapply(prR, function(x) x/(rowSums(prR) + 1))
-    prF <- sapply(prF, function(x) x/(rowSums(prF) + 1))
-
-    hvR <- data.frame(1 - rowSums(prR), prR, "R", sq)
-    hvF <- data.frame(1 - rowSums(prF), prF, "F", sq)
-
-    if (is.null(rownames(x$mlrPAR[[i]]))){
-      nams <- levels(x$Data[, i])[levels(x$Data[, i]) != x$key[i]]
-    } else {
-      nams <- rownames(x$mlrPAR[[i]])
+    coefs = x$mlrPAR[[i]]
+    if (x$parametrization == "irt"){
+      a = coefs[, "a"]
+      b = coefs[, "b"]
+      aDIF = coefs[, "aDIF"]
+      bDIF = coefs[, "bDIF"]
+      coefs = cbind(-a*b, a, -a*bDIF - aDIF*b - aDIF*bDIF, aDIF)
     }
 
-    colnames(hvR) <- colnames(hvF) <- c(paste(x$key[i]), nams, "group", "score")
-    hv <- rbind(hvR, hvF)
+    if (is.null(dim(coefs))) coefs = matrix(coefs, ncol = length(coefs))
+    if (dim(coefs)[2] == 2)
+      coefs = as.matrix(data.frame(coefs, 0, 0))
+    if (dim(coefs)[2] == 3)
+      coefs = as.matrix(data.frame(coefs, 0))
 
-    df <- reshape2::melt(hv, id = c("score", "group"))
-    df$group <- as.factor(df$group)
+    prR = as.data.frame(t(exp(coefs %*% t(sqR))))
+    prF = as.data.frame(t(exp(coefs %*% t(sqF))))
+    colnames(prR) = colnames(prF) = rownames(coefs)
 
-    df2 <- rbind(data.frame(prop.table(table(x$Data[x$group == 1, i], score[x$group == 1]), 2),
+    prR = sapply(prR, function(x) x/(rowSums(prR) + 1))
+    prF = sapply(prF, function(x) x/(rowSums(prF) + 1))
+
+    hvR = data.frame(1 - rowSums(prR), prR, "R", sq)
+    hvF = data.frame(1 - rowSums(prF), prF, "F", sq)
+
+    if (is.null(rownames(coefs))){
+      nams = levels(x$Data[, i])[levels(x$Data[, i]) != x$key[i]]
+    } else {
+      nams = rownames(coefs)
+    }
+
+    colnames(hvR) = colnames(hvF) = c(paste(x$key[i]), nams, "group", "score")
+    hv = rbind(hvR, hvF)
+
+    df = reshape2::melt(hv, id = c("score", "group"))
+    df$group = as.factor(df$group)
+
+    df2 = rbind(data.frame(prop.table(table(x$Data[x$group == 1, i], score[x$group == 1]), 2),
                             table(x$Data[x$group == 1, i], score[x$group == 1]),
                             group = "1"),
                  data.frame(prop.table(table(x$Data[x$group == 0, i], score[x$group == 0]), 2),
                             table(x$Data[x$group == 0, i], score[x$group == 0]),
                             group = "0"))
 
-    df2$score <- as.numeric(levels(df2$Var2))[df2$Var2]
-    df2$answ <- relevel(df2$Var1, ref = paste(x$key[i]))
-    df2$group <- as.factor(df2$group)
+    df2$score = as.numeric(levels(df2$Var2))[df2$Var2]
+    df2$answ = relevel(df2$Var1, ref = paste(x$key[i]))
+    df2$group = as.factor(df2$group)
 
-    df$variable <- relevel(df$variable, ref = paste(x$key[i]))
+    df$variable = relevel(df$variable, ref = paste(x$key[i]))
 
-    plot_CC[[i]] <-  ggplot() +
+    plot_CC[[i]] =  ggplot() +
       geom_line(data = df,
                 aes_string(x = "score" , y = "value",
                            colour = "variable", linetype = "group"),
@@ -562,7 +606,7 @@ plot.ddfMLR <- function(x, item = "all", title, ...){
       ggtitle(TITLE) +
       labs(x = xlab,
            y = "Probability of answer") +
-      scale_linetype_manual(breaks = c(0, 1), labels = c("Reference", "Focal"),
+      scale_linetype_manual(breaks = c("R", "F"), labels = group.names,
                             values = c("solid", "dashed")) +
       theme_bw() +
       theme(axis.line  = element_line(colour = "black"),

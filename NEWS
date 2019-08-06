@@ -5,6 +5,16 @@
 ****************************************************
 
 ----------------------------------------
+- Changes in difNLR 1.2.8-1 (2019-08-06) -
+----------------------------------------
+
+MAJOR UPDATES
+  o IRT parametrization now available in ddfMLR() function with
+    argument 'parametrization'. SE calculated with delta method.
+  o Names of reference and focal group in plot.ddfMLR() can be
+    changed with 'group.name' argument.
+
+----------------------------------------
 - Changes in difNLR 1.2.8 (2019-08-05) -
 ----------------------------------------
 

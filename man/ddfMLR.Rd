@@ -11,11 +11,12 @@
 \title{DDF detection for nominal data.}
 \usage{
 ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-purify = FALSE, nrIter = 10, alpha = 0.05, p.adjust.method = "none")
+purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "classic",
+alpha = 0.05)
 
 \method{print}{ddfMLR}(x, ...)
 
-\method{plot}{ddfMLR}(x, item = "all", title, ...)
+\method{plot}{ddfMLR}(x, item = "all", title, group.names, ...)
 
 \method{coef}{ddfMLR}(object, SE = FALSE, simplify = FALSE, ...)
 
@@ -50,10 +51,13 @@ currently considered as anchor (DDF free) items. Argument is ignored if \code{ma
 
 \item{nrIter}{numeric: the maximal number of iterations in the item purification (default is 10).}
 
-\item{alpha}{numeric: significance level (default is 0.05).}
-
 \item{p.adjust.method}{character: method for multiple comparison correction.
 See \strong{Details}.}
+
+\item{parametrization}{character: parametrization of regression coefficients. Possible options are
+\code{"classic"} and \code{"irt"}. See \strong{Details}.}
+
+\item{alpha}{numeric: significance level (default is 0.05).}
 
 \item{x}{an object of 'ddfMLR' class}
 
@@ -63,6 +67,8 @@ See \strong{Details}.}
 (default) for all items. See \strong{Details}.}
 
 \item{title}{string: title of plot.}
+
+\item{group.names}{character: names of reference and focal group.}
 
 \item{object}{an object of 'ddfMLR' class}
 
@@ -96,6 +102,7 @@ A list of class 'ddfMLR' with the following arguments:
   \item{\code{group}}{the vector of group membership.}
   \item{\code{Data}}{the data matrix.}
   \item{\code{match}}{matching criterion.}
+  \item{\code{group.names}}{levels of grouping variable.}
   \item{\code{llM0}}{log-likelihood of null model.}
   \item{\code{llM1}}{log-likelihood of alternative model.}
   \item{\code{AICM0}}{AIC of null model.}
@@ -136,6 +143,10 @@ The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
 See also \code{\link[stats]{p.adjust}} for more information.
 
+Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
+is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
+Option \code{"irt"} returns IRT parametrization.
+
 The output of the \code{ddfMLR} function is displayed by the \code{print.ddfMLR} function.
 
 The characteristic curve for item specified in \code{item} option can be plotted. \code{item} can be
@@ -173,13 +184,14 @@ ddfMLR(Data, group, focal.name = 1, key, match = "score")
 
 # Graphical devices
 plot(x, item = 1)
+plot(x, item = 1, group.names = c("Group 1", "Group 2"))
 plot(x, item = x$DDFitems)
 plot(x, item = "all")
 
-# AIC, BIC, logLik
-AIC(x)
-BIC(x)
-logLik(x)
+# AIC, BIC, log-likelihood
+AIC(x); BIC(x); logLik(x)
+# AIC, BIC, log-likelihood for the first item
+AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
 
 # estimates
 coef(x)

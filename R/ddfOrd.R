@@ -136,6 +136,7 @@
 #' # graphical devices
 #' plot(x, item = 3)
 #' plot(x, item = "X2003")
+#' plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 #'
 #' # estimated parameters
 #' coef(x)
@@ -187,6 +188,9 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
          call. = FALSE)
   if (alpha > 1 | alpha < 0)
     stop("'alpha' must be between 0 and 1",
+         call. = FALSE)
+  if (!parametrization %in% c("classic", "irt"))
+    stop("Invalid value for 'parametrization'. Possible values are 'classic' and 'irt'.",
          call. = FALSE)
   ### matching criterion
   if (!(match[1] %in% c("score", "zscore"))){
