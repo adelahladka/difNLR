@@ -260,6 +260,7 @@
 #' # Graphical devices
 #' plot(x)
 #' plot(x, item = x$DIFitems)
+#' plot(x, item = 1, group.names = c("Group 1", "Group 2"))
 #' plot(x, plot.type = "stat")
 #'
 #' # Coefficients
@@ -283,10 +284,10 @@
 #' predict(x, item = 1, match = 0, group = 1)
 #' predict(x, item = 1, match = 0, group = 0)
 #'
-#' # AIC, BIC, logLik
-#' AIC(x); AIC(x, item = 1)
-#' BIC(x); BIC(x, item = 1)
-#' logLik(x); logLik(x, item = 1)
+#' # AIC, BIC, log-likelihood
+#' AIC(x); BIC(x); logLik(x)
+#' # AIC, BIC, log-likelihood for the first item
+#' AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
 #' }
 #'
 #' @keywords DIF
@@ -378,6 +379,9 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       }
     }
 
+    group.names = unique(GROUP)[!is.na(unique(GROUP))]
+    if (group.names[1] == focal.name)
+      group.names = rev(group.names)
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
     if (length(match) == dim(DATA)[1]){
@@ -525,7 +529,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
                   type = type, types = types, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
                   purification = purify,
-                  group = GROUP, Data = DATA, method = method,
+                  group = GROUP, Data = DATA, method = method, group.names = group.names,
                   conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
     } else {
@@ -629,7 +633,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
                   type = type, types = types, p.adjust.method = p.adjust.method,
                   pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
                   purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
-                  group = GROUP, Data = DATA, method = method,
+                  group = GROUP, Data = DATA, method = method, group.names = group.names,
                   conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
                   llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
     }
@@ -782,6 +786,7 @@ print.difNLR <- function (x, ...){
 #' @param size numeric: single number, or vector of two numbers representing line width in plot.
 #' @param linetype numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.
 #' @param title string: title of plot.
+#' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for \code{plot()} function.
 #'
 #' @author
@@ -825,7 +830,7 @@ print.difNLR <- function (x, ...){
 #' }
 #' @export
 plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2", "goldenrod2"),
-                        shape = 21, size = .8, linetype = c(2, 1), title, ...){
+                        shape = 21, size = .8, linetype = c(2, 1), title, group.names, ...){
 
   plotstat <- function(x, size = size, title = title){
     if (x$conv.fail != 0){
@@ -896,9 +901,14 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
     return(plot_stat)
   }
 
+  if (missing(group.names)){
+    group.names = x$group.names
+    if (all(group.names %in% c(0, 1))) group.names = c("Reference", "Focal")
+  }
+
   plotCC <- function(x, item = item,
                      col = col, shape = shape, size = size,
-                     linetype = linetype, title = title){
+                     linetype = linetype, title = title, group.names = group.names){
     m <- length(x$nlrPAR)
     if (class(item) == "character"){
       if (item != "all")
@@ -948,6 +958,15 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
         linetype <- linetype[1:2]
         warning("Length of 'linetype' is greater than 2. Only first two values are used.",
                 call. = FALSE)
+      }
+    }
+    if (length(group.names) > 2){
+      group.names = group.names[1:2]
+      warning("Only first two values for 'group.names' argument are used. ")
+    } else {
+      if (length(group.names) < 2){
+        group.names = c("Reference", "Focal")
+        warning("Argument 'group.names' need to have length of two. Default value is used.")
       }
     }
 
@@ -1024,9 +1043,9 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
                       size = size,
                       geom = "line") +
         ### style
-        scale_colour_manual(breaks = hv$Group, values = col, name = "Group") +
-        scale_fill_manual(breaks = hv$Group, values = col, name = "Group") +
-        scale_linetype_manual(breaks = hv$Group, values = linetype, name = "Group") +
+        scale_colour_manual(breaks = levels(hv$Group), values = col, name = "Group", labels = group.names) +
+        scale_fill_manual(breaks = levels(hv$Group), values = col, name = "Group", labels = group.names) +
+        scale_linetype_manual(breaks = levels(hv$Group), values = linetype, name = "Group", labels = group.names) +
         ### theme
         ggtitle(TITLE) +
         labs(x = xlab, y = "Probability of correct answer") +
@@ -1061,7 +1080,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
     if (plot.type == "cc"){
       plotCC(x, item = item,
              col = col, shape = shape, size = size,
-             linetype = linetype, title = title)
+             linetype = linetype, title = title, group.names = group.names)
     } else {
       plotstat(x, size = size, title = title)
     }

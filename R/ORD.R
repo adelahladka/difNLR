@@ -19,11 +19,11 @@
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"classic"} and \code{"irt"}. See \strong{Details}.
+#' \code{"irt"} (default) and \code{"classic"}. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
 #' @usage ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
-#' anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "classic",
+#' anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
 #' alpha = 0.05)
 #'
 #' @details
@@ -49,8 +49,8 @@
 #' \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
 #'
 #' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-#' is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-#' Option \code{"irt"} returns IRT parametrization.
+#' is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+#' intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -84,29 +84,42 @@
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # loading data
+#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
+#' df <- dataMedicalgraded[, c(1:5, 101)]
+#' df <- df[complete.cases(df), ]
+#'
+#' Data <- df[, 1:5]
+#' group <- df[, 6]
 #'
 #' # Testing both DDF effects
-#' ORD(Data, group, key, type = "both")
+#' ORD(Data, group, type = "both")
 #'
 #' # Testing uniform DDF effects
-#' ORD(Data, group, key, type = "udif")
+#' ORD(Data, group, type = "udif")
 #'
 #' # Testing non-uniform DDF effects
-#' ORD(Data, group, key, type = "nudif")
+#' ORD(Data, group, type = "nudif")
+#'
+#' # Testing DDF using cumulative logit model
+#' ORD(Data, group, model = "cumulative")
 #' }
 #'
 #' @keywords DDF
 #' @export
 ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore",
                 anchor = 1:ncol(Data), p.adjust.method = "none",
-                parametrization = "classic", alpha = 0.05){
+                parametrization = "irt", alpha = 0.05){
+
+  for (i in 1:dim(Data)[2]){
+    Data[, i] = as.numeric(paste(Data[, i]))
+  }
 
   if (match[1] == "zscore"){
-    x = c(unlist(scale(rowSums(Data))))
+    x = c(unlist(scale(rowSums(as.data.frame(Data[, anchor])))))
   } else {
     if (match[1] == "score"){
-      x = rowSums(Data)
+      x = rowSums(as.data.frame(Data[, anchor]))
     } else {
       if (length(match) == dim(Data)[1]){
         x = match
@@ -153,42 +166,113 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
   cov.m0 = lapply(m0, vcov)
   cov.m1 = lapply(m1, vcov)
 
+  cats = lapply(Data, function(x) sort(unique(x))[-1])
+
   if (parametrization == "irt"){
-    b0s = unique(sapply(par.m0, names)[grepl("Intercept", sapply(par.m0, names))])
-    num.b0s = length(b0s)
 
-    par.m0.delta = lapply(par.m0, function(x) c(-x[1:num.b0s]/x["x"],
-                                                x["x"],
-                                                (x[1:num.b0s]*x["x:group"] - x["x"]*x["group"])/(x["x"]^2 + x["x"]*x["x:group"]),
-                                                x["x:group"]))
-    par.m1.delta = lapply(par.m1, function(x) c(-x[1:num.b0s]/x["x"], x["x"]))
+    b0s = lapply(par.m0, function(x) names(x)[grepl("Intercept", names(x))])
+    num.b0s = sapply(b0s, length)
 
-    se.m0 = lapply(1:m, function(i) c(sapply(1:num.b0s, function(j) deltamethod(~ -x1/x2,
-                                                                                par.m0[[i]][c(b0s[j], "x")],
-                                                                                cov.m0[[i]][c(b0s[j], "x"), c(b0s[j], "x")])),
-                                      cov.m0[[i]]["x", "x"],
-                                      sapply(1:num.b0s, function(j) deltamethod(~ (x1*x4 - x2*x3)/(x2*x2 + x2*x4),
-                                                                                par.m0[[i]][c(b0s[j], "x", "group", "x:group")],
-                                                                                cov.m0[[i]][c(b0s[j], "x", "group", "x:group"), c(b0s[j], "x", "group", "x:group")])),
-                                      cov.m0[[i]]["x:group", "x:group"]))
-    se.m1 = lapply(1:m, function(i) c(sapply(1:num.b0s, function(j) deltamethod(~ -x1/x2,
-                                                                                par.m1[[i]][c(b0s[j], "x")],
-                                                                                cov.m1[[i]][c(b0s[j], "x"), c(b0s[j], "x")])),
-                                      cov.m1[[i]]["x", "x"]))
+    par.m0.tmp = lapply(1:m, function(i) c(par.m0[[i]], rep(0, num.b0s[i] + 3 - length(par.m0[[i]]))))
+    par.m0.tmp = lapply(1:m, function(i) {
+      names(par.m0.tmp[[i]])[-c(1:num.b0s[[i]])] <- c("x", "group", "x:group")
+      par.m0.tmp[[i]]
+      })
+    par.m1.tmp = lapply(1:m, function(i) c(par.m1[[i]], rep(0, num.b0s[i] + 3 - length(par.m1[[i]]))))
+    par.m1.tmp = lapply(1:m, function(i) {
+      names(par.m1.tmp[[i]])[-c(1:num.b0s[[i]])] <- c("x", "group", "x:group")
+      par.m1.tmp[[i]]
+    })
 
-    se.m0 = lapply(se.m0, "names<-", c(paste0("b", gsub("\\(Intercept\\):", "", b0s)), "a",
-                                       paste0("bDIF", gsub("\\(Intercept\\):", "", b0s)), "aDIF"))
-    se.m1 = lapply(se.m1, "names<-", c(paste0("b", gsub("\\(Intercept\\):", "", b0s)), "a"))
+
+    par.m0.delta = lapply(par.m0.tmp, function(x) c(-x[grepl("Intercept", names(x))]/x["x"],
+                                                    x["x"],
+                                                    (x[grepl("Intercept", names(x))]*x["x:group"] - x["x"]*x["group"])/(x["x"]^2 + x["x"]*x["x:group"]),
+                                                    x["x:group"]))
+    par.m1.delta = lapply(par.m1.tmp, function(x) c(-x[grepl("Intercept", names(x))]/x["x"],
+                                                    x["x"],
+                                                    (x[grepl("Intercept", names(x))]*x["x:group"] - x["x"]*x["group"])/(x["x"]^2 + x["x"]*x["x:group"]),
+                                                    x["x:group"]))
+
+    nams.m0 = lapply(par.m0.tmp, names)
+    nams.m1 = lapply(par.m1.tmp, names)
+
+    nams.cov.m0 = lapply(cov.m0, rownames)
+    nams.cov.m1 = lapply(cov.m1, rownames)
+
+    nams.add.m0 = lapply(1:m, function(i) c(nams.m0[[i]][nams.m0[[i]] %in% nams.cov.m0[[i]]], nams.m0[[i]][!nams.m0[[i]] %in% nams.cov.m0[[i]]]))
+    nams.add.m1 = lapply(1:m, function(i) c(nams.m1[[i]][nams.m1[[i]] %in% nams.cov.m1[[i]]], nams.m1[[i]][!nams.m1[[i]] %in% nams.cov.m1[[i]]]))
+
+    cov.m0.tmp = lapply(1:m, function(i)
+      rbind(cbind(cov.m0[[i]], matrix(0, nrow = nrow(cov.m0[[i]]), ncol = num.b0s[i] + 3 - nrow(cov.m0[[i]]))),
+            matrix(0, nrow = num.b0s[i] + 3 - nrow(cov.m0[[i]]), ncol = num.b0s[i] + 3)))
+    cov.m0.tmp = lapply(1:m, function(i) {colnames(cov.m0.tmp[[i]]) <- rownames(cov.m0.tmp[[i]]) <- nams.add.m0[[i]]; cov.m0.tmp[[i]]})
+    cov.m1.tmp = lapply(1:m, function(i)
+      rbind(cbind(cov.m1[[i]], matrix(0, nrow = nrow(cov.m1[[i]]), ncol = num.b0s[i] + 3 - nrow(cov.m1[[i]]))),
+            matrix(0, nrow = num.b0s[i] + 3 - nrow(cov.m1[[i]]), ncol = num.b0s[i] + 3)))
+    cov.m1.tmp = lapply(1:m, function(i) {colnames(cov.m1.tmp[[i]]) <- rownames(cov.m1.tmp[[i]]) <- nams.add.m1[[i]]; cov.m1.tmp[[i]]})
+
+
+    se.m0 = lapply(1:m, function(i) c(sapply(1:num.b0s[[i]], function(j) deltamethod(~ -x1/x2,
+                                                                                     par.m0.tmp[[i]][c(b0s[[i]][j], "x")],
+                                                                                     cov.m0.tmp[[i]][c(b0s[[i]][j], "x"), c(b0s[[i]][j], "x")])),
+                                      sqrt(cov.m0.tmp[[i]]["x", "x"]),
+                                      sapply(1:num.b0s[[i]], function(j) deltamethod(~ (x1*x4 - x2*x3)/(x2*x2 + x2*x4),
+                                                                                     par.m0.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group")],
+                                                                                     cov.m0.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group"), c(b0s[[i]][j], "x", "group", "x:group")])),
+                                      sqrt(cov.m0.tmp[[i]]["x:group", "x:group"])))
+
+    se.m1 = lapply(1:m, function(i) c(sapply(1:num.b0s[[i]], function(j) deltamethod(~ -x1/x2,
+                                                                                     par.m1.tmp[[i]][c(b0s[[i]][j], "x")],
+                                                                                     cov.m1.tmp[[i]][c(b0s[[i]][j], "x"), c(b0s[[i]][j], "x")])),
+                                      sqrt(cov.m1.tmp[[i]]["x", "x"]),
+                                      sapply(1:num.b0s[[i]], function(j) deltamethod(~ (x1*x4 - x2*x3)/(x2*x2 + x2*x4),
+                                                                                     par.m1.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group")],
+                                                                                     cov.m1.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group"), c(b0s[[i]][j], "x", "group", "x:group")])),
+                                      sqrt(cov.m1.tmp[[i]]["x:group", "x:group"])))
+
+
+    se.m0 = lapply(1:m, function(i) {
+      names(se.m0[[i]]) = c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
+      se.m0[[i]]
+    })
+    se.m1 = lapply(1:m, function(i) {
+      names(se.m1[[i]]) = c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
+      se.m1[[i]]
+    })
 
     par.m0 = par.m0.delta
     par.m1 = par.m1.delta
-    par.m0 = lapply(par.m0, "names<-", c(paste0("b", gsub("\\(Intercept\\):", "", b0s)), "a",
-                                       paste0("bDIF", gsub("\\(Intercept\\):", "", b0s)), "aDIF"))
-    par.m1 = lapply(par.m1, "names<-", c(paste0("b", gsub("\\(Intercept\\):", "", b0s)), "a"))
+    par.m0 = lapply(1:m, function(i) {
+      names(par.m0[[i]]) = c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
+      par.m0[[i]]
+    })
+    par.m1 = lapply(1:m, function(i) {
+      names(par.m1[[i]]) = c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
+      par.m1[[i]]
+    })
 
   } else {
     se.m1 = lapply(lapply(cov.m1, diag), sqrt)
     se.m0 = lapply(lapply(cov.m0, diag), sqrt)
+
+    se.m0 = lapply(1:m, function(i) {
+      names(se.m0[[i]]) = c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m0[[i]])]
+      se.m0[[i]]
+    })
+    se.m1 = lapply(1:m, function(i) {
+      names(se.m1[[i]]) = c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m1[[i]])]
+      se.m1[[i]]
+    })
+
+    par.m0 = lapply(1:m, function(i) {
+      names(par.m0[[i]]) = c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m0[[i]])]
+      par.m0[[i]]
+    })
+    par.m1 = lapply(1:m, function(i) {
+      names(par.m1[[i]]) = c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m1[[i]])]
+      par.m1[[i]]
+    })
   }
 
   names(par.m0) = names(par.m1) = names(se.m0) = names(par.m1) = colnames(Data)[1:m]

@@ -27,14 +27,14 @@ Or you can get the newest development version from GitHub:
 devtools::install_github("drabinova/difNLR")
 ```
 ## Version
-Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.2.2. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.2.8-1.
+Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.2.2. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.2.8-2.
 
 ## Reference
 
 To cite `difNLR` package in publications, please, use:
 
   Hladka A., Martinkova P., & Zvara K. (2019). difNLR: DIF and DDF detection by non-linear
-  regression models. R package version 1.2.8-1 [https://CRAN.R-project.org/package=difNLR]( https://CRAN.R-project.org/package=difNLR)
+  regression models. R package version 1.2.8-2 [https://CRAN.R-project.org/package=difNLR]( https://CRAN.R-project.org/package=difNLR)
 
   Drabinova A., & Martinkova P. (2017). Detection of Differential Item Functioning with
   Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. Journal of

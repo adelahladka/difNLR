@@ -290,6 +290,7 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
 # Graphical devices
 plot(x)
 plot(x, item = x$DIFitems)
+plot(x, item = 1, group.names = c("Group 1", "Group 2"))
 plot(x, plot.type = "stat")
 
 # Coefficients
@@ -313,10 +314,10 @@ predict(x, item = 1)
 predict(x, item = 1, match = 0, group = 1)
 predict(x, item = 1, match = 0, group = 0)
 
-# AIC, BIC, logLik
-AIC(x); AIC(x, item = 1)
-BIC(x); BIC(x, item = 1)
-logLik(x); logLik(x, item = 1)
+# AIC, BIC, log-likelihood
+AIC(x); BIC(x); logLik(x)
+# AIC, BIC, log-likelihood for the first item
+AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
 }
 
 }

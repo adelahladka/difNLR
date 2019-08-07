@@ -23,7 +23,7 @@
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"classic"} and \code{"irt"}. See \strong{Details}.
+#' \code{"irt"} (default) and \code{"classic"}. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param x an object of 'ddfMLR' class
 #' @param object an object of 'ddfMLR' class
@@ -33,7 +33,7 @@
 #' @param ... other generic parameters for \code{print} or \code{plot} functions.
 #'
 #' @usage ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-#' purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "classic",
+#' purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
 #' alpha = 0.05)
 #'
 #' @details
@@ -65,8 +65,8 @@
 #' See also \code{\link[stats]{p.adjust}} for more information.
 #'
 #' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-#' is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-#' Option \code{"irt"} returns IRT parametrization.
+#' is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+#' intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 #'
 #' The output of the \code{ddfMLR} function is displayed by the \code{print.ddfMLR} function.
 #'
@@ -148,6 +148,9 @@
 #' # Testing both DDF effects with total score as matching criterion
 #' ddfMLR(Data, group, focal.name = 1, key, match = "score")
 #'
+#' # Testing both DDF effects using classic parametrization
+#' ddfMLR(Data, group, focal.name = 1, key, parametrization = "classic")
+#'
 #' # Graphical devices
 #' plot(x, item = 1)
 #' plot(x, item = 1, group.names = c("Group 1", "Group 2"))
@@ -168,7 +171,7 @@
 #' @keywords DDF
 #' @export
 ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-                   purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "classic",
+                   purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
                    alpha = 0.05)
 {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
@@ -510,12 +513,18 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...){
     }
   }
 
+  if (x$purification){
+    anchor = c(1:m)[!c(1:m) %in% x$DDFitems]
+  } else {
+    anchor = 1:m
+  }
+
   if (x$match[1] == "zscore"){
-    score = c(scale(unlist(CTT::score(as.data.frame(x$Data), x$key))))
+    score = c(scale(unlist(CTT::score(as.data.frame(x$Data[, anchor]), x$key))))
     xlab = "Standardized total score"
   } else {
     if (x$match[1] == "score"){
-      score = c(unlist(CTT::score(as.data.frame(x$Data), x$key)))
+      score = c(unlist(CTT::score(as.data.frame(x$Data[, anchor]), x$key)))
       xlab = "Total score"
     } else {
       if (length(x$match) == dim(x$Data)[1]){
@@ -710,8 +719,8 @@ logLik.ddfMLR <- function(object, item = "all", ...){
   }
 
   val = ifelse(items %in% object$DDFitems,
-               object$llM0[[items]],
-               object$llM1[[items]])
+               object$llM0[items],
+               object$llM1[items])
   df = ifelse(items %in% object$DDFitems,
               sapply(object$parM0, length)[items],
               sapply(object$parM1, length)[items])

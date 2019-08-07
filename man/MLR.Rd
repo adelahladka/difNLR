@@ -5,7 +5,7 @@
 \title{DDF likelihood ratio statistics based on multinomial log-linear regression model.}
 \usage{
 MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
-p.adjust.method = "none", parametrization = "classic", alpha = 0.05)
+p.adjust.method = "none", parametrization = "irt", alpha = 0.05)
 }
 \arguments{
 \item{Data}{character: the unscored data matrix.}
@@ -28,7 +28,7 @@ See \strong{Details}.}
 See \strong{Details}.}
 
 \item{parametrization}{character: parametrization of regression coefficients. Possible options are
-\code{"classic"} and \code{"irt"}. See \strong{Details}.}
+\code{"irt"} (default) and \code{"classic"}. See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 }
@@ -77,8 +77,8 @@ The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 See also \code{\link[stats]{p.adjust}} for more information.
 
 Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-Option \code{"irt"} returns IRT parametrization.
+is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 }
 \examples{
 \dontrun{

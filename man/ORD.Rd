@@ -5,7 +5,7 @@
 \title{DDF likelihood ratio statistics for ordinal data.}
 \usage{
 ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
-anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "classic",
+anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
 alpha = 0.05)
 }
 \arguments{
@@ -30,7 +30,7 @@ See \strong{Details}.}
 See \strong{Details}.}
 
 \item{parametrization}{character: parametrization of regression coefficients. Possible options are
-\code{"classic"} and \code{"irt"}. See \strong{Details}.}
+\code{"irt"} (default) and \code{"classic"}. See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 }
@@ -80,21 +80,30 @@ The \code{p.adjust.method} is a character for \code{p.adjust} function from the 
 \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
 
 Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-Option \code{"irt"} returns IRT parametrization.
+is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 }
 \examples{
 \dontrun{
-# loading data based on GMAT
+# loading data
+data(dataMedicalgraded, package = "ShinyItemAnalysis")
+df <- dataMedicalgraded[, c(1:5, 101)]
+df <- df[complete.cases(df), ]
+
+Data <- df[, 1:5]
+group <- df[, 6]
 
 # Testing both DDF effects
-ORD(Data, group, key, type = "both")
+ORD(Data, group, type = "both")
 
 # Testing uniform DDF effects
-ORD(Data, group, key, type = "udif")
+ORD(Data, group, type = "udif")
 
 # Testing non-uniform DDF effects
-ORD(Data, group, key, type = "nudif")
+ORD(Data, group, type = "nudif")
+
+# Testing DDF using cumulative logit model
+ORD(Data, group, model = "cumulative")
 }
 
 }

@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{difNLR}(x, plot.type = "cc", item = "all",
   col = c("dodgerblue2", "goldenrod2"), shape = 21, size = 0.8,
-  linetype = c(2, 1), title, ...)
+  linetype = c(2, 1), title, group.names, ...)
 }
 \arguments{
 \item{x}{an object of "difNLR" class}
@@ -25,6 +25,8 @@
 \item{linetype}{numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.}
 
 \item{title}{string: title of plot.}
+
+\item{group.names}{character: names of reference and focal group.}
 
 \item{...}{other generic parameters for \code{plot()} function.}
 }

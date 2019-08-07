@@ -24,8 +24,8 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.2.8-1\cr
-#' Date: 2019-08-06\cr
+#' Version: 1.2.8-2\cr
+#' Date: 2019-08-07\cr
 #' Depends: R (>= 3.1)
 #' Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 #' License: GPL-3\cr

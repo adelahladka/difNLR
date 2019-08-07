@@ -11,7 +11,7 @@
 \title{DDF detection for nominal data.}
 \usage{
 ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "classic",
+purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
 alpha = 0.05)
 
 \method{print}{ddfMLR}(x, ...)
@@ -55,7 +55,7 @@ currently considered as anchor (DDF free) items. Argument is ignored if \code{ma
 See \strong{Details}.}
 
 \item{parametrization}{character: parametrization of regression coefficients. Possible options are
-\code{"classic"} and \code{"irt"}. See \strong{Details}.}
+\code{"irt"} (default) and \code{"classic"}. See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 
@@ -144,8 +144,8 @@ The \code{p.adjust.method} is a character for \code{p.adjust} function from the
 See also \code{\link[stats]{p.adjust}} for more information.
 
 Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-Option \code{"irt"} returns IRT parametrization.
+is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 
 The output of the \code{ddfMLR} function is displayed by the \code{print.ddfMLR} function.
 
@@ -181,6 +181,9 @@ ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 
 # Testing both DDF effects with total score as matching criterion
 ddfMLR(Data, group, focal.name = 1, key, match = "score")
+
+# Testing both DDF effects using classic parametrization
+ddfMLR(Data, group, focal.name = 1, key, parametrization = "classic")
 
 # Graphical devices
 plot(x, item = 1)

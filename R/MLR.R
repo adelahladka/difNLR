@@ -18,11 +18,11 @@
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"classic"} and \code{"irt"}. See \strong{Details}.
+#' \code{"irt"} (default) and \code{"classic"}. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
 #' @usage MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
-#' p.adjust.method = "none", parametrization = "classic", alpha = 0.05)
+#' p.adjust.method = "none", parametrization = "irt", alpha = 0.05)
 #'
 #' @details
 #' Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
@@ -46,8 +46,8 @@
 #' See also \code{\link[stats]{p.adjust}} for more information.
 #'
 #' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-#' is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-#' Option \code{"irt"} returns IRT parametrization.
+#' is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+#' intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -101,7 +101,7 @@
 #' @keywords DDF
 #' @export
 MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data), p.adjust.method = "none",
-                parametrization = "classic", alpha = 0.05){
+                parametrization = "irt", alpha = 0.05){
 
   if (match[1] == "zscore"){
     x = c(scale(unlist(CTT::score(as.data.frame(Data[, anchor]), key[anchor]))))

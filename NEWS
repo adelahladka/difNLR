@@ -4,9 +4,30 @@
 *                                                  *
 ****************************************************
 
-----------------------------------------
+------------------------------------------
+- Changes in difNLR 1.2.8-2 (2019-08-07) -
+------------------------------------------
+
+BUG FIXING
+  o plot.ddfORD() now works when items have different scales.
+  o Argument 'anchor' is now used for calculation of matching
+    criterion in function ORD().
+  o IRT parametrization was fixed for ddfORD().
+  o logLik.ddfMLR() now works properly.
+  o anchor items are now used for calculation of matching
+    criterion in plot.ddfORD() and plot.ddfMLR()
+
+MAJOR UPDATES
+  o Names of reference and focal group in plot.difNLR() can be
+    changed with 'group.name' argument.
+
+MINOR CHANGES
+  o Help pages for difNLR(), ddfMLR(), ddfORD(), MLR() and ORD()
+    functions were updated.
+
+------------------------------------------
 - Changes in difNLR 1.2.8-1 (2019-08-06) -
-----------------------------------------
+------------------------------------------
 
 MAJOR UPDATES
   o IRT parametrization now available in ddfMLR() function with

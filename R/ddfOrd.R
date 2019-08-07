@@ -24,12 +24,12 @@
 #' @param p.adjust.method character: method for multiple comparison correction.
 #' See \strong{Details}.
 #' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"classic"} and \code{"irt"}. See \strong{Details}.
+#' \code{"irt"} (default) and \code{"classic"}. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
 #' @usage ddfORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 #' anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
-#' parametrization = "classic", alpha = 0.05)
+#' parametrization = "irt", alpha = 0.05)
 #'
 #' @details
 #' DDF detection procedure for ordinal data based either on adjacent category logit model
@@ -61,8 +61,8 @@
 #' \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
 #'
 #' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-#' is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-#' Option \code{"irt"} returns IRT parametrization.
+#' is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+#' intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 #'
 #' The output of the \code{ddfORD()} function is displayed by the \code{print.ddfORD} function.
 #'
@@ -126,12 +126,13 @@
 #'
 #' @examples
 #' \dontrun{
+#' # loading data
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
 #' Data <- dataMedicalgraded[, 1:5]
 #' group <- dataMedicalgraded[, 101]
 #'
 #' # Testing both DDF effects with adjacent category logit model
-#' x <- ddfORD(Data, group, focal.name = 1, model = "adjacent")
+#' (x <- ddfORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
 #' # graphical devices
 #' plot(x, item = 3)
@@ -164,7 +165,7 @@
 #'
 #' # Testing both DDF effects with cumulative logit model
 #' # using IRT parametrization
-#' x <- ddfORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt")
+#' (x <- ddfORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt"))
 #'
 #' # graphical devices
 #' plot(x, item = 3, plot.type = "cumulative")
@@ -178,7 +179,7 @@
 #' @export
 ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
                    anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
-                   parametrization = "classic", alpha = 0.05)
+                   parametrization = "irt", alpha = 0.05)
 {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type))
     stop("'type' must be either 'udif', 'nudif' or 'both'",
@@ -518,6 +519,13 @@ coef.ddfORD <- function(object, SE = FALSE, simplify = FALSE, ...){
     res = res[, -1]
     rownames(res) = resnams
     res[is.na(res)] = 0
+
+    cat.est = sort(unique(unlist(lapply(object$Data, function(x) sort(unique(x))[-1]))))
+    if (object$parametrization == "irt"){
+      res = res[, c(paste0("b", cat.est), "a", paste0("bDIF", cat.est), "aDIF")]
+    } else {
+      res = res[, c(paste0("(Intercept):", cat.est), "x", "group", "x:group")[1:ncol(res)]]
+    }
   } else {
     res = coefs
   }
@@ -706,12 +714,18 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
     }
   }
 
+  if (x$purification){
+    anchor = c(1:m)[!c(1:m) %in% x$DDFitems]
+  } else {
+    anchor = 1:m
+  }
+
   if (x$match[1] == "zscore"){
-    matching = c(unlist(scale(rowSums(x$Data))))
+    matching = c(unlist(scale(rowSums(as.data.frame(x$Data[, anchor])))))
     xlab = "Standardized total score"
   } else {
     if (x$match[1] == "score"){
-      matching = rowSums(x$Data)
+      matching = rowSums(as.data.frame(x$Data[, anchor]))
       xlab = "Total score"
     } else {
       if (length(x$match) == dim(x$Data)[1]){
@@ -751,12 +765,14 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
       num.cat.est = num.cat - 1
       cat.est = cat[-1]
 
-      coefs = sapply(coef(x, simplify = T)[i, ], function(x) +x)
-      if (x$parametrization == "irt"){
+      coefs = x$ordPAR[[i]]
+      if (x$parametrization == "classic"){
+        coefs = c(coefs, rep(0, num.cat.est + 3 - length(coefs)))
+      } else {
         a = coefs["a"]
-        b = coefs[cat.est]
+        b = coefs[paste0("b", cat.est)]
         aDIF = coefs["aDIF"]
-        bDIF = coefs[length(coefs) - rev(cat.est)]
+        bDIF = coefs[paste0("bDIF", cat.est)]
         coefs = c(-a*b, a, unique(round(-a*bDIF - aDIF*b - aDIF*bDIF, 7)), aDIF)
       }
       coefs = sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
@@ -848,13 +864,14 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
       num.cat.est = num.cat - 1
       cat.est = cat[-1]
 
-
-      coefs = sapply(coef(x, simplify = T)[i, ], function(x) +x)
-      if (x$parametrization == "irt"){
+      coefs = x$ordPAR[[i]]
+      if (x$parametrization == "classic"){
+        coefs = c(coefs, rep(0, num.cat.est + 3 - length(coefs)))
+      } else {
         a = coefs["a"]
-        b = coefs[cat.est]
+        b = coefs[paste0("b", cat.est)]
         aDIF = coefs["aDIF"]
-        bDIF = coefs[length(coefs) - rev(cat.est)]
+        bDIF = coefs[paste0("bDIF", cat.est)]
         coefs = c(-a*b, a, unique(round(-a*bDIF - aDIF*b - aDIF*bDIF, 7)), aDIF)
       }
       coefs = sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])

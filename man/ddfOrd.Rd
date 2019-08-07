@@ -12,7 +12,7 @@
 \usage{
 ddfORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
-parametrization = "classic", alpha = 0.05)
+parametrization = "irt", alpha = 0.05)
 
 \method{print}{ddfORD}(x, ...)
 
@@ -57,7 +57,7 @@ currently considered as anchor (DDF free) items. Argument is ignored if \code{ma
 See \strong{Details}.}
 
 \item{parametrization}{character: parametrization of regression coefficients. Possible options are
-\code{"classic"} and \code{"irt"}. See \strong{Details}.}
+\code{"irt"} (default) and \code{"classic"}. See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 
@@ -153,8 +153,8 @@ The \code{p.adjust.method} is a character for \code{p.adjust} function from the 
 \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
 
 Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-is \code{"classic"} for intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-Option \code{"irt"} returns IRT parametrization.
+is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
+intercept-slope parametrization with effect of group membership and interaction with matching criterion.
 
 The output of the \code{ddfORD()} function is displayed by the \code{print.ddfORD} function.
 
@@ -167,12 +167,13 @@ for both, \code{Data} and \code{group} parameters.
 }
 \examples{
 \dontrun{
+# loading data
 data(dataMedicalgraded, package = "ShinyItemAnalysis")
 Data <- dataMedicalgraded[, 1:5]
 group <- dataMedicalgraded[, 101]
 
 # Testing both DDF effects with adjacent category logit model
-x <- ddfORD(Data, group, focal.name = 1, model = "adjacent")
+(x <- ddfORD(Data, group, focal.name = 1, model = "adjacent"))
 
 # graphical devices
 plot(x, item = 3)
@@ -205,7 +206,7 @@ ddfORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 
 # Testing both DDF effects with cumulative logit model
 # using IRT parametrization
-x <- ddfORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt")
+(x <- ddfORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt"))
 
 # graphical devices
 plot(x, item = 3, plot.type = "cumulative")
