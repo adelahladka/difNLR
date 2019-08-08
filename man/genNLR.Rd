@@ -11,8 +11,9 @@ genNLR(N = 1000, ratio = 1, itemtype = "dich", a, b, c, d, mu = 0, sigma = 1)
 
 \item{ratio}{numeric: ratio of respondents number in reference and focal group.}
 
-\item{itemtype}{character: type of items to be generated. Options are "dich" for
-dichotomous item (default) and "nominal" for nominal items. See \strong{Details}.}
+\item{itemtype}{character: type of items to be generated. Options are \code{"dich"} for
+dichotomous item (default), \code{"nominal"} for nominal items, and \code{"ordinal"} for
+ordinal data. See \strong{Details}.}
 
 \item{a}{numeric: matrix representing discriminations with m rows
 (where m is number of items). Need to be provided. See \strong{Details}.}
@@ -21,10 +22,10 @@ dichotomous item (default) and "nominal" for nominal items. See \strong{Details}
 (where m is number of items). Need to be provided. See \strong{Details}.}
 
 \item{c}{numeric: matrix representing guessings (lower asymptotes) with m rows
-(where m is number of items). Default is NULL. See \strong{Details}.}
+(where m is number of items). Default is \code{NULL}. See \strong{Details}.}
 
 \item{d}{numeric: matrix representing inattentions (upper asymptotes) with m rows
-(where m is number of items). Default is NULL. See \strong{Details}.}
+(where m is number of items). Default is \code{NULL}. See \strong{Details}.}
 
 \item{mu}{numeric: a mean vector of the underlying distribution. The first value corresponds to
 reference group, the second to focal group. Default is 0 value for both groups. See \strong{Details}.}
@@ -33,8 +34,9 @@ reference group, the second to focal group. Default is 0 value for both groups. 
 reference group, the second to focal group. Default is 1 value for both groups. See \strong{Details}.}
 }
 \value{
-A \code{data.frame} containing \code{N} rows representing respondents and m+1 columns representing m items.
-Last column is group membership variable with coding 0 for reference group and 1 for focal group.
+A \code{data.frame} containing \code{N} rows representing respondents and \code{m + 1} columns representing
+\code{m} items. Last column is group membership variable with coding 0 for reference group and 1 for focal
+group.
 }
 \description{
 Generates dichotomous and nominal data set based on non-linear regression
@@ -42,20 +44,21 @@ models for DIF and DDF detection.
 }
 \details{
 The \code{itemtype} argument specify what type of item should be generated. In case
-\code{itemtype = "dich"}, dichotomous items are generated with non-linear regression models
-for DIF detection specified in \code{\link[difNLR]{difNLR}}. In case \code{itemtype = "nominal"}, nominal items are generated with
-nominal model specified in \code{\link[difNLR]{ddfMLR}}.
+\code{itemtype = "dich"}, dichotomous items are generated with non-linear regression model (generalized
+logistic regression model) for DIF detection specified in \code{\link[difNLR]{difNLR}}.
+In case \code{itemtype = "nominal"}, nominal items are generated with multinomial model specified in
+\code{\link[difNLR]{ddfMLR}}. For option \code{itemtype = "ordinal"}, ordinal items are generated with
+adjacent logit model specified in \code{\link[difNLR]{ddfORD}} with argument \code{model = "adjacent"}.
 
-The \code{a}, \code{b}, \code{c} and \code{d} are numeric matrices with m rows
-(where m is number of items) representing parameters of non-linear regression model for
-DIF detection.
+The \code{a}, \code{b}, \code{c} and \code{d} are numeric matrices with m rows (where m is number of items)
+representing parameters of regression models for DIF and DDF detection.
 
-For option \code{itemtype = "dich"}, matrices should have two columns.
-The first column represents parameters of the reference group and the second of the focal group.
-In case that only one column is provided, parameters are set to be the same for both groups.
+For option \code{itemtype = "dich"}, matrices should have two columns. The first column represents
+parameters of the reference group and the second of the focal group. In case that only one column is
+provided, parameters are set to be the same for both groups.
 
-For option \code{itemtype = "nominal"}, matrices \code{c} and \code{d} are ignored. Matrices
-\code{a} and \code{b} contain parameters for distractors. For example, when
+For options \code{itemtype = "nominal"} and \code{itemtype = "ordinal"}, matrices \code{c} and \code{d}
+are ignored. Matrices \code{a} and \code{b} contain parameters for distractors. For example, when
 item with 4 different choices is supposed to be generated, user provide matrices with 6 columns.
 First 3 columns correspond to distractors parameters for reference group and last three columns
 for focal group. The number of choices can differ for items. Matrices \code{a} and \code{b}
@@ -112,7 +115,7 @@ Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54
 \url{https://doi.org/10.1111/jedm.12158}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}
+\code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{ddfORD}}
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

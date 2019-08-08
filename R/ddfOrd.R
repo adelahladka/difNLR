@@ -721,11 +721,13 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
   }
 
   if (x$match[1] == "zscore"){
-    matching = c(unlist(scale(rowSums(as.data.frame(x$Data[, anchor])))))
+    Data = sapply(1:m, function(i) as.numeric(paste(Data[, i])))
+    matching = c(unlist(scale(rowSums(as.data.frame(Data[, anchor])))))
     xlab = "Standardized total score"
   } else {
     if (x$match[1] == "score"){
-      matching = rowSums(as.data.frame(x$Data[, anchor]))
+      Data = sapply(1:m, function(i) as.numeric(paste(Data[, i])))
+      matching = rowSums(as.data.frame(Data[, anchor]))
       xlab = "Total score"
     } else {
       if (length(x$match) == dim(x$Data)[1]){

@@ -5,6 +5,17 @@
 ****************************************************
 
 ------------------------------------------
+- Changes in difNLR 1.2.8-3 (2019-08-08) -
+------------------------------------------
+
+BUG FIXING
+  o plot.ddfORD() now works when Data is factor.
+
+MAJOR UPDATES
+  o genNLR() now generates ordinal data using adjacent category
+    logit model with argument itemtype = "ordinal".
+
+------------------------------------------
 - Changes in difNLR 1.2.8-2 (2019-08-07) -
 ------------------------------------------
 
