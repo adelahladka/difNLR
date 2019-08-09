@@ -416,9 +416,9 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
 #' @export
 print.ddfMLR <- function (x, ...){
   title <- switch(x$type,
-                  both = "Detection of both types of Differential Distractor Functioning using Multinomial Log-linear Regression model",
-                  udif = "Detection of uniform Differential Distractor Functioning using Multinomial Log-linear Regression model",
-                  nudif = "Detection of non-uniform Differential Distractor Functioning using Multinomial Log-linear Regression model")
+                  both = "Detection of both types of Differential Distractor Functioning using multinomial log-linear regression model",
+                  udif = "Detection of uniform Differential Distractor Functioning using multinomial log-linear regression model",
+                  nudif = "Detection of non-uniform Differential Distractor Functioning using multinomial log-linear regression model")
   cat(paste(strwrap(title, width = 60), collapse = "\n"))
   cat("\n\nLikelihood-ratio chi-square statistics\n")
   if (x$purification) word.iteration <- ifelse(x$nrPur <= 1, " iteration", " iterations")
@@ -465,9 +465,9 @@ print.ddfMLR <- function (x, ...){
            nudif = cat("\nNone of items is detected as non-uniform DDF"))
   }
   else {
-    switch(x$type, both = cat("\n\nItems detected as DDF items:"),
-           udif = cat("\n\nItems detected as uniform DDF items:"),
-           nudif = cat("\n\nItems detected as non-uniform DDF items:"))
+    switch(x$type, both = cat("\nItems detected as DDF items:"),
+           udif = cat("\nItems detected as uniform DDF items:"),
+           nudif = cat("\nItems detected as non-uniform DDF items:"))
     cat("\n", paste(colnames(x$Data)[x$DDFitems], "\n", sep = ""))
   }
 }

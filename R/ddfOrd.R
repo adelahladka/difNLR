@@ -425,7 +425,8 @@ print.ddfORD <- function (x, ...){
                          udif = "uniform ",
                          nudif = "non-uniform"),
                   "Differential Distractor Functioning for ordinal data using ",
-                  x$model, " logistic regression model.")
+                  ifelse(x$model == "adjacent", "adjacent category", "cumulative"),
+                         " logit regression model ")
   cat(paste(strwrap(title, width = 60), collapse = "\n"))
   cat("\n\nLikelihood-ratio Chi-square statistics\n")
   if (x$purification) word.iteration <- ifelse(x$nrPur <= 1, " iteration", " iterations")
@@ -434,7 +435,7 @@ print.ddfORD <- function (x, ...){
   if (x$purification){
     if (!x$conv.puri){
       cat(paste("WARNING: Item purification process not converged after "), x$nrPur, word.iteration, "\n",
-          "         Results are based on last iteration of the item purification.\n", sep = "")
+          "         Results are based on last iteration of the item purification. \n", sep = "")
     }
   }
   if (x$p.adjust.method == "none") {
@@ -471,12 +472,11 @@ print.ddfORD <- function (x, ...){
            both = cat("\nNone of items is detected as DDF"),
            udif = cat("\nNone of items is detected as uniform DDF"),
            nudif = cat("\nNone of items is detected as non-uniform DDF"))
-  }
-  else {
+  } else {
     switch(x$type,
-           both = cat("\n\nItems detected as DDF items:"),
-           udif = cat("\n\nItems detected as uniform DDF items:"),
-           nudif = cat("\n\nItems detected as non-uniform DDF items:"))
+           both = cat("\nItems detected as DDF items:"),
+           udif = cat("\nItems detected as uniform DDF items:"),
+           nudif = cat("\nItems detected as non-uniform DDF items:"))
     cat("\n", paste(colnames(x$Data)[x$DDFitems], "\n", sep = ""))
   }
 }
@@ -721,12 +721,12 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
   }
 
   if (x$match[1] == "zscore"){
-    Data = sapply(1:m, function(i) as.numeric(paste(Data[, i])))
+    Data = sapply(1:m, function(i) as.numeric(paste(x$Data[, i])))
     matching = c(unlist(scale(rowSums(as.data.frame(Data[, anchor])))))
     xlab = "Standardized total score"
   } else {
     if (x$match[1] == "score"){
-      Data = sapply(1:m, function(i) as.numeric(paste(Data[, i])))
+      Data = sapply(1:m, function(i) as.numeric(paste(x$Data[, i])))
       matching = rowSums(as.data.frame(Data[, anchor]))
       xlab = "Total score"
     } else {
