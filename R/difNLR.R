@@ -644,7 +644,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       if (!noLoop){
         warning(paste("Item purification process not converged after ",
                       nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
-                      "Results are based on last iteration of the item purification.\n", sep = ""),
+                      "Results are based on the last iteration of the item purification.\n", sep = ""),
                 call. = F)
       }
     }

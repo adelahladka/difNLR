@@ -17,12 +17,12 @@ logistic regression models.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.2.8-4\cr
-Date: 2019-08-09\cr
+Version: 1.3.0\cr
+Date: 2019-08-19\cr
 Depends: R (>= 3.1)
 Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 License: GPL-3\cr
-BugReports: https://github.com/drabinova/difNLR/issues
+BugReports: https://github.com/adelahladka/difNLR/issues
 Encoding: UTF-8
 }
 \note{
@@ -50,7 +50,7 @@ Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 \seealso{
 Useful links:
 \itemize{
-  \item Report bugs at \url{https://github.com/drabinova/difNLR/issues}
+  \item Report bugs at \url{https://github.com/adelahladka/difNLR/issues}
 }
 
 }
