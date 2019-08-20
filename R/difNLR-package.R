@@ -42,9 +42,6 @@
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' martinkova@cs.cas.cz \cr
 #'
-#' Karel Zvara \cr
-#' Faculty of Mathematics and Physics, Charles University \cr
-#'
 #' @references
 #' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 #'

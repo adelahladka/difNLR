@@ -33,10 +33,10 @@ Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.3.
 
 To cite `difNLR` package in publications, please, use:
 
-  Hladka A., Martinkova P., & Zvara K. (2019). difNLR: DIF and DDF detection by non-linear
-  regression models. R package version 1.2.8-4 [https://CRAN.R-project.org/package=difNLR]( https://CRAN.R-project.org/package=difNLR)
+  Hladka A. & Martinkova P. (2019). difNLR: DIF and DDF detection by non-linear
+  regression models. R package version 1.3.0 [https://CRAN.R-project.org/package=difNLR]( https://CRAN.R-project.org/package=difNLR)
 
-  Drabinova A., & Martinkova P. (2017). Detection of Differential Item Functioning with
+  Drabinova A. & Martinkova P. (2017). Detection of Differential Item Functioning with
   Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. Journal of
   Educational Measurement, 54(4), 498-517. [DOI: 10.1111/jedm.12158](https://doi.org/10.1111/jedm.12158).
   
