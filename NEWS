@@ -4,12 +4,19 @@
 *                                                  *
 ****************************************************
 
+------------------------------------------
+- Changes in difNLR 1.3.0-1 (2019-12-16) -
+------------------------------------------
+
+BUG FIXING
+  o Legend in plot.ddfORD is now correctly displayed.
+
 ----------------------------------------
 - Changes in difNLR 1.3.0 (2019-08-19) -
 ----------------------------------------
 
 * Version 1.3.0 is CRAN version.
-* It includes version 1.2.3 - 1.2.8.-4.
+* It includes version 1.2.3 - 1.2.8-4
 
 MINOR CHANGES
   o Some typos fixed in print.difNLR()

@@ -389,7 +389,7 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         }
       }
       if (!is.null(ddfPur)) {
-        rownames(ddfPur) <- paste("Step", 0:(dim(ddfPur)[1] - 1), sep = "")
+        rownames(ddfPur) <- paste0("Step", 0:(dim(ddfPur)[1] - 1))
         colnames(ddfPur) <- colnames(DATA)
       }
       RES <- list(Sval = STATS,
@@ -431,7 +431,7 @@ print.ddfORD <- function (x, ...){
   cat("\n\nLikelihood-ratio Chi-square statistics\n")
   if (x$purification) word.iteration <- ifelse(x$nrPur <= 1, " iteration", " iterations")
   cat(paste("\nItem purification was", ifelse(x$purification, " ", " not "), "applied",
-            ifelse(x$purification, paste(" with ", x$nrPur, word.iteration, sep = ""), ""), "\n", sep = ""))
+            ifelse(x$purification, paste0(" with ", x$nrPur, word.iteration), ""), "\n", sep = ""))
   if (x$purification){
     if (!x$conv.puri){
       cat(paste("WARNING: Item purification process not converged after "), x$nrPur, word.iteration, "\n",
@@ -794,7 +794,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
 
       # melting data
       df.probs.cat = data.frame(match, group = rep(c(0, 1), each = length(match)), df.probs.cat)
-      colnames(df.probs.cat) = c("matching", "group", paste0("P = ", cat))
+      colnames(df.probs.cat) = c("matching", "group", paste0("P(Y = ", cat, ")"))
       df.probs.cat = reshape2::melt(df.probs.cat, id.vars = c("matching", "group"),
                                     variable.name = "category", value.name = "probability")
       df.probs.cat$group = as.factor(df.probs.cat$group)
@@ -812,7 +812,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
       df.emp.cat$matching = as.numeric(paste(df.emp.cat$matching))
       df.emp.cat$category = as.factor(df.emp.cat$category)
       df.emp.cat$group = as.factor(df.emp.cat$group)
-      levels(df.emp.cat$category) = paste0("P = ", levels(df.emp.cat$category))
+      levels(df.emp.cat$category) = paste0("P(Y = ", levels(df.emp.cat$category), ")")
 
       plot_CC[[k]] = ggplot() +
         geom_point(data = df.emp.cat,
@@ -896,13 +896,13 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
 
       # melting data
       df.probs.cum = data.frame(match, group = rep(c(0, 1), each = length(match)), df.probs.cum)
-      colnames(df.probs.cum) = c("matching", "group", paste0("P >= ", cat))
+      colnames(df.probs.cum) = c("matching", "group", paste0("P(Y >= ", cat, ")"))
       df.probs.cum = reshape2::melt(df.probs.cum, id.vars = c("matching", "group"),
                                     variable.name = "category", value.name = "probability")
       df.probs.cum$group = as.factor(df.probs.cum$group)
 
       df.probs.cat = data.frame(match, group = rep(c(0, 1), each = length(match)), df.probs.cat)
-      colnames(df.probs.cat) = c("matching", "group", paste0("P = ", cat))
+      colnames(df.probs.cat) = c("matching", "group", paste0("P(Y = ", cat, ")"))
       df.probs.cat = reshape2::melt(df.probs.cat, id.vars = c("matching", "group"),
                                     variable.name = "category", value.name = "probability")
       df.probs.cat$group = as.factor(df.probs.cat$group)
@@ -925,7 +925,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
       df.emp.cat$matching = as.numeric(paste(df.emp.cat$matching))
       df.emp.cat$category = as.factor(df.emp.cat$category)
       df.emp.cat$group = as.factor(df.emp.cat$group)
-      levels(df.emp.cat$category) = paste0("P = ", levels(df.emp.cat$category))
+      levels(df.emp.cat$category) = paste0("P(Y = ", levels(df.emp.cat$category), ")")
 
 
       # empirical cumulative values
@@ -945,12 +945,12 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
       df.emp.cum.count = reshape2::melt(df.emp.cum[, c(1:2, 3:(2 + num.cat))],
                                         id.vars = c("matching", "group"),
                                         variable.name = "category", value.name = "size")
-      levels(df.emp.cum.count$category) = paste0("P >= ", cat)
+      levels(df.emp.cum.count$category) = paste0("P(Y >= ", cat, ")")
 
       df.emp.cum.prob = reshape2::melt(df.emp.cum[, c(1:2, (3 + num.cat):dim(df.emp.cum)[2])],
                                        id.vars = c("matching", "group"),
                                        variable.name = "category", value.name = "probability")
-      levels(df.emp.cum.prob$category) = paste0("P >= ", cat)
+      levels(df.emp.cum.prob$category) = paste0("P(Y >= ", cat, ")")
       df.emp.cum = merge(df.emp.cum.count, df.emp.cum.prob, by = c("matching", "group", "category"))
 
       # colours
@@ -959,8 +959,8 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...){
 
       if (plot.type == "cumulative") {
 
-        df.emp.cum = df.emp.cum[df.emp.cum$category != paste0("P >= ", cat[1]), ]
-        df.probs.cum = df.probs.cum[df.probs.cum$category != paste0("P >= ", cat[1]), ]
+        df.emp.cum = df.emp.cum[df.emp.cum$category != paste0("P(Y >= ", cat[1], ")"), ]
+        df.probs.cum = df.probs.cum[df.probs.cum$category != paste0("P(Y >= ", cat[1], ")"), ]
         cols = cols[-1]
 
         df.emp.cum <- df.emp.cum[complete.cases(df.emp.cum), ]
