@@ -5,10 +5,10 @@
 #' @description Estimates parameters of non-linear regression models for DIF detection using either
 #' non-linear least squares or maximum likelihood method.
 #'
-#' @param y numeric: binary vector. See \strong{Details}.
-#' @param match numeric: matching criterion. See \strong{Details}.
+#' @param y numeric: binary vector of responses.
+#' @param match numeric: vector of matching criterion.
 #' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.
-#' @param formula formula: specification of the model. See \strong{Details}.
+#' @param formula formula: specification of the model. Can be obtained by \code{formulaNLR()} function.
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
 #' squares (default) and \code{"likelihood"} for maximum likelihood method.
 #' @param lower numeric: lower bounds for parameters of model specified in \code{formula}.

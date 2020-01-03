@@ -1,8 +1,7 @@
-#' Key of Correct Answers for \code{GMATtest} Data Set
+#' Key of correct answers for \code{GMATtest} dataset.
 #'
 #' @description The \code{GMATkey} is a vector of factors representing correct answers of
-#' generated \code{GMATtest} data set based on Graduate Management Admission Test (GMAT)
-#' data set (Kingston et al., 1985).
+#' generated \code{GMATtest} data set based on Graduate Management Admission Test (GMAT, Kingston et al., 1985).
 #'
 #' @usage data(GMATkey)
 #'
@@ -16,7 +15,6 @@
 #' Institute of Computer Science, The Czech Academy of Sciences \cr
 #' martinkova@cs.cas.cz \cr
 #'
-#'
 #' @references
 #' Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
 #' Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
@@ -29,6 +27,6 @@
 #'
 #' @seealso \code{\link{GMAT}}, \code{\link{GMATtest}}
 #'
-#' @format A data frame with 20 values representing correct answers to items of \code{GMATtest}
-#' data set. For more details see \code{\link{GMATtest}}.
+#' @format A nominal vector with 20 values representing correct answers to items of \code{GMATtest}
+#' dataset. For more details see \code{\link{GMATtest}}.
 "GMATkey"

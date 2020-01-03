@@ -3,19 +3,21 @@
 \docType{data}
 \name{MSATBtest}
 \alias{MSATBtest}
-\title{Data Set of School Admission Test in Biology}
-\format{A \code{MSATBtest} data frame consists of 1,407 observations on the following 21 variables. The first 20
-columns represent answers of subject to an items of the test. The 21st column is vector subjects' gender;
-values 0 and 1 refer to males (reference group) and females (focal group).}
+\title{Dataset of School Admission Test in Biology.}
+\format{A \code{MSATBtest} data frame consists of 1,407 observations on the following 21 variables:
+\describe{
+\item{Item}{nominal items of the test}
+\item{gender}{gender of respondents, \code{"0"} males, \code{"1"} females}
+}}
 \usage{
 data(MSATBtest)
 }
 \description{
-The \code{MSATBtest} data set consists of the responses of 1,407 subjects (484 males, 923 females)
-to multiple-choice admission test to medical school in Czech republic. It contains 20 selected items from original
+The \code{MSATBtest} dataset consists of the responses of 1,407 subjects (484 males, 923 females)
+to multiple-choice admission test to medical school in the Czech republic. It contains 20 selected items from original
 test while first item was previously detected detected as differently functioning (Vlckova, 2014).
-Possible answers were A, B, C, D, while any combination of these can be correct. The column \code{gender} represents
-gender of students, where 0 represents males (reference group) and 1 represents females (focal group).
+Possible answers were A, B, C, and D, while any combination of these can be correct. The column \code{gender} represents
+gender of students, where 0 indicates males (reference group) and 1 indicates females (focal group).
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:

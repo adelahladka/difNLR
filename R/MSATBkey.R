@@ -1,8 +1,7 @@
-#' Key of Correct Answers for \code{MSATBtest} Data Set
+#' Key of correct answers for \code{MSATBtest} dataset.
 #'
-#' @docType data
 #' @description The \code{MSATBkey} is a vector of factors representing correct answers of
-#' \code{MSATBtest} data set.
+#' \code{MSATBtest} dataset.
 #'
 #' @usage data(MSATBkey)
 #'
@@ -27,7 +26,6 @@
 #'
 #' @seealso \code{\link{MSATB}}, \code{\link{MSATBtest}}
 #'
-#' @format A data frame with 20 values representing correct answers to items of \code{MSATBtest}
-#' data set. For more details see \code{\link{MSATBtest}}.
-#' @docType data
+#' @format A nominal vector with 20 values representing correct answers to items of \code{MSATBtest}
+#' dataset. For more details see \code{\link{MSATBtest}}.
 "MSATBkey"

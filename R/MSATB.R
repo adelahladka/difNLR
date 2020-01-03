@@ -1,11 +1,11 @@
-#' Dichotomous Data Set of Medical School Admission Test in Biology
+#' Dichotomous dataset of Medical School Admission Test in Biology.
 #'
-#' @description The \code{MSATB} data set consists of the responses of 1,407 subjects
-#' (484 males, 923 females) to admission test to medical school in Czech republic.
+#' @description The \code{MSATB} dataset consists of the responses of 1,407 subjects
+#' (484 males, 923 females) to admission test to medical school in the Czech republic.
 #' It contains 20 selected items from original test while first item was previously detected
 #' as differently functioning (Vlckova, 2014). A correct answer is coded as 1 and incorrect
-#' answer as 0. The column \code{gender} represents gender of students, where 0 represents
-#' males (reference group) and 1 represents females (focal group).
+#' answer as 0. The column \code{gender} represents gender of students, where 0 indicates
+#' males (reference group) and 1 indicates females (focal group).
 #'
 #' @usage data(MSATB)
 #'
@@ -30,9 +30,9 @@
 #'
 #' @seealso \code{\link{MSATBtest}}, \code{\link{MSATBkey}}
 #'
-#' @format A \code{MSATB} data frame consists of 1,407 observations on the following
-#' 21 variables. The first 20 columns represent dichotomously scored items of the test.
-#' The 21st column is vector of group membership; values 0 and 1 refer to males (reference group)
-#' and females (focal group).
-#' @docType data
+#' @format A \code{MSATB} data frame consists of 1,407 observations on the following 21 variables:
+#' \describe{
+#' \item{Item}{dichotomously scored items of the test}
+#' \item{gender}{gender of respondents, \code{"0"} males, \code{"1"} females}
+#' }
 "MSATB"

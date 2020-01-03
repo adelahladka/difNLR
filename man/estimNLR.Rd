@@ -7,13 +7,13 @@
 estimNLR(y, match, group, formula, method, lower, upper, start)
 }
 \arguments{
-\item{y}{numeric: binary vector. See \strong{Details}.}
+\item{y}{numeric: binary vector of responses.}
 
-\item{match}{numeric: matching criterion. See \strong{Details}.}
+\item{match}{numeric: vector of matching criterion.}
 
 \item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.}
 
-\item{formula}{formula: specification of the model. See \strong{Details}.}
+\item{formula}{formula: specification of the model. Can be obtained by \code{formulaNLR()} function.}
 
 \item{method}{character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
 squares (default) and \code{"likelihood"} for maximum likelihood method.}

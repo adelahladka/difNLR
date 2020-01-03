@@ -3,16 +3,15 @@
 \docType{data}
 \name{GMATkey}
 \alias{GMATkey}
-\title{Key of Correct Answers for \code{GMATtest} Data Set}
-\format{A data frame with 20 values representing correct answers to items of \code{GMATtest}
-data set. For more details see \code{\link{GMATtest}}.}
+\title{Key of correct answers for \code{GMATtest} dataset.}
+\format{A nominal vector with 20 values representing correct answers to items of \code{GMATtest}
+dataset. For more details see \code{\link{GMATtest}}.}
 \usage{
 data(GMATkey)
 }
 \description{
 The \code{GMATkey} is a vector of factors representing correct answers of
-generated \code{GMATtest} data set based on Graduate Management Admission Test (GMAT)
-data set (Kingston et al., 1985).
+generated \code{GMATtest} data set based on Graduate Management Admission Test (GMAT, Kingston et al., 1985).
 }
 \references{
 Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response

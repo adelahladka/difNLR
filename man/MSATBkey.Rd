@@ -3,15 +3,15 @@
 \docType{data}
 \name{MSATBkey}
 \alias{MSATBkey}
-\title{Key of Correct Answers for \code{MSATBtest} Data Set}
-\format{A data frame with 20 values representing correct answers to items of \code{MSATBtest}
-data set. For more details see \code{\link{MSATBtest}}.}
+\title{Key of correct answers for \code{MSATBtest} dataset.}
+\format{A nominal vector with 20 values representing correct answers to items of \code{MSATBtest}
+dataset. For more details see \code{\link{MSATBtest}}.}
 \usage{
 data(MSATBkey)
 }
 \description{
 The \code{MSATBkey} is a vector of factors representing correct answers of
-\code{MSATBtest} data set.
+\code{MSATBtest} dataset.
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:

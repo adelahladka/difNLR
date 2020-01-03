@@ -1,13 +1,13 @@
-#' Data Set Based on Graduate Management Admission Test with the Same Total Score Distribution for Groups
+#' Dataset based on GMAT with the same total score distribution for groups.
 #'
-#' @description The \code{GMATtest} data set is generated data set based on parameters from
-#' Graduate Management Admission Test (GMAT) data set (Kingston et al., 1985). First two items
+#' @description The \code{GMATtest} is a generated dataset based on parameters from
+#' Graduate Management Admission Test (GMAT, Kingston et al., 1985). First two items
 #' were considered to function differently in uniform and non-uniform way respectively.
-#' The data set represents responses of 2,000 subjects to multiple-choice test of 20 items.
-#' Aditionally, 4 possible answers on all items were generated, coded A, B, C and D. The column
-#' \code{group} represents group membership, where 0 represents reference group and 1 represent
+#' The dataset represents responses of 2,000 subjects to multiple-choice test of 20 items.
+#' Aditionally, 4 possible answers on all items were generated, coded A, B, C, and D. The column
+#' \code{group} represents group membership, where 0 indicates reference group and 1 indicates
 #' focal group. Groups are the same size (i.e. 1,000 per group). The distributions of total scores
-#' (sum of correct answers) are the same for both reference and focal group (Martinkova et al., 2016).
+#' (sum of correct answers) are the same for both reference and focal group (Martinkova et al., 2017).
 #' The column \code{criterion} represents generated continuous variable which is intended to be predicted
 #' by test.
 #'
@@ -35,9 +35,11 @@
 #'
 #' @seealso \code{\link{GMAT}}, \code{\link{GMATkey}}
 #'
-#' @format A \code{GMAT} data frame consists of 2,000 observations on the following 21 variables.
-#' The first 20 columns represents answers of subject to an items of the test. The 21st column is
-#' vector of group membership; values 0 and 1 refer to reference and focal group. The 22nd column is vector
-#' representing variable which is intended to be predicted by test.
+#' @format A \code{GMATtest} data frame consists of 2,000 observations on the following 22 variables:
+#' \describe{
+#' \item{Item1-Item20}{nominal items of the test coded A, B, C, and D}
+#' \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
+#' \item{criterion}{continuous critetion intended to be predicted by test}
+#' }
 #' Correct answers are presented in \code{\link{GMATkey}} data set.
 "GMATtest"

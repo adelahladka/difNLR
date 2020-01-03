@@ -3,9 +3,9 @@
 \docType{data}
 \name{GMAT2key}
 \alias{GMAT2key}
-\title{Key of Correct Answers for \code{GMAT2test} Data Set}
-\format{A data frame with 20 values representing correct answers to items of \code{GMAT2test} data set.
-For more details see \code{\link{GMAT2test}}.}
+\title{Key of correct answers for \code{GMAT2test} dataset.}
+\format{A nominal vector with 20 values representing correct answers to items of \code{GMAT2test}
+dataset. For more details see \code{\link{GMAT2test}}.}
 \usage{
 data(GMAT2key)
 }
