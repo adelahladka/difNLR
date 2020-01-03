@@ -246,7 +246,7 @@ alternative parameterization.
 # loading data based on GMAT
 data(GMAT)
 
-Data  <- GMAT[, 1:20]
+Data <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
 # Testing both DIF effects using likelihood-ratio test and
@@ -315,9 +315,13 @@ predict(x, item = 1, match = 0, group = 1)
 predict(x, item = 1, match = 0, group = 0)
 
 # AIC, BIC, log-likelihood
-AIC(x); BIC(x); logLik(x)
+AIC(x)
+BIC(x)
+logLik(x)
 # AIC, BIC, log-likelihood for the first item
-AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
+AIC(x, item = 1)
+BIC(x, item = 1)
+logLik(x, item = 1)
 }
 
 }

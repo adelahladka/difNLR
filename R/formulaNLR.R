@@ -95,24 +95,27 @@
 #' @export
 #' @importFrom stats as.formula
 
-formulaNLR <- function(model, constraints = NULL, type = "both", parameterization = "classic", outcome){
+formulaNLR <- function(model, constraints = NULL, type = "both", parameterization = "classic", outcome) {
   if (missing(model)) {
     stop("Argument 'model' is missing")
   } else {
-    if (!(model %in% c("Rasch", "1PL", "2PL",
-                       "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
-                       "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"))){
+    if (!(model %in% c(
+      "Rasch", "1PL", "2PL",
+      "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
+      "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"
+    ))) {
       stop("Invalid value for 'model'")
     }
   }
 
   # constraints for model
-  cons <- rep(T, 8); names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+  cons <- rep(T, 8)
+  names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
 
-  if (!is.null(constraints)){
-    if (!is.na(constraints)){
+  if (!is.null(constraints)) {
+    if (!is.na(constraints)) {
       constr <- unlist(strsplit(constraints, split = ""))
-      if (!all(constr %in% letters[1:4])){
+      if (!all(constr %in% letters[1:4])) {
         warning("Constraints can be only 'a', 'b', 'c' or 'd'!", call. = F)
       }
       cons[paste(constr, "Dif", sep = "")] <- F
@@ -122,24 +125,25 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
   # model
   mod <- logical(8)
   mod <- switch(model,
-                # 1 PL models
-                "Rasch"   = c(F, T, F, F, F, T, F, F),
-                "1PL"     = c(T, T, F, F, F, T, F, F),
-                # 2 PL models
-                "2PL"     = c(T, T, F, F, T, T, F, F),
-                # 3 PL models
-                "3PLcg"   = c(T, T, T, F, T, T, F, F),
-                "3PLdg"   = c(T, T, F, T, T, T, F, F),
-                "3PLc"    = c(T, T, T, F, T, T, T, F),
-                "3PL"     = c(T, T, T, F, T, T, T, F),
-                "3PLd"    = c(T, T, F, T, T, T, F, T),
-                # 4PL models
-                "4PLcgdg" = c(T, T, T, T, T, T, F, F),
-                "4PLcgd"  = c(T, T, T, T, T, T, F, T),
-                "4PLd"    = c(T, T, T, T, T, T, F, T),
-                "4PLcdg"  = c(T, T, T, T, T, T, T, F),
-                "4PLc"    = c(T, T, T, T, T, T, T, F),
-                "4PL"     = c(T, T, T, T, T, T, T, T))
+    # 1 PL models
+    "Rasch"   = c(F, T, F, F, F, T, F, F),
+    "1PL"     = c(T, T, F, F, F, T, F, F),
+    # 2 PL models
+    "2PL"     = c(T, T, F, F, T, T, F, F),
+    # 3 PL models
+    "3PLcg"   = c(T, T, T, F, T, T, F, F),
+    "3PLdg"   = c(T, T, F, T, T, T, F, F),
+    "3PLc"    = c(T, T, T, F, T, T, T, F),
+    "3PL"     = c(T, T, T, F, T, T, T, F),
+    "3PLd"    = c(T, T, F, T, T, T, F, T),
+    # 4PL models
+    "4PLcgdg" = c(T, T, T, T, T, T, F, F),
+    "4PLcgd"  = c(T, T, T, T, T, T, F, T),
+    "4PLd"    = c(T, T, T, T, T, T, F, T),
+    "4PLcdg"  = c(T, T, T, T, T, T, T, F),
+    "4PLc"    = c(T, T, T, T, T, T, T, F),
+    "4PL"     = c(T, T, T, T, T, T, T, T)
+  )
 
   names(mod) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
   mod <- apply(cbind(mod, cons), 1, all)
@@ -147,9 +151,9 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
   # type of DIF to be tested
   typ <- typcons <- mod
 
-  if (!(type %in% c("udif", "nudif", "both", "all"))){
+  if (!(type %in% c("udif", "nudif", "both", "all"))) {
     types <- unlist(strsplit(type, split = ""))
-    if (!all(types %in% letters[1:4])){
+    if (!all(types %in% letters[1:4])) {
       stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
            or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'")
     }
@@ -157,27 +161,41 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
     type <- "other"
   }
 
-  if (type == "other"){
-    if (!is.na(constraints)){
-      if (length(intersect(types, constr)) > 0){
+  if (type == "other") {
+    if (!is.na(constraints)) {
+      if (length(intersect(types, constr)) > 0) {
         stop("The difference in constrained parameters cannot be tested!")
       }
     }
   }
 
   switch(type,
-         "udif"  = {typ["bDif"] <- F; typ["aDif"] <- F; mod["aDif"] <- F},
-         "nudif" = {typ["aDif"] <- F},
-         "both"  = {typ["bDif"] <- F; typ["aDif"] <- F},
-         "all"   = {typ[c("aDif", "bDif", "cDif", "dDif")] <- F},
-         "other" = {typ <- typcons})
+    "udif" = {
+      typ["bDif"] <- F
+      typ["aDif"] <- F
+      mod["aDif"] <- F
+    },
+    "nudif" = {
+      typ["aDif"] <- F
+    },
+    "both" = {
+      typ["bDif"] <- F
+      typ["aDif"] <- F
+    },
+    "all" = {
+      typ[c("aDif", "bDif", "cDif", "dDif")] <- F
+    },
+    "other" = {
+      typ <- typcons
+    }
+  )
 
-  if (model %in% c("Rasch", "1PL")){
+  if (model %in% c("Rasch", "1PL")) {
     typ["aDif"] <- F
-    if (type == "both"){
+    if (type == "both") {
       warning("Only uniform DIF can be tested with specified model!", call. = F)
     }
-    if (type == "nudif"){
+    if (type == "nudif") {
       stop("It is not possible to test non-uniform DIF in specified model!", call. = F)
     }
   }
@@ -190,21 +208,23 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
   param0 <- param1 <- list()
 
 
-  for (i in 1:4){
+  for (i in 1:4) {
     param0[[i]] <- paste(names(which(mod0[c(i, i + 4)])), collapse = " + g * ")
     param1[[i]] <- paste(names(which(mod1[c(i, i + 4)])), collapse = " + g * ")
   }
 
-  if (parameterization == "alternative"){
+  if (parameterization == "alternative") {
     names(mod0)[3:4] <- names(mod1)[3:4] <- c("cR", "dR")
     names(mod0)[7:8] <- names(mod1)[7:8] <- c("cF", "dF")
-    for (i in 3:4){
+    for (i in 3:4) {
       param0[[i]] <- ifelse(length(which(mod0[c(i, i + 4)])) == 1,
-                            names(which(mod0[c(i, i + 4)])),
-                            paste(names(which(mod0[c(i, i + 4)])), c("* (1 - g)", "* g")[mod0[c(i, i + 4)]], collapse = " + "))
+        names(which(mod0[c(i, i + 4)])),
+        paste(names(which(mod0[c(i, i + 4)])), c("* (1 - g)", "* g")[mod0[c(i, i + 4)]], collapse = " + ")
+      )
       param1[[i]] <- ifelse(length(which(mod1[c(i, i + 4)])) == 1,
-                            names(which(mod1[c(i, i + 4)])),
-                            paste(names(which(mod1[c(i, i + 4)])), c("* (1 - g)", "* g")[mod1[c(i, i + 4)]], collapse = " + "))
+        names(which(mod1[c(i, i + 4)])),
+        paste(names(which(mod1[c(i, i + 4)])), c("* (1 - g)", "* g")[mod1[c(i, i + 4)]], collapse = " + ")
+      )
     }
   }
 
@@ -224,22 +244,22 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
 
 
   ### (d - c)
-  part_dc0  <- paste(c(param0[4], param0[3]), collapse = " - ")
-  part_dc0[grepl(" ", part_dc0)]  <- paste("(", part_dc0[grepl(" ", part_dc0)], ")", sep = "")
-  part_dc1  <- paste(c(param1[4], param1[3]), collapse = " - ")
-  part_dc1[grepl(" ", part_dc1)]  <- paste("(", part_dc1[grepl(" ", part_dc1)], ")", sep = "")
+  part_dc0 <- paste(c(param0[4], param0[3]), collapse = " - ")
+  part_dc0[grepl(" ", part_dc0)] <- paste("(", part_dc0[grepl(" ", part_dc0)], ")", sep = "")
+  part_dc1 <- paste(c(param1[4], param1[3]), collapse = " - ")
+  part_dc1[grepl(" ", part_dc1)] <- paste("(", part_dc1[grepl(" ", part_dc1)], ")", sep = "")
 
   ### c + (d - c)
   part_cdc0 <- paste(c(param0[3], part_dc0), collapse = " + ")
   part_cdc1 <- paste(c(param1[3], part_dc1), collapse = " + ")
 
   ### x - b
-  part_xb0   <- paste("(x - ", param0[2], ")", sep = "")
-  part_xb1   <- paste("(x - ", param1[2], ")", sep = "")
+  part_xb0 <- paste("(x - ", param0[2], ")", sep = "")
+  part_xb1 <- paste("(x - ", param1[2], ")", sep = "")
 
   ### a*(x - b)
-  part_axb0  <- paste(param0[1], "*", part_xb0)
-  part_axb1  <- paste(param1[1], "*", part_xb1)
+  part_axb0 <- paste(param0[1], "*", part_xb0)
+  part_axb1 <- paste(param1[1], "*", part_xb1)
 
   ### 1 + exp(-a*(x - b))
   part_exp0 <- paste("1 + exp(-", part_axb0, ")", sep = "")
@@ -252,13 +272,13 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
   part_abcd1 <- paste(part_cdc1, "/", part_exp1)
 
   ### formula
-  if (missing(outcome)){
+  if (missing(outcome)) {
     outcome <- "y"
   }
   form0 <- paste(outcome, "~", part_abcd0)
   form1 <- paste(outcome, "~", part_abcd1)
 
-  if (parameterization == "classic"){
+  if (parameterization == "classic") {
     lower <- c(-Inf, -Inf, 0, 0, -Inf, -Inf, -1, -1)
     upper <- c(Inf, Inf, 1, 1, Inf, Inf, 1, 1)
   } else {
@@ -266,12 +286,18 @@ formulaNLR <- function(model, constraints = NULL, type = "both", parameterizatio
     upper <- c(Inf, Inf, 1, 1, Inf, Inf, 1, 1)
   }
 
-  return(list(M0 = list(formula = as.formula(form0),
-                        parameters = names(mod0[mod0]),
-                        lower = lower[mod0],
-                        upper = upper[mod0]),
-              M1 = list(formula = as.formula(form1),
-                        parameters = names(mod1[mod1]),
-                        lower = lower[mod1],
-                        upper = upper[mod1])))
+  return(list(
+    M0 = list(
+      formula = as.formula(form0),
+      parameters = names(mod0[mod0]),
+      lower = lower[mod0],
+      upper = upper[mod0]
+    ),
+    M1 = list(
+      formula = as.formula(form1),
+      parameters = names(mod1[mod1]),
+      lower = lower[mod1],
+      upper = upper[mod1]
+    )
+  ))
 }

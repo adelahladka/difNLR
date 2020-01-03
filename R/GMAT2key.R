@@ -30,4 +30,4 @@
 #' @format A data frame with 20 values representing correct answers to items of \code{GMAT2test} data set.
 #' For more details see \code{\link{GMAT2test}}.
 "GMAT2key"
-#> [1] "GMAT2key"
+# > [1] "GMAT2key"

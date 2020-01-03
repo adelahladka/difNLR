@@ -5,8 +5,8 @@
 #'
 #' @description Checks whether \code{x} lies in interval defined by bounds in \code{vec}. If it does,
 #' it returns value of \code{x}. In case that value of \code{x} is lower than lower bound specified
-#' in \code{vec}, it returns it value. In case that value of \code{x} is greater than upper bound specified
-#' in \code{vec}, it returns it value.
+#' in \code{vec}, it returns its value. In case that value of \code{x} is greater than upper bound specified
+#' in \code{vec}, it returns its value.
 #'
 #' @usage checkInterval(x, vec)
 #'
@@ -28,7 +28,8 @@
 #' }
 #'
 #' @export
-checkInterval <- function(x, vec){
+checkInterval <- function(x, vec) {
   ifelse(x >= vec[1] & x <= vec[2], x,
-         ifelse(x > vec[2], vec[2], vec[1]))
+    ifelse(x > vec[2], vec[2], vec[1])
+  )
 }

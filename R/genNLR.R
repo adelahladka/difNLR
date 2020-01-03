@@ -110,140 +110,178 @@
 #' genNLR(N = 300, itemtype = "nominal", a = a, b = b)
 #' # generating nominal data set with 300 observations (250 reference group, 50 focal)
 #' genNLR(N = 300, itemtype = "nominal", ratio = 5, a = a, b = b)
-#'
 #' }
 #' @export
 
 
 genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = NULL,
-                   mu = 0, sigma = 1){
+                   mu = 0, sigma = 1) {
+  N_R <- round(N / (ratio + 1) * ratio)
+  N_F <- round(N / (ratio + 1))
+  group <- c(rep(0, N_R), rep(1, N_F))
 
-  N_R   = round(N/(ratio + 1)*ratio)
-  N_F   = round(N/(ratio + 1))
-  group = c(rep(0, N_R), rep(1, N_F))
-
-  if (!(is.numeric(mu)))
+  if (!(is.numeric(mu))) {
     stop("Invalid value for 'mu'. 'mu' needs to be numeric.")
-  if (!(is.numeric(sigma)))
+  }
+  if (!(is.numeric(sigma))) {
     stop("Invalid value for 'sigma'. 'sigma' needs to be numeric. ")
-  if (length(mu) == 1){
-    mu = c(mu, mu)
+  }
+  if (length(mu) == 1) {
+    mu <- c(mu, mu)
   } else {
-    if (length(mu) > 2)
+    if (length(mu) > 2) {
       warning("Length of 'mu' is greater than 2. Only first two values are used.")
-    mu = mu[1:2]
+    }
+    mu <- mu[1:2]
   }
-  if (length(sigma) == 1){
-    sigma = c(sigma, sigma)
+  if (length(sigma) == 1) {
+    sigma <- c(sigma, sigma)
   } else {
-    if (length(sigma) > 2)
+    if (length(sigma) > 2) {
       warning("Length of 'sigma' is greater than 2. Only first two values are used.")
-    sigma = sigma[1:2]
+    }
+    sigma <- sigma[1:2]
   }
 
-  theta = c(rnorm(N_R, mean = mu[1], sd = sigma[1]),
-            rnorm(N_F, mean = mu[2], sd = sigma[2]))
+  theta <- c(
+    rnorm(N_R, mean = mu[1], sd = sigma[1]),
+    rnorm(N_F, mean = mu[2], sd = sigma[2])
+  )
 
-  if (!(itemtype %in% c("dich", "nominal", "ordinal"))){
+  if (!(itemtype %in% c("dich", "nominal", "ordinal"))) {
     stop("Invalid value for 'itemtype'. Type of item can be either 'dich', 'nominal', or 'ordinal'.")
   }
 
-  if (itemtype == "dich"){
-    if (missing(a))
+  if (itemtype == "dich") {
+    if (missing(a)) {
       stop("Missing 'a'. Discrimination parameter need to be provided.")
-    if (is.null(dim(a)))
-      a = cbind(a, a)
-    m = nrow(a)
-    if (missing(b))
+    }
+    if (is.null(dim(a))) {
+      a <- cbind(a, a)
+    }
+    m <- nrow(a)
+    if (missing(b)) {
       stop("Missing 'b'. Discrimination parameter need to be provided.")
-    if (is.null(dim(b)))
-      b = cbind(b, b)
-    if (nrow(a) != nrow(b))
+    }
+    if (is.null(dim(b))) {
+      b <- cbind(b, b)
+    }
+    if (nrow(a) != nrow(b)) {
       stop("Invalid dimensions for 'a' and 'b'.")
-    if (is.null(c))
-      c = matrix(0, ncol = 2, nrow = m)
-    if (is.null(d))
-      d = matrix(1, ncol = 2, nrow = m)
-    if (any(is.na(a)) | any(is.na(b)) | any(is.na(c))| any(is.na(d)))
+    }
+    if (is.null(c)) {
+      c <- matrix(0, ncol = 2, nrow = m)
+    }
+    if (is.null(d)) {
+      d <- matrix(1, ncol = 2, nrow = m)
+    }
+    if (any(is.na(a)) | any(is.na(b)) | any(is.na(c)) | any(is.na(d))) {
       stop("Missing values are not allowed in parameters for dichotomous items.")
-
-    gNLR = function(x, g, a, b, c, d){
-      return(c + (d - c)/(1 + exp(-a * (x - b))))
     }
 
-    pR = sapply(1:m, function(i)
-      do.call(gNLR, list(x = theta[1:N_R],
-                         a = a[i, 1], b = b[i, 1], c = c[i, 1], d = d[i, 1])))
-    pF = sapply(1:m, function(i)
-      do.call(gNLR, list(x = theta[(N_R+1):N],
-                         a = a[i, 2], b = b[i, 2], c = c[i, 2], d = d[i, 2])))
+    gNLR <- function(x, g, a, b, c, d) {
+      return(c + (d - c) / (1 + exp(-a * (x - b))))
+    }
 
-    p = rbind(pR, pF)
+    pR <- sapply(1:m, function(i) {
+      do.call(gNLR, list(
+        x = theta[1:N_R],
+        a = a[i, 1], b = b[i, 1], c = c[i, 1], d = d[i, 1]
+      ))
+    })
+    pF <- sapply(1:m, function(i) {
+      do.call(gNLR, list(
+        x = theta[(N_R + 1):N],
+        a = a[i, 2], b = b[i, 2], c = c[i, 2], d = d[i, 2]
+      ))
+    })
 
-    answer = matrix(NA, nrow = N, ncol = m)
+    p <- rbind(pR, pF)
+
+    answer <- matrix(NA, nrow = N, ncol = m)
     for (j in 1:m) {
       for (i in 1:N) {
-        answer[i, j] = rbinom(1, 1, p[i, j])
+        answer[i, j] <- rbinom(1, 1, p[i, j])
       }
     }
   } else {
-    if (missing(a))
+    if (missing(a)) {
       stop("Missing 'a'. Discrimination parameter need to be provided.")
-    if (!((ncol(a) %% 2) == 0))
+    }
+    if (!((ncol(a) %% 2) == 0)) {
       stop("Invalid dimension for 'a'.")
-
-    if (missing(b))
-      stop("Missing 'b'. Discrimination parameter need to be provided.")
-    if (!((ncol(b) %% 2) == 0))
-      stop("Invalid dimension for 'b'.")
-
-    if (nrow(a) != nrow(b))
-      stop("Invalid dimensions for 'a' and 'b'.")
-
-    if (any(is.na(a) != is.na(b)))
-      stop("Missing values need to be the same in 'a' and 'b'.")
-
-    gMLR = function(x, a, b){return(exp(a * (x - b)))}
-    m = nrow(a)
-    answer = matrix(NA, nrow = N, ncol = m)
-
-    if (itemtype == "ordinal"){
-      L = apply(a, 1, function(x) sum(!is.na(x))/2)
-      atmp = t(sapply(1:nrow(a), function(i) c(cumsum(a[i, 1:L[i]]), cumsum(a[i, (L[i]+1):ncol(a)]))))
-      ab = a*b
-      btmp = t(sapply(1:nrow(a), function(i) c(cumsum(ab[i, 1:L[i]]), cumsum(ab[i, (L[i]+1):ncol(a)]))))
-
-      a = atmp
-      b = btmp/atmp
     }
 
-    for (i in 1:m){
-      L = sum(!is.na(a[i, ]))/2
-      atmp = a[i, ]; atmp = atmp[!is.na(atmp)]
-      btmp = b[i, ]; btmp = btmp[!is.na(btmp)]
-      pR = sapply(1:L, function(l) do.call(gMLR, list(x = theta[1:N_R],
-                                                      a = atmp[l], b = btmp[l])))
-      pF = sapply(1:L, function(l) do.call(gMLR, list(x = theta[(N_R+1):N],
-                                                      a = atmp[l+L], b = btmp[l+L])))
+    if (missing(b)) {
+      stop("Missing 'b'. Discrimination parameter need to be provided.")
+    }
+    if (!((ncol(b) %% 2) == 0)) {
+      stop("Invalid dimension for 'b'.")
+    }
 
-      pR = cbind(1, pR); pF = cbind(1, pF)
-      sumR = apply(pR, 1, sum); sumF = apply(pF, 1, sum)
-      pR = pR/sumR; pF = pF/sumF
-      p = rbind(pR, pF)
+    if (nrow(a) != nrow(b)) {
+      stop("Invalid dimensions for 'a' and 'b'.")
+    }
+
+    if (any(is.na(a) != is.na(b))) {
+      stop("Missing values need to be the same in 'a' and 'b'.")
+    }
+
+    gMLR <- function(x, a, b) {
+      return(exp(a * (x - b)))
+    }
+    m <- nrow(a)
+    answer <- matrix(NA, nrow = N, ncol = m)
+
+    if (itemtype == "ordinal") {
+      L <- apply(a, 1, function(x) sum(!is.na(x)) / 2)
+      atmp <- t(sapply(1:nrow(a), function(i) c(cumsum(a[i, 1:L[i]]), cumsum(a[i, (L[i] + 1):ncol(a)]))))
+      ab <- a * b
+      btmp <- t(sapply(1:nrow(a), function(i) c(cumsum(ab[i, 1:L[i]]), cumsum(ab[i, (L[i] + 1):ncol(a)]))))
+
+      a <- atmp
+      b <- btmp / atmp
+    }
+
+    for (i in 1:m) {
+      L <- sum(!is.na(a[i, ])) / 2
+      atmp <- a[i, ]
+      atmp <- atmp[!is.na(atmp)]
+      btmp <- b[i, ]
+      btmp <- btmp[!is.na(btmp)]
+      pR <- sapply(1:L, function(l) {
+        do.call(gMLR, list(
+          x = theta[1:N_R],
+          a = atmp[l], b = btmp[l]
+        ))
+      })
+      pF <- sapply(1:L, function(l) {
+        do.call(gMLR, list(
+          x = theta[(N_R + 1):N],
+          a = atmp[l + L], b = btmp[l + L]
+        ))
+      })
+
+      pR <- cbind(1, pR)
+      pF <- cbind(1, pF)
+      sumR <- apply(pR, 1, sum)
+      sumF <- apply(pF, 1, sum)
+      pR <- pR / sumR
+      pF <- pF / sumF
+      p <- rbind(pR, pF)
 
       for (j in 1:N) {
-        answer[j, i] = rbinom(1, size = L, prob = p[j, ])
+        answer[j, i] <- rbinom(1, size = L, prob = p[j, ])
       }
     }
 
-    if (itemtype == "ordinal"){
-      uval = lapply(1:m, function(i) sort(unique(answer[, i])))
-      answer = as.data.frame(sapply(1:m, function(i) factor(answer[, i], levels = uval[[i]], ordered = T)))
+    if (itemtype == "ordinal") {
+      uval <- lapply(1:m, function(i) sort(unique(answer[, i])))
+      answer <- as.data.frame(sapply(1:m, function(i) factor(answer[, i], levels = uval[[i]], ordered = T)))
     }
   }
 
-  data = data.frame(answer, group)
-  colnames(data) = c(paste0("Item", 1:m), "group")
+  data <- data.frame(answer, group)
+  colnames(data) <- c(paste0("Item", 1:m), "group")
   return(data)
 }
-

@@ -64,4 +64,4 @@
 #' @note This package was supported by grant funded by Czech Science foundation under number GJ15-15856Y.
 #' @docType package
 "_PACKAGE"
-#> [1] "_PACKAGE"
+# > [1] "_PACKAGE"

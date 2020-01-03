@@ -33,8 +33,8 @@ non-linear least squares or maximum likelihood method.
 data(GMAT)
 
 # item 1
-y  <- GMAT[, 1]
-match  <- scale(apply(GMAT[, 1:20], 1, sum))
+y <- GMAT[, 1]
+match <- scale(apply(GMAT[, 1:20], 1, sum))
 group <- GMAT[, "group"]
 
 # formula for 3PL model with the same guessing
@@ -45,9 +45,11 @@ start <- startNLR(GMAT[, 1:20], group, model = "3PLcg", parameterization = "clas
 start <- start[[1]][M$M0$parameters]
 
 # Non-linear least squares
-fitNLSM0 <- estimNLR(y = y, match = match, group = group,
-                     formula = M$M0$formula, method = "nls",
-                     lower = M$M0$lower, upper = M$M0$upper, start = start)
+fitNLSM0 <- estimNLR(
+  y = y, match = match, group = group,
+  formula = M$M0$formula, method = "nls",
+  lower = M$M0$lower, upper = M$M0$upper, start = start
+)
 fitNLSM0
 
 coef(fitNLSM0)
@@ -57,9 +59,11 @@ fitted(fitNLSM0)
 residuals(fitNLSM0)
 
 # Maximum likelihood
-fitLKLM0 <- estimNLR(y = y, match = match, group = group,
-                     formula = M$M0$formula, method = "likelihood",
-                     lower = M$M0$lower, upper = M$M0$upper, start = start)
+fitLKLM0 <- estimNLR(
+  y = y, match = match, group = group,
+  formula = M$M0$formula, method = "likelihood",
+  lower = M$M0$lower, upper = M$M0$upper, start = start
+)
 fitLKLM0
 
 coef(fitLKLM0)
@@ -67,7 +71,6 @@ logLik(fitLKLM0)
 vcov(fitLKLM0)
 fitted(fitLKLM0)
 residuals(fitLKLM0)
-
 }
 
 }

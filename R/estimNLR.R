@@ -32,8 +32,8 @@
 #' data(GMAT)
 #'
 #' # item 1
-#' y  <- GMAT[, 1]
-#' match  <- scale(apply(GMAT[, 1:20], 1, sum))
+#' y <- GMAT[, 1]
+#' match <- scale(apply(GMAT[, 1:20], 1, sum))
 #' group <- GMAT[, "group"]
 #'
 #' # formula for 3PL model with the same guessing
@@ -44,9 +44,11 @@
 #' start <- start[[1]][M$M0$parameters]
 #'
 #' # Non-linear least squares
-#' fitNLSM0 <- estimNLR(y = y, match = match, group = group,
-#'                      formula = M$M0$formula, method = "nls",
-#'                      lower = M$M0$lower, upper = M$M0$upper, start = start)
+#' fitNLSM0 <- estimNLR(
+#'   y = y, match = match, group = group,
+#'   formula = M$M0$formula, method = "nls",
+#'   lower = M$M0$lower, upper = M$M0$upper, start = start
+#' )
 #' fitNLSM0
 #'
 #' coef(fitNLSM0)
@@ -56,9 +58,11 @@
 #' residuals(fitNLSM0)
 #'
 #' # Maximum likelihood
-#' fitLKLM0 <- estimNLR(y = y, match = match, group = group,
-#'                      formula = M$M0$formula, method = "likelihood",
-#'                      lower = M$M0$lower, upper = M$M0$upper, start = start)
+#' fitLKLM0 <- estimNLR(
+#'   y = y, match = match, group = group,
+#'   formula = M$M0$formula, method = "likelihood",
+#'   lower = M$M0$lower, upper = M$M0$upper, start = start
+#' )
 #' fitLKLM0
 #'
 #' coef(fitLKLM0)
@@ -66,36 +70,40 @@
 #' vcov(fitLKLM0)
 #' fitted(fitLKLM0)
 #' residuals(fitLKLM0)
-#'
 #' }
 #'
 #' @keywords DIF
 #' @export
 #' @importFrom stats optim binomial glm residuals
 #'
-estimNLR <- function(y, match, group, formula, method, lower, upper, start){
-
-
-
+estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
   M <- switch(method,
-              nls = tryCatch(nls(formula = formula,
-                                 data = data.frame(y = y, x = match, g = group),
-                                 algorithm = "port",
-                                 start = start,
-                                 lower = lower,
-                                 upper = upper),
-                             error = function(e){},
-                             finally = ""),
-              likelihood = tryCatch(lkl(formula = formula,
-                                        data = data.frame(y = y, x = match, g = group),
-                                        par = start,
-                                        lower = lower,
-                                        upper = upper),
-                                    error = function(e){},
-                                    finally = ""),
-              IRLS = tryCatch(glm(formula, family = binomial()),
-                              error = function(e){},
-                              finally = ""))
+    nls = tryCatch(nls(
+      formula = formula,
+      data = data.frame(y = y, x = match, g = group),
+      algorithm = "port",
+      start = start,
+      lower = lower,
+      upper = upper
+    ),
+    error = function(e) {},
+    finally = ""
+    ),
+    likelihood = tryCatch(lkl(
+      formula = formula,
+      data = data.frame(y = y, x = match, g = group),
+      par = start,
+      lower = lower,
+      upper = upper
+    ),
+    error = function(e) {},
+    finally = ""
+    ),
+    IRLS = tryCatch(glm(formula, family = binomial()),
+      error = function(e) {},
+      finally = ""
+    )
+  )
 
   return(M)
 }
@@ -103,72 +111,87 @@ estimNLR <- function(y, match, group, formula, method, lower, upper, start){
 
 
 #' @aliases estimNLR
-lkl <- function(formula, data, par, lower, upper, fitv){
-
-  param.likel <- function(data, formula, par){
+lkl <- function(formula, data, par, lower, upper, fitv) {
+  param.likel <- function(data, formula, par) {
     param <- as.list(par)
-    param[[length(param)+1]] <- data$x; names(param)[length(param)] <- "x"
-    param[[length(param)+1]] <- data$g; names(param)[length(param)] <- "g"
+    param[[length(param) + 1]] <- data$x
+    names(param)[length(param)] <- "x"
+    param[[length(param) + 1]] <- data$g
+    names(param)[length(param)] <- "g"
 
     y <- data$y
 
     h. <- parse(text = as.character(formula)[3])
     h <- eval(h., envir = param)
 
-    l <- -sum((y*log(h)) + ((1 - y)*log(1 - h)), na.rm = T)
+    l <- -sum((y * log(h)) + ((1 - y) * log(1 - h)), na.rm = T)
   }
 
-  m <- optim(par = par,
-             fn = param.likel,
-             data = data,
-             formula = formula,
-             method = "L-BFGS-B",
-             lower = lower,
-             upper = upper,
-             hessian = T)
+  m <- optim(
+    par = par,
+    fn = param.likel,
+    data = data,
+    formula = formula,
+    method = "L-BFGS-B",
+    lower = lower,
+    upper = upper,
+    hessian = T
+  )
 
   h. <- parse(text = as.character(formula)[3])
   param <- as.list(par)
-  param[[length(param)+1]] <- data$x; names(param)[length(param)] <- "x"
-  param[[length(param)+1]] <- data$g; names(param)[length(param)] <- "g"
+  param[[length(param) + 1]] <- data$x
+  names(param)[length(param)] <- "x"
+  param[[length(param) + 1]] <- data$g
+  names(param)[length(param)] <- "g"
 
   m$fitted <- eval(h., param)
   m$data <- data
   m$formula <- formula
 
-  class(m) <- 'lkl'
+  class(m) <- "lkl"
   return(m)
 }
 #' @rdname lkl
 #' @export
-print.lkl <- function(x, ...){
-  cat("Nonlinear regression model \n",
-      "model: ", paste(x$formula[2], x$formula[1], x$formula[3]), "\n")
+print.lkl <- function(x, ...) {
+  cat(
+    "Nonlinear regression model \n",
+    "model: ", paste(x$formula[2], x$formula[1], x$formula[3]), "\n"
+  )
   print(x$par)
-  cat("\n",
-      "Algorithm L-BFGS-B")
+  cat(
+    "\n",
+    "Algorithm L-BFGS-B"
+  )
 }
 
 #' @rdname lkl
 #' @export
-vcov.lkl <- function(object, ...){object$hessian}
+vcov.lkl <- function(object, ...) {
+  object$hessian
+}
 
 #' @rdname lkl
 #' @export
-logLik.lkl <- function(object, ...){-object$value}
+logLik.lkl <- function(object, ...) {
+  -object$value
+}
 
 #' @rdname lkl
 #' @export
-coef.lkl <- function(object, ...){object$par}
+coef.lkl <- function(object, ...) {
+  object$par
+}
 
 #' @rdname lkl
 #' @export
-fitted.lkl <- function(object, ...){object$fitted}
+fitted.lkl <- function(object, ...) {
+  object$fitted
+}
 
 #' @rdname lkl
 #' @export
-residuals.lkl <- function(object, ...){object$data$y - object$fitted}
-
-
-
-
+residuals.lkl <- function(object, ...) {
+  object$data$y - object$fitted
+}

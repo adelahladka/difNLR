@@ -36,4 +36,3 @@
 #' and females (focal group).
 #' @docType data
 "MSATB"
-

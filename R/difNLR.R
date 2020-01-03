@@ -216,7 +216,7 @@
 #' # loading data based on GMAT
 #' data(GMAT)
 #'
-#' Data  <- GMAT[, 1:20]
+#' Data <- GMAT[, 1:20]
 #' group <- GMAT[, "group"]
 #'
 #' # Testing both DIF effects using likelihood-ratio test and
@@ -285,9 +285,13 @@
 #' predict(x, item = 1, match = 0, group = 0)
 #'
 #' # AIC, BIC, log-likelihood
-#' AIC(x); BIC(x); logLik(x)
+#' AIC(x)
+#' BIC(x)
+#' logLik(x)
 #' # AIC, BIC, log-likelihood for the first item
-#' AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
+#' AIC(x, item = 1)
+#' BIC(x, item = 1)
+#' logLik(x, item = 1)
 #' }
 #'
 #' @keywords DIF
@@ -295,55 +299,59 @@
 difNLR <- function(Data, group, focal.name, model, constraints, type = "both", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start,
-                   initboot = T, nrBo = 20)
-{
-  if (any(type == "nudif" & model == "1PL"))
+                   initboot = T, nrBo = 20) {
+  if (any(type == "nudif" & model == "1PL")) {
     stop("Detection of non-uniform DIF is not possible with 1PL model.", call. = FALSE)
-  if (any(type == "nudif" & model == "Rasch"))
+  }
+  if (any(type == "nudif" & model == "Rasch")) {
     stop("Detection of non-uniform DIF is not possible with Rasch model.", call. = FALSE)
+  }
   # input check
   ### model
   if (missing(model)) {
     stop("'model' is missing", call. = FALSE)
   }
   ### constraints
-  if (missing(constraints)){
+  if (missing(constraints)) {
     constraints <- NULL
   }
   ### matching criterion
-  if (!(match[1] %in% c("score", "zscore"))){
-    if (is.null(dim(Data))){
+  if (!(match[1] %in% c("score", "zscore"))) {
+    if (is.null(dim(Data))) {
       no <- length(Data)
     } else {
       no <- dim(Data)[1]
     }
-    if (length(match) != no){
+    if (length(match) != no) {
       stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
            of observations in 'Data'.")
     }
-    }
+  }
   ### purification
-  if (purify & !(match[1] %in% c("score", "zscore")))
-    stop("Purification not allowed when matching variable is not 'zscore' or 'score'.",  call. = FALSE)
+  if (purify & !(match[1] %in% c("score", "zscore"))) {
+    stop("Purification not allowed when matching variable is not 'zscore' or 'score'.", call. = FALSE)
+  }
   ### test
-  if (!test %in% c("F", "LR") | !is.character(type))
+  if (!test %in% c("F", "LR") | !is.character(type)) {
     stop("Invalid value for 'test'. Test for DIF detection must be either 'F' or 'LR'.", call. = FALSE)
+  }
   ### significance level
-  if (alpha > 1 | alpha < 0)
+  if (alpha > 1 | alpha < 0) {
     stop("Argument 'alpha' must be between 0 and 1.", call. = FALSE)
+  }
   ### starting values
   if (missing(start)) {
     start <- NULL
   }
   ### starting values with bootstraped samples
-  if (initboot){
-    if (nrBo < 1){
+  if (initboot) {
+    if (nrBo < 1) {
       stop("The maximal number of iterations for calculation of starting values using bootstraped
            samples 'nrBo' need to be greater than 1. ")
     }
-    }
+  }
   ### estimation method
-  if (!(method %in% c("nls", "likelihood"))){
+  if (!(method %in% c("nls", "likelihood"))) {
     stop("Invalid value for 'method'. Estimation method must be either 'nls' or 'likelihood'.", call. = FALSE)
   }
   # internal NLR function
@@ -352,39 +360,46 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
       if (is.numeric(group)) {
         GROUP <- Data[, group]
         DATA <- Data[, (1:dim(Data)[2]) != group]
-        colnames(DATA) <- colnames(Data)[(1:dim(Data)[2]) !=  group]
+        colnames(DATA) <- colnames(Data)[(1:dim(Data)[2]) != group]
       } else {
         GROUP <- Data[, colnames(Data) == group]
         DATA <- Data[, colnames(Data) != group]
-        colnames(DATA) <- colnames(Data)[colnames(Data) !=  group]
+        colnames(DATA) <- colnames(Data)[colnames(Data) != group]
       }
     } else {
       GROUP <- group
       DATA <- Data
     }
-    if (length(levels(as.factor(GROUP))) != 2)
+    if (length(levels(as.factor(GROUP))) != 2) {
       stop("'group' must be binary vector", call. = FALSE)
+    }
     if (is.matrix(DATA) | is.data.frame(DATA)) {
-      if (!all(apply(DATA, 2, function(i) { length(levels(as.factor(i))) == 2 })))
+      if (!all(apply(DATA, 2, function(i) {
+        length(levels(as.factor(i))) == 2
+      }))) {
         stop("'Data' must be data frame or matrix of binary vectors.", call. = FALSE)
-      if (dim(DATA)[1] != length(GROUP))
+      }
+      if (dim(DATA)[1] != length(GROUP)) {
         stop("'Data' must have the same number of rows as is length of vector 'group'.", call. = FALSE)
+      }
     } else {
-      if (is.vector(DATA)){
-        if (length(DATA) != length(GROUP))
+      if (is.vector(DATA)) {
+        if (length(DATA) != length(GROUP)) {
           stop("'Data' must have the same number of rows as is length of vector 'group'.", call. = FALSE)
+        }
         DATA <- as.data.frame(DATA)
       } else {
         stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
       }
     }
 
-    group.names = unique(GROUP)[!is.na(unique(GROUP))]
-    if (group.names[1] == focal.name)
-      group.names = rev(group.names)
+    group.names <- unique(GROUP)[!is.na(unique(GROUP))]
+    if (group.names[1] == focal.name) {
+      group.names <- rev(group.names)
+    }
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
-    if (length(match) == dim(DATA)[1]){
+    if (length(match) == dim(DATA)[1]) {
       df <- data.frame(DATA, GROUP, match, check.names = F)
     } else {
       df <- data.frame(DATA, GROUP, check.names = F)
@@ -392,116 +407,134 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
 
     df <- df[complete.cases(df), ]
 
-    if (dim(df)[1] == 0){
+    if (dim(df)[1] == 0) {
       stop("It seems that your 'Data' does not include any subjects that are complete. ",
-           call. = FALSE)
+        call. = FALSE
+      )
     }
 
     GROUP <- df[, "GROUP"]
     DATA <- data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
 
-    if (length(match) > 1){
+    if (length(match) > 1) {
       match <- df[, "match"]
     }
 
     ### model
-    if (length(model) == 1){
+    if (length(model) == 1) {
       model <- rep(model, dim(DATA)[2])
     } else {
-      if (length(model) != dim(DATA)[2]){
+      if (length(model) != dim(DATA)[2]) {
         stop("Invalid length of 'model'. Model needs to be specified for each item or
              by single string. ", call. = FALSE)
       }
-      }
-    if (!all(model %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
-                          "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"))){
+    }
+    if (!all(model %in% c(
+      "Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
+      "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"
+    ))) {
       stop("Invalid value for 'model'.", call. = FALSE)
     }
 
     ### type of DIF to be tested
-    if (length(type) == 1){
+    if (length(type) == 1) {
       type <- rep(type, dim(DATA)[2])
     } else {
-      if (length(type) != dim(DATA)[2]){
+      if (length(type) != dim(DATA)[2]) {
         stop("Invalid length of 'type'. Type of DIF need to be specified for each item or
              by single string. ", call. = FALSE)
       }
-      }
+    }
     tmptype <- type[!(type %in% c("udif", "nudif", "both", "all"))]
-    if (length(tmptype) > 0){
-      tmptypes <- unique(unlist(sapply(1:length(tmptype),
-                                       function(i) unique(unlist(strsplit(tmptype[i], split = ""))))))
-      if (!all(tmptypes %in% letters[1:4])){
+    if (length(tmptype) > 0) {
+      tmptypes <- unique(unlist(sapply(
+        1:length(tmptype),
+        function(i) unique(unlist(strsplit(tmptype[i], split = "")))
+      )))
+      if (!all(tmptypes %in% letters[1:4])) {
         stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
              or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.")
       }
-      }
+    }
 
     ### constraints
-    if (!(is.null(constraints))){
-      if (length(constraints) == 1){
+    if (!(is.null(constraints))) {
+      if (length(constraints) == 1) {
         constraints <- rep(constraints, dim(DATA)[2])
       } else {
-        if (length(constraints) != dim(DATA)[2]){
+        if (length(constraints) != dim(DATA)[2]) {
           stop("Invalid length of 'constraints'. Constraints need to be specified for each item or
                by single string. ", call. = FALSE)
         }
-        }
+      }
       constraints <- lapply(1:dim(DATA)[2], function(i) unique(unlist(strsplit(constraints[i], split = ""))))
       if (!all(sapply(1:dim(DATA)[2], function(i) {
         all(constraints[[i]] %in% letters[1:4]) | all(is.na(constraints[[i]]))
-      }))){
+      }))) {
         stop("Constraints can be only 'a', 'b', 'c' or 'd'. ")
       }
-      if (any(!(type %in% c("udif", "nudif", "both", "all")))){
+      if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
         types <- as.list(rep(NA, dim(DATA)[2]))
         wht <- !(type %in% c("udif", "nudif", "both", "all"))
         types[wht] <- unlist(strsplit(type[wht], split = ""))
-        if (any(sapply(1:dim(DATA)[2], function(i) (all(!is.na(constraints[[i]])) & (types[[i]] %in% constraints[[i]]))))){
+        if (any(sapply(1:dim(DATA)[2], function(i) (all(!is.na(constraints[[i]])) & (types[[i]] %in% constraints[[i]]))))) {
           stop("The difference in constrained parameters cannot be tested.")
         }
       }
-      } else {
-        constraints <- as.list(rep(NA, dim(DATA)[2]))
-        types <- NULL
-      }
+    } else {
+      constraints <- as.list(rep(NA, dim(DATA)[2]))
+      types <- NULL
+    }
     ### anchors
     if (!is.null(anchor)) {
-      if (is.numeric(anchor)){
+      if (is.numeric(anchor)) {
         ANCHOR <- anchor
       } else {
         ANCHOR <- NULL
-        for (i in 1:length(anchor))
+        for (i in 1:length(anchor)) {
           ANCHOR[i] <- (1:dim(DATA)[2])[colnames(DATA) == anchor[i]]
+        }
       }
     } else {
       ANCHOR <- 1:dim(DATA)[2]
     }
     ### parameterization
-    parameterization <- ifelse(model %in% c("3PLc", "3PL", "3PLd", "4PLcgd", "4PLd",
-                                            "4PLcdg", "4PLc", "4PL"),
-                               "alternative",
-                               "classic")
-    if (!is.null(start)){
-      if (length(start) != dim(DATA)[2])
+    parameterization <- ifelse(model %in% c(
+      "3PLc", "3PL", "3PLd", "4PLcgd", "4PLd",
+      "4PLcdg", "4PLc", "4PL"
+    ),
+    "alternative",
+    "classic"
+    )
+    if (!is.null(start)) {
+      if (length(start) != dim(DATA)[2]) {
         stop("Invalid value for 'start'. Initial values must be a list with as many elements
              as number of items in Data. ", call. = FALSE)
-      if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste(letters[1:4], "Dif", sep = ""))))
+      }
+      if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste(letters[1:4], "Dif", sep = "")))) {
         stop("Invalid names in 'start'. Each element of 'start' need to be a numeric vector
              with names 'a', 'b', 'c', 'd', 'aDif', 'bDif', 'cDif' and 'dDif'.", call. = FALSE)
+      }
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
-      PROV <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
-                                   match = match, anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method,
-                                   test = test, alpha = alpha, initboot = initboot, nrBo = nrBo))
+      PROV <- suppressWarnings(NLR(DATA, GROUP,
+        model = model, constraints = constraints, type = type, method = method,
+        match = match, anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method,
+        test = test, alpha = alpha, initboot = initboot, nrBo = nrBo
+      ))
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
       significant <- which(ADJ.PVAL < alpha)
 
-      nlrPAR <- nlrSE <- lapply(1:length(PROV$par.m0),
-                                function(i) structure(rep(0, length(PROV$par.m0[[i]])),
-                                                      names = names(PROV$par.m0[[i]])))
-      for (i in 1:length(PROV$par.m0)){
+      nlrPAR <- nlrSE <- lapply(
+        1:length(PROV$par.m0),
+        function(i) {
+          structure(rep(0, length(PROV$par.m0[[i]])),
+            names = names(PROV$par.m0[[i]])
+          )
+        }
+      )
+      for (i in 1:length(PROV$par.m0)) {
         nlrPAR[[i]][names(PROV$par.m1[[i]])] <- PROV$par.m1[[i]]
         nlrSE[[i]][names(PROV$se.m1[[i]])] <- PROV$se.m1[[i]]
       }
@@ -516,29 +549,33 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         DIFitems <- "No DIF item detected"
       }
 
-      if (any(!(type %in% c("udif", "nudif", "both", "all")))){
+      if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
         wht <- (!(type %in% c("udif", "nudif", "both", "all")))
         type[wht] <- "other"
       }
-      RES <- list(Sval = STATS,
-                  nlrPAR = nlrPAR, nlrSE = nlrSE,
-                  parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
-                  parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
-                  alpha = alpha, DIFitems = DIFitems, match = match,
-                  model = model, constraints = constraints,
-                  type = type, types = types, p.adjust.method = p.adjust.method,
-                  pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
-                  purification = purify,
-                  group = GROUP, Data = DATA, method = method, group.names = group.names,
-                  conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
-                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
+      RES <- list(
+        Sval = STATS,
+        nlrPAR = nlrPAR, nlrSE = nlrSE,
+        parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
+        parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
+        alpha = alpha, DIFitems = DIFitems, match = match,
+        model = model, constraints = constraints,
+        type = type, types = types, p.adjust.method = p.adjust.method,
+        pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
+        purification = purify,
+        group = GROUP, Data = DATA, method = method, group.names = group.names,
+        conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
+        llM0 = PROV$ll.m0, llM1 = PROV$ll.m1
+      )
     } else {
       nrPur <- 0
       difPur <- NULL
       noLoop <- FALSE
-      prov1 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
-                                    match = match, start = start, p.adjust.method = p.adjust.method, test = test,
-                                    alpha = alpha, initboot = initboot, nrBo = nrBo))
+      prov1 <- suppressWarnings(NLR(DATA, GROUP,
+        model = model, constraints = constraints, type = type, method = method,
+        match = match, start = start, p.adjust.method = p.adjust.method, test = test,
+        alpha = alpha, initboot = initboot, nrBo = nrBo
+      ))
       stats1 <- prov1$Sval
       pval1 <- prov1$pval
       significant1 <- which(pval1 < alpha)
@@ -548,7 +585,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         STATS <- stats1
         DIFitems <- "No DIF item detected"
         nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = dim(PROV$par.m0)[2], nrow = dim(PROV$par.m0)[1])),
-                                     .Names = colnames(PROV$par.m0))
+          .Names = colnames(PROV$par.m0)
+        )
         nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
         nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
         noLoop <- TRUE
@@ -557,7 +595,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         difPur <- rep(0, length(stats1))
         difPur[dif] <- 1
         repeat {
-          if (nrPur >= nrIter){
+          if (nrPur >= nrIter) {
             break
           } else {
             nrPur <- nrPur + 1
@@ -566,41 +604,53 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
               nodif <- 1:dim(DATA)[2]
             } else {
               for (i in 1:dim(DATA)[2]) {
-                if (sum(i == dif) == 0)
+                if (sum(i == dif) == 0) {
                   nodif <- c(nodif, i)
+                }
               }
             }
-            prov2 <- suppressWarnings(NLR(DATA, GROUP, model = model, constraints = constraints, type = type, method = method,
-                                          match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
-                                          test = test, alpha = alpha, initboot = initboot, nrBo = nrBo))
+            prov2 <- suppressWarnings(NLR(DATA, GROUP,
+              model = model, constraints = constraints, type = type, method = method,
+              match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
+              test = test, alpha = alpha, initboot = initboot, nrBo = nrBo
+            ))
             stats2 <- prov2$Sval
             pval2 <- prov2$pval
             significant2 <- which(pval2 < alpha)
-            if (length(significant2) == 0)
+            if (length(significant2) == 0) {
               dif2 <- NULL
-            else dif2 <- significant2
+            } else {
+              dif2 <- significant2
+            }
             difPur <- rbind(difPur, rep(0, dim(DATA)[2]))
             difPur[nrPur + 1, dif2] <- 1
-            if (length(dif) != length(dif2))
+            if (length(dif) != length(dif2)) {
               dif <- dif2
-            else {
+            } else {
               dif <- sort(dif)
               dif2 <- sort(dif2)
               if (sum(dif == dif2) == length(dif)) {
                 noLoop <- TRUE
                 break
               }
-              else dif <- dif2
+              else {
+                dif <- dif2
+              }
             }
           }
         }
         PROV <- prov2
         STATS <- stats2
         significant1 <- which(PROV$adjusted.pval < alpha)
-        nlrPAR <- nlrSE <- lapply(1:length(PROV$par.m0),
-                                  function(i) structure(rep(0, length(PROV$par.m0[[i]])),
-                                                        names = names(PROV$par.m0[[i]])))
-        for (i in 1:length(PROV$par.m0)){
+        nlrPAR <- nlrSE <- lapply(
+          1:length(PROV$par.m0),
+          function(i) {
+            structure(rep(0, length(PROV$par.m0[[i]])),
+              names = names(PROV$par.m0[[i]])
+            )
+          }
+        )
+        for (i in 1:length(PROV$par.m0)) {
           nlrPAR[[i]][names(PROV$par.m1[[i]])] <- PROV$par.m1[[i]]
           nlrSE[[i]][names(PROV$se.m1[[i]])] <- PROV$se.m1[[i]]
         }
@@ -620,117 +670,149 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "both", m
         colnames(difPur) <- colnames(DATA)
       }
 
-      if (any(!(type %in% c("udif", "nudif", "both", "all")))){
+      if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
         wht <- (!(type %in% c("udif", "nudif", "both", "all")))
         type[wht] <- "other"
       }
-      RES <- list(Sval = STATS,
-                  nlrPAR = nlrPAR, nlrSE = nlrSE,
-                  parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
-                  parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
-                  alpha = alpha, DIFitems = DIFitems, match = match,
-                  model = model, constraints = constraints,
-                  type = type, types = types, p.adjust.method = p.adjust.method,
-                  pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
-                  purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
-                  group = GROUP, Data = DATA, method = method, group.names = group.names,
-                  conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
-                  llM0 = PROV$ll.m0, llM1 = PROV$ll.m1)
+      RES <- list(
+        Sval = STATS,
+        nlrPAR = nlrPAR, nlrSE = nlrSE,
+        parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0,
+        parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1,
+        alpha = alpha, DIFitems = DIFitems, match = match,
+        model = model, constraints = constraints,
+        type = type, types = types, p.adjust.method = p.adjust.method,
+        pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df, test = test,
+        purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
+        group = GROUP, Data = DATA, method = method, group.names = group.names,
+        conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
+        llM0 = PROV$ll.m0, llM1 = PROV$ll.m1
+      )
     }
     if (PROV$conv.fail > 0) {
       warning(paste("Convergence failure in item", PROV$conv.fail.which, "\n"), call. = F)
     }
-    if (purify){
-      if (!noLoop){
+    if (purify) {
+      if (!noLoop) {
         warning(paste("Item purification process not converged after ",
-                      nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
-                      "Results are based on the last iteration of the item purification.\n", sep = ""),
-                call. = F)
+          nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
+          "Results are based on the last iteration of the item purification.\n",
+          sep = ""
+        ),
+        call. = F
+        )
       }
     }
     class(RES) <- "difNLR"
     return(RES)
-    }
+  }
 
 
   resToReturn <- internalNLR()
   return(resToReturn)
-    }
+}
 
 
 
 #' @param x an object of "difNLR" class
 #' @rdname difNLR
 #' @export
-print.difNLR <- function (x, ...){
+print.difNLR <- function(x, ...) {
   cat(paste("Detection of ",
-            ifelse(length(unique(x$type)) == 1,
-                   switch(unique(x$type),
-                          both = "both types of ",
-                          udif = "uniform ",
-                          nudif = "non-uniform ",
-                          all = "all types of ",
-                          other = ""),
-                   ""),
-            "differential item functioning\n",
-            "using generalized logistic regression model", sep = ""))
-  cat(paste("\n\nGeneralized logistic regression ",
-            switch(x$test,
-                   "F" = "F-test",
-                   "LR" = "likelihood ratio chi-square"),
-            " statistics",
-            ifelse(length(unique(x$model)) == 1,
-                   paste("\nbased on",
-                         switch(unique(x$model),
-                                "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
-                                "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
-                                "3PLdg" = "3PL model with fixed inattention parameter for groups",
-                                "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
-                                "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
-                                "4PLcgd" = "4PL model with fixed guessing for groups",
-                                "4PLd" = "4PL model with fixed guessing for groups",
-                                "4PLcdg" = "4PL model with fixed inattention parameter for groups",
-                                "4PLc" = "4PL model with fixed inattention parameter for groups",
-                                "4PL" = "4PL model")),
-                   ""), sep = ""),
-      ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
-             paste("with constraints on",
-                   ifelse(length(unique(unlist(x$constraints))) == 1, "parameter", "parameters"),
-                   paste(unique(unlist(x$constraints)), collapse = ", "), "\n"),
-             "\n"))
+    ifelse(length(unique(x$type)) == 1,
+      switch(unique(x$type),
+        both = "both types of ",
+        udif = "uniform ",
+        nudif = "non-uniform ",
+        all = "all types of ",
+        other = ""
+      ),
+      ""
+    ),
+    "differential item functioning\n",
+    "using generalized logistic regression model",
+    sep = ""
+  ))
+  cat(
+    paste("\n\nGeneralized logistic regression ",
+      switch(x$test,
+        "F" = "F-test",
+        "LR" = "likelihood ratio chi-square"
+      ),
+      " statistics",
+      ifelse(length(unique(x$model)) == 1,
+        paste(
+          "\nbased on",
+          switch(unique(x$model),
+            "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
+            "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
+            "3PLdg" = "3PL model with fixed inattention parameter for groups",
+            "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
+            "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
+            "4PLcgd" = "4PL model with fixed guessing for groups",
+            "4PLd" = "4PL model with fixed guessing for groups",
+            "4PLcdg" = "4PL model with fixed inattention parameter for groups",
+            "4PLc" = "4PL model with fixed inattention parameter for groups",
+            "4PL" = "4PL model"
+          )
+        ),
+        ""
+      ),
+      sep = ""
+    ),
+    ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
+      paste(
+        "with constraints on",
+        ifelse(length(unique(unlist(x$constraints))) == 1, "parameter", "parameters"),
+        paste(unique(unlist(x$constraints)), collapse = ", "), "\n"
+      ),
+      "\n"
+    )
+  )
   cat(paste("\nParameters were estimated with", ifelse(x$method == "nls",
-                                                       "non-linear least squares\n",
-                                                       "maximum likelihood method\n")))
+    "non-linear least squares\n",
+    "maximum likelihood method\n"
+  )))
   cat(paste("\nItem purification was",
-            ifelse(x$purification, " ", " not "), "applied",
-            ifelse(x$purification, paste(" with ", x$nrPur,
-                                         ifelse(x$nrPur <= 1, " iteration.", " iterations."),
-                                         sep = ""), ""), "\n", sep = ""))
+    ifelse(x$purification, " ", " not "), "applied",
+    ifelse(x$purification, paste(" with ", x$nrPur,
+      ifelse(x$nrPur <= 1, " iteration.", " iterations."),
+      sep = ""
+    ), ""), "\n",
+    sep = ""
+  ))
   if (x$p.adjust.method == "none") {
     cat("No p-value adjustment for multiple comparisons\n\n")
   } else {
-    cat(paste("Multiple comparisons made with",
-              switch(x$p.adjust.method,
-                     holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
-                     bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
-                     BY = "Benjamini-Yekutieli", fdr = "FDR"), "adjustment of p-values\n\n"))
+    cat(paste(
+      "Multiple comparisons made with",
+      switch(x$p.adjust.method,
+        holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
+        bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
+        BY = "Benjamini-Yekutieli", fdr = "FDR"
+      ), "adjustment of p-values\n\n"
+    ))
   }
   sign <- ifelse(is.na(x$adj.pval), " ",
-                 symnum(x$adj.pval,
-                        c(0, 0.001, 0.01, 0.05, 0.1, 1),
-                        symbols = c("***", "**", "*", ".", "")))
-  if (x$p.adjust.method == "none"){
+    symnum(x$adj.pval,
+      c(0, 0.001, 0.01, 0.05, 0.1, 1),
+      symbols = c("***", "**", "*", ".", "")
+    )
+  )
+  if (x$p.adjust.method == "none") {
     tab <- format(round(cbind(x$Sval, x$pval), 4))
     tab <- matrix(cbind(tab, sign), ncol = 3)
     colnames(tab) <- switch(x$test,
-                            "F" = c("F-value", "P-value", ""),
-                            "LR" = c("Chisq-value", "P-value", ""))
+      "F" = c("F-value", "P-value", ""),
+      "LR" = c("Chisq-value", "P-value", "")
+    )
   } else {
     tab <- format(round(cbind(x$Sval, x$pval, x$adj.pval), 4))
     tab <- matrix(cbind(tab, sign), ncol = 4)
     colnames(tab) <- switch(x$test,
-                            "F" = c("F-value", "P-value", "Adj. P-value", ""),
-                            "LR" = c("Chisq-value", "P-value", "Adj. P-value", ""))
+      "F" = c("F-value", "P-value", "Adj. P-value", ""),
+      "LR" = c("Chisq-value", "P-value", "Adj. P-value", "")
+    )
   }
 
   rownames(tab) <- colnames(x$Data)
@@ -738,20 +820,20 @@ print.difNLR <- function (x, ...){
   print(tab, quote = F, digits = 4, zero.print = F)
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
 
-  if (x$test == "F"){
-    if (dim(unique(x$df))[1] == 1){
+  if (x$test == "F") {
+    if (dim(unique(x$df))[1] == 1) {
       critical <- unique(qf(1 - x$alpha, x$df[, 1], x$df[, 2]))
     } else {
       critical <- NULL
     }
   } else {
-    if (length(unique(x$df)) == 1){
+    if (length(unique(x$df)) == 1) {
       critical <- unique(qchisq(1 - x$alpha, x$df))
     } else {
       critical <- NULL
     }
   }
-  if (!is.null(critical)){
+  if (!is.null(critical)) {
     cat(paste("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")", sep = ""))
   }
 
@@ -816,7 +898,7 @@ print.difNLR <- function (x, ...){
 #' # loading data based on GMAT
 #' data(GMAT)
 #'
-#' Data  <- GMAT[, 1:20]
+#' Data <- GMAT[, 1:20]
 #' group <- GMAT[, "group"]
 #'
 #' # testing both DIF effects using likelihood-ratio test and
@@ -830,43 +912,46 @@ print.difNLR <- function (x, ...){
 #' }
 #' @export
 plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2", "goldenrod2"),
-                        shape = 21, size = .8, linetype = c(2, 1), title, group.names, ...){
-
-  plotstat <- function(x, size = size, title = title){
-    if (x$conv.fail != 0){
-      if (length(x$conv.fail) == sum(!is.na(x$Sval))){
+                        shape = 21, size = .8, linetype = c(2, 1), title, group.names, ...) {
+  plotstat <- function(x, size = size, title = title) {
+    if (x$conv.fail != 0) {
+      if (length(x$conv.fail) == sum(!is.na(x$Sval))) {
         switch(x$test, "F" = stop("None of items does converge.
                                   F-statistic values not plotted", call. = FALSE),
-               "LR" = stop("None of items does converge.
-                           LR-statistic values not plotted", call. = FALSE))
+          "LR" = stop("None of items does converge.
+                           LR-statistic values not plotted", call. = FALSE)
+        )
       } else {
         switch(x$test, "F" = warning(paste("Item ", x$conv.fail.which,
-                                           " does not converge. F-statistic value not plotted",
-                                           sep = "", collapse = "\n"), call. = FALSE),
-               "LR" = warning(paste("Item ", x$conv.fail.which,
-                                    " does not converge. LR-statistic value not plotted",
-                                    sep = "", collapse = "\n"), call. = FALSE))
+          " does not converge. F-statistic value not plotted",
+          sep = "", collapse = "\n"
+        ), call. = FALSE),
+        "LR" = warning(paste("Item ", x$conv.fail.which,
+          " does not converge. LR-statistic value not plotted",
+          sep = "", collapse = "\n"
+        ), call. = FALSE)
+        )
       }
     }
 
-    if (missing(title)){
+    if (missing(title)) {
       title <- "Non-linear regression DIF detection with none multiple comparison correction"
     }
     n <- dim(x$Data)[1]
-    if (x$test == "F"){
-      if (dim(unique(x$df))[1] == 1){
+    if (x$test == "F") {
+      if (dim(unique(x$df))[1] == 1) {
         Sval_critical <- unique(qf(1 - x$alpha, x$df[, 1], x$df[, 2]))
       } else {
         Sval_critical <- NULL
       }
     } else {
-      if (length(unique(x$df)) == 1){
+      if (length(unique(x$df)) == 1) {
         Sval_critical <- unique(qchisq(1 - x$alpha, x$df))
       } else {
         Sval_critical <- NULL
       }
     }
-    if (is.null(Sval_critical)){
+    if (is.null(Sval_critical)) {
       stop("Critical values are different for different items. Plot cannot be rendered.")
     }
 
@@ -874,10 +959,13 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
     items <- setdiff(1:length(x$Sval), x$conv.fail.which)
     g <- as.factor(ifelse(x$Sval > Sval_critical, 1, 0))
     hv <- na.omit(as.data.frame(cbind(1:length(x$Sval), x$Sval, g)))
-    hv$g <- as.factor(hv$g); hv$V1 <- as.factor(hv$V1)
-    plot_stat <- ggplot(hv, aes_string(x = "V1", y = "V2",
-                                       label = "V1",
-                                       col = "g")) +
+    hv$g <- as.factor(hv$g)
+    hv$V1 <- as.factor(hv$V1)
+    plot_stat <- ggplot(hv, aes_string(
+      x = "V1", y = "V2",
+      label = "V1",
+      col = "g"
+    )) +
       ### points
       geom_text() +
       scale_color_manual(values = c("black", "red")) +
@@ -886,103 +974,120 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
       ### theme
       ggtitle(title) +
       labs(x = "Item", y = switch(x$test,
-                                  "F" = "F-statistic",
-                                  "LR" = "Chisq-statistic")) +
+        "F" = "F-statistic",
+        "LR" = "Chisq-statistic"
+      )) +
       theme_bw() +
-      theme(plot.title = element_text(face = "bold", vjust = 1.5),
-            axis.line  = element_line(colour = "black"),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            plot.background = element_rect(fill = "transparent", colour = NA),
-            axis.text.x = element_blank(),
-            axis.ticks.x = element_blank(),
-            legend.position = "none")
+      theme(
+        plot.title = element_text(face = "bold", vjust = 1.5),
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill = "transparent", colour = NA),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "none"
+      )
 
     return(plot_stat)
   }
 
-  if (missing(group.names)){
-    group.names = x$group.names
-    if (all(group.names %in% c(0, 1))) group.names = c("Reference", "Focal")
+  if (missing(group.names)) {
+    group.names <- x$group.names
+    if (all(group.names %in% c(0, 1))) group.names <- c("Reference", "Focal")
   }
 
   plotCC <- function(x, item = item,
                      col = col, shape = shape, size = size,
-                     linetype = linetype, title = title, group.names = group.names){
+                     linetype = linetype, title = title, group.names = group.names) {
     m <- length(x$nlrPAR)
-    if (class(item) == "character"){
-      if (item != "all")
+    if (class(item) == "character") {
+      if (item != "all") {
         stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
-             call. = FALSE)
+          call. = FALSE
+        )
+      }
     } else {
-      if (class(item) != "integer" & class(item) != "numeric")
+      if (class(item) != "integer" & class(item) != "numeric") {
         stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
-             call. = FALSE)
-    }
-    if (class(item) == "numeric" & !all(item %in% 1:m))
-      stop("Invalid number for 'item'.",
-           call. = FALSE)
-    if (class(item) == "integer" & !all(item %in% 1:m))
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
-           call. = FALSE)
-    if (length(col) == 1){
-      col <- rep(col, 2)
-    } else {
-      if (length(col) > 2){
-        col <- col[1:2]
-        warning("Length of 'col' is greater than 2. Only first two values are used.",
-                call. = FALSE)
+          call. = FALSE
+        )
       }
     }
-    if (class(item) == "character"){
+    if (class(item) == "numeric" & !all(item %in% 1:m)) {
+      stop("Invalid number for 'item'.",
+        call. = FALSE
+      )
+    }
+    if (class(item) == "integer" & !all(item %in% 1:m)) {
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
+        call. = FALSE
+      )
+    }
+    if (length(col) == 1) {
+      col <- rep(col, 2)
+    } else {
+      if (length(col) > 2) {
+        col <- col[1:2]
+        warning("Length of 'col' is greater than 2. Only first two values are used.",
+          call. = FALSE
+        )
+      }
+    }
+    if (class(item) == "character") {
       items <- 1:m
     } else {
       items <- item
     }
-    if (any(x$conv.fail.which %in% items)){
-      if (length(setdiff(items, x$conv.fail.which)) == 0){
+    if (any(x$conv.fail.which %in% items)) {
+      if (length(setdiff(items, x$conv.fail.which)) == 0) {
         stop(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
-                   sep = "", collapse = "\n"),
-             call. = FALSE)
+          sep = "", collapse = "\n"
+        ),
+        call. = FALSE
+        )
       } else {
         warning(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
-                      sep = "", collapse = "\n"),
-                call. = FALSE)
+          sep = "", collapse = "\n"
+        ),
+        call. = FALSE
+        )
         items <- setdiff(items, x$conv.fail.which)
       }
     }
-    if (length(linetype) != 2){
-      if (length(linetype) == 1){
+    if (length(linetype) != 2) {
+      if (length(linetype) == 1) {
         linetype <- rep(linetype, 2)
       } else {
         linetype <- linetype[1:2]
         warning("Length of 'linetype' is greater than 2. Only first two values are used.",
-                call. = FALSE)
+          call. = FALSE
+        )
       }
     }
-    if (length(group.names) > 2){
-      group.names = group.names[1:2]
+    if (length(group.names) > 2) {
+      group.names <- group.names[1:2]
       warning("Only first two values for 'group.names' argument are used. ")
     } else {
-      if (length(group.names) < 2){
-        group.names = c("Reference", "Focal")
+      if (length(group.names) < 2) {
+        group.names <- c("Reference", "Focal")
         warning("Argument 'group.names' need to have length of two. Default value is used.")
       }
     }
 
 
     ### functions
-    gNLR <- function(x, a, b, c, d){
-      c + (d - c)/(1 + exp(-a*(x - b)))
+    gNLR <- function(x, a, b, c, d) {
+      c + (d - c) / (1 + exp(-a * (x - b)))
     }
 
     ### Data
-    if (length(x$match) > 1){
+    if (length(x$match) > 1) {
       xlab <- "Matching criterion"
       xR <- x$match[x$group == 0]
       xF <- x$match[x$group == 1]
     } else {
-      if (x$match == "score"){
+      if (x$match == "score") {
         xlab <- "Total score"
         xR <- c(apply(x$Data[x$group == 0, ], 1, sum))
         xF <- c(apply(x$Data[x$group == 1, ], 1, sum))
@@ -993,55 +1098,78 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
       }
     }
 
-    max_sts <- max(as.numeric(levels(as.factor(xR))),
-                   as.numeric(levels(as.factor(xF))))
-    min_sts <- min(as.numeric(levels(as.factor(xR))),
-                   as.numeric(levels(as.factor(xF))))
+    max_sts <- max(
+      as.numeric(levels(as.factor(xR))),
+      as.numeric(levels(as.factor(xF)))
+    )
+    min_sts <- min(
+      as.numeric(levels(as.factor(xR))),
+      as.numeric(levels(as.factor(xF)))
+    )
     alpha <- 0.5
     plot_CC <- list()
 
-    for (i in items){
-      hv_R <- data.frame(cbind(as.numeric(levels(as.factor(xR))),
-                               tapply(x$Data[x$group == 0, i],
-                                      as.factor(xR), mean)))
-      hv_F <- data.frame(cbind(as.numeric(levels(as.factor(xF))),
-                               tapply(x$Data[x$group == 1, i],
-                                      as.factor(xF), mean)))
-      hv   <- data.frame(rbind(cbind(hv_R, Group = "Reference"),
-                               cbind(hv_F, Group = "Focal")))
+    for (i in items) {
+      hv_R <- data.frame(cbind(
+        as.numeric(levels(as.factor(xR))),
+        tapply(
+          x$Data[x$group == 0, i],
+          as.factor(xR), mean
+        )
+      ))
+      hv_F <- data.frame(cbind(
+        as.numeric(levels(as.factor(xF))),
+        tapply(
+          x$Data[x$group == 1, i],
+          as.factor(xF), mean
+        )
+      ))
+      hv <- data.frame(rbind(
+        cbind(hv_R, Group = "Reference"),
+        cbind(hv_F, Group = "Focal")
+      ))
       rownames(hv) <- 1:dim(hv)[1]
       hv$size <- c(table(xR), table(xF))
 
-      if (!missing(title)){
+      if (!missing(title)) {
         TITLE <- title
       } else {
         TITLE <- colnames(x$Data)[i]
       }
 
-      PAR <- data.frame(a = 1, b = 0, c = 0, d = 1,
-                        aDif = 0, bDif = 0, cDif = 0, dDif = 0)
+      PAR <- data.frame(
+        a = 1, b = 0, c = 0, d = 1,
+        aDif = 0, bDif = 0, cDif = 0, dDif = 0
+      )
       PAR[names(x$nlrPAR[[i]])] <- x$nlrPAR[[i]]
       PARR <- PAR[1:4]
       PARF <- PAR[1:4] + PAR[5:8]
 
       plot_CC[[i]] <- ggplot(hv, aes_string("X1", "X2")) +
         ### points
-        geom_point(aes_string(colour = "Group",
-                              fill = "Group",
-                              size = "size"),
-                   alpha = alpha, shape = shape) +
+        geom_point(aes_string(
+          colour = "Group",
+          fill = "Group",
+          size = "size"
+        ),
+        alpha = alpha, shape = shape
+        ) +
         ### lines
-        stat_function(aes(colour = "Reference",
-                          linetype = "Reference"),
-                      fun = gNLR,
-                      args = as.list(PARR),
-                      size = size,
-                      geom = "line") +
+        stat_function(aes(
+          colour = "Reference",
+          linetype = "Reference"
+        ),
+        fun = gNLR,
+        args = as.list(PARR),
+        size = size,
+        geom = "line"
+        ) +
         stat_function(aes(colour = "Focal", linetype = "Focal"),
-                      fun = gNLR,
-                      args = as.list(PARF),
-                      size = size,
-                      geom = "line") +
+          fun = gNLR,
+          args = as.list(PARF),
+          size = size,
+          geom = "line"
+        ) +
         ### style
         scale_colour_manual(breaks = levels(hv$Group), values = col, name = "Group", labels = group.names) +
         scale_fill_manual(breaks = levels(hv$Group), values = col, name = "Group", labels = group.names) +
@@ -1051,36 +1179,45 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
         labs(x = xlab, y = "Probability of correct answer") +
         scale_y_continuous(limits = c(0, 1)) +
         theme_bw() +
-        theme(axis.line  = element_line(colour = "black"),
-              panel.grid.major = element_blank(),
-              panel.grid.minor = element_blank(),
-              plot.background = element_rect(fill = "transparent", colour = NA),
-              legend.key = element_rect(fill = "white", colour = NA),
-              legend.background = element_rect(fill = "transparent", colour = NA),
-              legend.box.background = element_rect(fill = "transparent", colour = NA)) +
+        theme(
+          axis.line = element_line(colour = "black"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          plot.background = element_rect(fill = "transparent", colour = NA),
+          legend.key = element_rect(fill = "white", colour = NA),
+          legend.background = element_rect(fill = "transparent", colour = NA),
+          legend.box.background = element_rect(fill = "transparent", colour = NA)
+        ) +
         ### legend
-        theme(legend.box.just = "top",
-              legend.justification = c("left", "top"),
-              legend.position = c(0.02, 0.98),
-              legend.box = "horizontal",
-              legend.box.margin = margin(3, 3, 3, 3)) +
-        guides(size = guide_legend(title = "Count", order = 1),
-               colour = guide_legend(title = "Group", order = 2),
-               fill = guide_legend(title = "Group", order = 2),
-               linetype = guide_legend(title = "Group", order = 2))
+        theme(
+          legend.box.just = "top",
+          legend.justification = c("left", "top"),
+          legend.position = c(0.02, 0.98),
+          legend.box = "horizontal",
+          legend.box.margin = margin(3, 3, 3, 3)
+        ) +
+        guides(
+          size = guide_legend(title = "Count", order = 1),
+          colour = guide_legend(title = "Group", order = 2),
+          fill = guide_legend(title = "Group", order = 2),
+          linetype = guide_legend(title = "Group", order = 2)
+        )
     }
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     return(plot_CC)
   }
   ### checking input
-  if (!(plot.type %in% c("cc", "stat"))){
+  if (!(plot.type %in% c("cc", "stat"))) {
     stop("Invalid value for 'plot.type'. Possible values of 'plot.type' is 'cc' or 'stat'.",
-         call. = FALSE)
+      call. = FALSE
+    )
   } else {
-    if (plot.type == "cc"){
-      plotCC(x, item = item,
-             col = col, shape = shape, size = size,
-             linetype = linetype, title = title, group.names = group.names)
+    if (plot.type == "cc") {
+      plotCC(x,
+        item = item,
+        col = col, shape = shape, size = size,
+        linetype = linetype, title = title, group.names = group.names
+      )
     } else {
       plotstat(x, size = size, title = title)
     }
@@ -1089,39 +1226,51 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
 
 #' @rdname difNLR
 #' @export
-fitted.difNLR <- function(object, item = "all", ...){
+fitted.difNLR <- function(object, item = "all", ...) {
 
   ### checking input
   m <- length(object$nlrPAR)
-  if (class(item) == "character"){
-    if (item != "all")
+  if (class(item) == "character") {
+    if (item != "all") {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-           call. = FALSE)
+        call. = FALSE
+      )
+    }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric")
+    if (class(item) != "integer" & class(item) != "numeric") {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-           call. = FALSE)
+        call. = FALSE
+      )
+    }
   }
-  if (class(item) == "numeric" & !all(item %in% 1:m))
+  if (class(item) == "numeric" & !all(item %in% 1:m)) {
     stop("Invalid number for 'item'.",
-         call. = FALSE)
-  if (class(item) == "integer" & !all(item %in% 1:m))
+      call. = FALSE
+    )
+  }
+  if (class(item) == "integer" & !all(item %in% 1:m)) {
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-         call. = FALSE)
-  if (class(item) == "character"){
+      call. = FALSE
+    )
+  }
+  if (class(item) == "character") {
     items <- 1:m
   } else {
     items <- item
   }
-  if (any(object$conv.fail.which %in% items)){
-    if (length(setdiff(items, object$conv.fail.which)) == 0){
+  if (any(object$conv.fail.which %in% items)) {
+    if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-                 sep = "", collapse = "\n"),
-           call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
     } else {
       warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-                    sep = "", collapse = "\n"),
-              call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
       ITEMS <- setdiff(items, object$conv.fail.which)
     }
   } else {
@@ -1129,21 +1278,23 @@ fitted.difNLR <- function(object, item = "all", ...){
   }
 
   ### functions
-  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
+  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
     return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
   }
 
-  PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1,
-                    aDif = 0, bDif = 0, cDif = 0, dDif = 0)
-  for (i in ITEMS){
+  PAR <- data.frame(
+    a = rep(1, m), b = 0, c = 0, d = 1,
+    aDif = 0, bDif = 0, cDif = 0, dDif = 0
+  )
+  for (i in ITEMS) {
     PAR[i, names(object$nlrPAR[[i]])] <- object$nlrPAR[[i]]
   }
 
   ### data
-  if (length(object$match) > 1){
+  if (length(object$match) > 1) {
     match <- object$match
   } else {
-    if (object$match == "score"){
+    if (object$match == "score") {
       match <- c(apply(object$Data, 1, sum))
     } else {
       match <- c(scale(apply(object$Data, 1, sum)))
@@ -1152,11 +1303,15 @@ fitted.difNLR <- function(object, item = "all", ...){
 
   ### fitted values
   FV <- as.list(rep(NA, m))
-  FV[ITEMS] <- lapply(ITEMS, function(i) gNLR(match, object$group,
-                                              PAR[i, "a"], PAR[i, "b"],
-                                              PAR[i, "c"], PAR[i, "d"],
-                                              PAR[i, "aDif"], PAR[i, "bDif"],
-                                              PAR[i, "cDif"], PAR[i, "dDif"]))
+  FV[ITEMS] <- lapply(ITEMS, function(i) {
+    gNLR(
+      match, object$group,
+      PAR[i, "a"], PAR[i, "b"],
+      PAR[i, "c"], PAR[i, "d"],
+      PAR[i, "aDif"], PAR[i, "bDif"],
+      PAR[i, "cDif"], PAR[i, "dDif"]
+    )
+  })
   FV <- do.call(cbind, FV)
   colnames(FV) <- colnames(object$Data)
   rownames(FV) <- rownames(object$Data)
@@ -1206,7 +1361,7 @@ fitted.difNLR <- function(object, item = "all", ...){
 #' # loading data based on GMAT
 #' data(GMAT)
 #'
-#' Data  <- GMAT[, 1:20]
+#' Data <- GMAT[, 1:20]
 #' group <- GMAT[, "group"]
 #'
 #' # Testing both DIF effects using likelihood-ratio test and
@@ -1223,31 +1378,39 @@ fitted.difNLR <- function(object, item = "all", ...){
 #' }
 #'
 #' @export
-predict.difNLR <- function(object, item = "all", match, group, ...){
+predict.difNLR <- function(object, item = "all", match, group, ...) {
 
   ### checking input
   m <- length(object$nlrPAR)
-  if (class(item) == "character"){
-    if (item != "all")
+  if (class(item) == "character") {
+    if (item != "all") {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-           call. = FALSE)
+        call. = FALSE
+      )
+    }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric")
+    if (class(item) != "integer" & class(item) != "numeric") {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-           call. = FALSE)
+        call. = FALSE
+      )
+    }
   }
-  if (class(item) == "numeric" & !all(item %in% 1:m))
+  if (class(item) == "numeric" & !all(item %in% 1:m)) {
     stop("Invalid number for 'item'.",
-         call. = FALSE)
-  if (class(item) == "integer" & !all(item %in% 1:m))
+      call. = FALSE
+    )
+  }
+  if (class(item) == "integer" & !all(item %in% 1:m)) {
     stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-         call. = FALSE)
+      call. = FALSE
+    )
+  }
 
-  if (missing(match)){
-    if (length(object$match) > 1){
+  if (missing(match)) {
+    if (length(object$match) > 1) {
       match <- object$match
     } else {
-      if (object$match == "score"){
+      if (object$match == "score") {
         match <- c(apply(object$Data, 1, sum))
       } else {
         match <- c(scale(apply(object$Data, 1, sum)))
@@ -1255,27 +1418,32 @@ predict.difNLR <- function(object, item = "all", match, group, ...){
     }
   }
 
-  if (missing(group)){
+  if (missing(group)) {
     group <- object$group
   }
-  if(length(match) != length(group)){
+  if (length(match) != length(group)) {
     stop("Arguments 'match' and 'group' must be of the same length.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
-  if (class(item) == "character"){
+  if (class(item) == "character") {
     items <- 1:m
   } else {
     items <- item
   }
-  if (any(object$conv.fail.which %in% items)){
-    if (length(setdiff(items, object$conv.fail.which)) == 0){
+  if (any(object$conv.fail.which %in% items)) {
+    if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-                 sep = "", collapse = "\n"),
-           call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
     } else {
       warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-                    sep = "", collapse = "\n"),
-              call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
       ITEMS <- setdiff(items, object$conv.fail.which)
     }
   } else {
@@ -1283,25 +1451,31 @@ predict.difNLR <- function(object, item = "all", match, group, ...){
   }
 
   ### functions
-  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif){
+  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
     return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
   }
 
-  PAR <- data.frame(a = rep(1, m), b = 0, c = 0, d = 1,
-                    aDif = 0, bDif = 0, cDif = 0, dDif = 0)
-  for (i in ITEMS){
+  PAR <- data.frame(
+    a = rep(1, m), b = 0, c = 0, d = 1,
+    aDif = 0, bDif = 0, cDif = 0, dDif = 0
+  )
+  for (i in ITEMS) {
     PAR[i, names(object$nlrPAR[[i]])] <- object$nlrPAR[[i]]
   }
 
   ### predicted values
   PV <- as.list(rep(NA, m))
-  PV[ITEMS] <- lapply(ITEMS, function(i) gNLR(match, group, PAR[i, "a"], PAR[i, "b"],
-                                              PAR[i, "c"], PAR[i, "d"],
-                                              PAR[i, "aDif"], PAR[i, "bDif"],
-                                              PAR[i, "cDif"], PAR[i, "dDif"]))
+  PV[ITEMS] <- lapply(ITEMS, function(i) {
+    gNLR(
+      match, group, PAR[i, "a"], PAR[i, "b"],
+      PAR[i, "c"], PAR[i, "d"],
+      PAR[i, "aDif"], PAR[i, "bDif"],
+      PAR[i, "cDif"], PAR[i, "dDif"]
+    )
+  })
   PV <- do.call(cbind, PV)
   colnames(PV) <- colnames(object$Data)
-  if (dim(PV)[1] == dim(object$Data)[1]){
+  if (dim(PV)[1] == dim(object$Data)[1]) {
     rownames(PV) <- rownames(object$Data)
   }
 
@@ -1315,40 +1489,44 @@ predict.difNLR <- function(object, item = "all", match, group, ...){
 #' @param simplify logical: should the result be simplified to a matrix? (default is \code{FALSE}).
 #' @rdname difNLR
 #' @export
-coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...){
-  if (class(SE) != "logical")
+coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
+  if (class(SE) != "logical") {
     stop("Invalid value for 'SE'. 'SE' need to be logical. ",
-         call. = FALSE)
-  if (class(simplify) != "logical")
+      call. = FALSE
+    )
+  }
+  if (class(simplify) != "logical") {
     stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
-         call. = FALSE)
-
-  m = dim(object$Data)[2]
-  nams = colnames(object$Data)
-
-  coefs = object$nlrPAR
-  names(coefs) = nams
-
-  if (SE){
-    se = object$nlrSE
-    names(se) = nams
-    coefs = lapply(nams, function(i) rbind(coefs[[i]], se[[i]]))
-    coefs = lapply(coefs, "rownames<-", c("estimate", "SE"))
-    names(coefs) = nams
+      call. = FALSE
+    )
   }
 
-  if (simplify){
-    res = as.data.frame(plyr::ldply(coefs, rbind))
+  m <- dim(object$Data)[2]
+  nams <- colnames(object$Data)
+
+  coefs <- object$nlrPAR
+  names(coefs) <- nams
+
+  if (SE) {
+    se <- object$nlrSE
+    names(se) <- nams
+    coefs <- lapply(nams, function(i) rbind(coefs[[i]], se[[i]]))
+    coefs <- lapply(coefs, "rownames<-", c("estimate", "SE"))
+    names(coefs) <- nams
+  }
+
+  if (simplify) {
+    res <- as.data.frame(plyr::ldply(coefs, rbind))
     if (SE) {
-      resnams = paste(res[, 1], c("estimate", "SE"))
+      resnams <- paste(res[, 1], c("estimate", "SE"))
     } else {
-      resnams = res[, 1]
+      resnams <- res[, 1]
     }
-    res = res[, -1]
-    rownames(res) = resnams
-    res[is.na(res)] = 0
+    res <- res[, -1]
+    rownames(res) <- resnams
+    res[is.na(res)] <- 0
   } else {
-    res = coefs
+    res <- coefs
   }
 
   return(res)
@@ -1356,44 +1534,56 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...){
 
 #' @rdname difNLR
 #' @export
-logLik.difNLR <- function(object, item = "all", ...){
-  m = length(object$nlrPAR)
-  nams = colnames(object$Data)
+logLik.difNLR <- function(object, item = "all", ...) {
+  m <- length(object$nlrPAR)
+  nams <- colnames(object$Data)
 
-  if (class(item) == "character"){
-    if (item != "all" & !item %in% nams)
+  if (class(item) == "character") {
+    if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m))
-    stop("Invalid number for 'item'.",
-         call. = FALSE)
-  if (class(item) == "integer" & !all(item %in% 1:m))
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-         call. = FALSE)
-  if (class(item) == "character"){
-    if (item[1] == "all"){
-      items = 1:m
-    } else {
-      items = which(nams %in% item)
+        call. = FALSE
+      )
     }
   } else {
-    items = item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+        call. = FALSE
+      )
+    }
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m)) {
+    stop("Invalid number for 'item'.",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "integer" & !all(item %in% 1:m)) {
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "character") {
+    if (item[1] == "all") {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
+    }
+  } else {
+    items <- item
   }
 
-  if (any(object$conv.fail.which %in% items)){
-    if (length(setdiff(items, object$conv.fail.which)) == 0){
+  if (any(object$conv.fail.which %in% items)) {
+    if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-                 sep = "", collapse = "\n"),
-           call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
     } else {
       warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-                    sep = "", collapse = "\n"),
-              call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
       ITEMS <- setdiff(items, object$conv.fail.which)
     }
   } else {
@@ -1403,14 +1593,16 @@ logLik.difNLR <- function(object, item = "all", ...){
   val <- df <- rep(NA, m)
 
   val[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-                       object$llM0[ITEMS],
-                       object$llM1[ITEMS])
+    object$llM0[ITEMS],
+    object$llM1[ITEMS]
+  )
   df[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-                      sapply(object$parM0, length)[ITEMS],
-                      sapply(object$parM1, length)[ITEMS])
+    sapply(object$parM0, length)[ITEMS],
+    sapply(object$parM1, length)[ITEMS]
+  )
   val <- val[items]
   df <- df[items]
-  if (length(items) == 1){
+  if (length(items) == 1) {
     attr(val, "df") <- df
     class(val) <- "logLik"
   }
@@ -1420,44 +1612,56 @@ logLik.difNLR <- function(object, item = "all", ...){
 
 #' @rdname difNLR
 #' @export
-AIC.difNLR <- function(object, item = "all", ...){
-  m = length(object$nlrPAR)
-  nams = colnames(object$Data)
+AIC.difNLR <- function(object, item = "all", ...) {
+  m <- length(object$nlrPAR)
+  nams <- colnames(object$Data)
 
-  if (class(item) == "character"){
-    if (item != "all" & !item %in% nams)
+  if (class(item) == "character") {
+    if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m))
-    stop("Invalid number for 'item'.",
-         call. = FALSE)
-  if (class(item) == "integer" & !all(item %in% 1:m))
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-         call. = FALSE)
-  if (class(item) == "character"){
-    if (item[1] == "all"){
-      items = 1:m
-    } else {
-      items = which(nams %in% item)
+        call. = FALSE
+      )
     }
   } else {
-    items = item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+        call. = FALSE
+      )
+    }
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m)) {
+    stop("Invalid number for 'item'.",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "integer" & !all(item %in% 1:m)) {
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "character") {
+    if (item[1] == "all") {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
+    }
+  } else {
+    items <- item
   }
 
-  if (any(object$conv.fail.which %in% items)){
-    if (length(setdiff(items, object$conv.fail.which)) == 0){
+  if (any(object$conv.fail.which %in% items)) {
+    if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-                 sep = "", collapse = "\n"),
-           call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
     } else {
       warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-                    sep = "", collapse = "\n"),
-              call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
       ITEMS <- setdiff(items, object$conv.fail.which)
     }
   } else {
@@ -1466,9 +1670,10 @@ AIC.difNLR <- function(object, item = "all", ...){
 
   k <- AIC <- rep(NA, m)
   k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-                     sapply(object$parM0, length)[ITEMS],
-                     sapply(object$parM1, length)[ITEMS])
-  AIC[ITEMS] <- 2*k[ITEMS] - 2*logLik(object, item = ITEMS)
+    sapply(object$parM0, length)[ITEMS],
+    sapply(object$parM1, length)[ITEMS]
+  )
+  AIC[ITEMS] <- 2 * k[ITEMS] - 2 * logLik(object, item = ITEMS)
   AIC <- AIC[items]
 
   return(AIC)
@@ -1476,44 +1681,56 @@ AIC.difNLR <- function(object, item = "all", ...){
 
 #' @rdname difNLR
 #' @export
-BIC.difNLR <- function(object, item = "all", ...){
-  m = length(object$nlrPAR)
-  nams = colnames(object$Data)
+BIC.difNLR <- function(object, item = "all", ...) {
+  m <- length(object$nlrPAR)
+  nams <- colnames(object$Data)
 
-  if (class(item) == "character"){
-    if (item != "all" & !item %in% nams)
+  if (class(item) == "character") {
+    if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m))
-    stop("Invalid number for 'item'.",
-         call. = FALSE)
-  if (class(item) == "integer" & !all(item %in% 1:m))
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-         call. = FALSE)
-  if (class(item) == "character"){
-    if (item[1] == "all"){
-      items = 1:m
-    } else {
-      items = which(nams %in% item)
+        call. = FALSE
+      )
     }
   } else {
-    items = item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+        call. = FALSE
+      )
+    }
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m)) {
+    stop("Invalid number for 'item'.",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "integer" & !all(item %in% 1:m)) {
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "character") {
+    if (item[1] == "all") {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
+    }
+  } else {
+    items <- item
   }
 
-  if (any(object$conv.fail.which %in% items)){
-    if (length(setdiff(items, object$conv.fail.which)) == 0){
+  if (any(object$conv.fail.which %in% items)) {
+    if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-                 sep = "", collapse = "\n"),
-           call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
     } else {
       warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-                    sep = "", collapse = "\n"),
-              call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
       ITEMS <- setdiff(items, object$conv.fail.which)
     }
   } else {
@@ -1521,10 +1738,11 @@ BIC.difNLR <- function(object, item = "all", ...){
   }
   k <- BIC <- rep(NA, m)
   k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-                     sapply(object$parM0, length)[ITEMS],
-                     sapply(object$parM1, length)[ITEMS])
+    sapply(object$parM0, length)[ITEMS],
+    sapply(object$parM1, length)[ITEMS]
+  )
   n <- dim(object$Data)[1]
-  BIC[ITEMS] <- log(n)*k[ITEMS] - 2*logLik(object, item = ITEMS)
+  BIC[ITEMS] <- log(n) * k[ITEMS] - 2 * logLik(object, item = ITEMS)
   BIC <- BIC[items]
 
   return(BIC)
@@ -1533,56 +1751,68 @@ BIC.difNLR <- function(object, item = "all", ...){
 #' @aliases resid.difNLR
 #' @rdname difNLR
 #' @export
-residuals.difNLR <- function(object, item = "all", ...){
+residuals.difNLR <- function(object, item = "all", ...) {
   ### checking input
-  m = length(object$nlrPAR)
-  n = dim(object$Data)[1]
-  nams = colnames(object$Data)
+  m <- length(object$nlrPAR)
+  n <- dim(object$Data)[1]
+  nams <- colnames(object$Data)
 
-  if (class(item) == "character"){
-    if (item != "all" & !item %in% nams)
+  if (class(item) == "character") {
+    if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric")
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-           call. = FALSE)
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m))
-    stop("Invalid number for 'item'.",
-         call. = FALSE)
-  if (class(item) == "integer" & !all(item %in% 1:m))
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-         call. = FALSE)
-  if (class(item) == "character"){
-    if (item[1] == "all"){
-      items = 1:m
-    } else {
-      items = which(nams %in% item)
+        call. = FALSE
+      )
     }
   } else {
-    items = item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+        call. = FALSE
+      )
+    }
+  }
+  if (class(item) == "numeric" & !all(item %in% 1:m)) {
+    stop("Invalid number for 'item'.",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "integer" & !all(item %in% 1:m)) {
+    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
+      call. = FALSE
+    )
+  }
+  if (class(item) == "character") {
+    if (item[1] == "all") {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
+    }
+  } else {
+    items <- item
   }
 
-  if (any(object$conv.fail.which %in% items)){
-    if (length(setdiff(items, object$conv.fail.which)) == 0){
+  if (any(object$conv.fail.which %in% items)) {
+    if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-                 sep = "", collapse = "\n"),
-           call. = FALSE)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
     } else {
       warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-                    sep = "", collapse = "\n"),
-              call. = FALSE)
-      ITEMS = setdiff(items, object$conv.fail.which)
+        sep = "", collapse = "\n"
+      ),
+      call. = FALSE
+      )
+      ITEMS <- setdiff(items, object$conv.fail.which)
     }
   } else {
-    ITEMS = items
+    ITEMS <- items
   }
 
-  residuals = matrix(NA, nrow = n, ncol = m)
-  residuals[, ITEMS] = as.matrix(object$Data[, ITEMS] - fitted(object, item = ITEMS))
+  residuals <- matrix(NA, nrow = n, ncol = m)
+  residuals[, ITEMS] <- as.matrix(object$Data[, ITEMS] - fitted(object, item = ITEMS))
 
-  residuals = residuals[, items]
+  residuals <- residuals[, items]
 
   return(residuals)
 }

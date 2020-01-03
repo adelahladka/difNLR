@@ -186,9 +186,13 @@ coef(x, SE = T) # with SE
 coef(x, SE = T, simplify = T) # with SE, simplified
 
 # AIC, BIC, log-likelihood
-AIC(x); BIC(x); logLik(x)
+AIC(x)
+BIC(x)
+logLik(x)
 # AIC, BIC, log-likelihood for the first item
-AIC(x, item = 1); BIC(x, item = 1); logLik(x, item = 1)
+AIC(x, item = 1)
+BIC(x, item = 1)
+logLik(x, item = 1)
 
 # Testing both DDF effects with Benjamini-Hochberg adjustment method
 ddfORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")

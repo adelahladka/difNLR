@@ -32,4 +32,3 @@
 #' @format A data frame with 20 values representing correct answers to items of \code{GMATtest}
 #' data set. For more details see \code{\link{GMATtest}}.
 "GMATkey"
-

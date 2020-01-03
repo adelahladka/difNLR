@@ -36,4 +36,4 @@
 #' group membership; values 0 and 1 refer to reference and focal group.
 #' Correct answers are presented in \code{\link{GMAT2key}} data set.
 "GMAT2test"
-#> [1] "GMAT2test"
+# > [1] "GMAT2test"

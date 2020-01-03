@@ -106,7 +106,6 @@ b[1:2, c(2, 4)] <- NA
 genNLR(N = 300, itemtype = "nominal", a = a, b = b)
 # generating nominal data set with 300 observations (250 reference group, 50 focal)
 genNLR(N = 300, itemtype = "nominal", ratio = 5, a = a, b = b)
-
 }
 }
 \references{

@@ -47,7 +47,7 @@ are used.
 # loading data based on GMAT
 data(GMAT)
 
-Data  <- GMAT[, 1:20]
+Data <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
 # testing both DIF effects using likelihood-ratio test and

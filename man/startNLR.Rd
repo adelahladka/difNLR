@@ -60,7 +60,7 @@ parameterization.
 # loading data based on GMAT
 data(GMAT)
 
-Data  <- GMAT[, 1:20]
+Data <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
 # starting values for 3PL model
@@ -76,9 +76,11 @@ startNLR(Data, group, model = "3PL", match = "score")
 
 # starting values for model specified for each item
 startNLR(Data, group,
-         model = c(rep("1PL", 5), rep("2PL", 5),
-                   rep("3PL", 5), rep("4PL", 5)))
-
+  model = c(
+    rep("1PL", 5), rep("2PL", 5),
+    rep("3PL", 5), rep("4PL", 5)
+  )
+)
 }
 
 }

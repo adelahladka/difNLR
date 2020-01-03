@@ -14,8 +14,8 @@ checkInterval(x, vec)
 \description{
 Checks whether \code{x} lies in interval defined by bounds in \code{vec}. If it does,
 it returns value of \code{x}. In case that value of \code{x} is lower than lower bound specified
-in \code{vec}, it returns it value. In case that value of \code{x} is greater than upper bound specified
-in \code{vec}, it returns it value.
+in \code{vec}, it returns its value. In case that value of \code{x} is greater than upper bound specified
+in \code{vec}, it returns its value.
 }
 \examples{
 \dontrun{

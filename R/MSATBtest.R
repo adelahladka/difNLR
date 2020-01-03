@@ -34,4 +34,3 @@
 #' values 0 and 1 refer to males (reference group) and females (focal group).
 #' @docType data
 "MSATBtest"
-

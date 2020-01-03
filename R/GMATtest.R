@@ -41,4 +41,3 @@
 #' representing variable which is intended to be predicted by test.
 #' Correct answers are presented in \code{\link{GMATkey}} data set.
 "GMATtest"
-

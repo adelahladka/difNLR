@@ -30,4 +30,4 @@
 #' dichotomously scored items of the test. The 21st column is vector of group membership; values 0 and 1 refer to reference and
 #' focal group.
 "GMAT2"
-#> [1] "GMAT2"
+# > [1] "GMAT2"

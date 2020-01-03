@@ -152,7 +152,7 @@ alternative parameterization.
 # loading data based on GMAT
 data(GMAT)
 
-Data  <- GMAT[, 1:20]
+Data <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
 # Testing both DIF effects using LR test (default)

@@ -39,4 +39,3 @@
 #' of group membership; values 0 and 1 refer to reference and focal group. The 22nd column is vector
 #' representing variable which is intended to be predicted by test.
 "GMAT"
-
