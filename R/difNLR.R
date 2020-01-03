@@ -14,9 +14,9 @@
 #' focal group
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
 #' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
-#' @param type character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-#' \code{"nudif"}, \code{"all"}, or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}.
-#' See \strong{Details}.
+#' @param type character: type of DIF to be tested. Possible values are \code{"all"} (default), \code{"udif"} for
+#' uniform DIF only, \code{"nudif"} for non-uniform DIF only, \code{"both"} for uniform and non-uniform DIF,
+#' or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}.
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
 #' squares (default) and \code{"likelihood"} for maximum likelihood method.
 #' @param match character or numeric: specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
@@ -40,7 +40,7 @@
 #' corresponding to column indicators.
 #' @param ... other generic parameters for S3 methods.
 #'
-#' @usage difNLR(Data, group, focal.name, model, constraints, type = "both", method = "nls",
+#' @usage difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
 #' match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
 #' p.adjust.method = "none", start, initboot = T, nrBo = 20)
 #'
@@ -55,9 +55,7 @@
 #'
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct
 #' answer (i.e., y = 1) is
-#'
 #' P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
-#'
 #' where x is by default standardized total score (also called Z-score) and g is group membership.
 #' Parameters a, b, c and d are discrimination, difficulty, guessing and inattention.
 #' Terms aDif, bDif, cDif and dDif then represent differences between two groups in relevant
@@ -296,7 +294,7 @@
 #'
 #' @keywords DIF
 #' @export
-difNLR <- function(Data, group, focal.name, model, constraints, type = "both", method = "nls",
+difNLR <- function(Data, group, focal.name, model, constraints, type = "all", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start,
                    initboot = T, nrBo = 20) {

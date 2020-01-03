@@ -5,6 +5,23 @@
 ****************************************************
 
 ------------------------------------------
+- Changes in difNLR 1.3.0-2 (2019-01-03) -
+------------------------------------------
+
+DOCUMENTATION
+  o Documentation for all data was updated. Format of data was fixed.
+  o Documentation of estimNLR() was improved.
+
+MAJOR CHANGES
+  o Default option of argument type in difNLR() function was set
+    to "all" instead of "both".
+
+MINOR CHANGES
+  o Package styler was used to improve formatting of the code.
+  o Package ShinyItemAnalysis was added into Suggests.
+  o Figures for README were updated.
+
+------------------------------------------
 - Changes in difNLR 1.3.0-1 (2019-12-16) -
 ------------------------------------------
 
