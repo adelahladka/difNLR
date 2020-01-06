@@ -5,7 +5,22 @@
 ****************************************************
 
 ------------------------------------------
-- Changes in difNLR 1.3.0-2 (2019-01-03) -
+- Changes in difNLR 1.3.0-3 (2020-01-06) -
+------------------------------------------
+
+DOCUMENTATION
+  o Documentation of difNLR() function and its S3 methods was updated.
+  o Documentation of NLR() function was updated.
+  o Documentation of estimNLR() function was updated.
+
+MINOR CHANGES
+  o Argument item for S3 methods of difNLR class can be now
+    name of the column in Data.
+  o Seed was added for re-calculation of bootstrapped initial values
+    in NLR() estimation.
+
+------------------------------------------
+- Changes in difNLR 1.3.0-2 (2020-01-03) -
 ------------------------------------------
 
 DOCUMENTATION

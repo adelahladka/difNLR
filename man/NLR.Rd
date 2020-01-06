@@ -9,40 +9,57 @@ match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test =
 alpha = 0.05, initboot = T, nrBo = 20)
 }
 \arguments{
-\item{Data}{numeric: either binary data matrix only, or the binary data matrix plus the vector of group .
-See \strong{Details}.}
+\item{Data}{numeric: numeric: matrix which rows represents scored examinee answers (\code{"1"} correct,
+\code{"0"} incorrect) and columns correspond to the items.}
 
-\item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.}
+\item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for
+focal group.}
 
 \item{model}{character: generalized logistic regression model to be fitted. See \strong{Details}.}
 
-\item{constraints}{character: which parameters should be the same for both groups. Default value is \code{NULL}. See \strong{Details}.}
+\item{constraints}{character: which parameters should be the same for both groups. Possible values
+are any combinations of parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}. Default value
+is \code{NULL}. See \strong{Details}.}
 
-\item{type}{character: type of DIF to be tested. Possible values are \code{"both"} (default), \code{"udif"},
-\code{"nudif"}, \code{"all"}, or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}. See \strong{Details}.}
+\item{type}{character: type of DIF to be tested. Possible values are \code{"all"} for detecting
+difference in any parameter (default), \code{"udif"} for uniform DIF only (i.e., difference in
+difficulty parameter \code{"b"}), \code{"nudif"} for non-uniform DIF only (i.e., difference in
+discrimination parameter \code{"a"}), \code{"both"} for uniform and non-uniform DIF (i.e.,
+difference in parameters \code{"a"} and \code{"b"}), or combination of parameters \code{"a"},
+\code{"b"}, \code{"c"}, and \code{"d"}. Can be specified as a single value (for all items) or as
+an item-specific vector.}
 
-\item{method}{character: what method should be used for estimation of parameters in \code{model}. The options are
-\code{"nls"} for non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.}
+\item{method}{character: method used to estimate parameters. The options are \code{"nls"} for
+non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.}
 
-\item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-\code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.}
+\item{match}{character or numeric: matching criterion to be used as estimate of trait. Can be
+either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
+or numeric vector of the same length as number of observations in \code{Data}.}
 
-\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DIF free) items. By
-default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-See \strong{Details}.}
+\item{anchor}{character or numeric: specification of DIF free items. A vector of item identifiers
+(integers specifying the column  number) specifying which items are currently considered as anchor
+(DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
 
-\item{start}{numeric: matrix with n rows (where n is the number of items) and 8 columns containing initial
-item parameters estimates. See \strong{Details}.}
+\item{start}{numeric: initial values for estimation of parameters. If not specified, starting
+values are calculated with \code{\link[difNLR]{startNLR}} function. Otherwise, list with as many
+elements as number of items. Each element is a named numeric vector of length 8 representing initial
+values for parameter estimation. Specifically, parameters \code{"a"}, \code{"b"}, \code{"c"}, and
+\code{"d"} are initial values for discrimination, difficulty, guessing, and inattention for reference
+group. Parameters \code{"aDif"}, \code{"bDif"}, \code{"cDif"}, and \code{"dDif"} are then differences
+in these parameters between reference and focal group.}
 
-\item{p.adjust.method}{character: method for multiple comparison correction. See \strong{Details}.}
+\item{p.adjust.method}{character: method for multiple comparison correction. Possible values are
+\code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+\code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.}
 
-\item{test}{character: test to be performed for DIF detection (either \code{"LR"} (default), or \code{"F"}).
-See \strong{Details}.}
+\item{test}{character: test to be performed for DIF detection. Can be either \code{"LR"} for
+likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a submodel.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 
 \item{initboot}{logical: in case of convergence issues, should be starting values recalculated based on
-bootstraped samples? (default is \code{TRUE}). See \strong{Details}.}
+bootstraped samples? (default is \code{TRUE}; newly calculated initial values are applied only to
+items/models with convergence issues).}
 
 \item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
 bootstraped samples (default is 20).}
@@ -74,29 +91,24 @@ A list with the following arguments:
 }
 }
 \description{
-Calculates either DIF likelihood ratio or F statistics for dichotomous data
-based on non-linear regression model (generalized logistic regression model).
+Calculates either DIF likelihood ratio statistics or F statistics for dichotomous
+data based on non-linear regression model (generalized logistic regression model).
 }
 \details{
-DIF detection procedure based on Non-Linear Regression is the extension
-of Logistic Regression procedure (Swaminathan and Rogers, 1990).
-
-The \code{Data} is a matrix which rows represents examinee scored answers
-(1 - correct, 0 - incorrect) and columns correspond to the items.
-The \code{group} must be a vector of the same length as \code{nrow(Data)}.
-
-The unconstrained form of 4PL generalized logistic regression model for probability of
-correct answer (i.e., y = 1) is
-
-P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
-
-where x is standardized total score (also called Z-score) and g is group membership.
-Parameters a, b, c and d are discrimination, difficulty, guessing and inattention.
-Parameters aDif, bDif, cDif and dDif then represent differences between two groups in
-discrimination, difficulty, guessing and inattention.
+Calculation of the test statistics using DIF detection procedure based on non-linear regression
+(extension of logistic regression procedure; Swaminathan and Rogers, 1990; Drabinova and Martinkova, 2017).
+The unconstrained form of 4PL generalized logistic regression model for probability of correct
+answer (i.e., \eqn{y = 1}) is
+\deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
+where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
+Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
+Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
+in relevant parameters.
 
 This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
-The arguments \code{model} and \code{constraints} can be also combined.
+The arguments \code{model} and \code{constraints} can be also combined. Both arguments can
+be specified as a single value (for all items) or as an item-specific vector (where each
+element correspond to one item).
 
 The \code{model} argument offers several predefined models. The options are as follows:
 \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
@@ -112,36 +124,9 @@ The \code{model} argument offers several predefined models. The options are as f
 or \code{4PL} for 4PL model.
 
 The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
-arguments should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
-inattention (d) are fixed for both groups and other parameters (b and c) are not.
-
-The \code{type} corresponds to type of DIF to be tested. Possible values are
-\code{"both"} to detect any DIF caused by difference in difficulty or discrimination (i.e., uniform and/or non-uniform),
-\code{"udif"} to detect only uniform DIF (i.e., difference in difficulty b),
-\code{"nudif"} to detect only non-uniform DIF (i.e., difference in discrimination a), or
-\code{"all"} to detect DIF caused by difference caused by any parameter that can differed between groups. The \code{type}
-of DIF can be also specified in more detail by using combination of parameters a, b, c and d. For example, with an option
-\code{"c"} for 4PL model only the difference in parameter c is tested.
-
-Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
-total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
-in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
-
-The \code{start} is a list with as many elements as number of items. Each element is a named numeric
-vector representing initial values for parameter estimation. Specifically, parameters
-a, b, c, and d are initial values for discrimination, difficulty, guessing and inattention
-for reference group. Parameters aDif, bDif, cDif and dDif are then differences in these
-parameters between reference and focal group. If not specified, starting
-values are calculated with \code{\link[difNLR]{startNLR}} function.
-
-The \code{p.adjust.method} is a character for \code{p.adjust} function from the
-\code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
-\code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"},
-\code{"none"}.
-
-In case of convergence issues, with an option \code{initboot = TRUE}, the starting values are
-re-calculated based on bootstraped samples. Newly calculated initial values are applied only to
-items/models with convergence issues.
+parameters should be fixed for both groups. For example, choice \code{"ad"} means that discrimination
+(parameter \code{"a"}) and inattention (parameter \code{"d"}) are fixed for both groups and other parameters
+(\code{"b"} and \code{"c"}) are not. The \code{NA} value for \code{constraints} means no constraints.
 
 In case that model considers difference in guessing or inattention parameter, the different parameterization is
 used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
@@ -187,20 +172,21 @@ Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54
 \url{https://doi.org/10.1111/jedm.12158}.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-Journal of Educational Measurement, 27, 361-370.
+Journal of Educational Measurement, 27(4), 361-370,
+\url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 }
 \seealso{
 \code{\link[stats]{p.adjust}}
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-hladka@cs.cas.cz \cr
+\email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
-martinkova@cs.cas.cz \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
+\email{martinkova@cs.cas.cz} \cr
 
 Karel Zvara \cr
 Faculty of Mathematics and Physics, Charles University \cr

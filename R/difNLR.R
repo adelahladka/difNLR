@@ -6,37 +6,54 @@
 #' regression model (generalized logistic regression) and either likelihood-ratio or F test
 #' of submodel.
 #'
-#' @param Data numeric: either the scored data matrix only, or the scored data
-#' matrix plus the vector of group. See \strong{Details}.
-#' @param group numeric or character: either the binary vector of group membership or
-#' the column indicator (in \code{Data}) of group membership. See \strong{Details}.
+#' @param Data numeric: matrix which rows represents scored examinee answers (\code{"1"} correct,
+#' \code{"0"} incorrect) and columns correspond to the items. In addition, \code{Data} can hold
+#' the vector of group membership.
+#' @param group numeric or character: a dichotomous vector of the same length as \code{nrow(Data)}
+#' or a column indicator of \code{Data}.
 #' @param focal.name numeric or character: indicates the level of \code{group} which corresponds to
-#' focal group
+#' focal group.
 #' @param model character: generalized logistic regression model to be fitted. See \strong{Details}.
-#' @param constraints character: which parameters should be the same for both groups. See \strong{Details}.
-#' @param type character: type of DIF to be tested. Possible values are \code{"all"} (default), \code{"udif"} for
-#' uniform DIF only, \code{"nudif"} for non-uniform DIF only, \code{"both"} for uniform and non-uniform DIF,
-#' or combination of parameters \code{"a"}, \code{"b"}, \code{"c"} and \code{"d"}.
-#' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
-#' squares (default) and \code{"likelihood"} for maximum likelihood method.
-#' @param match character or numeric: specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-#' \code{"score"} (total test score), or numeric vector of the same length as number of observations in \code{Data}. See \strong{Details}.
-#' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
-#' currently considered as anchor (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' @param constraints character: which parameters should be the same for both groups. Possible values
+#' are any combinations of parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}.
 #' See \strong{Details}.
-#' @param purify logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.
+#' @param type character: type of DIF to be tested. Possible values are \code{"all"} for detecting
+#' difference in any parameter (default), \code{"udif"} for uniform DIF only (i.e., difference in
+#' difficulty parameter \code{"b"}), \code{"nudif"} for non-uniform DIF only (i.e., difference in
+#' discrimination parameter \code{"a"}), \code{"both"} for uniform and non-uniform DIF (i.e.,
+#' difference in parameters \code{"a"} and \code{"b"}), or combination of parameters \code{"a"},
+#' \code{"b"}, \code{"c"}, and \code{"d"}. Can be specified as a single value (for all items) or as
+#' an item-specific vector.
+#' @param method character: method used to estimate parameters. The options are \code{"nls"} for
+#' non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.
+#' @param match character or numeric: matching criterion to be used as estimate of trait. Can be
+#' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
+#' or numeric vector of the same length as number of observations in \code{Data}.
+#' @param anchor character or numeric: specification of DIF free items. Either \code{NULL} (default)
+#' or a vector of item names (as specified in column names of \code{Data}) or item identifiers
+#' (integers specifying the column number) specifying which items are currently considered as anchor
+#' (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' @param purify logical: should the item purification be applied? (default is \code{FALSE}).
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
-#' @param test character: test to be performed for DIF detection. Can be either \code{"LR"} (default), or \code{"F"}.
-#' See \strong{Details}.
+#' @param test character: test to be performed for DIF detection. Can be either \code{"LR"} for
+#' likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a submodel.
 #' @param alpha numeric: significance level (default is 0.05).
-#' @param p.adjust.method character: method for multiple comparison correction. See \strong{Details}.
-#' @param start numeric: list with as many elements as number of items. Each element is a named
-#' numeric vector with values representing initial values for parameter estimation. See \strong{Details}.
+#' @param p.adjust.method character: method for multiple comparison correction. Possible values are
+#' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+#' \code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.
+#' @param start numeric: initial values for estimation of parameters. If not specified, starting
+#' values are calculated with \code{\link[difNLR]{startNLR}} function. Otherwise, list with as many
+#' elements as number of items. Each element is a named numeric vector of length 8 representing initial
+#' values for parameter estimation. Specifically, parameters \code{"a"}, \code{"b"}, \code{"c"}, and
+#' \code{"d"} are initial values for discrimination, difficulty, guessing, and inattention for reference
+#' group. Parameters \code{"aDif"}, \code{"bDif"}, \code{"cDif"}, and \code{"dDif"} are then differences
+#' in these parameters between reference and focal group.
 #' @param initboot logical: in case of convergence issues, should be starting values recalculated based on
-#' bootstraped samples? (default is \code{TRUE}). See \strong{Details}.
+#' bootstraped samples? (default is \code{TRUE}; newly calculated initial values are applied only to
+#' items/models with convergence issues).
 #' @param nrBo numeric: the maximal number of iterations for calculation of starting values using
 #' bootstraped samples (default is 20).
-#' @param item either character (\code{"all"}), or numeric vector, or single number
+#' @param item character or numeric: either character (\code{"all"}), or numeric vector, or single number
 #' corresponding to column indicators.
 #' @param ... other generic parameters for S3 methods.
 #'
@@ -46,23 +63,20 @@
 #'
 #' @details
 #' DIF detection procedure based on non-linear regression is the extension of logistic regression
-#' procedure (Swaminathan and Rogers, 1990).
-#'
-#' The \code{Data} is a matrix which rows represents scored examinee answers (\code{"1"} correct,
-#' \code{"0"} incorrect) and columns correspond to the items. In addition, \code{Data} can hold
-#' the vector of group membership. If so, \code{group} is a column indicator of \code{Data}.
-#' Otherwise, \code{group} must be a dichotomous vector of the same length as \code{nrow(Data)}.
-#'
+#' procedure (Swaminathan and Rogers, 1990; Drabinova and Martinkova, 2017).
+
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct
-#' answer (i.e., y = 1) is
-#' P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))),
-#' where x is by default standardized total score (also called Z-score) and g is group membership.
-#' Parameters a, b, c and d are discrimination, difficulty, guessing and inattention.
-#' Terms aDif, bDif, cDif and dDif then represent differences between two groups in relevant
-#' parameters.
+#' answer (i.e., \eqn{y = 1}) is
+#' \deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
+#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
+#' Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
+#' Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
+#' in relevant parameters.
 #'
 #' This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
-#' The arguments \code{model} and \code{constraints} can be also combined.
+#' The arguments \code{model} and \code{constraints} can be also combined. Both arguments can
+#' be specified as a single value (for all items) or as an item-specific vector (where each
+#' element correspond to one item).
 #'
 #' The \code{model} argument offers several predefined models. The options are as follows:
 #' \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
@@ -78,76 +92,39 @@
 #' or \code{4PL} for 4PL model.
 #'
 #' The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
-#' parameters should be fixed for both groups. For example, choice \code{"ad"} means that discrimination (a) and
-#' inattention (d) are fixed for both groups and other parameters (b and c) are not. The arguments
-#' \code{model} and \code{constraints} can be also item specific if they take a form of vector, where
-#' each element correspond to one item. The \code{NA} value for \code{constraints} means no constraints.
-#'
-#' The \code{type} corresponds to type of DIF to be tested. Possible values are
-#' \code{"both"} to detect any DIF caused by difference in difficulty or discrimination (i.e., uniform and/or non-uniform),
-#' \code{"udif"} to detect only uniform DIF (i.e., difference in difficulty b),
-#' \code{"nudif"} to detect only non-uniform DIF (i.e., difference in discrimination a), or
-#' \code{"all"} to detect DIF caused by difference caused by any parameter that can differed between groups. The \code{type}
-#' of DIF can be also specified in more detail by using combination of parameters a, b, c and d. For example, with an option
-#' \code{"c"} for 4PL model only the difference in parameter c is tested. The \code{type} argument is
-#' also item specific.
-#'
-#' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
-#' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
-#' in \code{Data}.
-#'
-#' A set of anchor items (DIF free) can be specified through the \code{anchor} argument. It need to be a vector of either
-#' item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
-#' In case anchor items are provided, only these items are used to compute matching criterion \code{match}. If the \code{match}
-#' argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored. When anchor items are
-#' provided, purification is not applied.
-#'
-#' The \code{p.adjust.method} is a character for \code{\link[stats]{p.adjust}} function from the \code{stats}
-#' package. Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
-#' \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
-#'
-#' The \code{start} is a list with as many elements as number of items. Each element is a named numeric
-#' vector of length 8 representing initial values for parameter estimation. Specifically, parameters
-#' a, b, c, and d are initial values for discrimination, difficulty, guessing and inattention
-#' for reference group. Parameters aDif, bDif, cDif and dDif are then differences in these
-#' parameters between reference and focal group. If not specified, starting
-#' values are calculated with \code{\link[difNLR]{startNLR}} function.
+#' parameters should be fixed for both groups. For example, choice \code{"ad"} means that discrimination
+#' (parameter \code{"a"}) and inattention (parameter \code{"d"}) are fixed for both groups and other parameters
+#' (\code{"b"} and \code{"c"}) are not. The \code{NA} value for \code{constraints} means no constraints.
 #'
 #' Missing values are allowed but discarded for item estimation. They must be coded as
-#' \code{NA} for both, \code{data} and \code{group} parameters.
-#'
-#' In case of convergence issues, with an option \code{initboot = TRUE}, the starting values are
-#' re-calculated based on bootstraped samples. Newly calculated initial values are applied only to
-#' items/models with convergence issues.
+#' \code{NA} for both, \code{Data} and \code{group} parameters.
 #'
 #' In case that model considers difference in guessing or inattention parameter, the different parameterization is
 #' used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
 #' alternative parameterization.
 #'
 #' @return The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
+#' including values of the test statistics, p-values and item detected as function differently
 #' is displayed by the \code{print()} method.
 #'
 #' Item characteristic curves and graphical representation of DIF statistics can be displayed
 #' with \code{plot()} method. For more details see \code{\link[difNLR]{plot.difNLR}}.
 #' Estimated parameters can be displayed with \code{coef()} method.
 #'
-#' Fitted values can be extracted by the \code{fitted()} method for converged item(s)
-#' specified in \code{item} argument.
+#' Fitted values and residuals can be extracted by the \code{fitted()} and \code{residuals()} methods
+#' for converged item(s) specified in \code{item} argument.
 #'
 #' Predicted values are produced by the \code{predict()} method for converged item(s)
-#' specified in \code{item} argument. New data can be introduced with \code{match} and \code{group} arguments.
-#' For more details see \code{\link[difNLR]{predict.difNLR}}.
+#' specified in \code{item} argument. New data can be introduced with \code{match} and \code{group}
+#' arguments. For more details see \code{\link[difNLR]{predict.difNLR}}.
 #'
-#' Residuals are extracted with the \code{residuals()} method for converged item(s)
-#' specified in \code{item} argument.
-#'
-#' Log-likelihood, Akaike's information criterion and Schwarz's Bayesian criterion can be
+#' Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
 #' extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
 #' specified in \code{item} argument.
 #'
 #' Object of class \code{"difNLR"} is a list with the following components:
 #' \describe{
-#'   \item{\code{Sval}}{the values of test statistics.}
+#'   \item{\code{Sval}}{the values of the test statistics.}
 #'   \item{\code{nlrPAR}}{the estimates of final model.}
 #'   \item{\code{nlrSE}}{the standard errors of estimates of final model.}
 #'   \item{\code{parM0}}{the estimates of null model.}
@@ -158,16 +135,16 @@
 #'   \item{\code{covM1}}{the covariance matrices of estimates of alternative model.}
 #'   \item{\code{alpha}}{numeric: significance level.}
 #'   \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or
-#'   \code{"No DIF item detected"}.}
+#'   \code{"No DIF item detected"} in case no item was detected as function differently.}
 #'   \item{\code{match}}{matching criterion.}
 #'   \item{\code{model}}{fitted model.}
 #'   \item{\code{type}}{character: type of DIF that was tested. If parameters were specified, the value is \code{"other"}.}
 #'   \item{\code{types}}{character: the parameters (specified by user, \code{type} has value \code{"other"}) which were
 #'   tested for difference.}
 #'   \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
-#'   \item{\code{pval}}{the p-values by likelihood ratio test.}
-#'   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
-#'   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
+#'   \item{\code{pval}}{the p-values of the test.}
+#'   \item{\code{adj.pval}}{the adjusted p-values of the test using \code{p.adjust.method}.}
+#'   \item{\code{df}}{the degress of freedom of the test.}
 #'   \item{\code{test}}{used test.}
 #'   \item{\code{purification}}{\code{purify} value.}
 #'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
@@ -177,24 +154,24 @@
 #'   if \code{purify} is \code{TRUE}.}
 #'   \item{\code{conv.puri}}{logical: indicating whether item purification process converged before the maximal number
 #'   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
-#'   \item{\code{group}}{the vector of group membership.}
-#'   \item{\code{Data}}{the data matrix.}
 #'   \item{\code{method}}{used estimation method.}
 #'   \item{\code{conv.fail}}{numeric: number of convergence issues.}
 #'   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
 #'   \item{\code{llM0}}{log-likelihood of null model.}
 #'   \item{\code{llM1}}{log-likelihood of alternative model.}
+#'   \item{\code{Data}}{the data matrix.}
+#'   \item{\code{group}}{the vector of group membership.}
 #' }
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' hladka@cs.cas.cz \cr
+#' \email{hladka@@cs.cas.cz} \cr
 #'
 #' Patricia Martinkova \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
-#' martinkova@cs.cas.cz \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' Karel Zvara \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
@@ -205,12 +182,12 @@
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-#' Journal of Educational Measurement, 27, 361-370.
+#' Journal of Educational Measurement, 27(4), 361-370,
+#' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
 #' @seealso \code{\link[stats]{nls}} \code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
 #'
 #' @examples
-#' \dontrun{
 #' # loading data based on GMAT
 #' data(GMAT)
 #'
@@ -221,6 +198,43 @@
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
+#' # Graphical devices
+#' plot(x, item = x$DIFitems)
+#' plot(x, item = "Item1")
+#' plot(x, item = 1, group.names = c("Group 1", "Group 2"))
+#' plot(x, plot.type = "stat")
+#'
+#' # Coefficients
+#' coef(x)
+#' coef(x, SE = TRUE)
+#' coef(x, SE = TRUE, simplify = TRUE)
+#'
+#' # Fitted values
+#' fitted(x)
+#' fitted(x, item = 1)
+#'
+#' # Residuals
+#' residuals(x)
+#' residuals(x, item = 1)
+#'
+#' # Predicted values
+#' predict(x)
+#' predict(x, item = 1)
+#'
+#' # Predicted values for new subjects
+#' predict(x, item = 1, match = 0, group = 0)
+#' predict(x, item = 1, match = 0, group = 1)
+#'
+#' # AIC, BIC, log-likelihood
+#' AIC(x)
+#' BIC(x)
+#' logLik(x)
+#' # AIC, BIC, log-likelihood for the first item
+#' AIC(x, item = 1)
+#' BIC(x, item = 1)
+#' logLik(x, item = 1)
+#'
+#' \dontrun{
 #' # Testing both DIF effects using F test and
 #' # 3PL model with fixed guessing for groups
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
@@ -254,42 +268,6 @@
 #' # 3PL model with fixed guessing for groups
 #' # with maximum likelihood estimation method
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
-#'
-#' # Graphical devices
-#' plot(x)
-#' plot(x, item = x$DIFitems)
-#' plot(x, item = 1, group.names = c("Group 1", "Group 2"))
-#' plot(x, plot.type = "stat")
-#'
-#' # Coefficients
-#' coef(x)
-#' coef(x, SE = T)
-#' coef(x, SE = T, simplify = T)
-#'
-#' # Fitted values
-#' fitted(x)
-#' fitted(x, item = 1)
-#'
-#' # Residuals
-#' residuals(x)
-#' residuals(x, item = 1)
-#'
-#' # Predicted values
-#' predict(x)
-#' predict(x, item = 1)
-#'
-#' # Predicted values for new subjects
-#' predict(x, item = 1, match = 0, group = 1)
-#' predict(x, item = 1, match = 0, group = 0)
-#'
-#' # AIC, BIC, log-likelihood
-#' AIC(x)
-#' BIC(x)
-#' logLik(x)
-#' # AIC, BIC, log-likelihood for the first item
-#' AIC(x, item = 1)
-#' BIC(x, item = 1)
-#' logLik(x, item = 1)
 #' }
 #'
 #' @keywords DIF
@@ -345,7 +323,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
   if (initboot) {
     if (nrBo < 1) {
       stop("The maximal number of iterations for calculation of starting values using bootstraped
-           samples 'nrBo' need to be greater than 1. ")
+           samples 'nrBo' need to be greater than 1.", call. = FALSE)
     }
   }
   ### estimation method
@@ -387,7 +365,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         }
         DATA <- as.data.frame(DATA)
       } else {
-        stop("'Data' must be data frame or matrix of binary vectors", call. = FALSE)
+        stop("'Data' must be data frame or matrix of binary vectors.", call. = FALSE)
       }
     }
 
@@ -406,7 +384,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     df <- df[complete.cases(df), ]
 
     if (dim(df)[1] == 0) {
-      stop("It seems that your 'Data' does not include any subjects that are complete. ",
+      stop("It seems that your 'Data' does not include any subjects that are complete.",
         call. = FALSE
       )
     }
@@ -451,7 +429,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       )))
       if (!all(tmptypes %in% letters[1:4])) {
         stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
-             or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.")
+             or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.", call. = FALSE)
       }
     }
 
@@ -469,14 +447,14 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       if (!all(sapply(1:dim(DATA)[2], function(i) {
         all(constraints[[i]] %in% letters[1:4]) | all(is.na(constraints[[i]]))
       }))) {
-        stop("Constraints can be only 'a', 'b', 'c' or 'd'. ")
+        stop("Constraints can be only combinations of parameters 'a', 'b', 'c', and 'd'. ", call. = FALSE)
       }
       if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
         types <- as.list(rep(NA, dim(DATA)[2]))
         wht <- !(type %in% c("udif", "nudif", "both", "all"))
         types[wht] <- unlist(strsplit(type[wht], split = ""))
         if (any(sapply(1:dim(DATA)[2], function(i) (all(!is.na(constraints[[i]])) & (types[[i]] %in% constraints[[i]]))))) {
-          stop("The difference in constrained parameters cannot be tested.")
+          stop("The difference in constrained parameters cannot be tested.", call. = FALSE)
         }
       }
     } else {
@@ -507,7 +485,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     if (!is.null(start)) {
       if (length(start) != dim(DATA)[2]) {
         stop("Invalid value for 'start'. Initial values must be a list with as many elements
-             as number of items in Data. ", call. = FALSE)
+             as number of items in Data.", call. = FALSE)
       }
       if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste(letters[1:4], "Dif", sep = "")))) {
         stop("Invalid names in 'start'. Each element of 'start' need to be a numeric vector
@@ -844,12 +822,13 @@ print.difNLR <- function(x, ...) {
   }
 }
 
-#' ICC and test statistics plots for difNLR object
+#' ICC and test statistics plots for \code{"difNLR"} object.
 #'
-#' @description Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
-#' (default). The characteristic curve for item specified in \code{item} option is plotted. For default
-#' option \code{"all"} of item, characteristic curves of all converged items are plotted. The drawn
-#' curves represent best model.
+#' @description Plot method for an object of \code{"difNLR"} class using R package \pkg{ggplot2}.
+#'
+#' Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
+#' (default). The characteristic curves for an item specified in \code{item} argument are plotted.
+#' Plotted curves represent the best model.
 #'
 #' The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
 #' (either LR-test, or F-test, depends on argument \code{test}) are displayed on the Y axis,
@@ -857,37 +836,45 @@ print.difNLR <- function(x, ...) {
 #' detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
 #' are used.
 #'
-#' @param x an object of "difNLR" class
+#' @param x an object of \code{"difNLR"} class.
 #' @param plot.type character: type of plot to be plotted (either \code{"cc"} for characteristic curve
-#' (default), or \code{"stat"} for test statistics). See \strong{Details}.
-#' @param item either character (\code{"all"}), or numeric vector, or single number corresponding to column indicators. See \strong{Details}.
+#' (default), or \code{"stat"} for test statistics).
+#' @param item character or numeric: either character (\code{"all"}), or numeric vector, or single number
+#' corresponding to column indicators.
 #' @param col character: single value, or vector of two values representing colors for plot.
 #' @param shape integer: shape parameter for plot.
 #' @param size numeric: single number, or vector of two numbers representing line width in plot.
-#' @param linetype numeric: single number, or vector of two numbers representing line type in plot for reference and focal group.
+#' @param linetype numeric: single number, or vector of two numbers representing line type in plot for
+#' reference and focal group.
 #' @param title string: title of plot.
 #' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for \code{plot()} function.
 #'
+#' @return For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}. In case of
+#' \code{plot.type = "cc"}, returns list of objects of class \code{"ggplot"}.
+#'
+#'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' hladka@cs.cas.cz \cr
+#' \email{hladka@@cs.cas.cz} \cr
 #'
 #' Patricia Martinkova \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
-#' martinkova@cs.cas.cz \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' Karel Zvara \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
 #' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' \url{https://doi.org/10.1111/jedm.12158}.
 #'
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-#' Journal of Educational Measurement, 27, 361-370.
+#' Journal of Educational Measurement, 27(4), 361-370,
+#' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
 #' @seealso \code{\link[difNLR]{difNLR}}
 #'
@@ -903,9 +890,13 @@ print.difNLR <- function(x, ...) {
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # graphical devices
+#' # graphical devices - characteristic curves
 #' plot(x)
 #' plot(x, item = x$DIFitems)
+#' plot(x, item = 1)
+#' plot(x, item = "Item1")
+#'
+#' # graphical devices - test statistics
 #' plot(x, plot.type = "stat")
 #' }
 #' @export
@@ -999,29 +990,36 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
                      col = col, shape = shape, size = size,
                      linetype = linetype, title = title, group.names = group.names) {
     m <- length(x$nlrPAR)
+    nams <- colnames(x$Data)
     if (class(item) == "character") {
-      if (item != "all") {
-        stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
-          call. = FALSE
+      if (item != "all" & !item %in% nams) {
+        stop("Invalid value for 'item'. Item must be either character 'all', or
+             numeric vector corresponding to column indicators, or name of the item.",
+             call. = FALSE
         )
+      }
+      if (item[1] == "all") {
+        items <- 1:m
+      } else {
+        items <- which(nams %in% item)
       }
     } else {
       if (class(item) != "integer" & class(item) != "numeric") {
-        stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
-          call. = FALSE
+        stop("Invalid value for 'item'. Item must be either character 'all', or
+             numeric vector corresponding to column indicators, or name of the item.",
+             call. = FALSE
         )
+      } else {
+        if (!all(item %in% 1:m)) {
+          stop("Invalid number for 'item'.",
+               call. = FALSE
+          )
+        } else {
+          items <- item
+        }
       }
     }
-    if (class(item) == "numeric" & !all(item %in% 1:m)) {
-      stop("Invalid number for 'item'.",
-        call. = FALSE
-      )
-    }
-    if (class(item) == "integer" & !all(item %in% 1:m)) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' ",
-        call. = FALSE
-      )
-    }
+
     if (length(col) == 1) {
       col <- rep(col, 2)
     } else {
@@ -1031,11 +1029,6 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
           call. = FALSE
         )
       }
-    }
-    if (class(item) == "character") {
-      items <- 1:m
-    } else {
-      items <- item
     }
     if (any(x$conv.fail.which %in% items)) {
       if (length(setdiff(items, x$conv.fail.which)) == 0) {
@@ -1065,11 +1058,11 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
     }
     if (length(group.names) > 2) {
       group.names <- group.names[1:2]
-      warning("Only first two values for 'group.names' argument are used. ")
+      warning("Only first two values for 'group.names' argument are used.", call. = FALSE)
     } else {
       if (length(group.names) < 2) {
         group.names <- c("Reference", "Focal")
-        warning("Argument 'group.names' need to have length of two. Default value is used.")
+        warning("Argument 'group.names' need to have length of two. Default value is used.", call. = FALSE)
       }
     }
 
@@ -1225,37 +1218,39 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
 #' @rdname difNLR
 #' @export
 fitted.difNLR <- function(object, item = "all", ...) {
-
   ### checking input
   m <- length(object$nlrPAR)
+  nams <- colnames(object$Data)
+
   if (class(item) == "character") {
-    if (item != "all") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-        call. = FALSE
+    if (item != "all" & !item %in% nams) {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
+    }
+    if (item[1] == "all") {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
     }
   } else {
     if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
     }
   }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
-    items <- 1:m
-  } else {
-    items <- item
-  }
+
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
@@ -1275,10 +1270,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
     ITEMS <- items
   }
 
-  ### functions
-  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
-    return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
-  }
+
 
   PAR <- data.frame(
     a = rep(1, m), b = 0, c = 0, d = 1,
@@ -1302,7 +1294,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
   ### fitted values
   FV <- as.list(rep(NA, m))
   FV[ITEMS] <- lapply(ITEMS, function(i) {
-    gNLR(
+    .gNLR(
       match, object$group,
       PAR[i, "a"], PAR[i, "b"],
       PAR[i, "c"], PAR[i, "d"],
@@ -1318,39 +1310,38 @@ fitted.difNLR <- function(object, item = "all", ...) {
   return(FV)
 }
 
-#' Predicted values for difNLR object
+#' Predicted values for \code{"difNLR"} object.
 #'
-#' @description Predicted values based on "difNLR" object.
+#' @description Predicted values based on \code{"difNLR"} object.
 #'
-#' @param object an object of "difNLR" class
-#' @param item either character (\code{"all"}), or numeric vector, or single number
+#' @param object an object of \code{"difNLR"} class.
+#' @param item character or numeric: either character (\code{"all"}), or numeric vector, or single number
 #' corresponding to column indicators.
-#' @param match numeric: specifies matching criterion for new observation. See \strong{Details}.
-#' @param group numeric: specifies group membership for new observation. See \strong{Details}.
+#' @param match numeric: matching criterion for new observations.
+#' @param group numeric: group membership for new observations.
 #' @param ... other generic parameters for \code{predict()} function.
-#'
-#' @details Arguments \code{match} and \code{group} represent matching criterion and
-#' group membership of new observations and need to have the same length.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' hladka@cs.cas.cz \cr
+#' \email{hladka@@cs.cas.cz} \cr
 #'
 #' Patricia Martinkova \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
-#' martinkova@cs.cas.cz \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' Karel Zvara \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
 #' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' \url{https://doi.org/10.1111/jedm.12158}.
 #'
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-#' Journal of Educational Measurement, 27, 361-370.
+#' Journal of Educational Measurement, 27(4), 361-370,
+#' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
 #' @seealso \code{\link[difNLR]{difNLR}}
 #'
@@ -1369,39 +1360,50 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' # Predicted values
 #' predict(x)
 #' predict(x, item = 1)
+#' predict(x, item = "Item1")
 #'
-#' # Predicted values for new observations
-#' predict(x, item = 1, match = 0, group = 1)
-#' predict(x, item = 1, match = 0, group = 0)
+#' # Predicted values for new observations - average score
+#' predict(x, item = 1, match = 0, group = 0) # reference group
+#' predict(x, item = 1, match = 0, group = 1) # focal group
+#'
+#' # Predicted values for new observations - various z-scores
+#' predict(x, item = 1, match = c(-1, 0, 1), group = c(0, 0, 0)) # reference group
+#' predict(x, item = 1, match = c(-1, 0, 1), group = c(1, 1, 1)) # focal group
 #' }
 #'
 #' @export
 predict.difNLR <- function(object, item = "all", match, group, ...) {
-
   ### checking input
   m <- length(object$nlrPAR)
+  nams <- colnames(object$Data)
+
   if (class(item) == "character") {
-    if (item != "all") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-        call. = FALSE
+    if (item != "all" & !item %in% nams) {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
+    }
+    if (item[1] == "all") {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
     }
   } else {
     if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
     }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
   }
 
   if (missing(match)) {
@@ -1424,11 +1426,7 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
       call. = FALSE
     )
   }
-  if (class(item) == "character") {
-    items <- 1:m
-  } else {
-    items <- item
-  }
+
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
       stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
@@ -1448,11 +1446,6 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
     ITEMS <- items
   }
 
-  ### functions
-  gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
-    return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
-  }
-
   PAR <- data.frame(
     a = rep(1, m), b = 0, c = 0, d = 1,
     aDif = 0, bDif = 0, cDif = 0, dDif = 0
@@ -1464,7 +1457,7 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
   ### predicted values
   PV <- as.list(rep(NA, m))
   PV[ITEMS] <- lapply(ITEMS, function(i) {
-    gNLR(
+    .gNLR(
       match, group, PAR[i, "a"], PAR[i, "b"],
       PAR[i, "c"], PAR[i, "d"],
       PAR[i, "aDif"], PAR[i, "bDif"],
@@ -1482,7 +1475,7 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
   return(PV)
 }
 
-#' @param object an object of 'difNLR' class
+#' @param object an object of \code{"difNLR"} class
 #' @param SE logical: should be standard errors also returned? (default is \code{FALSE}).
 #' @param simplify logical: should the result be simplified to a matrix? (default is \code{FALSE}).
 #' @rdname difNLR
@@ -1535,38 +1528,33 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
 logLik.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
-
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   if (any(object$conv.fail.which %in% items)) {
@@ -1616,35 +1604,31 @@ AIC.difNLR <- function(object, item = "all", ...) {
 
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   if (any(object$conv.fail.which %in% items)) {
@@ -1685,35 +1669,31 @@ BIC.difNLR <- function(object, item = "all", ...) {
 
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+             numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+             numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   if (any(object$conv.fail.which %in% items)) {
@@ -1751,53 +1731,50 @@ BIC.difNLR <- function(object, item = "all", ...) {
 #' @export
 residuals.difNLR <- function(object, item = "all", ...) {
   ### checking input
-  m <- length(object$nlrPAR)
   n <- dim(object$Data)[1]
+
+  m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column indicators, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-        sep = "", collapse = "\n"
+      stop(paste("Item", intersect(object$conv.fail.which, items), "does not converge.",
+                 collapse = "\n"
       ),
       call. = FALSE
       )
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-        sep = "", collapse = "\n"
+      warning(paste("Item", intersect(object$conv.fail.which, items), "does not converge. NA produced.",
+        collapse = "\n"
       ),
       call. = FALSE
       )
@@ -1813,4 +1790,9 @@ residuals.difNLR <- function(object, item = "all", ...) {
   residuals <- residuals[, items]
 
   return(residuals)
+}
+
+# private functions
+.gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
+  return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
 }

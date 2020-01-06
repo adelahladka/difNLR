@@ -22,7 +22,7 @@ squares (default) and \code{"likelihood"} for maximum likelihood method.}
 
 \item{upper}{numeric: upper bounds for parameters of model specified in \code{formula}.}
 
-\item{start}{numeric: initial parameters. See \strong{Details}.}
+\item{start}{numeric: initial parameters. Can be obtained by \code{startNLR()} function.}
 }
 \description{
 Estimates parameters of non-linear regression models for DIF detection using either
@@ -34,7 +34,7 @@ data(GMAT)
 
 # item 1
 y <- GMAT[, 1]
-match <- scale(apply(GMAT[, 1:20], 1, sum))
+match <- scale(rowSums(GMAT[, 1:20]))
 group <- GMAT[, "group"]
 
 # formula for 3PL model with the same guessing
@@ -76,12 +76,12 @@ residuals(fitLKLM0)
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-hladka@cs.cas.cz \cr
+\email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
-martinkova@cs.cas.cz \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
+\email{martinkova@cs.cas.cz} \cr
 }
 \keyword{DIF}

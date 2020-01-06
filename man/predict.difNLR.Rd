@@ -2,28 +2,24 @@
 % Please edit documentation in R/difNLR.R
 \name{predict.difNLR}
 \alias{predict.difNLR}
-\title{Predicted values for difNLR object}
+\title{Predicted values for \code{"difNLR"} object.}
 \usage{
 \method{predict}{difNLR}(object, item = "all", match, group, ...)
 }
 \arguments{
-\item{object}{an object of "difNLR" class}
+\item{object}{an object of \code{"difNLR"} class.}
 
-\item{item}{either character (\code{"all"}), or numeric vector, or single number
+\item{item}{character or numeric: either character (\code{"all"}), or numeric vector, or single number
 corresponding to column indicators.}
 
-\item{match}{numeric: specifies matching criterion for new observation. See \strong{Details}.}
+\item{match}{numeric: matching criterion for new observations.}
 
-\item{group}{numeric: specifies group membership for new observation. See \strong{Details}.}
+\item{group}{numeric: group membership for new observations.}
 
 \item{...}{other generic parameters for \code{predict()} function.}
 }
 \description{
-Predicted values based on "difNLR" object.
-}
-\details{
-Arguments \code{match} and \code{group} represent matching criterion and
-group membership of new observations and need to have the same length.
+Predicted values based on \code{"difNLR"} object.
 }
 \examples{
 \dontrun{
@@ -40,32 +36,39 @@ group <- GMAT[, "group"]
 # Predicted values
 predict(x)
 predict(x, item = 1)
+predict(x, item = "Item1")
 
-# Predicted values for new observations
-predict(x, item = 1, match = 0, group = 1)
-predict(x, item = 1, match = 0, group = 0)
+# Predicted values for new observations - average score
+predict(x, item = 1, match = 0, group = 0) # reference group
+predict(x, item = 1, match = 0, group = 1) # focal group
+
+# Predicted values for new observations - various z-scores
+predict(x, item = 1, match = c(-1, 0, 1), group = c(0, 0, 0)) # reference group
+predict(x, item = 1, match = c(-1, 0, 1), group = c(1, 1, 1)) # focal group
 }
 
 }
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517.
+Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+\url{https://doi.org/10.1111/jedm.12158}.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-Journal of Educational Measurement, 27, 361-370.
+Journal of Educational Measurement, 27(4), 361-370,
+\url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 }
 \seealso{
 \code{\link[difNLR]{difNLR}}
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-hladka@cs.cas.cz \cr
+\email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
-martinkova@cs.cas.cz \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
+\email{martinkova@cs.cas.cz} \cr
 
 Karel Zvara \cr
 Faculty of Mathematics and Physics, Charles University \cr
