@@ -70,7 +70,7 @@ intercept-slope parametrization. See \strong{Details}.}
 
 \item{x}{an object of \code{"ddfMLR"} class.}
 
-\item{...}{other generic parameters for \code{print()} or \code{plot()} functions.}
+\item{...}{other generic parameters for S3 methods.}
 
 \item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
 or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
@@ -93,6 +93,10 @@ including values of the test statistics, p-values, and items marked as DDF is di
 
 Item characteristic curves can be displayed with \code{plot()} method.
 Estimated parameters can be displayed with \code{coef()} method.
+
+Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
+extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
+specified in \code{item} argument.
 
 Object of class \code{"ddfMLR"} is a list with the following components:
 \describe{
@@ -185,7 +189,6 @@ logLik(x, item = 1)
 coef(x)
 coef(x, SE = TRUE)
 coef(x, SE = TRUE, simplify = TRUE)
-
 \dontrun{
 # Testing both DDF effects with Benjamini-Hochberg adjustment method
 ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")

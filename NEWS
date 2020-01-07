@@ -14,6 +14,7 @@ DOCUMENTATION
   o Documentation of ddfMLR() function and its S3 methods was updated.
   o Documentation of MLR() function was updated.
   o Documentation of estimNLR() function was updated.
+  o Author details were updated.
 
 MINOR CHANGES
   o Argument item for S3 methods of difNLR class can be now

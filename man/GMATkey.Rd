@@ -19,19 +19,19 @@ Theory Methods to the Graduate Management Admission Test. ETS Research Report Se
 
 Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
 Checking equity: Why Differential Item Functioning Analysis Should Be a Routine Part of Developing Conceptual
-Assessments. CBE-Life Sciences Education, 16(2), \url{https://doi.org/10.1187/cbe.16-10-0307}.
+Assessments. CBE-Life Sciences Education, 16(2), rm2, \url{https://doi.org/10.1187/cbe.16-10-0307}.
 }
 \seealso{
 \code{\link{GMAT}}, \code{\link{GMATtest}}
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
 Faculty of Mathematics and Physics, Charles University \cr
-hladka@cs.cas.cz \cr
+\email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr
-Institute of Computer Science, The Czech Academy of Sciences \cr
-martinkova@cs.cas.cz \cr
+Institute of Computer Science of the Czech Academy of Sciences \cr
+\email{martinkova@cs.cas.cz} \cr
 }
 \keyword{datasets}
