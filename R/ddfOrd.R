@@ -2,93 +2,115 @@
 #'
 #' @aliases ddfORD print.ddfORD plot.ddfORD
 #'
-#' @description Performs DDF detection procedure for ordinal data based either on adjacent category logit model
-#' or on cumulative logit model and likelihood ratio test of submodel.
+#' @description Performs DDF detection procedure for ordinal data based either on adjacent category logit
+#' model or on cumulative logit model and likelihood ratio test of a submodel.
 #'
-#' @param Data matrix or data.frame: the ordinarily scored data matrix only or the ordinarily scored
-#' data matrix plus the vector of group. See \strong{Details}.
-#' @param group numeric or character: either the binary vector of group membership or
-#' the column indicator of group membership. See \strong{Details}.
+#' @param Data data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and
+#' columns correspond to the items. In addition, \code{Data} can hold the vector of group membership.
+#' @param group numeric or character: a dichotomous vector of the same length as \code{nrow(Data)}
+#' or a column identifier of \code{Data}.
 #' @param focal.name numeric or character: indicates the level of \code{group} which corresponds to
-#' focal group
-#' @param model character: logistic regression model for ordinal data (either \code{"adjacent"} (default) or \code{"cumulative"}).
-#' See \strong{Details}.
-#' @param type character: type of DDF to be tested (either \code{"both"} (default), \code{"udif"}, or \code{"nudif"}).
-#' See \strong{Details}.
-#' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-#' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
-#' @param anchor Either \code{NULL} (default) or a vector of item names or item identifiers specifying which items are
-#' currently considered as anchor (DDF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-#' @param purify logical: should the item purification be applied? (default is \code{FALSE}). See \strong{Details}.
+#' focal group.
+#' @param model character: logistic regression model for ordinal data (either \code{"adjacent"} (default)
+#' or \code{"cumulative"}). See \strong{Details}.
+#' @param type character: type of DDF to be tested. Either \code{"both"} for uniform and non-uniform
+#' DDF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
+#' uniform DDF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
+#' non-uniform DDF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
+#' as a single value (for all items) or as an item-specific vector.
+#' @param match numeric or character: matching criterion to be used as an estimate of trait. Can be
+#' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
+#' or vector of the same length as number of observations in \code{Data}.
+#' @param anchor numeric or character: specification of DDF free items. Either \code{NULL} (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number) determining which items are currently considered as anchor (DDF free) items.
+#' Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' @param purify logical: should the item purification be applied? (default is \code{FALSE}).
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
-#' @param p.adjust.method character: method for multiple comparison correction.
-#' See \strong{Details}.
+#' @param p.adjust.method character: method for multiple comparison correction. Possible values are
+#' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+#' \code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.
 #' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"irt"} (default) and \code{"classic"}. See \strong{Details}.
+#' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
+#' intercept-slope parametrization. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
+#' @param x an object of \code{"ddfORD"} class.
+#' @param object an object of \code{"ddfORD"} class.
+#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
+#' @param title string: title of a plot.
+#' @param plot.type character: which plot should be displayed for cumulative logit regression model. Either
+#' \code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.
+#' @param group.names character: names of reference and focal group.
+#' @param ... other generic parameters for S3 methods.
 #'
 #' @usage ddfORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 #' anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
 #' parametrization = "irt", alpha = 0.05)
 #'
 #' @details
-#' DDF detection procedure for ordinal data based either on adjacent category logit model
+#' Performs DDF detection procedure for ordinal data based either on adjacent category logit model
 #' or on cumulative logit model.
 #'
-#' The \code{Data} is a matrix or data.frame which rows represents examinee ordinarily scored answers and
-#' columns correspond to the items. The \code{group} must be either a vector of the same length as \code{nrow(Data)}
-#' or column indicator of \code{Data}.
+#' Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
+#' categories is
+#' \deqn{log(P(y = k)/P(y = k-1)) = (a + aDif*g)*(x - b_k - b_kDif*g),}
+#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
+#' membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
+#' for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
+#' between two groups (reference and focal) in relevant parameters.
 #'
-#' The \code{model} corresponds to model to be used for DDF detection. Options are \code{"adjacent"}
-#' for adjacent category logit model or \code{"cumulative"} for cumulative logit model.
+#' Using cumulative logit model, probability of gaining at least \eqn{k} points is given by
+#' 2PL model, i.e.,
+#' \deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
+#' The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
+#' \eqn{P(Y = k) = P(Y >= k) - P(Y >= k + 1)}.
 #'
-#' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
-#' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
-#' \code{"nudif"} to detect only non-uniform DDF.
+#' Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
 #'
-#' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default,
-#' \code{"zscore"}), total test score (\code{"score"}), or any other continuous or discrete variable of the same
-#' length as number of observations in \code{Data}.
-#'
-#' A set of anchor items (DDF free) can be specified through the \code{anchor} argument. It need to be a vector of either
-#' item names (as specified in column names of \code{Data}) or item identifiers (integers specifying the column number).
-#' In case anchor items are provided, only these items are used to compute matching criterion \code{match}. If the \code{match}
-#' argument is not either \code{"zscore"} or \code{"score"}, \code{anchor} argument is ignored.  When anchor items are
-#' provided, purification is not applied.
-#'
-#' The \code{p.adjust.method} is a character for \code{p.adjust} function from the \code{stats} package. Possible values are
-#' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
-#' \code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
-#'
-#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-#' is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
-#' intercept-slope parametrization with effect of group membership and interaction with matching criterion.
-#'
-#' The output of the \code{ddfORD()} function is displayed by the \code{print.ddfORD} function.
-#'
-#' The characteristic curve for item specified in \code{item} option can be plotted. For default
-#' option \code{"all"} of item, characteristic curves of all converged items are plotted.
-#' The drawn curves represent best model.
+#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
+#' Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
+#' Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
+#' interaction with matching criterion, i.e. \eqn{b_0k + b_1*x + b_2k*g + b_3*x*g} instead of
+#' \eqn{(a + a_Dif*g)*(x - b_k - b_kDif*g))}.
 #'
 #' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 #' for both, \code{Data} and \code{group} parameters.
 #'
-#' @return A list of class 'ddfORD' with the following arguments:
+#' @return The \code{ddfORD()} function returns an object of class \code{"ddfORD"}. The output
+#' including values of the test statistics, p-values, and items marked as DDF is displayed by the
+#' \code{print()} method.
+#'
+#' Item characteristic curves can be displayed with \code{plot()} method.
+#' Estimated parameters can be displayed with \code{coef()} method.
+#'
+#' Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
+#' extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
+#' specified in \code{item} argument.
+#'
+#' A list of class \code{"ddfORD"} with the following arguments:
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
 #'   \item{\code{ordPAR}}{the estimates of the final model.}
 #'   \item{\code{ordSE}}{standard errors of the estimates of the final model.}
 #'   \item{\code{parM0}}{the estimates of null model.}
 #'   \item{\code{parM1}}{the estimates of alternative model.}
+#'   \item{\code{llM0}}{log-likelihood of null model.}
+#'   \item{\code{llM1}}{log-likelihood of alternative model.}
+#'   \item{\code{AICM0}}{AIC of null model.}
+#'   \item{\code{AICM1}}{AIC of alternative model.}
+#'   \item{\code{BICM0}}{BIC of null model.}
+#'   \item{\code{BICM1}}{BIC of alternative model.}
+#'   \item{\code{DDFitems}}{either the column identifiers of the items which were detected as DDF, or
+#'   \code{"No DDF item detected"} in case no item was detected as DDF.}
 #'   \item{\code{model}}{model used for DDF detection.}
-#'   \item{\code{alpha}}{numeric: significance level.}
-#'   \item{\code{DDFitems}}{either the column indicators of the items which were detected as DDF, or \code{"No DDF item detected"}.}
 #'   \item{\code{type}}{character: type of DDF that was tested.}
+#'   \item{\code{parametrization}}{Parameters' parametrization.}
 #'   \item{\code{purification}}{\code{purify} value.}
 #'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
 #'   is \code{TRUE}.}
 #'   \item{\code{ddfPur}}{a binary matrix with one row per iteration of item purification and one column per item.
-#'   "1" in i-th row and j-th column means that j-th item was identified as DDF in i-1-th iteration. Returned only
+#'   \code{"1"} in i-th row and j-th column means that j-th item was identified as DDF in i-th iteration. Returned only
 #'   if \code{purify} is \code{TRUE}.}
 #'   \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
 #'   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
@@ -96,17 +118,11 @@
 #'   \item{\code{pval}}{the p-values by likelihood ratio test.}
 #'   \item{\code{adj.pval}}{the adjusted p-values by likelihood ratio test using \code{p.adjust.method}.}
 #'   \item{\code{df}}{the degress of freedom of likelihood ratio test.}
-#'   \item{\code{group}}{the vector of group membership.}
+#'   \item{\code{alpha}}{numeric: significance level.}
 #'   \item{\code{Data}}{the data matrix.}
-#'   \item{\code{match}}{matching criterion.}
+#'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{group.names}}{levels of grouping variable.}
-#'   \item{\code{llM0}}{log-likelihood of null model.}
-#'   \item{\code{llM1}}{log-likelihood of alternative model.}
-#'   \item{\code{AICM0}}{AIC of null model.}
-#'   \item{\code{AICM1}}{AIC of alternative model.}
-#'   \item{\code{BICM0}}{BIC of null model.}
-#'   \item{\code{BICM1}}{BIC of alternative model.}
-#'   \item{\code{parametrization}}{Parameters' parametrization.}
+#'   \item{\code{match}}{matching criterion.}
 #'   }
 #'
 #' @author
@@ -125,7 +141,6 @@
 #' @seealso \code{\link[stats]{p.adjust}} \code{\link[VGAM]{vglm}}
 #'
 #' @examples
-#' \dontrun{
 #' # loading data
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
 #' Data <- dataMedicalgraded[, 1:5]
@@ -141,8 +156,8 @@
 #'
 #' # estimated parameters
 #' coef(x)
-#' coef(x, SE = T) # with SE
-#' coef(x, SE = T, simplify = T) # with SE, simplified
+#' coef(x, SE = TRUE) # with SE
+#' coef(x, SE = TRUE, simplify = TRUE) # with SE, simplified
 #'
 #' # AIC, BIC, log-likelihood
 #' AIC(x)
@@ -153,6 +168,7 @@
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
 #'
+#' \dontrun{
 #' # Testing both DDF effects with Benjamini-Hochberg adjustment method
 #' ddfORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 #'
@@ -166,6 +182,7 @@
 #'
 #' # Testing both DDF effects with total score as matching criterion
 #' ddfORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
+#' }
 #'
 #' # Testing both DDF effects with cumulative logit model
 #' # using IRT parametrization
@@ -176,8 +193,7 @@
 #' plot(x, item = 3, plot.type = "category")
 #'
 #' # estimated parameters in IRT parametrization
-#' coef(x, simplify = T)
-#' }
+#' coef(x, simplify = TRUE)
 #'
 #' @keywords DDF
 #' @export
@@ -185,17 +201,17 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
                    anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
                    parametrization = "irt", alpha = 0.05) {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type)) {
-    stop("'type' must be either 'udif', 'nudif' or 'both'",
+    stop("'type' must be either 'udif', 'nudif', or 'both'.",
       call. = FALSE
     )
   }
   if (!model %in% c("adjacent", "cumulative") | !is.character(model)) {
-    stop("'model' must be either 'adjacent' or 'cumulative'",
+    stop("'model' must be either 'adjacent' or 'cumulative'.",
       call. = FALSE
     )
   }
   if (alpha > 1 | alpha < 0) {
-    stop("'alpha' must be between 0 and 1",
+    stop("'alpha' must be between 0 and 1.",
       call. = FALSE
     )
   }
@@ -213,12 +229,12 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
     }
     if (length(match) != no) {
       stop("Invalid value for 'match'. Possible values are 'zscore', 'score' or vector of the same length as number
-           of observations in 'Data'!", call. = FALSE)
+           of observations in 'Data'.", call. = FALSE)
     }
   }
   ### purification
   if (purify & !(match[1] %in% c("score", "zscore"))) {
-    stop("Purification not allowed when matching variable is not 'zscore' or 'score'", call. = FALSE)
+    stop("Purification not allowed when matching variable is not 'zscore' or 'score'.", call. = FALSE)
   }
 
   internalORD <- function() {
@@ -241,12 +257,12 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
     }
     if (is.matrix(DATA) | is.data.frame(DATA)) {
       if (dim(DATA)[1] != length(GROUP)) {
-        stop("'Data' must have the same number of rows as is length of vector 'group'",
+        stop("'Data' must have the same number of rows as is length of vector 'group'.",
           call. = FALSE
         )
       }
     } else {
-      stop("'Data' must be data frame or matrix of binary vectors",
+      stop("'Data' must be data frame or matrix of ordinal vectors.",
         call. = FALSE
       )
     }
@@ -258,15 +274,15 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
     GROUP <- as.numeric(as.factor(GROUP) == focal.name)
 
     if (length(match) == dim(DATA)[1]) {
-      df <- data.frame(DATA, GROUP, match, check.names = F)
+      df <- data.frame(DATA, GROUP, match, check.names = FALSE)
     } else {
-      df <- data.frame(DATA, GROUP, check.names = F)
+      df <- data.frame(DATA, GROUP, check.names = FALSE)
     }
 
     df <- df[complete.cases(df), ]
 
     if (dim(df)[1] == 0) {
-      stop("It seems that your 'Data' does not include any subjects that are complete. ",
+      stop("It seems that your 'Data' does not include any subjects that are complete.",
         call. = FALSE
       )
     }
@@ -323,15 +339,18 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         ordSE = ordSE,
         parM0 = PROV$par.m0,
         parM1 = PROV$par.m1,
-        model = model,
-        alpha = alpha, DDFitems = DDFitems,
-        type = type, purification = purify, p.adjust.method = p.adjust.method,
-        pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-        group = GROUP, Data = DATA, match = match, group.names = group.names,
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
-        parametrization = parametrization
+        DDFitems = DDFitems,
+        model = model,
+        type = type,
+        parametrization = parametrization,
+        purification = purify,
+        p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
+        df = PROV$df,
+        alpha = alpha,
+        Data = DATA, group = GROUP, group.names = group.names, match = match
       )
     } else {
       nrPur <- 0
@@ -430,15 +449,18 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         ordSE = ordSE,
         parM0 = PROV$par.m0,
         parM1 = PROV$par.m1,
-        model = model,
-        alpha = alpha, DDFitems = DDFitems,
-        type = type, purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
-        p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
-        group = GROUP, Data = DATA, match = match, group.names = group.names,
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
-        parametrization = parametrization
+        DDFitems = DDFitems,
+        model = model,
+        type = type,
+        parametrization = parametrization,
+        purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
+        p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
+        df = PROV$df,
+        alpha = alpha,
+        Data = DATA, group = GROUP, group.names = group.names, match = match
       )
     }
     class(RES) <- "ddfORD"
@@ -448,8 +470,6 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
   return(resToReturn)
 }
 
-#' @param x an object of 'ddfORD' class
-#' @param ... other generic parameters for \code{print} function.
 #' @rdname ddfORD
 #' @export
 print.ddfORD <- function(x, ...) {
@@ -529,19 +549,16 @@ print.ddfORD <- function(x, ...) {
   }
 }
 
-#' @param object an object of 'ddfORD' class
-#' @param SE logical: should be standard errors also returned? (default is \code{FALSE}).
-#' @param simplify logical: should the result be simplified to a matrix? (default is \code{FALSE}).
 #' @rdname ddfORD
 #' @export
 coef.ddfORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
   if (class(SE) != "logical") {
-    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+    stop("Invalid value for 'SE'. 'SE' need to be logical.",
       call. = FALSE
     )
   }
   if (class(simplify) != "logical") {
-    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+    stop("Invalid value for 'simplify'. 'simplify' need to be logical.",
       call. = FALSE
     )
   }
@@ -595,35 +612,31 @@ logLik.ddfORD <- function(object, item = "all", ...) {
 
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   val <- ifelse(items %in% object$DDFitems,
@@ -649,35 +662,31 @@ AIC.ddfORD <- function(object, item = "all", ...) {
 
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   AIC <- ifelse(items %in% object$DDFitems, object$AICM0[items], object$AICM1[items])
@@ -692,46 +701,37 @@ BIC.ddfORD <- function(object, item = "all", ...) {
 
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   BIC <- ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
   return(BIC)
 }
 
-#' @param title string: title of plot.
-#' @param plot.type character: which plot should be displayed for cumulative logistic
-#' regression model. Either \code{"category"} for category probabilities or
-#' \code{"cumulative"} for cumulative probabilities.
-#' @param group.names character: names of reference and focal group.
 #' @rdname ddfORD
 #' @export
 plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...) {
@@ -740,35 +740,31 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...) {
 
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (item[1] == "all") {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   if (missing(plot.type)) {
@@ -957,7 +953,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...) {
           legend.key = element_rect(fill = "white", colour = NA)
         ) +
         guides(
-          size = guide_legend(title = "Counts", order = 1),
+          size = guide_legend(title = "Count", order = 1),
           colour = guide_legend(title = "Score", order = 2),
           fill = guide_legend(title = "Score", order = 2),
           linetype = guide_legend(title = "Group", order = 3)
@@ -1139,7 +1135,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...) {
             legend.box.margin = margin(3, 3, 3, 3)
           ) +
           guides(
-            size = guide_legend(title = "Counts", order = 3),
+            size = guide_legend(title = "Count", order = 3),
             colour = guide_legend(title = "Score", order = 2),
             fill = guide_legend(title = "Score", order = 2),
             linetype = guide_legend(title = "Group", order = 1)
@@ -1193,7 +1189,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...) {
             legend.box.margin = margin(3, 3, 3, 3)
           ) +
           guides(
-            size = guide_legend(title = "Counts", order = 1),
+            size = guide_legend(title = "Count", order = 1),
             colour = guide_legend(title = "Score", order = 2),
             fill = guide_legend(title = "Score", order = 2),
             linetype = guide_legend(title = "Group", order = 3)

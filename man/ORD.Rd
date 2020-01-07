@@ -9,28 +9,36 @@ anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
 alpha = 0.05)
 }
 \arguments{
-\item{Data}{matrix or data.frame: the ordinarily scored data matrix.}
+\item{Data}{data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and
+columns correspond to the items.}
 
-\item{group}{numeric or character: the binary vector of group membership}
+\item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for
+focal group.}
 
 \item{model}{character: logistic regression model for ordinal data (either \code{"adjacent"} (default) or \code{"cumulative"}).
 See \strong{Details}.}
 
-\item{type}{character: type of DDF to be tested (either \code{"both"} (default), \code{"udif"}, or \code{"nudif"}).
-See \strong{Details}.}
+\item{type}{character: type of DDF to be tested. Either \code{"both"} for uniform and non-uniform
+DDF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
+uniform DDF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
+non-uniform DDF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
+as a single value (for all items) or as an item-specific vector.}
 
-\item{match}{specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-\code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.}
+\item{match}{numeric or character: matching criterion to be used as an estimate of trait. Can be
+either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
+or vector of the same length as number of observations in \code{Data}.}
 
-\item{anchor}{a vector of integers specifying which items are currently considered as anchor (DDF free) items. By
-default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-See \strong{Details}.}
+\item{anchor}{character or numeric: specification of DIF free items. A vector of item identifiers
+(integers specifying the column  number) specifying which items are currently considered as anchor
+(DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
 
-\item{p.adjust.method}{character: method for multiple comparison correction.
-See \strong{Details}.}
+\item{p.adjust.method}{character: method for multiple comparison correction. Possible values are
+\code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+\code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.}
 
 \item{parametrization}{character: parametrization of regression coefficients. Possible options are
-\code{"irt"} (default) and \code{"classic"}. See \strong{Details}.}
+\code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
+intercept-slope parametrization. See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 }
@@ -54,34 +62,34 @@ A list with the following arguments:
   }
 }
 \description{
-Calculates DDF likelihood ratio statistics for ordinal data based either on adjacent logistic regression
-model or on cumulative logistic regression model.
+Calculates DDF likelihood ratio statistics for ordinal data based either on adjacent
+category logit regression model or on cumulative logit regression model.
 }
 \details{
-Calculates DDF likelihood ratio statistics for ordinal data based either on adjacent logistic regression
-model or on cumulative logistic regression model
+Calculates DDF likelihood ratio statistics based either on adjacent category logit model
+or on cumulative logit model for ordinal data.
 
-The \code{Data} is a matrix or data.frame which rows represents examinee ordinarily scored answers and
-columns correspond to the items. The \code{group} must be a vector of the same length as \code{nrow(Data)}.
+Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
+categories is
+\deqn{log(P(y = k)/P(y = k-1)) = (a + aDif*g)*(x - b_k - b_kDif*g),}
+where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
+membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
+for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
+between two groups (reference and focal) in relevant parameters.
 
-The \code{model} corresponds to model to be used for DDF detection. Options are \code{"adjacent"}
-for adjacent logistic regression model or \code{"cumulative"} for cumulative logistic regression model.
+Using cumulative logit model, probability of gaining at least \eqn{k} points is given by
+2PL model, i.e.,
+\deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
+The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
+\eqn{P(Y = k) = P(Y >= k) - P(Y >= k + 1)}.
 
-The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
-to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
-\code{"nudif"} to detect only non-uniform DDF.
+Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
 
-Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
-total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
-in \code{Data}.
-
-The \code{p.adjust.method} is a character for \code{p.adjust} function from the \code{stats} package. Possible values are
-\code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
-\code{"none"}. See also \code{\link[stats]{p.adjust}} for more information.
-
-Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
-intercept-slope parametrization with effect of group membership and interaction with matching criterion.
+Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
+Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
+Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
+interaction with matching criterion, i.e. \eqn{b_0k + b_1*x + b_2k*g + b_3*x*g} instead of
+\eqn{(a + a_Dif*g)*(x - b_k - b_kDif*g))}.
 }
 \examples{
 \dontrun{

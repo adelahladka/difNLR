@@ -17,7 +17,8 @@ MINOR CHANGES
     name of the column in Data.
   o Seed was added for re-calculation of bootstrapped initial values
     in NLR() estimation.
-  o Legend in plot.ddfMLR() was updated.
+  o Legend in plot.ddfMLR() and plot.ddfORD() was updated.
+  o Some typos were fixed.
 
 ------------------------------------------
 - Changes in difNLR 1.3.0-2 (2020-01-03) -
