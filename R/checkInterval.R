@@ -12,20 +12,18 @@
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' hladka@cs.cas.cz \cr
+#' \email{hladka@@cs.cas.cz} \cr
 #'
 #' Patricia Martinkova \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
-#' martinkova@cs.cas.cz \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' @examples
-#' \dontrun{
 #' checkInterval(x = 0.5, vec = c(0, 1))
 #' checkInterval(x = 1.5, vec = c(0, 1))
 #' checkInterval(x = -0.5, vec = c(0, 1))
-#' }
 #'
 #' @export
 checkInterval <- function(x, vec) {
