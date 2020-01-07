@@ -31,12 +31,12 @@ p.adjust.method = "none", start, initboot = T, nrBo = 20)
 \method{residuals}{difNLR}(object, item = "all", ...)
 }
 \arguments{
-\item{Data}{numeric: matrix which rows represents scored examinee answers (\code{"1"} correct,
-\code{"0"} incorrect) and columns correspond to the items. In addition, \code{Data} can hold
-the vector of group membership.}
+\item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
+correct, \code{"0"} incorrect) and columns correspond to the items. In addition, \code{Data} can
+hold the vector of group membership.}
 
 \item{group}{numeric or character: a dichotomous vector of the same length as \code{nrow(Data)}
-or a column indicator of \code{Data}.}
+or a column identifier of \code{Data}.}
 
 \item{focal.name}{numeric or character: indicates the level of \code{group} which corresponds to
 focal group.}
@@ -55,17 +55,17 @@ difference in parameters \code{"a"} and \code{"b"}), or combination of parameter
 \code{"b"}, \code{"c"}, and \code{"d"}. Can be specified as a single value (for all items) or as
 an item-specific vector.}
 
-\item{method}{character: method used to estimate parameters. The options are \code{"nls"} for
-non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.}
+\item{method}{character: method used to estimate parameters. Either \code{"nls"} for
+non-linear least squares (default), or \code{"likelihood"} for maximum likelihood method.}
 
-\item{match}{character or numeric: matching criterion to be used as estimate of trait. Can be
+\item{match}{numeric or character: matching criterion to be used as an estimate of trait. Can be
 either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
-or numeric vector of the same length as number of observations in \code{Data}.}
+or vector of the same length as number of observations in \code{Data}.}
 
-\item{anchor}{character or numeric: specification of DIF free items. Either \code{NULL} (default)
-or a vector of item names (as specified in column names of \code{Data}) or item identifiers
-(integers specifying the column number) specifying which items are currently considered as anchor
-(DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
+\item{anchor}{numeric or character: specification of DIF free items. Either \code{NULL} (default),
+or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+the column number) determining which items are currently considered as anchor (DIF free) items.
+Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
 
 \item{purify}{logical: should the item purification be applied? (default is \code{FALSE}).}
 
@@ -82,35 +82,36 @@ likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a sub
 
 \item{start}{numeric: initial values for estimation of parameters. If not specified, starting
 values are calculated with \code{\link[difNLR]{startNLR}} function. Otherwise, list with as many
-elements as number of items. Each element is a named numeric vector of length 8 representing initial
+elements as a number of items. Each element is a named numeric vector of length 8 representing initial
 values for parameter estimation. Specifically, parameters \code{"a"}, \code{"b"}, \code{"c"}, and
 \code{"d"} are initial values for discrimination, difficulty, guessing, and inattention for reference
 group. Parameters \code{"aDif"}, \code{"bDif"}, \code{"cDif"}, and \code{"dDif"} are then differences
 in these parameters between reference and focal group.}
 
-\item{initboot}{logical: in case of convergence issues, should be starting values recalculated based on
-bootstraped samples? (default is \code{TRUE}; newly calculated initial values are applied only to
+\item{initboot}{logical: in case of convergence issues, should be starting values re-calculated based
+on bootstraped samples? (default is \code{TRUE}; newly calculated initial values are applied only to
 items/models with convergence issues).}
 
 \item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
 bootstraped samples (default is 20).}
 
-\item{x}{an object of "difNLR" class}
+\item{x}{an object of \code{"difNLR"} class.}
 
 \item{...}{other generic parameters for S3 methods.}
 
-\item{object}{an object of \code{"difNLR"} class}
+\item{object}{an object of \code{"difNLR"} class.}
 
-\item{item}{character or numeric: either character (\code{"all"}), or numeric vector, or single number
-corresponding to column indicators.}
+\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
+or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+the column number).}
 
-\item{SE}{logical: should be standard errors also returned? (default is \code{FALSE}).}
+\item{SE}{logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).}
 
-\item{simplify}{logical: should the result be simplified to a matrix? (default is \code{FALSE}).}
+\item{simplify}{logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).}
 }
 \value{
 The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
-including values of the test statistics, p-values and item detected as function differently
+including values of the test statistics, p-values, and items detected as function differently
 is displayed by the \code{print()} method.
 
 Item characteristic curves and graphical representation of DIF statistics can be displayed
@@ -136,14 +137,15 @@ Object of class \code{"difNLR"} is a list with the following components:
   \item{\code{parM0}}{the estimates of null model.}
   \item{\code{seM0}}{the standard errors of estimates of null model.}
   \item{\code{covM0}}{the covariance matrices of estimates of null model.}
+  \item{\code{llM0}}{log-likelihood of null model.}
   \item{\code{parM1}}{the estimates of alternative model.}
   \item{\code{seM1}}{the standard errors of estimates of alternative model.}
   \item{\code{covM1}}{the covariance matrices of estimates of alternative model.}
-  \item{\code{alpha}}{numeric: significance level.}
-  \item{\code{DIFitems}}{either the column indicators of the items which were detected as DIF, or
+  \item{\code{llM1}}{log-likelihood of alternative model.}
+  \item{\code{DIFitems}}{either the column identifiers of the items which were detected as DIF, or
   \code{"No DIF item detected"} in case no item was detected as function differently.}
-  \item{\code{match}}{matching criterion.}
   \item{\code{model}}{fitted model.}
+  \item{\code{constraints}}{constraints for the \code{model}.}
   \item{\code{type}}{character: type of DIF that was tested. If parameters were specified, the value is \code{"other"}.}
   \item{\code{types}}{character: the parameters (specified by user, \code{type} has value \code{"other"}) which were
   tested for difference.}
@@ -156,23 +158,24 @@ Object of class \code{"difNLR"} is a list with the following components:
   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
   is \code{TRUE}.}
   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
-  "1" in i-th row and j-th column means that j-th item was identified as DIF in i-1-th iteration. Returned only
+  \code{"1"} in i-th row and j-th column means that j-th item was identified as DIF in i-th iteration. Returned only
   if \code{purify} is \code{TRUE}.}
   \item{\code{conv.puri}}{logical: indicating whether item purification process converged before the maximal number
   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{method}}{used estimation method.}
   \item{\code{conv.fail}}{numeric: number of convergence issues.}
-  \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
-  \item{\code{llM0}}{log-likelihood of null model.}
-  \item{\code{llM1}}{log-likelihood of alternative model.}
+  \item{\code{conv.fail.which}}{the identifiers of the items which did not converge.}
+  \item{\code{alpha}}{numeric: significance level.}
   \item{\code{Data}}{the data matrix.}
   \item{\code{group}}{the vector of group membership.}
+  \item{\code{group.names}}{names of groups.}
+  \item{\code{match}}{matching criterion.}
 }
 }
 \description{
 Performs DIF detection procedure for dichotomous data based on non-linear
 regression model (generalized logistic regression) and either likelihood-ratio or F test
-of submodel.
+of a submodel.
 }
 \details{
 DIF detection procedure based on non-linear regression is the extension of logistic regression
@@ -183,7 +186,7 @@ answer (i.e., \eqn{y = 1}) is
 where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
 Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
 Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
-in relevant parameters.
+(reference and focal) in relevant parameters.
 
 This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
 The arguments \code{model} and \code{constraints} can be also combined. Both arguments can
@@ -209,10 +212,10 @@ parameters should be fixed for both groups. For example, choice \code{"ad"} mean
 (\code{"b"} and \code{"c"}) are not. The \code{NA} value for \code{constraints} means no constraints.
 
 Missing values are allowed but discarded for item estimation. They must be coded as
-\code{NA} for both, \code{Data} and \code{group} parameters.
+\code{NA} for both, \code{Data} and \code{group} arguments.
 
 In case that model considers difference in guessing or inattention parameter, the different parameterization is
-used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
+used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick with
 alternative parameterization.
 }
 \examples{
@@ -261,7 +264,6 @@ logLik(x)
 AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
-
 \dontrun{
 # Testing both DIF effects using F test and
 # 3PL model with fixed guessing for groups

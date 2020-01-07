@@ -38,4 +38,3 @@
 #' }
 #' Correct answers are presented in \code{\link{GMAT2key}} data set.
 "GMAT2test"
-

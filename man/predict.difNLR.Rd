@@ -9,8 +9,9 @@
 \arguments{
 \item{object}{an object of \code{"difNLR"} class.}
 
-\item{item}{character or numeric: either character (\code{"all"}), or numeric vector, or single number
-corresponding to column indicators.}
+\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
+or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+the column number).}
 
 \item{match}{numeric: matching criterion for new observations.}
 

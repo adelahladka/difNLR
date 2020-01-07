@@ -38,4 +38,3 @@
 #' \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
 #' }
 "GMAT2"
-

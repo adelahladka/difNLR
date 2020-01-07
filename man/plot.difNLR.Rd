@@ -14,8 +14,9 @@
 \item{plot.type}{character: type of plot to be plotted (either \code{"cc"} for characteristic curve
 (default), or \code{"stat"} for test statistics).}
 
-\item{item}{character or numeric: either character (\code{"all"}), or numeric vector, or single number
-corresponding to column indicators.}
+\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
+or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+the column number).}
 
 \item{col}{character: single value, or vector of two values representing colors for plot.}
 
@@ -26,7 +27,7 @@ corresponding to column indicators.}
 \item{linetype}{numeric: single number, or vector of two numbers representing line type in plot for
 reference and focal group.}
 
-\item{title}{string: title of plot.}
+\item{title}{string: title of a plot.}
 
 \item{group.names}{character: names of reference and focal group.}
 

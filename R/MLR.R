@@ -5,49 +5,50 @@
 #' @description Calculates DDF likelihood ratio statistics for nominal data based on
 #' multinomial log-linear model.
 #'
-#' @param Data character: the unscored data matrix.
-#' @param group numeric or character: the binary vector of group membership
-#' @param key character: the answer key.
-#' @param type character: type of DDF to be tested (either \code{"both"} (default), \code{"udif"}, or \code{"nudif"}).
-#' See \strong{Details}.
-#' @param match specifies matching criterion. Can be either \code{"zscore"} (default, standardized total score),
-#' \code{"score"} (total test score), or vector of the same length as number of observations in \code{Data}. See \strong{Details}.
-#' @param anchor a vector of integers specifying which items are currently considered as anchor (DDF free) items. By
-#' default, all items are considered as anchors. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-#' See \strong{Details}.
-#' @param p.adjust.method character: method for multiple comparison correction.
-#' See \strong{Details}.
+#' @param Data data.frame or matrix: dataset which rows represent unscored examinee answers (nominal)
+#' and columns correspond to the items.
+#' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for
+#' focal group.
+#' @param key character: the answer key. Each element corresponds to the correct answer of one item.
+#' @param type character: type of DDF to be tested. Either \code{"both"} for uniform and non-uniform
+#' DDF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
+#' uniform DDF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
+#' non-uniform DDF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
+#' as a single value (for all items) or as an item-specific vector.
+#' @param match numeric or character: matching criterion to be used as an estimate of trait. Can be
+#' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
+#' or vector of the same length as number of observations in \code{Data}.
+#' @param anchor character or numeric: specification of DIF free items. A vector of item identifiers
+#' (integers specifying the column  number) specifying which items are currently considered as anchor
+#' (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' @param p.adjust.method character: method for multiple comparison correction. Possible values are
+#' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+#' \code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.
 #' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"irt"} (default) and \code{"classic"}. See \strong{Details}.
+#' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
+#' intercept-slope parametrization. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
 #' @usage MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
 #' p.adjust.method = "none", parametrization = "irt", alpha = 0.05)
 #'
 #' @details
-#' Calculates DDF likelihood ratio statistics based on multinomial log-linear model.
+#' Calculates DDF likelihood ratio statistics based on multinomial log-linear model. Probability of
+#' selection the \eqn{k}-th category (distractor) is
+#' \deqn{P(y = k) = exp((a_k + a_kDif*g)*(x - b_k - b_kDif*g)))/(1 + \sum_l exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))), }
+#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
+#' membership. Parameters \eqn{a_k} and \eqn{b_k} are discrimination and difficulty for the \eqn{k}-th
+#' category. Terms \eqn{a_kDif} and \eqn{b_kDif} then represent differences between two groups
+#' (reference and focal) in relevant parameters. Probability of correct answer (specified in argument
+#' \code{key}) is
+#' \deqn{P(y = k) = 1/(1 + \sum_l exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))). }
+#' Parameters are estimated via neural networks. For more details see \code{\link[nnet]{multinom}}.
 #'
-#' The \code{Data} is a matrix which rows represents examinee unscored answers and
-#' columns correspond to the items. The \code{group} must be a vector of the same
-#' length as \code{nrow(Data)}. The \code{key} must be a vector of correct answers
-#' corresponding to columns of \code{Data}.
-#'
-#' The \code{type} corresponds to type of DDF to be tested. Possible values are \code{"both"}
-#' to detect any DDF (uniform and/or non-uniform), \code{"udif"} to detect only uniform DDF or
-#' \code{"nudif"} to detect only non-uniform DDF.
-#'
-#' Argument \code{match} represents the matching criterion. It can be either the standardized test score (default, \code{"zscore"}),
-#' total test score (\code{"score"}), or any other continuous or discrete variable of the same length as number of observations
-#' in \code{Data}. Matching criterion is used in \code{NLR} function as a covariate in non-linear regression model.
-#'
-#' The \code{p.adjust.method} is a character for \code{p.adjust} function from the
-#' \code{stats} package. Possible values are \code{"holm"}, \code{"hochberg"},
-#' \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}.
-#' See also \code{\link[stats]{p.adjust}} for more information.
-#'
-#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters. Default option
-#' is \code{"irt"} which returns IRT parametrization (difficulty-discrimination). Option \code{"classic"} returns
-#' intercept-slope parametrization with effect of group membership and interaction with matching criterion.
+#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
+#' Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
+#' Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
+#' interaction with matching criterion, i.e. \eqn{b_0k + b_1k*x + b_2k*g + b_3k*x*g} instead of
+#' \eqn{(a_k + a_kDif*g)*(x - b_k - b_kDif*g))}.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -69,15 +70,15 @@
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' hladka@cs.cas.cz \cr
+#' \email{hladka@@cs.cas.cz} \cr
 #'
 #' Patricia Martinkova \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
-#' martinkova@cs.cas.cz \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
 #'
-#' @seealso \code{\link[stats]{p.adjust}}
+#' @seealso \code{\link[stats]{p.adjust}} \code{\link[nnet]{multinom}}
 #'
 #' @examples
 #' \dontrun{
@@ -111,8 +112,8 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
       if (length(match) == dim(Data)[1]) {
         x <- match
       } else {
-        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
-             of observations in 'Data'!")
+        stop("Invalid value for 'match'. Possible values are 'score', 'zscore', or vector of the same length as number
+             of observations in 'Data'.", call. = FALSE)
       }
     }
   }

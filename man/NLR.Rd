@@ -9,8 +9,8 @@ match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test =
 alpha = 0.05, initboot = T, nrBo = 20)
 }
 \arguments{
-\item{Data}{numeric: numeric: matrix which rows represents scored examinee answers (\code{"1"} correct,
-\code{"0"} incorrect) and columns correspond to the items.}
+\item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
+correct, \code{"0"} incorrect) and columns correspond to the items.}
 
 \item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for
 focal group.}
@@ -57,7 +57,7 @@ likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a sub
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 
-\item{initboot}{logical: in case of convergence issues, should be starting values recalculated based on
+\item{initboot}{logical: in case of convergence issues, should be starting values re-calculated based on
 bootstraped samples? (default is \code{TRUE}; newly calculated initial values are applied only to
 items/models with convergence issues).}
 
@@ -83,10 +83,10 @@ A list with the following arguments:
   \item{\code{ll.m0}}{log-likelihood of m0 model.}
   \item{\code{ll.m1}}{log-likelihood of m1 model.}
   \item{\code{startBo0}}{the binary matrix. Columns represents iterations of initial values
-  recalculations, rows represents items. The value of 0 means no convergence issue in m0 model,
+  re-calculations, rows represents items. The value of 0 means no convergence issue in m0 model,
   1 means convergence issue in m0 model.}
   \item{\code{startBo1}}{the binary matrix. Columns represents iterations of initial values
-  recalculations, rows represents items. The value of 0 means no convergence issue in m1 model,
+  re-calculations, rows represents items. The value of 0 means no convergence issue in m1 model,
   1 means convergence issue in m1 model.}
 }
 }
@@ -103,7 +103,7 @@ answer (i.e., \eqn{y = 1}) is
 where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
 Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
 Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
-in relevant parameters.
+(reference and focal) in relevant parameters.
 
 This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
 The arguments \code{model} and \code{constraints} can be also combined. Both arguments can
@@ -129,7 +129,7 @@ parameters should be fixed for both groups. For example, choice \code{"ad"} mean
 (\code{"b"} and \code{"c"}) are not. The \code{NA} value for \code{constraints} means no constraints.
 
 In case that model considers difference in guessing or inattention parameter, the different parameterization is
-used and parameters with standard errors are recalculated by delta method. However, covariance matrices stick with
+used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick with
 alternative parameterization.
 }
 \examples{
