@@ -29,7 +29,6 @@ Estimates parameters of non-linear regression models for DIF detection using eit
 non-linear least squares or maximum likelihood method.
 }
 \examples{
-\dontrun{
 data(GMAT)
 
 # item 1
@@ -71,7 +70,6 @@ logLik(fitLKLM0)
 vcov(fitLKLM0)
 fitted(fitLKLM0)
 residuals(fitLKLM0)
-}
 
 }
 \author{

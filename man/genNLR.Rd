@@ -2,18 +2,20 @@
 % Please edit documentation in R/genNLR.R
 \name{genNLR}
 \alias{genNLR}
-\title{Generates data set based on Non-Linear Regression DIF a DDF models.}
+\title{Generates data set based on generalized logistic regression DIF and DDF models.}
 \usage{
 genNLR(N = 1000, ratio = 1, itemtype = "dich", a, b, c, d, mu = 0, sigma = 1)
 }
 \arguments{
-\item{N}{numeric: number of rows representing respondents.}
+\item{N}{numeric: number of rows representing respondents. (default is 1000).}
 
 \item{ratio}{numeric: ratio of respondents number in reference and focal group.}
 
-\item{itemtype}{character: type of items to be generated. Options are \code{"dich"} for
-dichotomous item (default), \code{"nominal"} for nominal items, and \code{"ordinal"} for
-ordinal data. See \strong{Details}.}
+\item{itemtype}{character: type of items to be generated. Options are \code{"dich"} (default) for
+dichotomous item based on non-linear regression model for DIF detection (see \code{\link[difNLR]{difNLR}}
+for details), \code{"nominal"} for nominal items based on multinomial model for DDF detection (see
+\code{\link[difNLR]{ddfMLR}} for detail), and \code{"ordinal"} for ordinal data based on adjacent
+category logit model (for details see \code{\link[difNLR]{ddfORD}}).}
 
 \item{a}{numeric: matrix representing discriminations with m rows
 (where m is number of items). Need to be provided. See \strong{Details}.}
@@ -28,28 +30,21 @@ ordinal data. See \strong{Details}.}
 (where m is number of items). Default is \code{NULL}. See \strong{Details}.}
 
 \item{mu}{numeric: a mean vector of the underlying distribution. The first value corresponds to
-reference group, the second to focal group. Default is 0 value for both groups. See \strong{Details}.}
+reference group, the second to focal group. Default is 0 value for both groups.}
 
-\item{sigma}{numeric: a standard deviation vector of the underlying distribution. The first value corresponds to
-reference group, the second to focal group. Default is 1 value for both groups. See \strong{Details}.}
+\item{sigma}{numeric: a standard deviation vector of the underlying distribution. The first value
+corresponds to reference group, the second to focal group. Default is 1 value for both groups.}
 }
 \value{
 A \code{data.frame} containing \code{N} rows representing respondents and \code{m + 1} columns representing
-\code{m} items. Last column is group membership variable with coding 0 for reference group and 1 for focal
-group.
+\code{m} items. The last column is group membership variable with coding \code{"0"} for reference group and
+\code{"1"} for focal group.
 }
 \description{
-Generates dichotomous and nominal data set based on non-linear regression
+Generates dichotomous, nominal, and ordinal data based on generalized logistic regression
 models for DIF and DDF detection.
 }
 \details{
-The \code{itemtype} argument specify what type of item should be generated. In case
-\code{itemtype = "dich"}, dichotomous items are generated with non-linear regression model (generalized
-logistic regression model) for DIF detection specified in \code{\link[difNLR]{difNLR}}.
-In case \code{itemtype = "nominal"}, nominal items are generated with multinomial model specified in
-\code{\link[difNLR]{ddfMLR}}. For option \code{itemtype = "ordinal"}, ordinal items are generated with
-adjacent logit model specified in \code{\link[difNLR]{ddfORD}} with argument \code{model = "adjacent"}.
-
 The \code{a}, \code{b}, \code{c} and \code{d} are numeric matrices with m rows (where m is number of items)
 representing parameters of regression models for DIF and DDF detection.
 
@@ -64,14 +59,8 @@ First 3 columns correspond to distractors parameters for reference group and las
 for focal group. The number of choices can differ for items. Matrices \code{a} and \code{b}
 need to consist of as many columns as is the maximum number of distractors. Items with less
 choices can containt NAs.
-
-Single value for \code{mu} means that reference and focal group have underlying distribution with the same mean.
-Single value for \code{sigma} means that reference and focal group have underlying distribution with the same
-standard deviation. In case that \code{mu} or \code{sigma} are vectors of length grater than two, only
-first two values are taken.
 }
 \examples{
-\dontrun{
 # seed
 set.seed(123)
 # generating parameters for dichotomous data with DIF, 5 items
@@ -107,14 +96,14 @@ genNLR(N = 300, itemtype = "nominal", a = a, b = b)
 # generating nominal data set with 300 observations (250 reference group, 50 focal)
 genNLR(N = 300, itemtype = "nominal", ratio = 5, a = a, b = b)
 }
-}
 \references{
 Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 \url{https://doi.org/10.1111/jedm.12158}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{ddfORD}}
+\code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{ddfORD}},
+\code{\link[difNLR]{ddfORD}}
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

@@ -21,9 +21,11 @@
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' @examples
+#' \dontrun{
 #' checkInterval(x = 0.5, vec = c(0, 1))
 #' checkInterval(x = 1.5, vec = c(0, 1))
 #' checkInterval(x = -0.5, vec = c(0, 1))
+#' }
 #'
 #' @export
 checkInterval <- function(x, vec) {

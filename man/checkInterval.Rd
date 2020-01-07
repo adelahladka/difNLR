@@ -18,9 +18,11 @@ in \code{vec}, it returns its value. In case that value of \code{x} is greater t
 in \code{vec}, it returns its value.
 }
 \examples{
+\dontrun{
 checkInterval(x = 0.5, vec = c(0, 1))
 checkInterval(x = 1.5, vec = c(0, 1))
 checkInterval(x = -0.5, vec = c(0, 1))
+}
 
 }
 \author{

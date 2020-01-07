@@ -28,7 +28,6 @@
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' @examples
-#' \dontrun{
 #' data(GMAT)
 #'
 #' # item 1
@@ -70,7 +69,6 @@
 #' vcov(fitLKLM0)
 #' fitted(fitLKLM0)
 #' residuals(fitLKLM0)
-#' }
 #'
 #' @keywords DIF
 #' @export
@@ -134,7 +132,7 @@ lkl <- function(formula, data, par, lower, upper, fitv) {
     method = "L-BFGS-B",
     lower = lower,
     upper = upper,
-    hessian = T
+    hessian = TRUE
   )
 
   h. <- parse(text = as.character(formula)[3])

@@ -1,10 +1,12 @@
-#' Generates data set based on Non-Linear Regression DIF a DDF models.
+#' Generates data set based on generalized logistic regression DIF and DDF models.
 #'
-#' @param N numeric: number of rows representing respondents.
+#' @param N numeric: number of rows representing respondents. (default is 1000).
 #' @param ratio numeric: ratio of respondents number in reference and focal group.
-#' @param itemtype character: type of items to be generated. Options are \code{"dich"} for
-#' dichotomous item (default), \code{"nominal"} for nominal items, and \code{"ordinal"} for
-#' ordinal data. See \strong{Details}.
+#' @param itemtype character: type of items to be generated. Options are \code{"dich"} (default) for
+#' dichotomous item based on non-linear regression model for DIF detection (see \code{\link[difNLR]{difNLR}}
+#' for details), \code{"nominal"} for nominal items based on multinomial model for DDF detection (see
+#' \code{\link[difNLR]{ddfMLR}} for detail), and \code{"ordinal"} for ordinal data based on adjacent
+#' category logit model (for details see \code{\link[difNLR]{ddfORD}}).
 #' @param a numeric: matrix representing discriminations with m rows
 #' (where m is number of items). Need to be provided. See \strong{Details}.
 #' @param b numeric: numeric: matrix representing difficulties with m rows
@@ -14,22 +16,14 @@
 #' @param d numeric: matrix representing inattentions (upper asymptotes) with m rows
 #' (where m is number of items). Default is \code{NULL}. See \strong{Details}.
 #' @param mu numeric: a mean vector of the underlying distribution. The first value corresponds to
-#' reference group, the second to focal group. Default is 0 value for both groups. See \strong{Details}.
-#' @param sigma numeric: a standard deviation vector of the underlying distribution. The first value corresponds to
-#' reference group, the second to focal group. Default is 1 value for both groups. See \strong{Details}.
+#' reference group, the second to focal group. Default is 0 value for both groups.
+#' @param sigma numeric: a standard deviation vector of the underlying distribution. The first value
+#' corresponds to reference group, the second to focal group. Default is 1 value for both groups.
 #'
-#' @description Generates dichotomous and nominal data set based on non-linear regression
+#' @description Generates dichotomous, nominal, and ordinal data based on generalized logistic regression
 #' models for DIF and DDF detection.
 #'
 #' @details
-#'
-#' The \code{itemtype} argument specify what type of item should be generated. In case
-#' \code{itemtype = "dich"}, dichotomous items are generated with non-linear regression model (generalized
-#' logistic regression model) for DIF detection specified in \code{\link[difNLR]{difNLR}}.
-#' In case \code{itemtype = "nominal"}, nominal items are generated with multinomial model specified in
-#' \code{\link[difNLR]{ddfMLR}}. For option \code{itemtype = "ordinal"}, ordinal items are generated with
-#' adjacent logit model specified in \code{\link[difNLR]{ddfORD}} with argument \code{model = "adjacent"}.
-#'
 #' The \code{a}, \code{b}, \code{c} and \code{d} are numeric matrices with m rows (where m is number of items)
 #' representing parameters of regression models for DIF and DDF detection.
 #'
@@ -45,17 +39,12 @@
 #' need to consist of as many columns as is the maximum number of distractors. Items with less
 #' choices can containt NAs.
 #'
-#' Single value for \code{mu} means that reference and focal group have underlying distribution with the same mean.
-#' Single value for \code{sigma} means that reference and focal group have underlying distribution with the same
-#' standard deviation. In case that \code{mu} or \code{sigma} are vectors of length grater than two, only
-#' first two values are taken.
-#'
 #' @usage genNLR(N = 1000, ratio = 1, itemtype = "dich", a, b, c, d, mu = 0, sigma = 1)
 #'
 #' @return
 #' A \code{data.frame} containing \code{N} rows representing respondents and \code{m + 1} columns representing
-#' \code{m} items. Last column is group membership variable with coding 0 for reference group and 1 for focal
-#' group.
+#' \code{m} items. The last column is group membership variable with coding \code{"0"} for reference group and
+#' \code{"1"} for focal group.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -72,10 +61,10 @@
 #' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
-#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{ddfORD}}
+#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{ddfORD}},
+#' \code{\link[difNLR]{ddfORD}}
 #'
 #' @examples
-#' \dontrun{
 #' # seed
 #' set.seed(123)
 #' # generating parameters for dichotomous data with DIF, 5 items
@@ -110,7 +99,6 @@
 #' genNLR(N = 300, itemtype = "nominal", a = a, b = b)
 #' # generating nominal data set with 300 observations (250 reference group, 50 focal)
 #' genNLR(N = 300, itemtype = "nominal", ratio = 5, a = a, b = b)
-#' }
 #' @export
 
 
@@ -121,16 +109,16 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
   group <- c(rep(0, N_R), rep(1, N_F))
 
   if (!(is.numeric(mu))) {
-    stop("Invalid value for 'mu'. 'mu' needs to be numeric.")
+    stop("Invalid value for 'mu'. 'mu' needs to be numeric.", call. = FALSE)
   }
   if (!(is.numeric(sigma))) {
-    stop("Invalid value for 'sigma'. 'sigma' needs to be numeric. ")
+    stop("Invalid value for 'sigma'. 'sigma' needs to be numeric.", call. = FALSE)
   }
   if (length(mu) == 1) {
     mu <- c(mu, mu)
   } else {
     if (length(mu) > 2) {
-      warning("Length of 'mu' is greater than 2. Only first two values are used.")
+      warning("Length of 'mu' is greater than 2. Only first two values are used.", call. = FALSE)
     }
     mu <- mu[1:2]
   }
@@ -149,25 +137,25 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
   )
 
   if (!(itemtype %in% c("dich", "nominal", "ordinal"))) {
-    stop("Invalid value for 'itemtype'. Type of item can be either 'dich', 'nominal', or 'ordinal'.")
+    stop("Invalid value for 'itemtype'. Type of item can be either 'dich', 'nominal', or 'ordinal'.", call. = FALSE)
   }
 
   if (itemtype == "dich") {
     if (missing(a)) {
-      stop("Missing 'a'. Discrimination parameter need to be provided.")
+      stop("Missing 'a'. Discrimination parameter need to be provided.", call. = FALSE)
     }
     if (is.null(dim(a))) {
       a <- cbind(a, a)
     }
     m <- nrow(a)
     if (missing(b)) {
-      stop("Missing 'b'. Discrimination parameter need to be provided.")
+      stop("Missing 'b'. Discrimination parameter need to be provided.", call. = FALSE)
     }
     if (is.null(dim(b))) {
       b <- cbind(b, b)
     }
     if (nrow(a) != nrow(b)) {
-      stop("Invalid dimensions for 'a' and 'b'.")
+      stop("Invalid dimensions for 'a' and 'b'.", call. = FALSE)
     }
     if (is.null(c)) {
       c <- matrix(0, ncol = 2, nrow = m)
@@ -176,21 +164,17 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
       d <- matrix(1, ncol = 2, nrow = m)
     }
     if (any(is.na(a)) | any(is.na(b)) | any(is.na(c)) | any(is.na(d))) {
-      stop("Missing values are not allowed in parameters for dichotomous items.")
-    }
-
-    gNLR <- function(x, g, a, b, c, d) {
-      return(c + (d - c) / (1 + exp(-a * (x - b))))
+      stop("Missing values are not allowed in parameters for dichotomous items.", call. = FALSE)
     }
 
     pR <- sapply(1:m, function(i) {
-      do.call(gNLR, list(
+      do.call(.gNLR_simple, list(
         x = theta[1:N_R],
         a = a[i, 1], b = b[i, 1], c = c[i, 1], d = d[i, 1]
       ))
     })
     pF <- sapply(1:m, function(i) {
-      do.call(gNLR, list(
+      do.call(.gNLR_simple, list(
         x = theta[(N_R + 1):N],
         a = a[i, 2], b = b[i, 2], c = c[i, 2], d = d[i, 2]
       ))
@@ -206,30 +190,28 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     }
   } else {
     if (missing(a)) {
-      stop("Missing 'a'. Discrimination parameter need to be provided.")
+      stop("Missing 'a'. Discrimination parameter need to be provided.", call. = FALSE)
     }
     if (!((ncol(a) %% 2) == 0)) {
       stop("Invalid dimension for 'a'.")
     }
 
     if (missing(b)) {
-      stop("Missing 'b'. Discrimination parameter need to be provided.")
+      stop("Missing 'b'. Discrimination parameter need to be provided.", call. = FALSE)
     }
     if (!((ncol(b) %% 2) == 0)) {
-      stop("Invalid dimension for 'b'.")
+      stop("Invalid dimension for 'b'.", call. = FALSE)
     }
 
     if (nrow(a) != nrow(b)) {
-      stop("Invalid dimensions for 'a' and 'b'.")
+      stop("Invalid dimensions for 'a' and 'b'.", call. = FALSE)
     }
 
     if (any(is.na(a) != is.na(b))) {
       stop("Missing values need to be the same in 'a' and 'b'.")
     }
 
-    gMLR <- function(x, a, b) {
-      return(exp(a * (x - b)))
-    }
+
     m <- nrow(a)
     answer <- matrix(NA, nrow = N, ncol = m)
 
@@ -250,13 +232,13 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
       btmp <- b[i, ]
       btmp <- btmp[!is.na(btmp)]
       pR <- sapply(1:L, function(l) {
-        do.call(gMLR, list(
+        do.call(.gMLR, list(
           x = theta[1:N_R],
           a = atmp[l], b = btmp[l]
         ))
       })
       pF <- sapply(1:L, function(l) {
-        do.call(gMLR, list(
+        do.call(.gMLR, list(
           x = theta[(N_R + 1):N],
           a = atmp[l + L], b = btmp[l + L]
         ))
@@ -284,4 +266,13 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
   data <- data.frame(answer, group)
   colnames(data) <- c(paste0("Item", 1:m), "group")
   return(data)
+}
+
+# private functions
+.gNLR_simple <- function(x, g, a, b, c, d) {
+  return(c + (d - c) / (1 + exp(-a * (x - b))))
+}
+
+.gMLR <- function(x, a, b) {
+  return(exp(a * (x - b)))
 }

@@ -97,6 +97,7 @@ data based on non-linear regression model (generalized logistic regression model
 \details{
 Calculation of the test statistics using DIF detection procedure based on non-linear regression
 (extension of logistic regression procedure; Swaminathan and Rogers, 1990; Drabinova and Martinkova, 2017).
+
 The unconstrained form of 4PL generalized logistic regression model for probability of correct
 answer (i.e., \eqn{y = 1}) is
 \deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
