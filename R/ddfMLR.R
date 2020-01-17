@@ -666,6 +666,9 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
 
     df$variable <- relevel(df$variable, ref = paste(x$key[i]))
 
+    levels(df$variable) <- paste0("P(Y = ", levels(df$variable), ")")
+    levels(df2$answ) <- paste0("P(Y = ", levels(df2$answ), ")")
+
     plot_CC[[i]] <- ggplot() +
       geom_line(
         data = df,
