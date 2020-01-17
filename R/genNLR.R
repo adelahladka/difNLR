@@ -126,7 +126,7 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     sigma <- c(sigma, sigma)
   } else {
     if (length(sigma) > 2) {
-      warning("Length of 'sigma' is greater than 2. Only first two values are used.")
+      warning("Length of 'sigma' is greater than 2. Only first two values are used.", call. = FALSE)
     }
     sigma <- sigma[1:2]
   }
@@ -193,7 +193,7 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
       stop("Missing 'a'. Discrimination parameter need to be provided.", call. = FALSE)
     }
     if (!((ncol(a) %% 2) == 0)) {
-      stop("Invalid dimension for 'a'.")
+      stop("Invalid dimension for 'a'.", call. = FALSE)
     }
 
     if (missing(b)) {
@@ -208,9 +208,12 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     }
 
     if (any(is.na(a) != is.na(b))) {
-      stop("Missing values need to be the same in 'a' and 'b'.")
+      stop("Missing values need to be the same in 'a' and 'b'.", call. = FALSE)
     }
 
+    if (ncol(a) > 26 & itemtype == "nominal") {
+      stop("Maximum number of distractors is 26.", call. = FALSE)
+    }
 
     m <- nrow(a)
     answer <- matrix(NA, nrow = N, ncol = m)
@@ -260,6 +263,13 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     if (itemtype == "ordinal") {
       uval <- lapply(1:m, function(i) sort(unique(answer[, i])))
       answer <- as.data.frame(sapply(1:m, function(i) factor(answer[, i], levels = uval[[i]], ordered = T)))
+    }
+
+    if (itemtype == "nominal") {
+      uval <- lapply(1:m, function(i) sort(unique(answer[, i])))
+      vals <- lapply(uval, function(x) LETTERS[x + 1])
+      answer <- sapply(1:m, function(i) as.numeric(paste(answer[, i])) + 1)
+      answer <- data.frame(sapply(1:m, function(i) factor(vals[[i]][answer[, i]], levels = vals[[i]])))
     }
   }
 
