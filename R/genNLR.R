@@ -6,7 +6,7 @@
 #' dichotomous item based on non-linear regression model for DIF detection (see \code{\link[difNLR]{difNLR}}
 #' for details), \code{"nominal"} for nominal items based on multinomial model for DDF detection (see
 #' \code{\link[difNLR]{ddfMLR}} for detail), and \code{"ordinal"} for ordinal data based on adjacent
-#' category logit model (for details see \code{\link[difNLR]{ddfORD}}).
+#' category logit model (for details see \code{\link[difNLR]{difORD}}).
 #' @param a numeric: matrix representing discriminations with m rows
 #' (where m is number of items). Need to be provided. See \strong{Details}.
 #' @param b numeric: numeric: matrix representing difficulties with m rows
@@ -61,8 +61,8 @@
 #' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
-#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{ddfORD}},
-#' \code{\link[difNLR]{ddfORD}}
+#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{difORD}},
+#' \code{\link[difNLR]{difORD}}
 #'
 #' @examples
 #' # seed

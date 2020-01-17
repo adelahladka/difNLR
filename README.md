@@ -6,8 +6,7 @@ DIF and DDF Detection by Non-Linear Regression Models.
 ![cranlogs](https://cranlogs.r-pkg.org/badges/difNLR)
 
 ## Description
-
-The difNLR package containts method for detection of differential item functioning (DIF) based on non-linear regression. Both uniform and non-uniform DIF effects can be detected when considering one focal group. The method also allows to test the difference in guessing or inattention parameters between reference and focal group. DIF detection method is based either on likelihood-ratio test, or on F-test of submodel. Package also offers methods for detection of differential distractor functioning (DDF) based on multinomial log-linear regression model and newly for ordinal data via adjacent and cumulative logistic regression models.
+The difNLR package containts method for detection of differential item functioning (DIF) based on non-linear regression. Both uniform and non-uniform DIF effects can be detected when considering one focal group. The method also allows to test the difference in guessing or inattention parameters between reference and focal group. DIF detection method is based either on likelihood-ratio test, or on F-test of submodel. Package also offers methods for detection of differential distractor functioning (DDF) based on multinomial log-linear regression model and newly methods for DIF detection among ordinal data via adjacent category and cumulative logist regression models.
 
 <p align="center">
   <img src="inst/DIF_NLR.png" width=33%/> 
