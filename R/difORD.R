@@ -1,8 +1,8 @@
-#' DDF detection for ordinal data.
+#' DIF detection for ordinal data.
 #'
-#' @aliases ddfORD print.ddfORD plot.ddfORD
+#' @aliases difORD print.difORD plot.difORD
 #'
-#' @description Performs DDF detection procedure for ordinal data based either on adjacent category logit
+#' @description Performs DIF detection procedure for ordinal data based either on adjacent category logit
 #' model or on cumulative logit model and likelihood ratio test of a submodel.
 #'
 #' @param Data data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and
@@ -13,17 +13,17 @@
 #' focal group.
 #' @param model character: logistic regression model for ordinal data (either \code{"adjacent"} (default)
 #' or \code{"cumulative"}). See \strong{Details}.
-#' @param type character: type of DDF to be tested. Either \code{"both"} for uniform and non-uniform
-#' DDF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
-#' uniform DDF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
-#' non-uniform DDF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
+#' @param type character: type of DIF to be tested. Either \code{"both"} for uniform and non-uniform
+#' DIF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
+#' uniform DIF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
+#' non-uniform DIF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
 #' as a single value (for all items) or as an item-specific vector.
 #' @param match numeric or character: matching criterion to be used as an estimate of trait. Can be
 #' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
 #' or vector of the same length as number of observations in \code{Data}.
-#' @param anchor numeric or character: specification of DDF free items. Either \code{NULL} (default),
+#' @param anchor numeric or character: specification of DIF free items. Either \code{NULL} (default),
 #' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number) determining which items are currently considered as anchor (DDF free) items.
+#' the column number) determining which items are currently considered as anchor (DIF free) items.
 #' Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
 #' @param purify logical: should the item purification be applied? (default is \code{FALSE}).
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
@@ -34,8 +34,8 @@
 #' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
 #' intercept-slope parametrization. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
-#' @param x an object of \code{"ddfORD"} class.
-#' @param object an object of \code{"ddfORD"} class.
+#' @param x an object of \code{"difORD"} class.
+#' @param object an object of \code{"difORD"} class.
 #' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
 #' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
 #' @param title string: title of a plot.
@@ -44,12 +44,12 @@
 #' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for S3 methods.
 #'
-#' @usage ddfORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
+#' @usage difORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 #' anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
 #' parametrization = "irt", alpha = 0.05)
 #'
 #' @details
-#' Performs DDF detection procedure for ordinal data based either on adjacent category logit model
+#' Performs DIF detection procedure for ordinal data based either on adjacent category logit model
 #' or on cumulative logit model.
 #'
 #' Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
@@ -77,8 +77,8 @@
 #' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 #' for both, \code{Data} and \code{group} parameters.
 #'
-#' @return The \code{ddfORD()} function returns an object of class \code{"ddfORD"}. The output
-#' including values of the test statistics, p-values, and items marked as DDF is displayed by the
+#' @return The \code{difORD()} function returns an object of class \code{"difORD"}. The output
+#' including values of the test statistics, p-values, and items marked as DIF is displayed by the
 #' \code{print()} method.
 #'
 #' Item characteristic curves can be displayed with \code{plot()} method.
@@ -88,7 +88,7 @@
 #' extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
 #' specified in \code{item} argument.
 #'
-#' A list of class \code{"ddfORD"} with the following arguments:
+#' A list of class \code{"difORD"} with the following arguments:
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
 #'   \item{\code{ordPAR}}{the estimates of the final model.}
@@ -101,16 +101,16 @@
 #'   \item{\code{AICM1}}{AIC of alternative model.}
 #'   \item{\code{BICM0}}{BIC of null model.}
 #'   \item{\code{BICM1}}{BIC of alternative model.}
-#'   \item{\code{DDFitems}}{either the column identifiers of the items which were detected as DDF, or
-#'   \code{"No DDF item detected"} in case no item was detected as DDF.}
-#'   \item{\code{model}}{model used for DDF detection.}
-#'   \item{\code{type}}{character: type of DDF that was tested.}
+#'   \item{\code{DIFitems}}{either the column identifiers of the items which were detected as DIF, or
+#'   \code{"No DIF item detected"} in case no item was detected as DIF.}
+#'   \item{\code{model}}{model used for DIF detection.}
+#'   \item{\code{type}}{character: type of DIF that was tested.}
 #'   \item{\code{parametrization}}{Parameters' parametrization.}
 #'   \item{\code{purification}}{\code{purify} value.}
 #'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
 #'   is \code{TRUE}.}
-#'   \item{\code{ddfPur}}{a binary matrix with one row per iteration of item purification and one column per item.
-#'   \code{"1"} in i-th row and j-th column means that j-th item was identified as DDF in i-th iteration. Returned only
+#'   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
+#'   \code{"1"} in i-th row and j-th column means that j-th item was identified as DIF in i-th iteration. Returned only
 #'   if \code{purify} is \code{TRUE}.}
 #'   \item{\code{conv.puri}}{logical indicating whether item purification process converged before the maximal number
 #'   \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
@@ -146,8 +146,8 @@
 #' Data <- dataMedicalgraded[, 1:5]
 #' group <- dataMedicalgraded[, 101]
 #'
-#' # Testing both DDF effects with adjacent category logit model
-#' (x <- ddfORD(Data, group, focal.name = 1, model = "adjacent"))
+#' # Testing both DIF effects with adjacent category logit model
+#' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
 #' # graphical devices
 #' plot(x, item = 3)
@@ -169,24 +169,24 @@
 #' logLik(x, item = 1)
 #'
 #' \dontrun{
-#' # Testing both DDF effects with Benjamini-Hochberg adjustment method
-#' ddfORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
+#' # Testing both DIF effects with Benjamini-Hochberg adjustment method
+#' difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 #'
-#' # Testing both DDF effects with item purification
-#' ddfORD(Data, group, focal.name = 1, model = "adjacent", purify = T)
+#' # Testing both DIF effects with item purification
+#' difORD(Data, group, focal.name = 1, model = "adjacent", purify = T)
 #'
-#' # Testing uniform DDF effects
-#' ddfORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")
-#' # Testing non-uniform DDF effects
-#' ddfORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
+#' # Testing uniform DIF effects
+#' difORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")
+#' # Testing non-uniform DIF effects
+#' difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 #'
-#' # Testing both DDF effects with total score as matching criterion
-#' ddfORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
+#' # Testing both DIF effects with total score as matching criterion
+#' difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 #' }
 #'
-#' # Testing both DDF effects with cumulative logit model
+#' # Testing both DIF effects with cumulative logit model
 #' # using IRT parametrization
-#' (x <- ddfORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt"))
+#' (x <- difORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt"))
 #'
 #' # graphical devices
 #' plot(x, item = 3, plot.type = "cumulative")
@@ -195,9 +195,9 @@
 #' # estimated parameters in IRT parametrization
 #' coef(x, simplify = TRUE)
 #'
-#' @keywords DDF
+#' @keywords DIF
 #' @export
-ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
+difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
                    anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
                    parametrization = "irt", alpha = 0.05) {
   if (!type %in% c("udif", "nudif", "both") | !is.character(type)) {
@@ -320,15 +320,15 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
       significant <- which(ADJ.PVAL < alpha)
 
       if (length(significant) > 0) {
-        DDFitems <- significant
+        DIFitems <- significant
         ordPAR <- PROV$par.m1
         ordSE <- se.m1
-        for (idif in 1:length(DDFitems)) {
-          ordPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-          ordSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
+        for (idif in 1:length(DIFitems)) {
+          ordPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
+          ordSE[[DIFitems[idif]]] <- se.m0[[DIFitems[idif]]]
         }
       } else {
-        DDFitems <- "No DDF item detected"
+        DIFitems <- "No DIF item detected"
         ordPAR <- PROV$par.m1
         ordSE <- se.m1
       }
@@ -342,7 +342,7 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
-        DDFitems = DDFitems,
+        DIFitems = DIFitems,
         model = model,
         type = type,
         parametrization = parametrization,
@@ -354,7 +354,7 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
       )
     } else {
       nrPur <- 0
-      ddfPur <- NULL
+      difPur <- NULL
       noLoop <- FALSE
       prov1 <- suppressWarnings(ORD(DATA, GROUP,
         model = model, type = type, match = match,
@@ -367,7 +367,7 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
       if (length(significant1) == 0) {
         PROV <- prov1
         STATS <- stats1
-        DDFitems <- "No DDF item detected"
+        DIFitems <- "No DIF item detected"
         se.m1 <- PROV$se.m1
         se.m0 <- PROV$se.m0
         ordPAR <- PROV$par.m1
@@ -375,8 +375,8 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         noLoop <- TRUE
       } else {
         dif <- significant1
-        ddfPur <- rep(0, length(stats1))
-        ddfPur[dif] <- 1
+        difPur <- rep(0, length(stats1))
+        difPur[dif] <- 1
         repeat {
           if (nrPur >= nrIter) {
             break
@@ -405,8 +405,8 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
             } else {
               dif2 <- significant2
             }
-            ddfPur <- rbind(ddfPur, rep(0, dim(DATA)[2]))
-            ddfPur[nrPur + 1, dif2] <- 1
+            difPur <- rbind(difPur, rep(0, dim(DATA)[2]))
+            difPur[nrPur + 1, dif2] <- 1
             if (length(dif) != length(dif2)) {
               dif <- dif2
             } else {
@@ -430,18 +430,18 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         ordPAR <- PROV$par.m1
         ordSE <- se.m1
         if (length(significant1) > 0) {
-          DDFitems <- significant1
-          for (idif in 1:length(DDFitems)) {
-            ordPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-            ordSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
+          DIFitems <- significant1
+          for (idif in 1:length(DIFitems)) {
+            ordPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
+            ordSE[[DIFitems[idif]]] <- se.m0[[DIFitems[idif]]]
           }
         } else {
-          DDFitems <- "No DDF item detected"
+          DIFitems <- "No DIF item detected"
         }
       }
-      if (!is.null(ddfPur)) {
-        rownames(ddfPur) <- paste0("Step", 0:(dim(ddfPur)[1] - 1))
-        colnames(ddfPur) <- colnames(DATA)
+      if (!is.null(difPur)) {
+        rownames(difPur) <- paste0("Step", 0:(dim(difPur)[1] - 1))
+        colnames(difPur) <- colnames(DATA)
       }
       RES <- list(
         Sval = STATS,
@@ -452,27 +452,27 @@ ddfORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
-        DDFitems = DDFitems,
+        DIFitems = DIFitems,
         model = model,
         type = type,
         parametrization = parametrization,
-        purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
+        purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
         df = PROV$df,
         alpha = alpha,
         Data = DATA, group = GROUP, group.names = group.names, match = match
       )
     }
-    class(RES) <- "ddfORD"
+    class(RES) <- "difORD"
     return(RES)
   }
   resToReturn <- internalORD()
   return(resToReturn)
 }
 
-#' @rdname ddfORD
+#' @rdname difORD
 #' @export
-print.ddfORD <- function(x, ...) {
+print.difORD <- function(x, ...) {
   title <- paste0(
     "Detection of ",
     switch(x$type,
@@ -533,25 +533,25 @@ print.ddfORD <- function(x, ...) {
   print(tab, quote = F, digits = 4, zero.print = F)
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
 
-  if (is.character(x$DDFitems)) {
+  if (is.character(x$DIFitems)) {
     switch(x$type,
-      both = cat("\nNone of items is detected as DDF"),
-      udif = cat("\nNone of items is detected as uniform DDF"),
-      nudif = cat("\nNone of items is detected as non-uniform DDF")
+      both = cat("\nNone of items is detected as DIF"),
+      udif = cat("\nNone of items is detected as uniform DIF"),
+      nudif = cat("\nNone of items is detected as non-uniform DIF")
     )
   } else {
     switch(x$type,
-      both = cat("\nItems detected as DDF items:"),
-      udif = cat("\nItems detected as uniform DDF items:"),
-      nudif = cat("\nItems detected as non-uniform DDF items:")
+      both = cat("\nItems detected as DIF items:"),
+      udif = cat("\nItems detected as uniform DIF items:"),
+      nudif = cat("\nItems detected as non-uniform DIF items:")
     )
-    cat("\n", paste(colnames(x$Data)[x$DDFitems], "\n", sep = ""))
+    cat("\n", paste(colnames(x$Data)[x$DIFitems], "\n", sep = ""))
   }
 }
 
-#' @rdname ddfORD
+#' @rdname difORD
 #' @export
-coef.ddfORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
+coef.difORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
   if (class(SE) != "logical") {
     stop("Invalid value for 'SE'. 'SE' need to be logical.",
       call. = FALSE
@@ -604,9 +604,9 @@ coef.ddfORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
 
 #' @param item numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
 #' (default) for all items.
-#' @rdname ddfORD
+#' @rdname difORD
 #' @export
-logLik.ddfORD <- function(object, item = "all", ...) {
+logLik.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
   nams <- colnames(object$Data)
 
@@ -639,11 +639,11 @@ logLik.ddfORD <- function(object, item = "all", ...) {
     }
   }
 
-  val <- ifelse(items %in% object$DDFitems,
+  val <- ifelse(items %in% object$DIFitems,
     object$llM0[items],
     object$llM1[items]
   )
-  df <- ifelse(items %in% object$DDFitems,
+  df <- ifelse(items %in% object$DIFitems,
     sapply(object$parM0, length)[items],
     sapply(object$parM1, length)[items]
   )
@@ -654,9 +654,9 @@ logLik.ddfORD <- function(object, item = "all", ...) {
   return(val)
 }
 
-#' @rdname ddfORD
+#' @rdname difORD
 #' @export
-AIC.ddfORD <- function(object, item = "all", ...) {
+AIC.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
   nams <- colnames(object$Data)
 
@@ -689,13 +689,13 @@ AIC.ddfORD <- function(object, item = "all", ...) {
     }
   }
 
-  AIC <- ifelse(items %in% object$DDFitems, object$AICM0[items], object$AICM1[items])
+  AIC <- ifelse(items %in% object$DIFitems, object$AICM0[items], object$AICM1[items])
   return(AIC)
 }
 
-#' @rdname ddfORD
+#' @rdname difORD
 #' @export
-BIC.ddfORD <- function(object, item = "all", ...) {
+BIC.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
   nams <- colnames(object$Data)
 
@@ -728,13 +728,13 @@ BIC.ddfORD <- function(object, item = "all", ...) {
     }
   }
 
-  BIC <- ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
+  BIC <- ifelse(items %in% object$DIFitems, object$BICM0[items], object$BICM1[items])
   return(BIC)
 }
 
-#' @rdname ddfORD
+#' @rdname difORD
 #' @export
-plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...) {
+plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
   m <- length(x$ordPAR)
   nams <- colnames(x$Data)
 
@@ -799,7 +799,7 @@ plot.ddfORD <- function(x, item = "all", title, plot.type, group.names, ...) {
   }
 
   if (x$purification) {
-    anchor <- c(1:m)[!c(1:m) %in% x$DDFitems]
+    anchor <- c(1:m)[!c(1:m) %in% x$DIFitems]
   } else {
     anchor <- 1:m
   }

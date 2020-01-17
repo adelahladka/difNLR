@@ -8,6 +8,9 @@
 - Changes in difNLR 1.3.0-4 (2020-01-17) -
 ------------------------------------------
 
+MAJOR CHANGES
+  o Function ddfORD() was renamed to difORD().
+
 MINOR CHANGES
   o Function genNLR() with an option itemtype = "nominal" returns
     nominal items as factors with levels presented by capital letters.

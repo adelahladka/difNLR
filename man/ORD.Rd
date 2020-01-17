@@ -2,7 +2,7 @@
 % Please edit documentation in R/ORD.R
 \name{ORD}
 \alias{ORD}
-\title{DDF likelihood ratio statistics for ordinal data.}
+\title{DIF likelihood ratio statistics for ordinal data.}
 \usage{
 ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
 anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
@@ -18,10 +18,10 @@ focal group.}
 \item{model}{character: logistic regression model for ordinal data (either \code{"adjacent"} (default) or \code{"cumulative"}).
 See \strong{Details}.}
 
-\item{type}{character: type of DDF to be tested. Either \code{"both"} for uniform and non-uniform
-DDF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
-uniform DDF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
-non-uniform DDF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
+\item{type}{character: type of DIF to be tested. Either \code{"both"} for uniform and non-uniform
+DIF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
+uniform DIF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
+non-uniform DIF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
 as a single value (for all items) or as an item-specific vector.}
 
 \item{match}{numeric or character: matching criterion to be used as an estimate of trait. Can be
@@ -62,11 +62,11 @@ A list with the following arguments:
   }
 }
 \description{
-Calculates DDF likelihood ratio statistics for ordinal data based either on adjacent
+Calculates DIF likelihood ratio statistics for ordinal data based either on adjacent
 category logit regression model or on cumulative logit regression model.
 }
 \details{
-Calculates DDF likelihood ratio statistics based either on adjacent category logit model
+Calculates DIF likelihood ratio statistics based either on adjacent category logit model
 or on cumulative logit model for ordinal data.
 
 Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
@@ -101,16 +101,16 @@ df <- df[complete.cases(df), ]
 Data <- df[, 1:5]
 group <- df[, 6]
 
-# Testing both DDF effects
+# Testing both DIF effects
 ORD(Data, group, type = "both")
 
-# Testing uniform DDF effects
+# Testing uniform DIF effects
 ORD(Data, group, type = "udif")
 
-# Testing non-uniform DDF effects
+# Testing non-uniform DIF effects
 ORD(Data, group, type = "nudif")
 
-# Testing DDF using cumulative logit model
+# Testing DIF using cumulative logit model
 ORD(Data, group, model = "cumulative")
 }
 
@@ -128,4 +128,4 @@ Patricia Martinkova \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
 \email{martinkova@cs.cas.cz} \cr
 }
-\keyword{DDF}
+\keyword{DIF}
