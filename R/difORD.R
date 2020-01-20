@@ -480,7 +480,7 @@ print.difORD <- function(x, ...) {
       udif = "uniform ",
       nudif = "non-uniform"
     ),
-    "Differential Distractor Functioning for ordinal data using ",
+    "Differential Item Functioning for ordinal data using ",
     ifelse(x$model == "adjacent", "adjacent category", "cumulative"),
     " logit regression model "
   )
