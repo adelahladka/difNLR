@@ -167,7 +167,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   adjusted.pval <- p.adjust(MLRstat[2, ], method = p.adjust.method)
 
   par.m1 <- lapply(m1, function(x) {
-    if (is.null(dim(x))) {
+    if (is.null(dim(coef(x)))) {
       tmp <- matrix(coef(x), nrow = 1)
       rownames(tmp)[is.null(rownames(tmp))] <- 1
     } else {
@@ -176,7 +176,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     tmp
   })
   par.m0 <- lapply(m0, function(x) {
-    if (is.null(dim(x))) {
+    if (is.null(dim(coef(x)))) {
       tmp <- matrix(coef(x), nrow = 1)
       rownames(tmp)[is.null(rownames(tmp))] <- 1
     } else {

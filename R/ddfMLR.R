@@ -602,8 +602,9 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
   sqR <- as.matrix(data.frame(1, sq, 0, 0))
   sqF <- as.matrix(data.frame(1, sq, 1, sq))
 
-  plot_CC <- list()
-  for (i in items) {
+  plot_CC <- vector("list", length = length(items))
+  for (j in 1:length(items)) {
+    i <- items[[j]]
     if (!missing(title)) {
       TITLE <- title
     } else {
@@ -638,7 +639,12 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
     hvF <- data.frame(1 - rowSums(prF), prF, "F", sq)
 
     if (is.null(rownames(coefs))) {
-      nams <- levels(x$Data[, i])[levels(x$Data[, i]) != x$key[i]]
+      if (is.null(levels(x$Data[, i]))) {
+        lvls <- unique(x$Data[, i])
+      } else {
+        lvls <- levels(x$Data[, i])
+      }
+      nams <- lvls[lvls != x$key[i]]
     } else {
       nams <- rownames(coefs)
     }
@@ -669,7 +675,7 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
     levels(df$variable) <- paste0("P(Y = ", levels(df$variable), ")")
     levels(df2$answ) <- paste0("P(Y = ", levels(df2$answ), ")")
 
-    plot_CC[[i]] <- ggplot() +
+    plot_CC[[j]] <- ggplot() +
       geom_line(
         data = df,
         aes_string(
