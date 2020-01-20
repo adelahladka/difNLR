@@ -26,7 +26,7 @@ Or you can get the newest development version from GitHub:
 devtools::install_github("adelahladka/difNLR")
 ```
 ## Version
-Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.3.0. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.3.0-4.
+Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.3.0. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.3.0-5.
 
 ## Reference
 
