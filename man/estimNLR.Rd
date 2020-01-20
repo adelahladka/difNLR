@@ -70,7 +70,6 @@ logLik(fitLKLM0)
 vcov(fitLKLM0)
 fitted(fitLKLM0)
 residuals(fitLKLM0)
-
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

@@ -167,7 +167,6 @@
 #' AIC(x, item = 1)
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
-#'
 #' \dontrun{
 #' # Testing both DIF effects with Benjamini-Hochberg adjustment method
 #' difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
@@ -194,7 +193,6 @@
 #'
 #' # estimated parameters in IRT parametrization
 #' coef(x, simplify = TRUE)
-#'
 #' @keywords DIF
 #' @export
 difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
@@ -614,7 +612,7 @@ logLik.difORD <- function(object, item = "all", ...) {
     if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     }
     if (item[1] == "all") {
@@ -626,12 +624,12 @@ logLik.difORD <- function(object, item = "all", ...) {
     if (class(item) != "integer" & class(item) != "numeric") {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     } else {
       if (!all(item %in% 1:m)) {
         stop("Invalid number for 'item'.",
-             call. = FALSE
+          call. = FALSE
         )
       } else {
         items <- item
@@ -664,7 +662,7 @@ AIC.difORD <- function(object, item = "all", ...) {
     if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     }
     if (item[1] == "all") {
@@ -676,12 +674,12 @@ AIC.difORD <- function(object, item = "all", ...) {
     if (class(item) != "integer" & class(item) != "numeric") {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     } else {
       if (!all(item %in% 1:m)) {
         stop("Invalid number for 'item'.",
-             call. = FALSE
+          call. = FALSE
         )
       } else {
         items <- item
@@ -703,7 +701,7 @@ BIC.difORD <- function(object, item = "all", ...) {
     if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     }
     if (item[1] == "all") {
@@ -715,12 +713,12 @@ BIC.difORD <- function(object, item = "all", ...) {
     if (class(item) != "integer" & class(item) != "numeric") {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     } else {
       if (!all(item %in% 1:m)) {
         stop("Invalid number for 'item'.",
-             call. = FALSE
+          call. = FALSE
         )
       } else {
         items <- item
@@ -742,7 +740,7 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
     if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     }
     if (item[1] == "all") {
@@ -754,12 +752,12 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
     if (class(item) != "integer" & class(item) != "numeric") {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     } else {
       if (!all(item %in% 1:m)) {
         stop("Invalid number for 'item'.",
-             call. = FALSE
+          call. = FALSE
         )
       } else {
         items <- item

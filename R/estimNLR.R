@@ -69,7 +69,6 @@
 #' vcov(fitLKLM0)
 #' fitted(fitLKLM0)
 #' residuals(fitLKLM0)
-#'
 #' @keywords DIF
 #' @export
 #' @importFrom stats optim binomial glm residuals

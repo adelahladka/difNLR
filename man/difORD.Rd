@@ -198,7 +198,6 @@ logLik(x)
 AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
-
 \dontrun{
 # Testing both DIF effects with Benjamini-Hochberg adjustment method
 difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
@@ -225,7 +224,6 @@ plot(x, item = 3, plot.type = "category")
 
 # estimated parameters in IRT parametrization
 coef(x, simplify = TRUE)
-
 }
 \references{
 Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.

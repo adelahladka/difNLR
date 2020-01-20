@@ -84,7 +84,6 @@ formulaNLR(model = "4PL", type = "all", parameterization = "alternative")
 # 4PL model with fixed a and c parameter
 # to test difference in b with alternative parameterization
 formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "alternative")
-
 }
 \seealso{
 \code{\link[difNLR]{difNLR}}

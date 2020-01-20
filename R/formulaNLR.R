@@ -87,7 +87,6 @@
 #' # 4PL model with fixed a and c parameter
 #' # to test difference in b with alternative parameterization
 #' formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "alternative")
-#'
 #' @export
 #' @importFrom stats as.formula
 
