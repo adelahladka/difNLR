@@ -638,9 +638,9 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
     hvR <- data.frame(1 - rowSums(prR), prR, "R", sq)
     hvF <- data.frame(1 - rowSums(prF), prF, "F", sq)
 
-    if (is.null(rownames(coefs))) {
+    if (is.null(rownames(coefs)) | nrow(coefs) == 1) {
       if (is.null(levels(x$Data[, i]))) {
-        lvls <- unique(x$Data[, i])
+        lvls <- sort(unique(x$Data[, i]))
       } else {
         lvls <- levels(x$Data[, i])
       }
