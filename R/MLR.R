@@ -168,7 +168,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
 
   par.m1 <- lapply(m1, function(x) {
     if (is.null(dim(x))) {
-      tmp <- as.matrix(coef(x))
+      tmp <- matrix(coef(x), nrow = 1)
       rownames(tmp)[is.null(rownames(tmp))] <- 1
     } else {
       tmp <- coef(x)
@@ -177,7 +177,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   })
   par.m0 <- lapply(m0, function(x) {
     if (is.null(dim(x))) {
-      tmp <- as.matrix(coef(x))
+      tmp <- matrix(coef(x), nrow = 1)
       rownames(tmp)[is.null(rownames(tmp))] <- 1
     } else {
       tmp <- coef(x)
@@ -219,7 +219,6 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
       dimnames = list(rownames(x), c("b", "a", "bDIF", "aDIF"))
       )
     })
-
 
     nams <- lapply(1:m, function(i) paste(rep(cat.m0[[i]], each = 4), c("(Intercept)", "x", "group", "x:group"), sep = ":"))
     nams.m0 <- lapply(cov.m0, rownames)
@@ -347,7 +346,6 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
         )
       }
     })
-
     se.m0 <- lapply(se.m0, "colnames<-", c("b", "a", "bDIF", "aDIF"))
     se.m1 <- lapply(se.m1, "colnames<-", c("b", "a", "bDIF", "aDIF"))
 
