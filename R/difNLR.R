@@ -341,16 +341,16 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     if (length(group) == 1) {
       if (is.numeric(group)) {
         GROUP <- Data[, group]
-        DATA <- Data[, (1:dim(Data)[2]) != group]
+        DATA <- as.data.frame(Data[, (1:dim(Data)[2]) != group])
         colnames(DATA) <- colnames(Data)[(1:dim(Data)[2]) != group]
       } else {
         GROUP <- Data[, colnames(Data) == group]
-        DATA <- Data[, colnames(Data) != group]
+        DATA <- as.data.frame(Data[, colnames(Data) != group])
         colnames(DATA) <- colnames(Data)[colnames(Data) != group]
       }
     } else {
       GROUP <- group
-      DATA <- Data
+      DATA <- as.data.frame(Data)
     }
     if (length(levels(as.factor(GROUP))) != 2) {
       stop("'group' must be binary vector", call. = FALSE)
@@ -374,7 +374,6 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         stop("'Data' must be data frame or matrix of binary vectors.", call. = FALSE)
       }
     }
-
     group.names <- unique(GROUP)[!is.na(unique(GROUP))]
     if (group.names[1] == focal.name) {
       group.names <- rev(group.names)
@@ -396,7 +395,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     }
 
     GROUP <- df[, "GROUP"]
-    DATA <- data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
+    DATA <- as.data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
+    colnames(DATA) <- colnames(df)[!(colnames(df) %in% c("GROUP", "match"))]
 
     if (length(match) > 1) {
       match <- df[, "match"]
@@ -819,8 +819,7 @@ print.difNLR <- function(x, ...) {
 
   if (is.character(x$DIFitems)) {
     cat("\nNone of items is detected as DIF \n")
-  }
-  else {
+  } else {
     cat("\n\nItems detected as DIF items:")
     cat("\n", paste(colnames(x$Data)[x$DIFitems], "\n", sep = ""))
   }

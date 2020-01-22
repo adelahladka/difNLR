@@ -114,7 +114,7 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
       )
     }
   }
-
+  Data <- as.data.frame(Data)
   if (length(model) == 1) {
     model <- rep(model, ncol(Data))
   } else {
