@@ -4,7 +4,7 @@
 \alias{NLR}
 \title{DIF statistics based on non-linear regression model.}
 \usage{
-NLR(Data, group, model, constraints = NULL, type = "both", method = "nls",
+NLR(Data, group, model, constraints = NULL, type = "all", method = "nls",
 match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
 alpha = 0.05, initboot = T, nrBo = 20)
 }

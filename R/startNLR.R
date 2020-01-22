@@ -243,7 +243,6 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
   b_R <- ((d_R + c_R) / 2 - line_R$q) / line_R$k
   b_F <- ((d_F + c_F) / 2 - line_F$q) / line_F$k
 
-
   if (length(unique(parameterization)) == 1 & simplify) {
     results <- switch(unique(parameterization),
       classic = data.frame(

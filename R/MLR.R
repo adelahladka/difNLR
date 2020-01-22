@@ -121,7 +121,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   m <- dim(Data)[2]
   n <- dim(Data)[1]
 
-  m0 <- lapply(1:m, function(i) {
+  m1 <- lapply(1:m, function(i) {
     switch(type,
       "both" = nnet::multinom(relevel(as.factor(Data[, i]),
         ref = paste(key[i])
@@ -140,7 +140,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
       )
     )
   })
-  m1 <- lapply(1:m, function(i) {
+  m0 <- lapply(1:m, function(i) {
     switch(type,
       "both" = nnet::multinom(relevel(as.factor(Data[, i]),
         ref = paste(key[i])
@@ -210,10 +210,10 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     })
     par.m1.delta <- lapply(par.m1.tmp, function(x) {
       matrix(cbind(
-        b = -x[, "(Intercept)"] / x[, "x"],
-        a = x[, "x"],
-        bDIF = (x[, "(Intercept)"] * x[, "x:group"] - x[, "x"] * x[, "group"]) / (x[, "x"]^2 + x[, "x"] * x[, "x:group"]),
-        aDIF = x[, "x:group"]
+        -x[, "(Intercept)"] / x[, "x"],
+        x[, "x"],
+        (x[, "(Intercept)"] * x[, "x:group"] - x[, "x"] * x[, "group"]) / (x[, "x"]^2 + x[, "x"] * x[, "x:group"]),
+        x[, "x:group"]
       ),
       ncol = 4,
       dimnames = list(rownames(x), c("b", "a", "bDIF", "aDIF"))
@@ -355,9 +355,8 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     se.m1 <- lapply(lapply(cov.m1, diag), sqrt)
     se.m0 <- lapply(lapply(cov.m0, diag), sqrt)
   }
-
   ll.m0 <- sapply(m0, logLik)
-  ll.m1 <- sapply(m0, logLik)
+  ll.m1 <- sapply(m1, logLik)
 
   AIC.m0 <- sapply(m0, AIC)
   AIC.m1 <- sapply(m1, AIC)

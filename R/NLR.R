@@ -47,7 +47,7 @@
 #' @param nrBo numeric: the maximal number of iterations for calculation of starting values using
 #' bootstraped samples (default is 20).
 #'
-#' @usage NLR(Data, group, model, constraints = NULL, type = "both", method = "nls",
+#' @usage NLR(Data, group, model, constraints = NULL, type = "all", method = "nls",
 #' match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
 #' alpha = 0.05, initboot = T, nrBo = 20)
 #'
@@ -174,7 +174,7 @@
 #'
 #' @keywords DIF
 #' @export
-NLR <- function(Data, group, model, constraints = NULL, type = "both",
+NLR <- function(Data, group, model, constraints = NULL, type = "all",
                 method = "nls", match = "zscore", anchor = 1:ncol(Data),
                 start, p.adjust.method = "none", test = "LR", alpha = 0.05,
                 initboot = T, nrBo = 20) {
@@ -234,7 +234,6 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     }
   }
 
-
   M <- lapply(
     1:m,
     function(i) {
@@ -246,7 +245,6 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
       )
     }
   )
-
   m0 <- lapply(1:m, function(i) {
     estimNLR(
       y = Data[, i], match = x, group = group,
@@ -361,14 +359,14 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
     n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
 
-    df <- cbind(n0 - n1, n - n0)
+    df <- cbind(n1 - n0, n - n1)
 
     RSS0 <- rep(NA, m)
     RSS1 <- rep(NA, m)
     RSS0[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m0[[l]])^2))
     RSS1[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
 
-    Fval <- ((RSS1 - RSS0) / df[, 1]) / (RSS0 / df[, 2])
+    Fval <- ((RSS0 - RSS1) / df[, 1]) / (RSS1 / df[, 2])
     pval <- 1 - pf(Fval, df[, 1], df[, 2])
   } else {
     pval <- LRval <- rep(NA, m)
@@ -376,11 +374,11 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
     n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
     n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
 
-    df <- n0 - n1
+    df <- n1 - n0
 
     LRval[which(!(cfM1 | cfM0))] <- sapply(
       which(!(cfM1 | cfM0)),
-      function(l) -2 * c(logLik(m1[[l]]) - logLik(m0[[l]]))
+      function(l) -2 * c(logLik(m0[[l]]) - logLik(m1[[l]]))
     )
     pval[which(!(cfM1 | cfM0))] <- sapply(
       which(!(cfM1 | cfM0)),
@@ -391,6 +389,15 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
   ll.m0 <- ll.m1 <- rep(NA, m)
   ll.m0[which(!cfM0)] <- sapply(m0[which(!cfM0)], logLik)
   ll.m1[which(!cfM1)] <- sapply(m1[which(!cfM1)], logLik)
+
+  # R2 computation
+  # N <- dim(Data)[1]
+  # r2cs <- 1 - exp(-2/N * (ll.m0 - ll.m1)) # Cox and Snell
+  # r2n  <- r2cs / (1 - exp(2*ll.m1/N))     # Nagelkerge
+  #
+  # symnum(r2n, c(0, 0.13, 0.26, 1), symbols = c("A", "B", "C"))  # Zumbo & Thomas
+  # symnum(r2n, c(0, 0.035, 0.07, 1), symbols = c("A", "B", "C")) # Jodoin & Gierl
+
   # adjusted p-values
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
   # parameters
@@ -399,7 +406,6 @@ NLR <- function(Data, group, model, constraints = NULL, type = "both",
       names = M[[i]]$M1$parameters
     )
   })
-
   par.m0 <- se.m0 <- lapply(1:m, function(i) {
     structure(rep(NA, length(M[[i]]$M0$parameters)),
       names = M[[i]]$M0$parameters

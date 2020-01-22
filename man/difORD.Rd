@@ -24,8 +24,7 @@ parametrization = "irt", alpha = 0.05)
 
 \method{BIC}{difORD}(object, item = "all", ...)
 
-\method{plot}{difORD}(x, item = "all", title, plot.type, group.names,
-  ...)
+\method{plot}{difORD}(x, item = "all", title, plot.type, group.names, ...)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and

@@ -859,7 +859,6 @@ print.difNLR <- function(x, ...) {
 #' @return For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}. In case of
 #' \code{plot.type = "cc"}, returns list of objects of class \code{"ggplot"}.
 #'
-#'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science of the Czech Academy of Sciences \cr

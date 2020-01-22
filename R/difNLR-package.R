@@ -4,9 +4,9 @@
 #' based on non-linear regression. Both uniform and non-uniform DIF effects can be detected when considering
 #' one focal group. The method also allows to test the difference in guessing or inattention parameters
 #' between reference and focal group. DIF detection method is based either on likelihood-ratio test, or on F-test
-#' of submodel. Package also offers method for detection of differential distractor functioning (DDF)
-#' based on multinomial log-linear regression model and newly for ordinal data via adjacent and cumulative
-#' logistic regression models.
+#' of a submodel. Package also offers method for DIF detection among ordinal data using adjacent category logit or
+#' cumulative logit models. Moreover, the difNLR package containts method for detection of differential distractor
+#' functioning (DDF) based on multinomial log-linear regression model.
 #'
 #' @aliases difNLR-package
 #'
@@ -24,23 +24,24 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.3.0\cr
-#' Date: 2019-08-19\cr
+#' Version: 1.3.0-6\cr
+#' Date: 2020-01-22\cr
 #' Depends: R (>= 3.1)
 #' Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
+#' Suggests: ShinyItemAnalysis
 #' License: GPL-3\cr
 #' BugReports: https://github.com/adelahladka/difNLR/issues
 #' Encoding: UTF-8
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' Faculty of Mathematics and Physics, Charles University \cr
-#' hladka@cs.cas.cz \cr
+#' \email{hladka@@cs.cas.cz} \cr
 #'
 #' Patricia Martinkova \cr
-#' Institute of Computer Science, The Czech Academy of Sciences \cr
-#' martinkova@cs.cas.cz \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' @references
 #' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.

@@ -196,12 +196,11 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
   }
 
   # model 0 and model 1
-  mod0 <- mod
-  mod1 <- typ
+  mod0 <- typ
+  mod1 <- mod
 
   # parameters in model 0 and model 1
   param0 <- param1 <- list()
-
 
   for (i in 1:4) {
     param0[[i]] <- paste(names(which(mod0[c(i, i + 4)])), collapse = " + g * ")
@@ -233,10 +232,8 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
   if (param1[[1]] == "") param1[[1]] <- "1"
 
   # formulas for model 0 and model 1
-
   param0[grepl(" ", param0)] <- paste("(", param0[grepl(" ", param0)], ")", sep = "")
   param1[grepl(" ", param1)] <- paste("(", param1[grepl(" ", param1)], ")", sep = "")
-
 
   ### (d - c)
   part_dc0 <- paste(c(param0[4], param0[3]), collapse = " - ")

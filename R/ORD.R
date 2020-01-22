@@ -151,14 +151,14 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     family <- VGAM::cumulative(reverse = TRUE, parallel = TRUE)
   }
 
-  m0 <- lapply(1:m, function(i) {
+  m1 <- lapply(1:m, function(i) {
     switch(type,
       "both"  = VGAM::vglm(Data[, i] ~ x * group, family = family),
       "nudif" = VGAM::vglm(Data[, i] ~ x * group, family = family),
       "udif"  = VGAM::vglm(Data[, i] ~ x + group, family = family)
     )
   })
-  m1 <- lapply(1:m, function(i) {
+  m0 <- lapply(1:m, function(i) {
     switch(type,
       "both"  = VGAM::vglm(Data[, i] ~ x, family = family),
       "nudif" = VGAM::vglm(Data[, i] ~ x + group, family = family),
@@ -166,7 +166,7 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     )
   })
 
-  ORDtest <- lapply(1:m, function(i) VGAM::lrtest_vglm(m0[[i]], m1[[i]])@Body)
+  ORDtest <- lapply(1:m, function(i) VGAM::lrtest_vglm(m1[[i]], m0[[i]])@Body)
   ORDstat <- sapply(1:m, function(i) {
     c(
       ORDtest[[i]]$Chisq[2],
@@ -199,7 +199,6 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
       names(par.m1.tmp[[i]])[-c(1:num.b0s[[i]])] <- c("x", "group", "x:group")
       par.m1.tmp[[i]]
     })
-
 
     par.m0.delta <- lapply(par.m0.tmp, function(x) {
       c(
@@ -248,7 +247,6 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
       cov.m1.tmp[[i]]
     })
 
-
     se.m0 <- lapply(1:m, function(i) {
       c(
         sapply(1:num.b0s[[i]], function(j) {
@@ -269,7 +267,6 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
         sqrt(cov.m0.tmp[[i]]["x:group", "x:group"])
       )
     })
-
     se.m1 <- lapply(1:m, function(i) {
       c(
         sapply(1:num.b0s[[i]], function(j) {
@@ -290,7 +287,6 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
         sqrt(cov.m1.tmp[[i]]["x:group", "x:group"])
       )
     })
-
 
     se.m0 <- lapply(1:m, function(i) {
       names(se.m0[[i]]) <- c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
