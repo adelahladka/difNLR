@@ -319,16 +319,16 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
 
       if (length(significant) > 0) {
         DIFitems <- significant
-        ordPAR <- PROV$par.m1
-        ordSE <- se.m1
+        ordPAR <- PROV$par.m0
+        ordSE <- se.m0
         for (idif in 1:length(DIFitems)) {
-          ordPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
-          ordSE[[DIFitems[idif]]] <- se.m0[[DIFitems[idif]]]
+          ordPAR[[DIFitems[idif]]] <- PROV$par.m1[[DIFitems[idif]]]
+          ordSE[[DIFitems[idif]]] <- se.m1[[DIFitems[idif]]]
         }
       } else {
         DIFitems <- "No DIF item detected"
-        ordPAR <- PROV$par.m1
-        ordSE <- se.m1
+        ordPAR <- PROV$par.m0
+        ordSE <- se.m0
       }
 
       RES <- list(
@@ -368,8 +368,8 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         DIFitems <- "No DIF item detected"
         se.m1 <- PROV$se.m1
         se.m0 <- PROV$se.m0
-        ordPAR <- PROV$par.m1
-        ordSE <- se.m1
+        ordPAR <- PROV$par.m0
+        ordSE <- se.m0
         noLoop <- TRUE
       } else {
         dif <- significant1
@@ -425,13 +425,13 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         significant1 <- which(PROV$adjusted.pval < alpha)
         se.m1 <- PROV$se.m1
         se.m0 <- PROV$se.m0
-        ordPAR <- PROV$par.m1
-        ordSE <- se.m1
+        ordPAR <- PROV$par.m0
+        ordSE <- se.m0
         if (length(significant1) > 0) {
           DIFitems <- significant1
           for (idif in 1:length(DIFitems)) {
-            ordPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
-            ordSE[[DIFitems[idif]]] <- se.m0[[DIFitems[idif]]]
+            ordPAR[[DIFitems[idif]]] <- PROV$par.m1[[DIFitems[idif]]]
+            ordSE[[DIFitems[idif]]] <- se.m1[[DIFitems[idif]]]
           }
         } else {
           DIFitems <- "No DIF item detected"
@@ -638,12 +638,12 @@ logLik.difORD <- function(object, item = "all", ...) {
   }
 
   val <- ifelse(items %in% object$DIFitems,
-    object$llM0[items],
-    object$llM1[items]
+    object$llM1[items],
+    object$llM0[items]
   )
   df <- ifelse(items %in% object$DIFitems,
-    sapply(object$parM0, length)[items],
-    sapply(object$parM1, length)[items]
+    sapply(object$parM1, length)[items],
+    sapply(object$parM0, length)[items]
   )
   if (length(items) == 1) {
     attr(val, "df") <- df
@@ -687,7 +687,7 @@ AIC.difORD <- function(object, item = "all", ...) {
     }
   }
 
-  AIC <- ifelse(items %in% object$DIFitems, object$AICM0[items], object$AICM1[items])
+  AIC <- ifelse(items %in% object$DIFitems, object$AICM1[items], object$AICM0[items])
   return(AIC)
 }
 
@@ -726,7 +726,7 @@ BIC.difORD <- function(object, item = "all", ...) {
     }
   }
 
-  BIC <- ifelse(items %in% object$DIFitems, object$BICM0[items], object$BICM1[items])
+  BIC <- ifelse(items %in% object$DIFitems, object$BICM1[items], object$BICM0[items])
   return(BIC)
 }
 
@@ -1002,7 +1002,6 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
         sapply(1:(num.cat - 1), function(i) df.probs.cum[, i] - df.probs.cum[, i + 1]),
         df.probs.cum[, num.cat]
       )
-
 
       # melting data
       df.probs.cum <- data.frame(match, group = rep(c(0, 1), each = length(match)), df.probs.cum)

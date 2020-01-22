@@ -509,23 +509,23 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       significant <- which(ADJ.PVAL < alpha)
 
       nlrPAR <- nlrSE <- lapply(
-        1:length(PROV$par.m0),
+        1:length(PROV$par.m1),
         function(i) {
-          structure(rep(0, length(PROV$par.m0[[i]])),
-            names = names(PROV$par.m0[[i]])
+          structure(rep(0, length(PROV$par.m1[[i]])),
+            names = names(PROV$par.m1[[i]])
           )
         }
       )
-      for (i in 1:length(PROV$par.m0)) {
-        nlrPAR[[i]][names(PROV$par.m1[[i]])] <- PROV$par.m1[[i]]
-        nlrSE[[i]][names(PROV$se.m1[[i]])] <- PROV$se.m1[[i]]
+      for (i in 1:length(PROV$par.m1)) {
+        nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
+        nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
       }
 
       if (length(significant) > 0) {
         DIFitems <- significant
         for (idif in 1:length(DIFitems)) {
-          nlrPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
-          nlrSE[[DIFitems[idif]]] <- PROV$se.m0[[DIFitems[idif]]]
+          nlrPAR[[DIFitems[idif]]] <- PROV$par.m1[[DIFitems[idif]]]
+          nlrSE[[DIFitems[idif]]] <- PROV$se.m1[[DIFitems[idif]]]
         }
       } else {
         DIFitems <- "No DIF item detected"
@@ -567,11 +567,11 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         PROV <- prov1
         STATS <- stats1
         DIFitems <- "No DIF item detected"
-        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = dim(PROV$par.m0)[2], nrow = dim(PROV$par.m0)[1])),
-          .Names = colnames(PROV$par.m0)
+        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = dim(PROV$par.m1)[2], nrow = dim(PROV$par.m1)[1])),
+          .Names = colnames(PROV$par.m1)
         )
-        nlrPAR[, colnames(PROV$par.m1)] <- PROV$par.m1
-        nlrSE[, colnames(PROV$par.m1)] <- PROV$se.m1
+        nlrPAR[, colnames(PROV$par.m0)] <- PROV$par.m0
+        nlrSE[, colnames(PROV$par.m0)] <- PROV$se.m0
         noLoop <- TRUE
       } else {
         dif <- significant1
@@ -626,23 +626,23 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         STATS <- stats2
         significant1 <- which(PROV$adjusted.pval < alpha)
         nlrPAR <- nlrSE <- lapply(
-          1:length(PROV$par.m0),
+          1:length(PROV$par.m1),
           function(i) {
-            structure(rep(0, length(PROV$par.m0[[i]])),
-              names = names(PROV$par.m0[[i]])
+            structure(rep(0, length(PROV$par.m1[[i]])),
+              names = names(PROV$par.m1[[i]])
             )
           }
         )
-        for (i in 1:length(PROV$par.m0)) {
-          nlrPAR[[i]][names(PROV$par.m1[[i]])] <- PROV$par.m1[[i]]
-          nlrSE[[i]][names(PROV$se.m1[[i]])] <- PROV$se.m1[[i]]
+        for (i in 1:length(PROV$par.m1)) {
+          nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
+          nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
         }
 
         if (length(significant1) > 0) {
           DIFitems <- significant1
           for (idif in 1:length(DIFitems)) {
-            nlrPAR[[DIFitems[idif]]] <- PROV$par.m0[[DIFitems[idif]]]
-            nlrSE[[DIFitems[idif]]] <- PROV$se.m0[[DIFitems[idif]]]
+            nlrPAR[[DIFitems[idif]]] <- PROV$par.m1[[DIFitems[idif]]]
+            nlrSE[[DIFitems[idif]]] <- PROV$se.m1[[DIFitems[idif]]]
           }
         } else {
           DIFitems <- "No DIF item detected"
@@ -690,7 +690,6 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     class(RES) <- "difNLR"
     return(RES)
   }
-
 
   resToReturn <- internalNLR()
   return(resToReturn)
@@ -949,7 +948,6 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
       stop("Critical values are different for different items. Plot cannot be rendered.")
     }
 
-
     items <- setdiff(1:length(x$Sval), x$conv.fail.which)
     g <- as.factor(ifelse(x$Sval > Sval_critical, 1, 0))
     hv <- na.omit(as.data.frame(cbind(1:length(x$Sval), x$Sval, g)))
@@ -1070,7 +1068,6 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
         warning("Argument 'group.names' need to have length of two. Default value is used.", call. = FALSE)
       }
     }
-
 
     ### functions
     gNLR <- function(x, a, b, c, d) {
@@ -1275,8 +1272,6 @@ fitted.difNLR <- function(object, item = "all", ...) {
     ITEMS <- items
   }
 
-
-
   PAR <- data.frame(
     a = rep(1, m), b = 0, c = 0, d = 1,
     aDif = 0, bDif = 0, cDif = 0, dDif = 0
@@ -1428,9 +1423,15 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
     group <- object$group
   }
   if (length(match) != length(group)) {
-    stop("Arguments 'match' and 'group' must be of the same length.",
-      call. = FALSE
-    )
+    if (length(match) == 1) {
+      match <- rep(match, length(group))
+    } else if (length(group) == 1) {
+      group <- rep(group, length(match))
+    } else {
+      stop("Arguments 'match' and 'group' must be of the same length.",
+           call. = FALSE
+      )
+    }
   }
 
   if (any(object$conv.fail.which %in% items)) {
@@ -1475,7 +1476,6 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
   if (dim(PV)[1] == dim(object$Data)[1]) {
     rownames(PV) <- rownames(object$Data)
   }
-
   PV <- PV[, items]
 
   return(PV)
@@ -1582,12 +1582,12 @@ logLik.difNLR <- function(object, item = "all", ...) {
   val <- df <- rep(NA, m)
 
   val[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-    object$llM0[ITEMS],
-    object$llM1[ITEMS]
+    object$llM1[ITEMS],
+    object$llM0[ITEMS]
   )
   df[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-    sapply(object$parM0, length)[ITEMS],
-    sapply(object$parM1, length)[ITEMS]
+    sapply(object$parM1, length)[ITEMS],
+    sapply(object$parM0, length)[ITEMS]
   )
   val <- val[items]
   df <- df[items]
@@ -1595,7 +1595,6 @@ logLik.difNLR <- function(object, item = "all", ...) {
     attr(val, "df") <- df
     class(val) <- "logLik"
   }
-
   return(val)
 }
 
@@ -1655,8 +1654,8 @@ AIC.difNLR <- function(object, item = "all", ...) {
 
   k <- AIC <- rep(NA, m)
   k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-    sapply(object$parM0, length)[ITEMS],
-    sapply(object$parM1, length)[ITEMS]
+    sapply(object$parM1, length)[ITEMS],
+    sapply(object$parM0, length)[ITEMS]
   )
   AIC[ITEMS] <- 2 * k[ITEMS] - 2 * logLik(object, item = ITEMS)
   AIC <- AIC[items]
@@ -1719,8 +1718,8 @@ BIC.difNLR <- function(object, item = "all", ...) {
   }
   k <- BIC <- rep(NA, m)
   k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-    sapply(object$parM0, length)[ITEMS],
-    sapply(object$parM1, length)[ITEMS]
+    sapply(object$parM1, length)[ITEMS],
+    sapply(object$parM0, length)[ITEMS]
   )
   n <- dim(object$Data)[1]
   BIC[ITEMS] <- log(n) * k[ITEMS] - 2 * logLik(object, item = ITEMS)

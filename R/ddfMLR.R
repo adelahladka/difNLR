@@ -303,16 +303,16 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
 
       if (length(significant) > 0) {
         DDFitems <- significant
-        mlrPAR <- PROV$par.m1
-        mlrSE <- se.m1
+        mlrPAR <- PROV$par.m0
+        mlrSE <- se.m0
         for (idif in 1:length(DDFitems)) {
-          mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-          mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
+          mlrPAR[[DDFitems[idif]]] <- PROV$par.m1[[DDFitems[idif]]]
+          mlrSE[[DDFitems[idif]]] <- se.m1[[DDFitems[idif]]]
         }
       } else {
         DDFitems <- "No DDF item detected"
-        mlrPAR <- PROV$par.m1
-        mlrSE <- se.m1
+        mlrPAR <- PROV$par.m0
+        mlrSE <- se.m0
       }
 
       nrow <- sapply(mlrPAR, nrow)
@@ -357,8 +357,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         DDFitems <- "No DDF item detected"
         se.m1 <- PROV$se.m1
         se.m0 <- PROV$se.m0
-        mlrPAR <- PROV$par.m1
-        mlrSE <- se.m1
+        mlrPAR <- PROV$par.m0
+        mlrSE <- se.m0
         noLoop <- TRUE
       } else {
         dif <- significant1
@@ -414,13 +414,13 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         significant1 <- which(PROV$adjusted.pval < alpha)
         se.m1 <- PROV$se.m1
         se.m0 <- PROV$se.m0
-        mlrPAR <- PROV$par.m1
-        mlrSE <- se.m1
+        mlrPAR <- PROV$par.m0
+        mlrSE <- se.m0
         if (length(significant1) > 0) {
           DDFitems <- significant1
           for (idif in 1:length(DDFitems)) {
-            mlrPAR[[DDFitems[idif]]] <- PROV$par.m0[[DDFitems[idif]]]
-            mlrSE[[DDFitems[idif]]] <- se.m0[[DDFitems[idif]]]
+            mlrPAR[[DDFitems[idif]]] <- PROV$par.m1[[DDFitems[idif]]]
+            mlrSE[[DDFitems[idif]]] <- se.m1[[DDFitems[idif]]]
           }
         } else {
           DDFitems <- "No DDF item detected"
@@ -821,12 +821,12 @@ logLik.ddfMLR <- function(object, item = "all", ...) {
   }
 
   val <- ifelse(items %in% object$DDFitems,
-    object$llM0[items],
-    object$llM1[items]
+    object$llM1[items],
+    object$llM0[items]
   )
   df <- ifelse(items %in% object$DDFitems,
-    sapply(object$parM0, length)[items],
-    sapply(object$parM1, length)[items]
+    sapply(object$parM1, length)[items],
+    sapply(object$parM0, length)[items]
   )
   if (length(items) == 1) {
     attr(val, "df") <- df
@@ -874,7 +874,7 @@ AIC.ddfMLR <- function(object, item = "all", ...) {
     items <- item
   }
 
-  AIC <- ifelse(items %in% object$DDFitems, object$AICM0[items], object$AICM1[items])
+  AIC <- ifelse(items %in% object$DDFitems, object$AICM1[items], object$AICM0[items])
   return(AIC)
 }
 
@@ -917,6 +917,6 @@ BIC.ddfMLR <- function(object, item = "all", ...) {
     items <- item
   }
 
-  BIC <- ifelse(items %in% object$DDFitems, object$BICM0[items], object$BICM1[items])
+  BIC <- ifelse(items %in% object$DDFitems, object$BICM1[items], object$BICM0[items])
   return(BIC)
 }
