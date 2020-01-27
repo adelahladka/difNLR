@@ -30,7 +30,7 @@ title: "Changes and developments in the difNLR package"
   * `MLR()` function now returns correct value of log-likelihood for
     alternative model.
 
-#### MINOR UPDATES
+#### MAJOR UPDATES
   * Default option of argument type in `NLR()` function was set
     to `"all"` instead of `"both"`.
   * Input `Data` in `difNLR()` function can be also a vector now.
@@ -64,30 +64,32 @@ title: "Changes and developments in the difNLR package"
   * Documentation was updated.
   * Authors' details were updated.
 
-#### MINOR UPDATES
-  * Argument item for S3 methods of difNLR class can be now
-    name of the column in Data.
+#### MAJOR UPDATES
   * Seed was added for re-calculation of bootstrapped initial values
     in `NLR()` estimation.
-  * Legend in `plot.ddfMLR()` and `plot.ddfORD()` was updated.
+    
+#### MINOR UPDATES
+  * Argument `item` for S3 methods of `difNLR` class can be now
+    name of the column in `Data`.
+  * Legends in `plot.ddfMLR()` and `plot.ddfORD()` were updated.
   * Some typos were fixed.
 
 ------
 
 ### Changes in version 1.3.0-2 (2020-01-03)
-#### DOCUMENTATION
-  * Documentation for all data was updated. Format of data was fixed.
-  * Documentation of `estimNLR()` was improved.
-
 #### MAJOR UPDATES
   * Default option of argument type in `difNLR()` function was set
     to `"all"` instead of `"both"`.
 
 #### MINOR UPDATES
-  * Package styler was used to improve formatting of the code.
-  * Package ShinyItemAnalysis was added into Suggests.
+  * Package `styler` was used to improve formatting of the code.
+  * Package `ShinyItemAnalysis` was added into Suggests.
   * Figures for README were updated.
 
+#### DOCUMENTATION
+  * Documentation for all data was updated. Format of data was fixed.
+  * Documentation of `estimNLR()` was improved.
+  
 ------
 
 ### Changes in version 1.3.0-1 (2019-12-16)
