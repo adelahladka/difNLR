@@ -172,14 +172,16 @@ key <- GMATkey
 (x <- ddfMLR(Data, group, focal.name = 1, key))
 
 # Graphical devices
+plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
+\dontrun{
 plot(x, item = x$DDFitems)
 plot(x, item = 1)
-plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 
 # AIC, BIC, log-likelihood
 AIC(x)
 BIC(x)
 logLik(x)
+}
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)

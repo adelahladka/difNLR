@@ -181,6 +181,7 @@ group <- dataMedicalgraded[, 101]
 
 # graphical devices
 plot(x, item = 3)
+\dontrun{
 plot(x, item = "X2003")
 plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 
@@ -193,6 +194,7 @@ coef(x, SE = TRUE, simplify = TRUE) # with SE, simplified
 AIC(x)
 BIC(x)
 logLik(x)
+}
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)
@@ -211,7 +213,6 @@ difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 
 # Testing both DIF effects with total score as matching criterion
 difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
-}
 
 # Testing both DIF effects with cumulative logit model
 # using IRT parametrization
@@ -223,6 +224,7 @@ plot(x, item = 3, plot.type = "category")
 
 # estimated parameters in IRT parametrization
 coef(x, simplify = TRUE)
+}
 }
 \references{
 Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
