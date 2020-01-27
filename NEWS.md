@@ -4,6 +4,15 @@ title: "Changes and developments in the difNLR package"
 
 ------
 
+### Changes in version 1.3.2 (2020-01-28)
+
+**_THIS IS A CRAN VERSION_**
+
+#### BUGFIXING
+  * Bug in `plot.difNLR()` was fixed.
+    
+------
+
 ### Changes in version 1.3.1 (2020-01-27)
 
 **_THIS IS A CRAN VERSION_**
