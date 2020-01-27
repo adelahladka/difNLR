@@ -44,8 +44,8 @@ predict(x, item = 1, match = 0, group = 0) # reference group
 predict(x, item = 1, match = 0, group = 1) # focal group
 
 # Predicted values for new observations - various z-scores
-predict(x, item = 1, match = c(-1, 0, 1), group = c(0, 0, 0)) # reference group
-predict(x, item = 1, match = c(-1, 0, 1), group = c(1, 1, 1)) # focal group
+predict(x, item = 1, match = c(-1, 0, 1), group = 0) # reference group
+predict(x, item = 1, match = c(-1, 0, 1), group = 1) # focal group
 }
 
 }

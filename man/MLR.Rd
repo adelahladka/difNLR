@@ -66,13 +66,13 @@ multinomial log-linear model.
 \details{
 Calculates DDF likelihood ratio statistics based on multinomial log-linear model. Probability of
 selection the \eqn{k}-th category (distractor) is
-\deqn{P(y = k) = exp((a_k + a_kDif*g)*(x - b_k - b_kDif*g)))/(1 + \sum_l exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))), }
+\deqn{P(y = k) = exp((a_k + a_kDif*g)*(x - b_k - b_kDif*g)))/(1 + \sum exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))), }
 where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
 membership. Parameters \eqn{a_k} and \eqn{b_k} are discrimination and difficulty for the \eqn{k}-th
 category. Terms \eqn{a_kDif} and \eqn{b_kDif} then represent differences between two groups
 (reference and focal) in relevant parameters. Probability of correct answer (specified in argument
 \code{key}) is
-\deqn{P(y = k) = 1/(1 + \sum_l exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))). }
+\deqn{P(y = k) = 1/(1 + \sum exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))). }
 Parameters are estimated via neural networks. For more details see \code{\link[nnet]{multinom}}.
 
 Argument \code{parametrization} is a character which specifies parametrization of regression parameters.

@@ -61,8 +61,7 @@
 #' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
-#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{difORD}},
-#' \code{\link[difNLR]{difORD}}
+#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{difORD}}, \code{\link[difNLR]{ddfMLR}}
 #'
 #' @examples
 #' # seed

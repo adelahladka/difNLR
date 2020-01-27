@@ -121,7 +121,7 @@ estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
   l <- -sum((y * log(h)) + ((1 - y) * log(1 - h)), na.rm = T)
 }
 
-
+#' @noRd
 lkl <- function(formula, data, par, lower, upper, fitv) {
   m <- optim(
     par = par,

@@ -102,8 +102,7 @@ Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54
 \url{https://doi.org/10.1111/jedm.12158}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{ddfMLR}}, \code{\link[difNLR]{difORD}},
-\code{\link[difNLR]{difORD}}
+\code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{difORD}}, \code{\link[difNLR]{ddfMLR}}
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

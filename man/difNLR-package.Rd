@@ -17,18 +17,42 @@ functioning (DDF) based on multinomial log-linear regression model.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.3.0-6\cr
-Date: 2020-01-22\cr
-Depends: R (>= 3.1)
+Version: 1.3.1\cr
+Date: 2020-01-27\cr
+Depends: R (>= 3.1)\cr
 Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
-Suggests: ShinyItemAnalysis
+Suggests: ShinyItemAnalysis\cr
 License: GPL-3\cr
-BugReports: https://github.com/adelahladka/difNLR/issues
-Encoding: UTF-8
+BugReports: \url{https://github.com/adelahladka/difNLR/issues}\cr
+Encoding: UTF-8\cr
 }
 \note{
 This package was supported by grant funded by Czech Science foundation under number GJ15-15856Y.
 }
+\section{Functions}{
+
+\itemize{
+  \item \code{\link{ddfMLR}}
+  \item \code{\link{difNLR}}
+  \item \code{\link{difORD}}
+  \item \code{\link{estimNLR}}
+  \item \code{\link{formulaNLR}}
+  \item \code{\link{MLR}}
+  \item \code{\link{NLR}}
+  \item \code{\link{ORD}}
+  \item \code{\link{startNLR}}
+}
+}
+
+\section{Datasets}{
+
+\itemize{
+  \item \code{\link{GMAT}}
+  \item \code{\link{GMAT2}}
+  \item \code{\link{MSATB}}
+}
+}
+
 \references{
 Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 
@@ -44,7 +68,7 @@ Checking equity: Why Differential Item Functioning Analysis Should Be a Routine 
 Assessments. CBE-Life Sciences Education, 16(2), \url{https://doi.org/10.1187/cbe.16-10-0307}.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-Journal of Educational Measurement, 27, 361-370.
+Journal of Educational Measurement, 27, 361-370, \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 
 Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
 }

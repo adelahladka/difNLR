@@ -69,7 +69,7 @@
 #' @details
 #' DIF detection procedure based on non-linear regression is the extension of logistic regression
 #' procedure (Swaminathan and Rogers, 1990; Drabinova and Martinkova, 2017).
-
+#'
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct
 #' answer (i.e., \eqn{y = 1}) is
 #' \deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
@@ -879,7 +879,7 @@ print.difNLR <- function(x, ...) {
 #' Journal of Educational Measurement, 27(4), 361-370,
 #' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
-#' @seealso \code{\link[difNLR]{difNLR}}
+#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[ggplot2]{ggplot}}
 #'
 #' @examples
 #' \dontrun{
@@ -903,8 +903,9 @@ print.difNLR <- function(x, ...) {
 #' plot(x, plot.type = "stat")
 #' }
 #' @export
-plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2", "goldenrod2"),
-                        shape = 21, size = .8, linetype = c(2, 1), title, group.names, ...) {
+plot.difNLR <- function(x, plot.type = "cc", item = "all",
+                        col = c("dodgerblue2", "goldenrod2"), shape = 21,
+                        size = .8, linetype = c(2, 1), title, group.names, ...) {
   plotstat <- function(x, size = size, title = title) {
     if (x$conv.fail != 0) {
       if (length(x$conv.fail) == sum(!is.na(x$Sval))) {
@@ -1068,9 +1069,11 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
       }
     }
 
-    ### functions
-    gNLR <- function(x, a, b, c, d) {
-      c + (d - c) / (1 + exp(-a * (x - b)))
+
+    if (x$purification) {
+      anchor <- c(1:m)[!c(1:m) %in% x$DIFitems]
+    } else {
+      anchor <- 1:m
     }
 
     ### Data
@@ -1081,12 +1084,12 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
     } else {
       if (x$match == "score") {
         xlab <- "Total score"
-        xR <- c(apply(x$Data[x$group == 0, ], 1, sum))
-        xF <- c(apply(x$Data[x$group == 1, ], 1, sum))
+        xR <- c(apply(x$Data[x$group == 0, anchor], 1, sum))
+        xF <- c(apply(x$Data[x$group == 1, anchor], 1, sum))
       } else {
         xlab <- "Standardized total score"
-        xR <- c(scale(apply(x$Data[x$group == 0, ], 1, sum)))
-        xF <- c(scale(apply(x$Data[x$group == 1, ], 1, sum)))
+        xR <- c(scale(apply(x$Data[x$group == 0, anchor], 1, sum)))
+        xF <- c(scale(apply(x$Data[x$group == 1, anchor], 1, sum)))
       }
     }
 
@@ -1151,13 +1154,13 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all", col = c("dodgerblue2"
           colour = "Reference",
           linetype = "Reference"
         ),
-        fun = gNLR,
+        fun = .gNLR,
         args = as.list(PARR),
         size = size,
         geom = "line"
         ) +
         stat_function(aes(colour = "Focal", linetype = "Focal"),
-          fun = gNLR,
+          fun = .gNLR,
           args = as.list(PARF),
           size = size,
           geom = "line"
@@ -1367,8 +1370,8 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' predict(x, item = 1, match = 0, group = 1) # focal group
 #'
 #' # Predicted values for new observations - various z-scores
-#' predict(x, item = 1, match = c(-1, 0, 1), group = c(0, 0, 0)) # reference group
-#' predict(x, item = 1, match = c(-1, 0, 1), group = c(1, 1, 1)) # focal group
+#' predict(x, item = 1, match = c(-1, 0, 1), group = 0) # reference group
+#' predict(x, item = 1, match = c(-1, 0, 1), group = 1) # focal group
 #' }
 #'
 #' @export
@@ -1428,7 +1431,7 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
       group <- rep(group, length(match))
     } else {
       stop("Arguments 'match' and 'group' must be of the same length.",
-           call. = FALSE
+        call. = FALSE
       )
     }
   }
