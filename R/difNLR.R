@@ -253,7 +253,7 @@
 #' # Testing both DIF effects using LR test,
 #' # 3PL model with fixed guessing for groups
 #' # and item purification
-#' difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = T)
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = TRUE)
 #'
 #' # Testing both DIF effects using 3PL model with fixed guessing for groups
 #' # and total score as matching criterion

@@ -196,7 +196,7 @@ coef(x, SE = TRUE, simplify = TRUE)
 ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 
 # Testing both DDF effects with item purification
-ddfMLR(Data, group, focal.name = 1, key, purify = T)
+ddfMLR(Data, group, focal.name = 1, key, purify = TRUE)
 
 # Testing uniform DDF effects
 ddfMLR(Data, group, focal.name = 1, key, type = "udif")

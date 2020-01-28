@@ -204,7 +204,7 @@ logLik(x, item = 1)
 difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 
 # Testing both DIF effects with item purification
-difORD(Data, group, focal.name = 1, model = "adjacent", purify = T)
+difORD(Data, group, focal.name = 1, model = "adjacent", purify = TRUE)
 
 # Testing uniform DIF effects
 difORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")
