@@ -1,8 +1,4 @@
----
-title: "Changes and developments in the difNLR package"
----
-
-------
+## Changes and developments in the difNLR package
 
 ### Changes in version 1.3.2 (2020-01-28)
 

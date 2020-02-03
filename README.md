@@ -31,12 +31,15 @@ Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.3.
 ## Reference
 To cite `difNLR` package in publications, please, use:
 
-  Hladka A. & Martinkova P. (2019). difNLR: DIF and DDF detection by non-linear
-  regression models. R package version 1.3.0 [https://CRAN.R-project.org/package=difNLR]( https://CRAN.R-project.org/package=difNLR)
+  Hladka A. & Martinkova P. (2020). difNLR: DIF and DDF detection by non-linear
+  regression models. R package version 1.3.2 [https://CRAN.R-project.org/package=difNLR]( https://CRAN.R-project.org/package=difNLR)
 
   Drabinova A. & Martinkova P. (2017). Detection of Differential Item Functioning with
   Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. Journal of
   Educational Measurement, 54(4), 498-517. [DOI: 10.1111/jedm.12158](https://doi.org/10.1111/jedm.12158).
+  
+## Try online
+You can try some functionalities of the `difNLR` package [online](https://shiny.cs.cas.cz/ShinyItemAnalysis/) using [`ShinyItemAnalysis`](https://github.com/patriciamar/ShinyItemAnalysis) application and package and its DIF/Fairness section.
   
 ## Getting help
 In case you find any bug or just need help with `difNLR` package, you can leave your message as an issue here or directly contact us at hladka@cs.cas.cz
