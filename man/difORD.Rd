@@ -2,29 +2,11 @@
 % Please edit documentation in R/difORD.R
 \name{difORD}
 \alias{difORD}
-\alias{print.difORD}
-\alias{plot.difORD}
-\alias{coef.difORD}
-\alias{logLik.difORD}
-\alias{AIC.difORD}
-\alias{BIC.difORD}
-\title{DIF detection for ordinal data.}
+\title{DIF detection among ordinal data.}
 \usage{
 difORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
-anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
-parametrization = "irt", alpha = 0.05)
-
-\method{print}{difORD}(x, ...)
-
-\method{coef}{difORD}(object, SE = FALSE, simplify = FALSE, ...)
-
-\method{logLik}{difORD}(object, item = "all", ...)
-
-\method{AIC}{difORD}(object, item = "all", ...)
-
-\method{BIC}{difORD}(object, item = "all", ...)
-
-\method{plot}{difORD}(x, item = "all", title, plot.type, group.names, ...)
+       anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
+       parametrization = "irt", alpha = 0.05)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and
@@ -67,38 +49,11 @@ Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
 intercept-slope parametrization. See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
-
-\item{x}{an object of \code{"difORD"} class.}
-
-\item{...}{other generic parameters for S3 methods.}
-
-\item{object}{an object of \code{"difORD"} class.}
-
-\item{SE}{logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).}
-
-\item{simplify}{logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).}
-
-\item{item}{numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
-(default) for all items.}
-
-\item{title}{string: title of a plot.}
-
-\item{plot.type}{character: which plot should be displayed for cumulative logit regression model. Either
-\code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.}
-
-\item{group.names}{character: names of reference and focal group.}
 }
 \value{
 The \code{difORD()} function returns an object of class \code{"difORD"}. The output
 including values of the test statistics, p-values, and items marked as DIF is displayed by the
 \code{print()} method.
-
-Item characteristic curves can be displayed with \code{plot()} method.
-Estimated parameters can be displayed with \code{coef()} method.
-
-Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
-extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
-specified in \code{item} argument.
 
 A list of class \code{"difORD"} with the following arguments:
 \describe{
@@ -136,6 +91,8 @@ A list of class \code{"difORD"} with the following arguments:
   \item{\code{group.names}}{levels of grouping variable.}
   \item{\code{match}}{matching criterion.}
   }
+
+For an object of class \code{"difORD"} several methods are available (e.g. \code{methods(class = "difORD")}).
 }
 \description{
 Performs DIF detection procedure for ordinal data based either on adjacent category logit
@@ -179,9 +136,9 @@ group <- dataMedicalgraded[, 101]
 # Testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 
+\dontrun{
 # graphical devices
 plot(x, item = 3)
-\dontrun{
 plot(x, item = "X2003")
 plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 
@@ -194,12 +151,11 @@ coef(x, SE = TRUE, simplify = TRUE) # with SE, simplified
 AIC(x)
 BIC(x)
 logLik(x)
-}
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
-\dontrun{
+
 # Testing both DIF effects with Benjamini-Hochberg adjustment method
 difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 
@@ -230,7 +186,13 @@ coef(x, simplify = TRUE)
 Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 }
 \seealso{
-\code{\link[stats]{p.adjust}} \code{\link[VGAM]{vglm}}
+\code{\link[difNLR]{plot.difORD}} for graphical representation of item characteristic curves. \cr
+\code{\link[difNLR]{coef.difORD}} for extraction of item parameters with their standard errors. \cr
+\code{\link[difNLR]{logLik.difORD}}, \code{\link[difNLR]{AIC.difORD}}, \code{\link[difNLR]{BIC.difORD}}
+for extraction of loglikelihood and information criteria. \cr
+
+\code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
+\code{\link[VGAM]{vglm}} for estimation function using iteratively reweighted least squares.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

@@ -2,11 +2,20 @@
 % Please edit documentation in R/difNLR.R
 \name{plot.difNLR}
 \alias{plot.difNLR}
-\title{ICC and test statistics plots for \code{"difNLR"} object.}
+\title{ICC and test statistics plots for an object of \code{"difNLR"} class.}
 \usage{
-\method{plot}{difNLR}(x, plot.type = "cc", item = "all",
-  col = c("dodgerblue2", "goldenrod2"), shape = 21, size = 0.8,
-  linetype = c(2, 1), title, group.names, ...)
+\method{plot}{difNLR}(
+  x,
+  plot.type = "cc",
+  item = "all",
+  col = c("dodgerblue2", "goldenrod2"),
+  shape = 21,
+  size = 0.8,
+  linetype = c(2, 1),
+  title,
+  group.names,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of \code{"difNLR"} class.}
@@ -38,7 +47,7 @@ For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}
 \code{plot.type = "cc"}, returns list of objects of class \code{"ggplot"}.
 }
 \description{
-Plot method for an object of \code{"difNLR"} class using R package \pkg{ggplot2}.
+Plot method for an object of \code{"difNLR"} class using \pkg{ggplot2}.
 
 Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
 (default). The characteristic curves for an item specified in \code{item} argument are plotted.
@@ -73,7 +82,7 @@ plot(x, plot.type = "stat")
 }
 }
 \references{
-Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 \url{https://doi.org/10.1111/jedm.12158}.
 
@@ -82,7 +91,8 @@ Journal of Educational Measurement, 27(4), 361-370,
 \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 }
 \seealso{
-\code{\link[difNLR]{difNLR}}
+\code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+\code{\link[ggplot2]{ggplot}} for general function to plot a \code{"ggplot"} object.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

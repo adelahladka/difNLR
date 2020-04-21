@@ -1,5 +1,23 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.3.3 (2020-04-21)
+
+**_THIS IS A CRAN VERSION_**
+
+#### DOCUMENTATION
+  * Documentation of the package was updated.
+  * Some typos were fixed.
+  * Documentation of main functions was updated:
+    - S3 methods are now referenced in See Also sections.
+    - S3 methods are now documented in seperate files.
+
+#### MINOR UPDATES
+  * Legends in `plot.difNLR()`, `plot.difORD()` and `plot.ddfMLR()` were unified.
+  * Colors in `plot.difORD()` and `plot.ddfMLR()` were changed to blind-color
+    friendly palettes.
+
+------
+
 ### Changes in version 1.3.2 (2020-01-28)
 
 **_THIS IS A CRAN VERSION_**

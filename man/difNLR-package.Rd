@@ -17,8 +17,8 @@ functioning (DDF) based on multinomial log-linear regression model.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.3.2\cr
-Date: 2020-01-28\cr
+Version: 1.3.3\cr
+Date: 2020-04-21\cr
 Depends: R (>= 3.1)\cr
 Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 Suggests: ShinyItemAnalysis\cr
@@ -56,9 +56,12 @@ This package was supported by grant funded by Czech Science foundation under num
 \references{
 Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 
-Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 \url{https://doi.org/10.1111/jedm.12158}.
+
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
+The R journal. Accepted.
 
 Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory
 Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.

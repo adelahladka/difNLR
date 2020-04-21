@@ -2,33 +2,11 @@
 % Please edit documentation in R/difNLR.R
 \name{difNLR}
 \alias{difNLR}
-\alias{print.difNLR}
-\alias{fitted.difNLR}
-\alias{coef.difNLR}
-\alias{logLik.difNLR}
-\alias{AIC.difNLR}
-\alias{BIC.difNLR}
-\alias{residuals.difNLR}
-\alias{resid.difNLR}
 \title{DIF detection using non-linear regression method.}
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
-match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
-p.adjust.method = "none", start, initboot = T, nrBo = 20)
-
-\method{print}{difNLR}(x, ...)
-
-\method{fitted}{difNLR}(object, item = "all", ...)
-
-\method{coef}{difNLR}(object, SE = FALSE, simplify = FALSE, ...)
-
-\method{logLik}{difNLR}(object, item = "all", ...)
-
-\method{AIC}{difNLR}(object, item = "all", ...)
-
-\method{BIC}{difNLR}(object, item = "all", ...)
-
-\method{residuals}{difNLR}(object, item = "all", ...)
+       match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
+       alpha = 0.05, p.adjust.method = "none", start, initboot = T, nrBo = 20)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
@@ -94,40 +72,11 @@ items/models with convergence issues).}
 
 \item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
 bootstraped samples (default is 20).}
-
-\item{x}{an object of \code{"difNLR"} class.}
-
-\item{...}{other generic parameters for S3 methods.}
-
-\item{object}{an object of \code{"difNLR"} class.}
-
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
-
-\item{SE}{logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).}
-
-\item{simplify}{logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).}
 }
 \value{
 The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
 including values of the test statistics, p-values, and items detected as function differently
 is displayed by the \code{print()} method.
-
-Item characteristic curves and graphical representation of DIF statistics can be displayed
-with \code{plot()} method. For more details see \code{\link[difNLR]{plot.difNLR}}.
-Estimated parameters can be displayed with \code{coef()} method.
-
-Fitted values and residuals can be extracted by the \code{fitted()} and \code{residuals()} methods
-for converged item(s) specified in \code{item} argument.
-
-Predicted values are produced by the \code{predict()} method for converged item(s)
-specified in \code{item} argument. New data can be introduced with \code{match} and \code{group}
-arguments. For more details see \code{\link[difNLR]{predict.difNLR}}.
-
-Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
-extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
-specified in \code{item} argument.
 
 Object of class \code{"difNLR"} is a list with the following components:
 \describe{
@@ -171,6 +120,8 @@ Object of class \code{"difNLR"} is a list with the following components:
   \item{\code{group.names}}{names of groups.}
   \item{\code{match}}{matching criterion.}
 }
+
+For an object of class \code{"difNLR"} several methods are available (e.g. \code{methods(class = "difNLR")}).
 }
 \description{
 Performs DIF detection procedure for dichotomous data based on non-linear
@@ -216,8 +167,8 @@ Missing values are allowed but discarded for item estimation. They must be coded
 \code{NA} for both, \code{Data} and \code{group} arguments.
 
 In case that model considers difference in guessing or inattention parameter, the different parameterization is
-used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick with
-alternative parameterization.
+used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick
+with alternative parameterization.
 }
 \examples{
 # loading data based on GMAT
@@ -230,6 +181,7 @@ group <- GMAT[, "group"]
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
+\dontrun{
 # Graphical devices
 plot(x, item = x$DIFitems)
 plot(x, item = "Item1")
@@ -261,11 +213,12 @@ predict(x, item = 1, match = 0, group = 1)
 AIC(x)
 BIC(x)
 logLik(x)
+
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
-\dontrun{
+
 # Testing both DIF effects using F test and
 # 3PL model with fixed guessing for groups
 difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
@@ -303,7 +256,7 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
 
 }
 \references{
-Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 \url{https://doi.org/10.1111/jedm.12158}.
 
@@ -312,7 +265,17 @@ Journal of Educational Measurement, 27(4), 361-370,
 \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 }
 \seealso{
-\code{\link[stats]{nls}} \code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
+\code{\link[difNLR]{plot.difNLR}} for graphical representation of item characteristic curves and DIF statistics. \cr
+\code{\link[difNLR]{coef.difNLR}} for extraction of item parameters with their standard errors. \cr
+\code{\link[difNLR]{predict.difNLR}} for prediction. \cr
+\code{\link[difNLR]{fitted.difNLR}} and \code{\link[difNLR]{residuals.difNLR}} for extraction of fitted
+values and residuals. \cr
+\code{\link[difNLR]{logLik.difNLR}}, \code{\link[difNLR]{AIC.difNLR}}, \code{\link[difNLR]{BIC.difNLR}}
+for extraction of loglikelihood and information criteria. \cr
+
+\code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
+\code{\link[stats]{nls}} for nonlinear least squares estimation. \cr
+\code{\link[difNLR]{startNLR}} for calculation of initial values of fitting algorithms in \code{difNLR()}.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

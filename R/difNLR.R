@@ -1,6 +1,6 @@
 #' DIF detection using non-linear regression method.
 #'
-#' @aliases difNLR print.difNLR
+#' @aliases difNLR
 #'
 #' @description Performs DIF detection procedure for dichotomous data based on non-linear
 #' regression model (generalized logistic regression) and either likelihood-ratio or F test
@@ -53,18 +53,11 @@
 #' items/models with convergence issues).
 #' @param nrBo numeric: the maximal number of iterations for calculation of starting values using
 #' bootstraped samples (default is 20).
-#' @param x an object of \code{"difNLR"} class.
-#' @param object an object of \code{"difNLR"} class.
-#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number).
-#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
-#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
-#' @param ... other generic parameters for S3 methods.
 #'
-#' @usage difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
-#' match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR", alpha = 0.05,
-#' p.adjust.method = "none", start, initboot = T, nrBo = 20)
+#' @usage
+#' difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
+#'        match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
+#'        alpha = 0.05, p.adjust.method = "none", start, initboot = T, nrBo = 20)
 #'
 #' @details
 #' DIF detection procedure based on non-linear regression is the extension of logistic regression
@@ -105,27 +98,12 @@
 #' \code{NA} for both, \code{Data} and \code{group} arguments.
 #'
 #' In case that model considers difference in guessing or inattention parameter, the different parameterization is
-#' used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick with
-#' alternative parameterization.
+#' used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick
+#' with alternative parameterization.
 #'
 #' @return The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
 #' including values of the test statistics, p-values, and items detected as function differently
 #' is displayed by the \code{print()} method.
-#'
-#' Item characteristic curves and graphical representation of DIF statistics can be displayed
-#' with \code{plot()} method. For more details see \code{\link[difNLR]{plot.difNLR}}.
-#' Estimated parameters can be displayed with \code{coef()} method.
-#'
-#' Fitted values and residuals can be extracted by the \code{fitted()} and \code{residuals()} methods
-#' for converged item(s) specified in \code{item} argument.
-#'
-#' Predicted values are produced by the \code{predict()} method for converged item(s)
-#' specified in \code{item} argument. New data can be introduced with \code{match} and \code{group}
-#' arguments. For more details see \code{\link[difNLR]{predict.difNLR}}.
-#'
-#' Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
-#' extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
-#' specified in \code{item} argument.
 #'
 #' Object of class \code{"difNLR"} is a list with the following components:
 #' \describe{
@@ -170,6 +148,8 @@
 #'   \item{\code{match}}{matching criterion.}
 #' }
 #'
+#' For an object of class \code{"difNLR"} several methods are available (e.g. \code{methods(class = "difNLR")}).
+#'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
@@ -184,7 +164,7 @@
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
-#' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 #' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
@@ -192,7 +172,18 @@
 #' Journal of Educational Measurement, 27(4), 361-370,
 #' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
-#' @seealso \code{\link[stats]{nls}} \code{\link[stats]{p.adjust}} \code{\link[difNLR]{plot.difNLR}} \code{\link[difNLR]{startNLR}}
+#' @seealso
+#' \code{\link[difNLR]{plot.difNLR}} for graphical representation of item characteristic curves and DIF statistics. \cr
+#' \code{\link[difNLR]{coef.difNLR}} for extraction of item parameters with their standard errors. \cr
+#' \code{\link[difNLR]{predict.difNLR}} for prediction. \cr
+#' \code{\link[difNLR]{fitted.difNLR}} and \code{\link[difNLR]{residuals.difNLR}} for extraction of fitted
+#' values and residuals. \cr
+#' \code{\link[difNLR]{logLik.difNLR}}, \code{\link[difNLR]{AIC.difNLR}}, \code{\link[difNLR]{BIC.difNLR}}
+#' for extraction of loglikelihood and information criteria. \cr
+#'
+#' \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
+#' \code{\link[stats]{nls}} for nonlinear least squares estimation. \cr
+#' \code{\link[difNLR]{startNLR}} for calculation of initial values of fitting algorithms in \code{difNLR()}.
 #'
 #' @examples
 #' # loading data based on GMAT
@@ -205,6 +196,7 @@
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
+#' \dontrun{
 #' # Graphical devices
 #' plot(x, item = x$DIFitems)
 #' plot(x, item = "Item1")
@@ -236,11 +228,12 @@
 #' AIC(x)
 #' BIC(x)
 #' logLik(x)
+#'
 #' # AIC, BIC, log-likelihood for the first item
 #' AIC(x, item = 1)
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
-#' \dontrun{
+#'
 #' # Testing both DIF effects using F test and
 #' # 3PL model with fixed guessing for groups
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
@@ -695,7 +688,6 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
   return(resToReturn)
 }
 
-#' @rdname difNLR
 #' @export
 print.difNLR <- function(x, ...) {
   cat(paste("Detection of ",
@@ -825,9 +817,9 @@ print.difNLR <- function(x, ...) {
   }
 }
 
-#' ICC and test statistics plots for \code{"difNLR"} object.
+#' ICC and test statistics plots for an object of \code{"difNLR"} class.
 #'
-#' @description Plot method for an object of \code{"difNLR"} class using R package \pkg{ggplot2}.
+#' @description Plot method for an object of \code{"difNLR"} class using \pkg{ggplot2}.
 #'
 #' Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
 #' (default). The characteristic curves for an item specified in \code{item} argument are plotted.
@@ -871,7 +863,7 @@ print.difNLR <- function(x, ...) {
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
-#' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 #' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
@@ -879,7 +871,9 @@ print.difNLR <- function(x, ...) {
 #' Journal of Educational Measurement, 27(4), 361-370,
 #' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
-#' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[ggplot2]{ggplot}}
+#' @seealso
+#' \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+#' \code{\link[ggplot2]{ggplot}} for general function to plot a \code{"ggplot"} object.
 #'
 #' @examples
 #' \dontrun{
@@ -1219,7 +1213,8 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   }
 }
 
-#' @rdname difNLR
+#' @rdname residuals.difNLR
+#' @aliases residuals.difNLR
 #' @export
 fitted.difNLR <- function(object, item = "all", ...) {
   ### checking input
@@ -1312,9 +1307,9 @@ fitted.difNLR <- function(object, item = "all", ...) {
   return(FV)
 }
 
-#' Predicted values for \code{"difNLR"} object.
+#' Predicted values for an object of \code{"difNLR"} class.
 #'
-#' @description Predicted values based on \code{"difNLR"} object.
+#' @description S3 method for predictions from the model used in the object if \code{"difNLR"} class.
 #'
 #' @param object an object of \code{"difNLR"} class.
 #' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
@@ -1338,7 +1333,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' Faculty of Mathematics and Physics, Charles University \cr
 #'
 #' @references
-#' Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
 #' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
@@ -1346,7 +1341,9 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' Journal of Educational Measurement, 27(4), 361-370,
 #' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
-#' @seealso \code{\link[difNLR]{difNLR}}
+#' @seealso
+#' \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+#' \code{\link[stats]{predict}} for generic function for prediction.
 #'
 #' @examples
 #' \dontrun{
@@ -1483,7 +1480,59 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
   return(PV)
 }
 
-#' @rdname difNLR
+#' Extract model coefficients from an object of \code{"difNLR"} class.
+#'
+#' @description S3 method for extracting model coefficients from an object of \code{"difNLR"} class.
+#' @aliases coefficients.difNLR
+#'
+#' @param object an object of \code{"difNLR"} class.
+#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
+#' @param ... other generic parameters for \code{predict()} function.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' Karel Zvara \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#'
+#' @references
+#' Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' \url{https://doi.org/10.1111/jedm.12158}.
+#'
+#' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
+#' Journal of Educational Measurement, 27(4), 361-370,
+#' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
+#'
+#' @seealso
+#' \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+#' \code{\link[stats]{coef}} for generic function extracting model coefficients.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data based on GMAT
+#' data(GMAT)
+#'
+#' Data <- GMAT[, 1:20]
+#' group <- GMAT[, "group"]
+#'
+#' # Testing both DIF effects using likelihood-ratio test and
+#' # 3PL model with fixed guessing for groups
+#' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
+#'
+#' # Coefficients
+#' coef(x)
+#' coef(x, SE = TRUE)
+#' coef(x, SE = TRUE, simplify = TRUE)
+#' }
 #' @export
 coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
   if (class(SE) != "logical") {
@@ -1528,7 +1577,68 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
   return(res)
 }
 
-#' @rdname difNLR
+#' Loglikelihood and information criteria for an object of \code{"difNLR"} class.
+#'
+#' @aliases AIC.difNLR BIC.difNLR
+#' @rdname logLik.difNLR
+#'
+#' @description S3 methods for extracting loglikelihood, Akaike's information criterion (AIC) and
+#' Schwarz's Bayesian criterion (BIC) for an object of \code{"difNLR"} class.
+#'
+#' @param object an object of \code{"difNLR"} class.
+#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number).
+#' @param ... other generic parameters for S3 methods.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' Karel Zvara \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#'
+#' @references
+#' Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' \url{https://doi.org/10.1111/jedm.12158}.
+#'
+#' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
+#' Journal of Educational Measurement, 27(4), 361-370,
+#' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
+#'
+#' @seealso
+#' \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+#' \code{\link[stats]{logLik}} for generic function extracting loglikelihood. \cr
+#' \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data based on GMAT
+#' data(GMAT)
+#'
+#' Data <- GMAT[, 1:20]
+#' group <- GMAT[, "group"]
+#'
+#' # Testing both DIF effects using likelihood-ratio test and
+#' # 3PL model with fixed guessing for groups
+#' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
+#'
+#' # AIC, BIC, log-likelihood
+#' AIC(x)
+#' BIC(x)
+#' logLik(x)
+#' # AIC, BIC, log-likelihood for the first item
+#' AIC(x, item = 1)
+#' BIC(x, item = 1)
+#' logLik(x, item = 1)
+#' }
 #' @export
 logLik.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
@@ -1600,7 +1710,8 @@ logLik.difNLR <- function(object, item = "all", ...) {
   return(val)
 }
 
-#' @rdname difNLR
+#' @rdname logLik.difNLR
+#' @aliases BIC.difNLR logLik.difNLR
 #' @export
 AIC.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
@@ -1665,7 +1776,8 @@ AIC.difNLR <- function(object, item = "all", ...) {
   return(AIC)
 }
 
-#' @rdname difNLR
+#' @rdname logLik.difNLR
+#' @aliases AIC.difNLR logLik.difNLR
 #' @export
 BIC.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
@@ -1730,8 +1842,66 @@ BIC.difNLR <- function(object, item = "all", ...) {
   return(BIC)
 }
 
-#' @aliases resid.difNLR
-#' @rdname difNLR
+#' Fitted values and residuals for an object of \code{"difNLR"} class.
+#'
+#' @aliases resid.difNLR fitted.difNLR
+#' @rdname residuals.difNLR
+#'
+#' @description S3 methods for extracting fitted values and residuals for an object of \code{"difNLR"} class.
+#'
+#' @param object an object of \code{"difNLR"} class.
+#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number).
+#' @param ... other generic parameters for S3 methods.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' Karel Zvara \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#'
+#' @references
+#' Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
+#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' \url{https://doi.org/10.1111/jedm.12158}.
+#'
+#' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
+#' Journal of Educational Measurement, 27(4), 361-370,
+#' \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
+#'
+#' @seealso
+#' \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+#' \code{\link[stats]{fitted}} for generic function extracting fitted values. \cr
+#' \code{\link[stats]{residuals}} for generic function extracting residuals.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data based on GMAT
+#' data(GMAT)
+#'
+#' Data <- GMAT[, 1:20]
+#' group <- GMAT[, "group"]
+#'
+#' # Testing both DIF effects using likelihood-ratio test and
+#' # 3PL model with fixed guessing for groups
+#' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
+#'
+#' # Fitted values
+#' fitted(x)
+#' fitted(x, item = 1)
+#'
+#' # Residuals
+#' residuals(x)
+#' residuals(x, item = 1)
+#' }
 #' @export
 residuals.difNLR <- function(object, item = "all", ...) {
   ### checking input

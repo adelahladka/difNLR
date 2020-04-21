@@ -1,6 +1,6 @@
 #' DDF detection for nominal data.
 #'
-#' @aliases ddfMLR print.ddfMLR plot.ddfMLR
+#' @aliases ddfMLR
 #'
 #' @description Performs DDF detection procedure for nominal data based on multinomial
 #' log-linear regression model and likelihood ratio test of a submodel.
@@ -34,20 +34,11 @@
 #' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
 #' intercept-slope parametrization. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
-#' @param x an object of \code{"ddfMLR"} class.
-#' @param object an object of \code{"ddfMLR"} class.
-#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number).
-#' @param title string: title of a plot.
-#' @param group.names character: names of reference and focal group.
-#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
-#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
-#' @param ... other generic parameters for S3 methods.
 #'
-#' @usage ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-#' purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
-#' alpha = 0.05)
+#' @usage
+#' ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
+#'        purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
+#'        alpha = 0.05)
 #'
 #' @details
 #' Performs DDF detection procedure for nominal data based on multinomial
@@ -75,14 +66,7 @@
 #' including values of the test statistics, p-values, and items marked as DDF is displayed by the
 #' \code{print()} method.
 #'
-#' Item characteristic curves can be displayed with \code{plot()} method.
-#' Estimated parameters can be displayed with \code{coef()} method.
-#'
-#' Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
-#' extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
-#' specified in \code{item} argument.
-#'
-#' Object of class \code{"ddfMLR"} is a list with the following components:
+#' A list of class \code{"ddfMLR"} with the following arguments:
 #' \describe{
 #'   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
 #'   \item{\code{mlrPAR}}{the estimates of final model.}
@@ -118,6 +102,8 @@
 #'   \item{\code{match}}{matching criterion.}
 #'   }
 #'
+#' For an object of class \code{"ddfMLR"} several methods are available (e.g. \code{methods(class = "ddfMLR")}).
+#'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
@@ -128,7 +114,14 @@
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
-#' @seealso \code{\link[stats]{p.adjust}} \code{\link[nnet]{multinom}}
+#' @seealso
+#' \code{\link[difNLR]{plot.ddfMLR}} for graphical representation of item characteristic curves. \cr
+#' \code{\link[difNLR]{coef.ddfMLR}} for extraction of item parameters with their standard errors. \cr
+#' \code{\link[difNLR]{logLik.ddfMLR}}, \code{\link[difNLR]{AIC.ddfMLR}}, \code{\link[difNLR]{BIC.ddfMLR}}
+#' for extraction of loglikelihood and information criteria. \cr
+#'
+#' \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
+#' \code{\link[nnet]{multinom}} for estimation function using neural networks.
 #'
 #' @examples
 #' # loading data based on GMAT
@@ -141,9 +134,9 @@
 #' # Testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
+#' \dontrun{
 #' # Graphical devices
 #' plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
-#' \dontrun{
 #' plot(x, item = x$DDFitems)
 #' plot(x, item = 1)
 #'
@@ -151,7 +144,7 @@
 #' AIC(x)
 #' BIC(x)
 #' logLik(x)
-#' }
+
 #' # AIC, BIC, log-likelihood for the first item
 #' AIC(x, item = 1)
 #' BIC(x, item = 1)
@@ -161,7 +154,7 @@
 #' coef(x)
 #' coef(x, SE = TRUE)
 #' coef(x, SE = TRUE, simplify = TRUE)
-#' \dontrun{
+#'
 #' # Testing both DDF effects with Benjamini-Hochberg adjustment method
 #' ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 #'
@@ -455,8 +448,6 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
   return(resToReturn)
 }
 
-
-#' @rdname ddfMLR
 #' @export
 print.ddfMLR <- function(x, ...) {
   title <- switch(x$type,
@@ -528,7 +519,54 @@ print.ddfMLR <- function(x, ...) {
   }
 }
 
-#' @rdname ddfMLR
+#' ICC plots for an object of \code{"ddfMLR"} class.
+#'
+#' @description Plot method for an object of \code{"ddfMLR"} class using \pkg{ggplot2}.
+#'
+#' The characteristic curves for an item specified in \code{item} argument are plotted.
+#' Plotted curves represent the best model.
+#'
+#' @param x an object of \code{"ddfMLR"} class.
+#' @param item numeric or character: either character \code{"all"} to apply for all items (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number).
+#' @param title string: title of a plot.
+#' @param group.names character: names of reference and focal group.
+#' @param ... other generic parameters for \code{plot()} function.
+#'
+#' @return Returns list of objects of class \code{"ggplot"}.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @seealso
+#' \code{\link[difNLR]{ddfMLR}} for DDF detection. \cr
+#' \code{\link[ggplot2]{ggplot}} for general function to plot a \code{"ggplot"} object.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data based on GMAT
+#' data(GMATtest, GMATkey)
+#'
+#' Data <- GMATtest[, 1:20]
+#' group <- GMATtest[, "group"]
+#' key <- GMATkey
+#'
+#' # Testing both DDF effects
+#' (x <- ddfMLR(Data, group, focal.name = 1, key))
+#'
+#' # Graphical devices
+#' plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
+#' plot(x, item = x$DDFitems)
+#' plot(x, item = 1)
+#' }
 #' @export
 plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
   m <- length(x$mlrPAR)
@@ -677,6 +715,10 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
     levels(df$variable) <- paste0("P(Y = ", levels(df$variable), ")")
     levels(df2$answ) <- paste0("P(Y = ", levels(df2$answ), ")")
 
+    cbPalette <- c("#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
+    num.col <- ceiling(length(levels(df$variable)) / 8)
+    cols <- rep(cbPalette, num.col)[1:length(levels(df$variable))]
+
     plot_CC[[j]] <- ggplot() +
       geom_line(
         data = df,
@@ -706,6 +748,8 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
         breaks = c("R", "F"), labels = group.names,
         values = c("solid", "dashed")
       ) +
+      scale_color_manual(values = cols) +
+      scale_fill_manual(values = cols) +
       theme_bw() +
       theme(
         axis.line = element_line(colour = "black"),
@@ -735,7 +779,48 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
   return(plot_CC)
 }
 
-#' @rdname ddfMLR
+#' Extract model coefficients from an object of \code{"ddfMLR"} class.
+#'
+#' @description S3 method for extracting estimated model coefficients from an object of \code{"ddfMLR"} class.
+#' @aliases coefficients.ddfMLR
+#'
+#' @param object an object of \code{"ddfMLR"} class.
+#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
+#' @param ... other generic parameters for \code{coef()} method.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @seealso
+#' \code{\link[difNLR]{ddfMLR}} for DDF detection among nominal data. \cr
+#' \code{\link[stats]{coef}} for generic function extracting model coefficients.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data based on GMAT
+#' data(GMATtest, GMATkey)
+#'
+#' Data <- GMATtest[, 1:20]
+#' group <- GMATtest[, "group"]
+#' key <- GMATkey
+#'
+#' # testing both DDF effects
+#' (x <- ddfMLR(Data, group, focal.name = 1, key))
+#'
+#' # estimated parameters
+#' coef(x)
+#' coef(x, SE = TRUE)
+#' coef(x, simplify = TRUE)
+#' coef(x, SE = TRUE, simplify = TRUE)
+#' }
 #' @export
 coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
   if (class(SE) != "logical") {
@@ -783,7 +868,56 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
   return(res)
 }
 
-#' @rdname ddfMLR
+#' Loglikelihood and information criteria for an object of \code{"ddfMLR"} class.
+#'
+#' @aliases AIC.ddfMLR BIC.ddfMLR
+#' @rdname logLik.ddfMLR
+#'
+#' @description S3 methods for extracting loglikelihood, Akaike's information criterion (AIC) and
+#' Schwarz's Bayesian criterion (BIC) for an object of \code{"ddfMLR"} class.
+#'
+#' @param object an object of \code{"ddfMLR"} class.
+#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number).
+#' @param ... other generic parameters for S3 methods.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @seealso
+#' \code{\link[difNLR]{ddfMLR}} for DDF detection among nominal data. \cr
+#' \code{\link[stats]{logLik}} for generic function extracting loglikelihood. \cr
+#' \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data based on GMAT
+#' data(GMATtest, GMATkey)
+#'
+#' Data <- GMATtest[, 1:20]
+#' group <- GMATtest[, "group"]
+#' key <- GMATkey
+#'
+#' # testing both DDF effects
+#' (x <- ddfMLR(Data, group, focal.name = 1, key))
+#'
+#' # AIC, BIC, log-likelihood
+#' AIC(x)
+#' BIC(x)
+#' logLik(x)
+#' # AIC, BIC, log-likelihood for the first item
+#' AIC(x, item = 1)
+#' BIC(x, item = 1)
+#' logLik(x, item = 1)
+#' }
 #' @export
 logLik.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
@@ -837,7 +971,8 @@ logLik.ddfMLR <- function(object, item = "all", ...) {
   return(val)
 }
 
-#' @rdname ddfMLR
+#' @rdname logLik.ddfMLR
+#' @aliases BIC.ddfMLR logLik.ddfMLR
 #' @export
 AIC.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
@@ -880,7 +1015,8 @@ AIC.ddfMLR <- function(object, item = "all", ...) {
   return(AIC)
 }
 
-#' @rdname ddfMLR
+#' @rdname logLik.ddfMLR
+#' @aliases AIC.ddfMLR logLik.ddfMLR
 #' @export
 BIC.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)

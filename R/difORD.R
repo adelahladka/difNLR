@@ -1,6 +1,6 @@
-#' DIF detection for ordinal data.
+#' DIF detection among ordinal data.
 #'
-#' @aliases difORD print.difORD plot.difORD
+#' @aliases difORD
 #'
 #' @description Performs DIF detection procedure for ordinal data based either on adjacent category logit
 #' model or on cumulative logit model and likelihood ratio test of a submodel.
@@ -34,19 +34,11 @@
 #' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
 #' intercept-slope parametrization. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
-#' @param x an object of \code{"difORD"} class.
-#' @param object an object of \code{"difORD"} class.
-#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
-#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
-#' @param title string: title of a plot.
-#' @param plot.type character: which plot should be displayed for cumulative logit regression model. Either
-#' \code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.
-#' @param group.names character: names of reference and focal group.
-#' @param ... other generic parameters for S3 methods.
 #'
-#' @usage difORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
-#' anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
-#' parametrization = "irt", alpha = 0.05)
+#' @usage
+#' difORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
+#'        anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
+#'        parametrization = "irt", alpha = 0.05)
 #'
 #' @details
 #' Performs DIF detection procedure for ordinal data based either on adjacent category logit model
@@ -80,13 +72,6 @@
 #' @return The \code{difORD()} function returns an object of class \code{"difORD"}. The output
 #' including values of the test statistics, p-values, and items marked as DIF is displayed by the
 #' \code{print()} method.
-#'
-#' Item characteristic curves can be displayed with \code{plot()} method.
-#' Estimated parameters can be displayed with \code{coef()} method.
-#'
-#' Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
-#' extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
-#' specified in \code{item} argument.
 #'
 #' A list of class \code{"difORD"} with the following arguments:
 #' \describe{
@@ -125,6 +110,8 @@
 #'   \item{\code{match}}{matching criterion.}
 #'   }
 #'
+#' For an object of class \code{"difORD"} several methods are available (e.g. \code{methods(class = "difORD")}).
+#'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
@@ -138,7 +125,15 @@
 #' @references
 #' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 #'
-#' @seealso \code{\link[stats]{p.adjust}} \code{\link[VGAM]{vglm}}
+#' @seealso
+#' \code{\link[difNLR]{plot.difORD}} for graphical representation of item characteristic curves. \cr
+#' \code{\link[difNLR]{coef.difORD}} for extraction of item parameters with their standard errors. \cr
+#' \code{\link[difNLR]{logLik.difORD}}, \code{\link[difNLR]{AIC.difORD}}, \code{\link[difNLR]{BIC.difORD}}
+#' for extraction of loglikelihood and information criteria. \cr
+#'
+#' \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
+#' \code{\link[VGAM]{vglm}} for estimation function using iteratively reweighted least squares.
+#'
 #'
 #' @examples
 #' # loading data
@@ -149,9 +144,9 @@
 #' # Testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
+#' \dontrun{
 #' # graphical devices
 #' plot(x, item = 3)
-#' \dontrun{
 #' plot(x, item = "X2003")
 #' plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 #'
@@ -164,12 +159,11 @@
 #' AIC(x)
 #' BIC(x)
 #' logLik(x)
-#' }
 #' # AIC, BIC, log-likelihood for the first item
 #' AIC(x, item = 1)
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
-#' \dontrun{
+#'
 #' # Testing both DIF effects with Benjamini-Hochberg adjustment method
 #' difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 #'
@@ -470,7 +464,6 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
   return(resToReturn)
 }
 
-#' @rdname difORD
 #' @export
 print.difORD <- function(x, ...) {
   title <- paste0(
@@ -549,7 +542,46 @@ print.difORD <- function(x, ...) {
   }
 }
 
-#' @rdname difORD
+#' Extract model coefficients from an object of \code{"difORD"} class.
+#'
+#' @description S3 method for extracting estimated model coefficients from an object of \code{"difORD"} class.
+#' @aliases coefficients.difORD
+#'
+#' @param object an object of \code{"difORD"} class.
+#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
+#' @param ... other generic parameters for \code{coef()} method.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @seealso
+#' \code{\link[difNLR]{difORD}} for DIF detection among ordinal data. \cr
+#' \code{\link[stats]{coef}} for generic function extracting model coefficients.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data
+#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
+#' Data <- dataMedicalgraded[, 1:5]
+#' group <- dataMedicalgraded[, 101]
+#'
+#' # Testing both DIF effects with adjacent category logit model
+#' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
+#'
+#' # estimated parameters
+#' coef(x)
+#' coef(x, SE = TRUE)
+#' coef(x, simplify = TRUE)
+#' coef(x, SE = TRUE, simplify = TRUE)
+#' }
 #' @export
 coef.difORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
   if (class(SE) != "logical") {
@@ -602,9 +634,54 @@ coef.difORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
   return(res)
 }
 
-#' @param item numeric or character: either the vector of column indicator (number or column name) or \code{'all'}
-#' (default) for all items.
-#' @rdname difORD
+#' Loglikelihood and information criteria for an object of \code{"difORD"} class.
+#'
+#' @aliases AIC.difORD BIC.difORD
+#' @rdname logLik.difORD
+#'
+#' @description S3 methods for extracting loglikelihood, Akaike's information criterion (AIC) and
+#' Schwarz's Bayesian criterion (BIC) for an object of \code{"difORD"} class.
+#'
+#' @param object an object of \code{"difORD"} class.
+#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number).
+#' @param ... other generic parameters for S3 methods.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @seealso
+#' \code{\link[difNLR]{difORD}} for DIF detection among ordinal data. \cr
+#' \code{\link[stats]{logLik}} for generic function extracting loglikelihood. \cr
+#' \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data
+#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
+#' Data <- dataMedicalgraded[, 1:5]
+#' group <- dataMedicalgraded[, 101]
+#'
+#' # Testing both DIF effects with adjacent category logit model
+#' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
+#'
+#' # AIC, BIC, log-likelihood
+#' AIC(x)
+#' BIC(x)
+#' logLik(x)
+#' # AIC, BIC, log-likelihood for the first item
+#' AIC(x, item = 1)
+#' BIC(x, item = 1)
+#' logLik(x, item = 1)
+#' }
 #' @export
 logLik.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
@@ -654,7 +731,8 @@ logLik.difORD <- function(object, item = "all", ...) {
   return(val)
 }
 
-#' @rdname difORD
+#' @rdname logLik.difORD
+#' @aliases BIC.difORD logLik.difORD
 #' @export
 AIC.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
@@ -693,7 +771,8 @@ AIC.difORD <- function(object, item = "all", ...) {
   return(AIC)
 }
 
-#' @rdname difORD
+#' @rdname logLik.difORD
+#' @aliases AIC.difORD logLik.difORD
 #' @export
 BIC.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
@@ -732,7 +811,59 @@ BIC.difORD <- function(object, item = "all", ...) {
   return(BIC)
 }
 
-#' @rdname difORD
+#' ICC plots for an object of \code{"difORD"} class.
+#'
+#' @description Plot method for an object of \code{"difORD"} class using \pkg{ggplot2}.
+#'
+#' The characteristic curves (category probabilities) for an item specified in \code{item}
+#' argument are plotted. Plotted curves represent the best model. For cumulative logit model,
+#' also cumulative probabilities may be plotted.
+#'
+#' @param x an object of \code{"difORD"} class.
+#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number).
+#' @param plot.type character: which plot should be displayed for cumulative logit regression model. Either
+#' \code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.
+#' @param title string: title of a plot.
+#' @param group.names character: names of reference and focal group.
+#' @param ... other generic parameters for \code{plot()} function.
+#'
+#' @return Returns list of objects of class \code{"ggplot"}.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' Faculty of Mathematics and Physics, Charles University \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @seealso
+#' \code{\link[difNLR]{difORD}} for DIF detection among ordinal data. \cr
+#' \code{\link[ggplot2]{ggplot}} for general function to plot a \code{"ggplot"} object.
+#'
+#' @examples
+#' \dontrun{
+#' # loading data
+#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
+#' Data <- dataMedicalgraded[, 1:5]
+#' group <- dataMedicalgraded[, 101]
+#'
+#' # Testing both DIF effects with adjacent category logit model
+#' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
+#'
+#' # graphical devices
+#' plot(x, item = 3)
+#' plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
+#'
+#' # Testing both DIF effects with cumulative logit model
+#' (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
+#' plot(x, item = 3, plot.type = "cumulative", title = "Cumulative probabilities")
+#' plot(x, item = 3, plot.type = "category", title = "Category probabilities")
+#' }
 #' @export
 plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
   m <- length(x$ordPAR)
@@ -908,6 +1039,10 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
       df.emp.cat$group <- as.factor(df.emp.cat$group)
       levels(df.emp.cat$category) <- paste0("P(Y = ", levels(df.emp.cat$category), ")")
 
+      cbPalette <- c("#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
+      num.col <- ceiling(length(levels(df.probs.cat$category)) / 8)
+      cols <- rep(cbPalette, num.col)[1:length(levels(df.probs.cat$category))]
+
       plot_CC[[k]] <- ggplot() +
         geom_point(
           data = df.emp.cat,
@@ -930,9 +1065,12 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
         ylim(0, 1) +
         ggtitle(TITLE) +
         scale_linetype_manual(
-          breaks = c(0, 1), labels = group.names,
+          breaks = c(0, 1),
+          labels = group.names,
           values = c("solid", "dashed")
         ) +
+        scale_fill_manual(values = cols) +
+        scale_color_manual(values = cols) +
         theme_bw() +
         theme(
           axis.line = element_line(colour = "black"),
@@ -947,7 +1085,7 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
         theme(
           legend.box.just = "top",
           legend.justification = c("left", "top"),
-          legend.position = c(0, 1),
+          legend.position = c(0.02, 0.98),
           legend.box = "horizontal",
           legend.box.margin = margin(3, 3, 3, 3),
           legend.key = element_rect(fill = "white", colour = NA)
@@ -1077,8 +1215,12 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
       df.emp.cum <- merge(df.emp.cum.count, df.emp.cum.prob, by = c("matching", "group", "category"))
 
       # colours
-      hues <- seq(15, 375, length = num.cat)
-      cols <- c("black", hcl(h = hues, l = 65, c = 100)[1:(num.cat - 1)])
+      cbPalette <- c("#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
+      num.col <- ceiling(num.cat / 8)
+      cols <- c("black", rep(cbPalette, num.col)[1:(num.cat - 1)])
+
+      # hues <- seq(15, 375, length = num.cat)
+      # cols <- c("black", hcl(h = hues, l = 65, c = 100)[1:(num.cat - 1)])
 
       if (plot.type == "cumulative") {
         df.emp.cum <- df.emp.cum[df.emp.cum$category != paste0("P(Y >= ", cat[1], ")"), ]

@@ -2,29 +2,11 @@
 % Please edit documentation in R/ddfMLR.R
 \name{ddfMLR}
 \alias{ddfMLR}
-\alias{print.ddfMLR}
-\alias{plot.ddfMLR}
-\alias{coef.ddfMLR}
-\alias{logLik.ddfMLR}
-\alias{AIC.ddfMLR}
-\alias{BIC.ddfMLR}
 \title{DDF detection for nominal data.}
 \usage{
 ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
-alpha = 0.05)
-
-\method{print}{ddfMLR}(x, ...)
-
-\method{plot}{ddfMLR}(x, item = "all", title, group.names, ...)
-
-\method{coef}{ddfMLR}(object, SE = FALSE, simplify = FALSE, ...)
-
-\method{logLik}{ddfMLR}(object, item = "all", ...)
-
-\method{AIC}{ddfMLR}(object, item = "all", ...)
-
-\method{BIC}{ddfMLR}(object, item = "all", ...)
+       purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
+       alpha = 0.05)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent unscored examinee answers (nominal)
@@ -67,38 +49,13 @@ Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
 intercept-slope parametrization. See \strong{Details}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
-
-\item{x}{an object of \code{"ddfMLR"} class.}
-
-\item{...}{other generic parameters for S3 methods.}
-
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
-
-\item{title}{string: title of a plot.}
-
-\item{group.names}{character: names of reference and focal group.}
-
-\item{object}{an object of \code{"ddfMLR"} class.}
-
-\item{SE}{logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).}
-
-\item{simplify}{logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).}
 }
 \value{
 The \code{ddfMLR()} function returns an object of class \code{"ddfMLR"}. The output
 including values of the test statistics, p-values, and items marked as DDF is displayed by the
 \code{print()} method.
 
-Item characteristic curves can be displayed with \code{plot()} method.
-Estimated parameters can be displayed with \code{coef()} method.
-
-Log-likelihood, Akaike's information criterion, and Schwarz's Bayesian criterion can be
-extracted with methods \code{logLik()}, \code{AIC()}, \code{BIC()} for converged item(s)
-specified in \code{item} argument.
-
-Object of class \code{"ddfMLR"} is a list with the following components:
+A list of class \code{"ddfMLR"} with the following arguments:
 \describe{
   \item{\code{Sval}}{the values of likelihood ratio test statistics.}
   \item{\code{mlrPAR}}{the estimates of final model.}
@@ -133,6 +90,8 @@ Object of class \code{"ddfMLR"} is a list with the following components:
   \item{\code{key}}{key of correct answers.}
   \item{\code{match}}{matching criterion.}
   }
+
+For an object of class \code{"ddfMLR"} several methods are available (e.g. \code{methods(class = "ddfMLR")}).
 }
 \description{
 Performs DDF detection procedure for nominal data based on multinomial
@@ -171,9 +130,9 @@ key <- GMATkey
 # Testing both DDF effects
 (x <- ddfMLR(Data, group, focal.name = 1, key))
 
+\dontrun{
 # Graphical devices
 plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
-\dontrun{
 plot(x, item = x$DDFitems)
 plot(x, item = 1)
 
@@ -181,7 +140,6 @@ plot(x, item = 1)
 AIC(x)
 BIC(x)
 logLik(x)
-}
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)
@@ -191,7 +149,7 @@ logLik(x, item = 1)
 coef(x)
 coef(x, SE = TRUE)
 coef(x, SE = TRUE, simplify = TRUE)
-\dontrun{
+
 # Testing both DDF effects with Benjamini-Hochberg adjustment method
 ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 
@@ -212,7 +170,13 @@ ddfMLR(Data, group, focal.name = 1, key, parametrization = "classic")
 
 }
 \seealso{
-\code{\link[stats]{p.adjust}} \code{\link[nnet]{multinom}}
+\code{\link[difNLR]{plot.ddfMLR}} for graphical representation of item characteristic curves. \cr
+\code{\link[difNLR]{coef.ddfMLR}} for extraction of item parameters with their standard errors. \cr
+\code{\link[difNLR]{logLik.ddfMLR}}, \code{\link[difNLR]{AIC.ddfMLR}}, \code{\link[difNLR]{BIC.ddfMLR}}
+for extraction of loglikelihood and information criteria. \cr
+
+\code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
+\code{\link[nnet]{multinom}} for estimation function using neural networks.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
