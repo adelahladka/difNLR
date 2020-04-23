@@ -171,7 +171,7 @@ used and parameters with standard errors are re-calculated by delta method. Howe
 with alternative parameterization.
 }
 \examples{
-# loading data based on GMAT
+# Loading data based on GMAT
 data(GMAT)
 
 Data <- GMAT[, 1:20]

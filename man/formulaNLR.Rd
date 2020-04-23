@@ -4,8 +4,7 @@
 \alias{formulaNLR}
 \title{Formula for non-linear regression DIF model.}
 \usage{
-formulaNLR(model, constraints = NULL, type = "all", parameterization = "classic",
-outcome)
+formulaNLR(model, constraints = NULL, type = "all", parameterization = "classic", outcome)
 }
 \arguments{
 \item{model}{character: generalized logistic regression model for which starting values should be

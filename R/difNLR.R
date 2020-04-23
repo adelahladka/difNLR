@@ -186,7 +186,7 @@
 #' \code{\link[difNLR]{startNLR}} for calculation of initial values of fitting algorithms in \code{difNLR()}.
 #'
 #' @examples
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMAT)
 #'
 #' Data <- GMAT[, 1:20]
@@ -877,23 +877,23 @@ print.difNLR <- function(x, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMAT)
 #'
 #' Data <- GMAT[, 1:20]
 #' group <- GMAT[, "group"]
 #'
-#' # testing both DIF effects using likelihood-ratio test and
+#' # Testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # graphical devices - characteristic curves
+#' # Graphical devices - characteristic curves
 #' plot(x)
 #' plot(x, item = x$DIFitems)
 #' plot(x, item = 1)
 #' plot(x, item = "Item1")
 #'
-#' # graphical devices - test statistics
+#' # Graphical devices - test statistics
 #' plot(x, plot.type = "stat")
 #' }
 #' @export
@@ -1317,6 +1317,9 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' the column number).
 #' @param match numeric: matching criterion for new observations.
 #' @param group numeric: group membership for new observations.
+#' @param interval character: type of interval calculation, either \code{"none"} (default) or \code{"confidence"}
+#' for confidence interval.
+#' @param level numeric: confidence level.
 #' @param ... other generic parameters for \code{predict()} function.
 #'
 #' @author
@@ -1347,7 +1350,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMAT)
 #'
 #' Data <- GMAT[, 1:20]
@@ -1358,7 +1361,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
 #' # Predicted values
-#' predict(x)
+#' summary(predict(x))
 #' predict(x, item = 1)
 #' predict(x, item = "Item1")
 #'
@@ -1366,13 +1369,18 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' predict(x, item = 1, match = 0, group = 0) # reference group
 #' predict(x, item = 1, match = 0, group = 1) # focal group
 #'
-#' # Predicted values for new observations - various z-scores
-#' predict(x, item = 1, match = c(-1, 0, 1), group = 0) # reference group
-#' predict(x, item = 1, match = c(-1, 0, 1), group = 1) # focal group
+#' # Predicted values for new observations - various z-scores and groups
+#' new.match <- rep(c(-1, 0, 1), 2)
+#' new.group <- rep(c(0, 1), each = 3)
+#' predict(x, item = 1, match = new.match, group = new.group)
+#'
+#' # Predicted values for new observations with confidence intervals
+#' predict(x, item = 1, match = new.match, group = new.group, interval = "confidence")
+#' predict(x, item = c(1, 2), match = new.match, group = new.group, interval = "confidence")
 #' }
 #'
 #' @export
-predict.difNLR <- function(object, item = "all", match, group, ...) {
+predict.difNLR <- function(object, item = "all", match, group, interval = "none", level = 0.95, ...) {
   ### checking input
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
@@ -1452,6 +1460,14 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
     ITEMS <- items
   }
 
+  if (!interval %in% c("none", "confidence")) {
+    warning(
+      "Only confidence interval is supported. ",
+      call. = FALSE
+    )
+    interval <- "none"
+  }
+
   PAR <- data.frame(
     a = rep(1, m), b = 0, c = 0, d = 1,
     aDif = 0, bDif = 0, cDif = 0, dDif = 0
@@ -1461,23 +1477,94 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
   }
 
   ### predicted values
-  PV <- as.list(rep(NA, m))
-  PV[ITEMS] <- lapply(ITEMS, function(i) {
-    .gNLR(
-      match, group, PAR[i, "a"], PAR[i, "b"],
-      PAR[i, "c"], PAR[i, "d"],
-      PAR[i, "aDif"], PAR[i, "bDif"],
-      PAR[i, "cDif"], PAR[i, "dDif"]
-    )
+  NEW <- lapply(1:m, function(i) {
+    if (i %in% ITEMS) {
+      .gNLR(
+        match, group, PAR[i, "a"], PAR[i, "b"],
+        PAR[i, "c"], PAR[i, "d"],
+        PAR[i, "aDif"], PAR[i, "bDif"],
+        PAR[i, "cDif"], PAR[i, "dDif"]
+      )
+    } else {
+      NA
+    }
   })
-  PV <- do.call(cbind, PV)
-  colnames(PV) <- colnames(object$Data)
-  if (dim(PV)[1] == dim(object$Data)[1]) {
-    rownames(PV) <- rownames(object$Data)
-  }
-  PV <- PV[, items]
 
-  return(PV)
+  if (interval == "confidence") {
+    DELTA_new <- as.list(rep(NA, m))
+    DELTA_new[ITEMS] <- lapply(ITEMS, function(i) {
+      attr(.delta.gNLR(
+        match, group, PAR[i, "a"], PAR[i, "b"],
+        PAR[i, "c"], PAR[i, "d"],
+        PAR[i, "aDif"], PAR[i, "bDif"],
+        PAR[i, "cDif"], PAR[i, "dDif"]
+      ), "gradient")
+    })
+
+    VCOV_par <- matrix(
+      0,
+      ncol = 8, nrow = 8,
+      dimnames = list(
+        c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
+        c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+      )
+    )
+    VCOV_par <- lapply(1:m, function(i) VCOV_par)
+    VCOV_par <- lapply(ITEMS, function(i) {
+      if (i %in% object$DIFitems) {
+        tmp <- colnames(object$covM1[[i]])
+        VCOV_par[[i]][tmp, tmp] <- object$covM1[[i]]
+      } else {
+        VCOV_par <- colnames(object$covM0[[i]])
+        VCOV_par[[i]][tmp, tmp] <- object$covM0[[i]]
+      }
+      return(VCOV_par[[i]])
+    })
+
+    SE_new <- lapply(ITEMS, function(i) {
+      sqrt(diag(DELTA_new[[i]] %*% VCOV_par[[i]] %*% t(DELTA_new[[i]])))
+    })
+
+    alpha <- 1 - level
+    n <- dim(object$Data)[[1]]
+    d <- sapply(1:m, function(i) {
+      ifelse(i %in% object$DIFitems, length(object$parM1[[i]]), length(object$parM0[[i]]))
+    })
+    df <- n - d
+
+    const <- lapply(ITEMS, function(i) SE_new[[i]] * qt(1 - alpha / 2, df = df)[ITEMS])
+
+    lwr <- lapply(ITEMS, function(i) NEW[[i]] - const[[i]])
+    upp <- lapply(ITEMS, function(i) NEW[[i]] + const[[i]])
+
+    res <- lapply(ITEMS, function(i) {
+      data.frame(cbind(
+        item = colnames(object$Data)[i],
+        match, group,
+        prob = NEW[[i]],
+        lwr.conf = lwr[[i]],
+        upr.conf = upp[[i]]
+      ))
+    })
+    res <- as.data.frame(do.call(rbind, res))
+    res$match <- as.numeric(paste(res$match))
+    res$prob <- as.numeric(paste(res$prob))
+    res$lwr.conf <- as.numeric(paste(res$lwr.conf))
+    res$upr.conf <- as.numeric(paste(res$upr.conf))
+  } else {
+    res <- lapply(ITEMS, function(i) {
+      data.frame(cbind(
+        item = colnames(object$Data)[i],
+        match, group,
+        prob = NEW[[i]]
+      ))
+    })
+    res <- as.data.frame(do.call(rbind, res))
+    res$match <- as.numeric(paste(res$match))
+    res$prob <- as.numeric(paste(res$prob))
+  }
+
+  return(res)
 }
 
 #' Extract model coefficients from an object of \code{"difNLR"} class.
@@ -1518,7 +1605,7 @@ predict.difNLR <- function(object, item = "all", match, group, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMAT)
 #'
 #' Data <- GMAT[, 1:20]
@@ -1620,7 +1707,7 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMAT)
 #'
 #' Data <- GMAT[, 1:20]
@@ -1634,6 +1721,7 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #' AIC(x)
 #' BIC(x)
 #' logLik(x)
+#'
 #' # AIC, BIC, log-likelihood for the first item
 #' AIC(x, item = 1)
 #' BIC(x, item = 1)
@@ -1884,7 +1972,7 @@ BIC.difNLR <- function(object, item = "all", ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMAT)
 #'
 #' Data <- GMAT[, 1:20]
@@ -1974,3 +2062,8 @@ residuals.difNLR <- function(object, item = "all", ...) {
 .gNLR_group <- function(x, a, b, c, d) {
   return(c + (d - c) / (1 + exp(-(a * (x - b)))))
 }
+
+.delta.gNLR <- deriv(y ~ (c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))),
+  namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
+  function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {}
+)

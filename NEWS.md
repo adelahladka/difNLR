@@ -1,8 +1,17 @@
 ## Changes and developments in the difNLR package
 
-### Changes in version 1.3.3 (2020-04-21)
+### Changes in version 1.3.3 (2020-04-23)
 
 **_THIS IS A CRAN VERSION_**
+
+#### BUGFIXING
+  * Bug in calculation of standard errors for estimates of `difNLR()` 
+    was fixed.
+    
+#### MAJOR UPDATES
+  * Confidence intervals were added into `predict.difNLR()` method.
+  * Delta method for alternative parametrization is now applied for whole 
+    covariance matrix in `difNLR()`.
 
 #### DOCUMENTATION
   * Documentation of the package was updated.
@@ -10,6 +19,8 @@
   * Documentation of main functions was updated:
     - S3 methods are now referenced in See Also sections.
     - S3 methods are now documented in seperate files.
+  * CITATION file was updated.
+  * Formatting was improved.
 
 #### MINOR UPDATES
   * Legends in `plot.difNLR()`, `plot.difORD()` and `plot.ddfMLR()` were unified.

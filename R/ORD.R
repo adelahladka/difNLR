@@ -30,9 +30,10 @@
 #' intercept-slope parametrization. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
-#' anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
-#' alpha = 0.05)
+#' @usage
+#' ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
+#'     anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
+#'     alpha = 0.05)
 #'
 #' @details
 #' Calculates DIF likelihood ratio statistics based either on adjacent category logit model

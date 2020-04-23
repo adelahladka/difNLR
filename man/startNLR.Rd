@@ -5,7 +5,7 @@
 \title{Calculates starting values for non-linear regression DIF models.}
 \usage{
 startNLR(Data, group, model, match = "zscore", parameterization = "alternative",
-simplify = FALSE)
+         simplify = FALSE)
 }
 \arguments{
 \item{Data}{Data data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}

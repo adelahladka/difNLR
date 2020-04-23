@@ -120,7 +120,7 @@ Missing values are allowed but discarded for item estimation. They must be coded
 for both, \code{Data} and \code{group} arguments.
 }
 \examples{
-# loading data based on GMAT
+# Loading data based on GMAT
 data(GMATtest, GMATkey)
 
 Data <- GMATtest[, 1:20]
@@ -140,12 +140,13 @@ plot(x, item = 1)
 AIC(x)
 BIC(x)
 logLik(x)
+
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
 
-# estimates
+# Estimates
 coef(x)
 coef(x, SE = TRUE)
 coef(x, SE = TRUE, simplify = TRUE)

@@ -27,7 +27,7 @@ Schwarz's Bayesian criterion (BIC) for an object of \code{"difORD"} class.
 }
 \examples{
 \dontrun{
-# loading data
+# Loading data
 data(dataMedicalgraded, package = "ShinyItemAnalysis")
 Data <- dataMedicalgraded[, 1:5]
 group <- dataMedicalgraded[, 101]
@@ -39,6 +39,7 @@ group <- dataMedicalgraded[, 101]
 AIC(x)
 BIC(x)
 logLik(x)
+
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)

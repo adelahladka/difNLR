@@ -21,17 +21,17 @@ S3 method for extracting estimated model coefficients from an object of \code{"d
 }
 \examples{
 \dontrun{
-# loading data based on GMAT
+# Loading data based on GMAT
 data(GMATtest, GMATkey)
 
 Data <- GMATtest[, 1:20]
 group <- GMATtest[, "group"]
 key <- GMATkey
 
-# testing both DDF effects
+# Testing both DDF effects
 (x <- ddfMLR(Data, group, focal.name = 1, key))
 
-# estimated parameters
+# Estimated parameters
 coef(x)
 coef(x, SE = TRUE)
 coef(x, simplify = TRUE)

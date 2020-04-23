@@ -5,8 +5,8 @@
 \title{DIF statistics based on non-linear regression model.}
 \usage{
 NLR(Data, group, model, constraints = NULL, type = "all", method = "nls",
-match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
-alpha = 0.05, initboot = T, nrBo = 20)
+    match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
+    alpha = 0.05, initboot = TRUE, nrBo = 20)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
@@ -130,8 +130,7 @@ parameters should be fixed for both groups. For example, choice \code{"ad"} mean
 (\code{"b"} and \code{"c"}) are not. The \code{NA} value for \code{constraints} means no constraints.
 
 In case that model considers difference in guessing or inattention parameter, the different parameterization is
-used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick with
-alternative parameterization.
+used and parameters with standard errors are re-calculated by delta method.
 }
 \examples{
 \dontrun{

@@ -30,7 +30,7 @@ Plotted curves represent the best model.
 }
 \examples{
 \dontrun{
-# loading data based on GMAT
+# Loading data based on GMAT
 data(GMATtest, GMATkey)
 
 Data <- GMATtest[, 1:20]

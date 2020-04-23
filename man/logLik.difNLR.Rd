@@ -27,7 +27,7 @@ Schwarz's Bayesian criterion (BIC) for an object of \code{"difNLR"} class.
 }
 \examples{
 \dontrun{
-# loading data based on GMAT
+# Loading data based on GMAT
 data(GMAT)
 
 Data <- GMAT[, 1:20]
@@ -41,6 +41,7 @@ group <- GMAT[, "group"]
 AIC(x)
 BIC(x)
 logLik(x)
+
 # AIC, BIC, log-likelihood for the first item
 AIC(x, item = 1)
 BIC(x, item = 1)

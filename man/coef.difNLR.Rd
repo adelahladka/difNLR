@@ -21,7 +21,7 @@ S3 method for extracting model coefficients from an object of \code{"difNLR"} cl
 }
 \examples{
 \dontrun{
-# loading data based on GMAT
+# Loading data based on GMAT
 data(GMAT)
 
 Data <- GMAT[, 1:20]

@@ -19,8 +19,9 @@
 #' @description Calculates starting values for \code{difNLR()} function based
 #' on linear approximation.
 #'
-#' @usage startNLR(Data, group, model, match = "zscore", parameterization = "alternative",
-#' simplify = FALSE)
+#' @usage
+#' startNLR(Data, group, model, match = "zscore", parameterization = "alternative",
+#'          simplify = FALSE)
 #'
 #' @details
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct

@@ -5,8 +5,8 @@
 \title{DIF likelihood ratio statistics for ordinal data.}
 \usage{
 ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
-anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
-alpha = 0.05)
+    anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
+    alpha = 0.05)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and

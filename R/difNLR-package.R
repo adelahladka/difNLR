@@ -17,7 +17,7 @@
 #' @importFrom nnet multinom
 #' @importFrom plyr ldply
 #' @importFrom reshape2 melt
-#' @importFrom stats AIC as.formula anova BIC coef complete.cases deriv3 deviance fitted logLik na.omit nls p.adjust p.adjust.methods pf pchisq rbinom relevel rnorm setNames symnum qf qchisq quantile vcov
+#' @importFrom stats AIC as.formula anova BIC coef complete.cases deriv3 deviance fitted logLik na.omit nls p.adjust p.adjust.methods pf pchisq rbinom relevel rnorm setNames symnum qf qchisq qt quantile vcov
 #' @importFrom msm deltamethod
 #' @importFrom VGAM acat AICvlm BICvlm cumulative lrtest_vglm
 #'
@@ -45,7 +45,7 @@
 #' Package: difNLR\cr
 #' Type: Package\cr
 #' Version: 1.3.3\cr
-#' Date: 2020-04-21\cr
+#' Date: 2020-04-23\cr
 #' Depends: R (>= 3.1)\cr
 #' Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 #' Suggests: ShinyItemAnalysis\cr

@@ -23,8 +23,8 @@
 #' See \strong{Details}.
 #' @param outcome character: name of outcome to be printed in formula. If not specified \code{"y"} is used.
 #'
-#' @usage formulaNLR(model, constraints = NULL, type = "all", parameterization = "classic",
-#' outcome)
+#' @usage
+#' formulaNLR(model, constraints = NULL, type = "all", parameterization = "classic", outcome)
 #'
 #' @details
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct

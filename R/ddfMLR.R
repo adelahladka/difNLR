@@ -124,7 +124,7 @@
 #' \code{\link[nnet]{multinom}} for estimation function using neural networks.
 #'
 #' @examples
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMATtest, GMATkey)
 #'
 #' Data <- GMATtest[, 1:20]
@@ -144,13 +144,13 @@
 #' AIC(x)
 #' BIC(x)
 #' logLik(x)
-
+#'
 #' # AIC, BIC, log-likelihood for the first item
 #' AIC(x, item = 1)
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
 #'
-#' # estimates
+#' # Estimates
 #' coef(x)
 #' coef(x, SE = TRUE)
 #' coef(x, SE = TRUE, simplify = TRUE)
@@ -552,7 +552,7 @@ print.ddfMLR <- function(x, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMATtest, GMATkey)
 #'
 #' Data <- GMATtest[, 1:20]
@@ -805,17 +805,17 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMATtest, GMATkey)
 #'
 #' Data <- GMATtest[, 1:20]
 #' group <- GMATtest[, "group"]
 #' key <- GMATkey
 #'
-#' # testing both DDF effects
+#' # Testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
-#' # estimated parameters
+#' # Estimated parameters
 #' coef(x)
 #' coef(x, SE = TRUE)
 #' coef(x, simplify = TRUE)
@@ -899,20 +899,21 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # Loading data based on GMAT
 #' data(GMATtest, GMATkey)
 #'
 #' Data <- GMATtest[, 1:20]
 #' group <- GMATtest[, "group"]
 #' key <- GMATkey
 #'
-#' # testing both DDF effects
+#' # Testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
 #' # AIC, BIC, log-likelihood
 #' AIC(x)
 #' BIC(x)
 #' logLik(x)
+#'
 #' # AIC, BIC, log-likelihood for the first item
 #' AIC(x, item = 1)
 #' BIC(x, item = 1)

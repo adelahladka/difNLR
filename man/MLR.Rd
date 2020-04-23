@@ -5,7 +5,7 @@
 \title{DDF likelihood ratio statistics based on multinomial log-linear regression model.}
 \usage{
 MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
-p.adjust.method = "none", parametrization = "irt", alpha = 0.05)
+    p.adjust.method = "none", parametrization = "irt", alpha = 0.05)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent unscored examinee answers (nominal)

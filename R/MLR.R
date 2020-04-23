@@ -29,8 +29,9 @@
 #' intercept-slope parametrization. See \strong{Details}.
 #' @param alpha numeric: significance level (default is 0.05).
 #'
-#' @usage MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
-#' p.adjust.method = "none", parametrization = "irt", alpha = 0.05)
+#' @usage
+#' MLR(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data),
+#'     p.adjust.method = "none", parametrization = "irt", alpha = 0.05)
 #'
 #' @details
 #' Calculates DDF likelihood ratio statistics based on multinomial log-linear model. Probability of

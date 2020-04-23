@@ -61,23 +61,23 @@ are used.
 }
 \examples{
 \dontrun{
-# loading data based on GMAT
+# Loading data based on GMAT
 data(GMAT)
 
 Data <- GMAT[, 1:20]
 group <- GMAT[, "group"]
 
-# testing both DIF effects using likelihood-ratio test and
+# Testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
-# graphical devices - characteristic curves
+# Graphical devices - characteristic curves
 plot(x)
 plot(x, item = x$DIFitems)
 plot(x, item = 1)
 plot(x, item = "Item1")
 
-# graphical devices - test statistics
+# Graphical devices - test statistics
 plot(x, plot.type = "stat")
 }
 }
