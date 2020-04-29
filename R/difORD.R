@@ -827,7 +827,6 @@ BIC.difORD <- function(object, item = "all", ...) {
 #' the column number).
 #' @param plot.type character: which plot should be displayed for cumulative logit regression model. Either
 #' \code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.
-#' @param title string: title of a plot.
 #' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for \code{plot()} function.
 #'
@@ -863,11 +862,11 @@ BIC.difORD <- function(object, item = "all", ...) {
 #'
 #' # Testing both DIF effects with cumulative logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
-#' plot(x, item = 3, plot.type = "cumulative", title = "Cumulative probabilities")
-#' plot(x, item = 3, plot.type = "category", title = "Category probabilities")
+#' plot(x, item = 3, plot.type = "cumulative")
+#' plot(x, item = 3, plot.type = "category")
 #' }
 #' @export
-plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
+plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
   m <- length(x$ordPAR)
   nams <- colnames(x$Data)
 
@@ -975,11 +974,7 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
   if (x$model == "adjacent") {
     for (k in 1:I) {
       i <- items[k]
-      if (!missing(title)) {
-        TITLE <- title
-      } else {
-        TITLE <- colnames(x$Data)[i]
-      }
+      TITLE <- colnames(x$Data)[i]
 
       cat <- unique(sort(x$Data[, i]))
       num.cat <- length(cat)
@@ -1102,11 +1097,7 @@ plot.difORD <- function(x, item = "all", title, plot.type, group.names, ...) {
   } else {
     for (k in 1:I) {
       i <- items[k]
-      if (!missing(title)) {
-        TITLE <- title
-      } else {
-        TITLE <- colnames(x$Data)[i]
-      }
+      TITLE <- colnames(x$Data)[i]
 
       cat <- sort(unique(x$Data[, i]))
       num.cat <- length(cat)

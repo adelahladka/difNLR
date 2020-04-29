@@ -4,12 +4,14 @@
 \name{GMAT2test}
 \alias{GMAT2test}
 \title{Dataset based on GMAT.}
-\format{A \code{GMAT2test} data frame consists of 1,000 observations on the following 21 variables:
+\format{
+A \code{GMAT2test} data frame consists of 1,000 observations on the following 21 variables:
 \describe{
 \item{Item1-Item20}{nominal items of the test coded A, B, C, and D}
 \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
 }
-Correct answers are presented in \code{\link{GMAT2key}} data set.}
+Correct answers are presented in \code{\link{GMAT2key}} data set.
+}
 \usage{
 data(GMAT2test)
 }

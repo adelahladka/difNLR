@@ -1,6 +1,6 @@
 ## Changes and developments in the difNLR package
 
-### Changes in version 1.3.3 (2020-04-23)
+### Changes in version 1.3.3 (2020-04-29)
 
 **_THIS IS A CRAN VERSION_**
 
@@ -12,6 +12,14 @@
   * Confidence intervals were added into `predict.difNLR()` method.
   * Delta method for alternative parametrization is now applied for whole 
     covariance matrix in `difNLR()`.
+  * Unnecessary arguments of `plot.difNLR()`, `plot.difORD()` and `plot.ddfMLR()`
+    were removed. Change of colours/linetypes/shapes/title can be managed using
+    standard `ggplot2` syntax.
+  * `plot.difNLR()` now offers possibility to turn off drawing of empirical 
+    probabilities using argument `draw.empirical = FALSE`.
+  * `plot.difNLR()` now offers possibility to plot confidence intervals for 
+    predicted values as offered in `predict.difNLR()` using argument 
+    `draw.CI = TRUE`.
 
 #### DOCUMENTATION
   * Documentation of the package was updated.

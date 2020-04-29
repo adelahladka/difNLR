@@ -4,13 +4,15 @@
 \name{GMATtest}
 \alias{GMATtest}
 \title{Dataset based on GMAT with the same total score distribution for groups.}
-\format{A \code{GMATtest} data frame consists of 2,000 observations on the following 22 variables:
+\format{
+A \code{GMATtest} data frame consists of 2,000 observations on the following 22 variables:
 \describe{
 \item{Item1-Item20}{nominal items of the test coded A, B, C, and D}
 \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
 \item{criterion}{continuous critetion intended to be predicted by test}
 }
-Correct answers are presented in \code{\link{GMATkey}} data set.}
+Correct answers are presented in \code{\link{GMATkey}} data set.
+}
 \usage{
 data(GMATtest)
 }

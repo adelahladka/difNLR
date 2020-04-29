@@ -530,7 +530,6 @@ print.ddfMLR <- function(x, ...) {
 #' @param item numeric or character: either character \code{"all"} to apply for all items (default),
 #' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
 #' the column number).
-#' @param title string: title of a plot.
 #' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for \code{plot()} function.
 #'
@@ -568,7 +567,7 @@ print.ddfMLR <- function(x, ...) {
 #' plot(x, item = 1)
 #' }
 #' @export
-plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
+plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   m <- length(x$mlrPAR)
   nams <- colnames(x$Data)
   if (class(item) == "character") {
@@ -645,11 +644,8 @@ plot.ddfMLR <- function(x, item = "all", title, group.names, ...) {
   plot_CC <- vector("list", length = length(items))
   for (j in 1:length(items)) {
     i <- items[[j]]
-    if (!missing(title)) {
-      TITLE <- title
-    } else {
-      TITLE <- colnames(x$Data)[i]
-    }
+
+    TITLE <- colnames(x$Data)[i]
 
     coefs <- x$mlrPAR[[i]]
     if (x$parametrization == "irt") {

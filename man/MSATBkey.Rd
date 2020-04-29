@@ -4,8 +4,10 @@
 \name{MSATBkey}
 \alias{MSATBkey}
 \title{Key of correct answers for \code{MSATBtest} dataset.}
-\format{A nominal vector with 20 values representing correct answers to items of \code{MSATBtest}
-dataset. For more details see \code{\link{MSATBtest}}.}
+\format{
+A nominal vector with 20 values representing correct answers to items of \code{MSATBtest}
+dataset. For more details see \code{\link{MSATBtest}}.
+}
 \usage{
 data(MSATBkey)
 }

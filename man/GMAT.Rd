@@ -4,12 +4,14 @@
 \name{GMAT}
 \alias{GMAT}
 \title{Dichotomous dataset based on GMAT with the same total score distribution for groups.}
-\format{A \code{GMAT} data frame consists of 2,000 observations on the following 22 variables:
+\format{
+A \code{GMAT} data frame consists of 2,000 observations on the following 22 variables:
 \describe{
 \item{Item1-Item20}{dichotomously scored items of the test}
 \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
 \item{criterion}{continuous critetion intended to be predicted by test}
-}}
+}
+}
 \usage{
 data(GMAT)
 }

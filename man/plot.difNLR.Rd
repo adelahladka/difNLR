@@ -8,12 +8,9 @@
   x,
   plot.type = "cc",
   item = "all",
-  col = c("dodgerblue2", "goldenrod2"),
-  shape = 21,
-  size = 0.8,
-  linetype = c(2, 1),
-  title,
   group.names,
+  draw.empirical = TRUE,
+  draw.CI = FALSE,
   ...
 )
 }
@@ -27,24 +24,19 @@
 or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
 the column number).}
 
-\item{col}{character: single value, or vector of two values representing colors for plot.}
-
-\item{shape}{integer: shape parameter for plot.}
-
-\item{size}{numeric: single number, or vector of two numbers representing line width in plot.}
-
-\item{linetype}{numeric: single number, or vector of two numbers representing line type in plot for
-reference and focal group.}
-
-\item{title}{string: title of a plot.}
-
 \item{group.names}{character: names of reference and focal group.}
+
+\item{draw.empirical}{logical: should empirical probabilities be plotted as points? Default value is \code{TRUE}.}
+
+\item{draw.CI}{logical: should confidence intervals for predicted values be plotted? Default value is \code{FALSE}.}
 
 \item{...}{other generic parameters for \code{plot()} function.}
 }
 \value{
 For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}. In case of
 \code{plot.type = "cc"}, returns list of objects of class \code{"ggplot"}.
+
+Outputs can be edited and modified as standard \code{"ggplot"} object including colours, titles, shapes or linetypes.
 }
 \description{
 Plot method for an object of \code{"difNLR"} class using \pkg{ggplot2}.
@@ -71,11 +63,17 @@ group <- GMAT[, "group"]
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
-# Graphical devices - characteristic curves
+# Characteristic curves
 plot(x)
 plot(x, item = x$DIFitems)
 plot(x, item = 1)
 plot(x, item = "Item1")
+
+# Characteristic curves without empirical probabilities
+plot(x, item = 1, draw.empirical = FALSE)
+
+# Characteristic curves without empirical probabilities but with CI
+plot(x, item = 1, draw.empirical = FALSE, draw.CI = TRUE)
 
 # Graphical devices - test statistics
 plot(x, plot.type = "stat")

@@ -4,8 +4,10 @@
 \name{GMAT2key}
 \alias{GMAT2key}
 \title{Key of correct answers for \code{GMAT2test} dataset.}
-\format{A nominal vector with 20 values representing correct answers to items of \code{GMAT2test}
-dataset. For more details see \code{\link{GMAT2test}}.}
+\format{
+A nominal vector with 20 values representing correct answers to items of \code{GMAT2test}
+dataset. For more details see \code{\link{GMAT2test}}.
+}
 \usage{
 data(GMAT2key)
 }

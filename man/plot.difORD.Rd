@@ -4,7 +4,7 @@
 \alias{plot.difORD}
 \title{ICC plots for an object of \code{"difORD"} class.}
 \usage{
-\method{plot}{difORD}(x, item = "all", title, plot.type, group.names, ...)
+\method{plot}{difORD}(x, item = "all", plot.type, group.names, ...)
 }
 \arguments{
 \item{x}{an object of \code{"difORD"} class.}
@@ -12,8 +12,6 @@
 \item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
 or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
 the column number).}
-
-\item{title}{string: title of a plot.}
 
 \item{plot.type}{character: which plot should be displayed for cumulative logit regression model. Either
 \code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.}
@@ -48,8 +46,8 @@ plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 
 # Testing both DIF effects with cumulative logit model
 (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
-plot(x, item = 3, plot.type = "cumulative", title = "Cumulative probabilities")
-plot(x, item = 3, plot.type = "category", title = "Category probabilities")
+plot(x, item = 3, plot.type = "cumulative")
+plot(x, item = 3, plot.type = "category")
 }
 }
 \seealso{

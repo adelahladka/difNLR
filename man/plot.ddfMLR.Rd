@@ -4,7 +4,7 @@
 \alias{plot.ddfMLR}
 \title{ICC plots for an object of \code{"ddfMLR"} class.}
 \usage{
-\method{plot}{ddfMLR}(x, item = "all", title, group.names, ...)
+\method{plot}{ddfMLR}(x, item = "all", group.names, ...)
 }
 \arguments{
 \item{x}{an object of \code{"ddfMLR"} class.}
@@ -12,8 +12,6 @@
 \item{item}{numeric or character: either character \code{"all"} to apply for all items (default),
 or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
 the column number).}
-
-\item{title}{string: title of a plot.}
 
 \item{group.names}{character: names of reference and focal group.}
 

@@ -4,11 +4,13 @@
 \name{MSATB}
 \alias{MSATB}
 \title{Dichotomous dataset of Medical School Admission Test in Biology.}
-\format{A \code{MSATB} data frame consists of 1,407 observations on the following 21 variables:
+\format{
+A \code{MSATB} data frame consists of 1,407 observations on the following 21 variables:
 \describe{
 \item{Item}{dichotomously scored items of the test}
 \item{gender}{gender of respondents, \code{"0"} males, \code{"1"} females}
-}}
+}
+}
 \usage{
 data(MSATB)
 }

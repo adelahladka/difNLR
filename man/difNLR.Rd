@@ -180,7 +180,6 @@ group <- GMAT[, "group"]
 # Testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
-
 \dontrun{
 # Graphical devices
 plot(x, item = x$DIFitems)

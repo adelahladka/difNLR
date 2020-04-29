@@ -195,7 +195,6 @@
 #' # Testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
-#'
 #' \dontrun{
 #' # Graphical devices
 #' plot(x, item = x$DIFitems)
@@ -837,17 +836,15 @@ print.difNLR <- function(x, ...) {
 #' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
 #' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
 #' the column number).
-#' @param col character: single value, or vector of two values representing colors for plot.
-#' @param shape integer: shape parameter for plot.
-#' @param size numeric: single number, or vector of two numbers representing line width in plot.
-#' @param linetype numeric: single number, or vector of two numbers representing line type in plot for
-#' reference and focal group.
-#' @param title string: title of a plot.
+#' @param draw.empirical logical: should empirical probabilities be plotted as points? Default value is \code{TRUE}.
+#' @param draw.CI logical: should confidence intervals for predicted values be plotted? Default value is \code{FALSE}.
 #' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for \code{plot()} function.
 #'
 #' @return For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}. In case of
 #' \code{plot.type = "cc"}, returns list of objects of class \code{"ggplot"}.
+#'
+#' Outputs can be edited and modified as standard \code{"ggplot"} object including colours, titles, shapes or linetypes.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -887,43 +884,54 @@ print.difNLR <- function(x, ...) {
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # Graphical devices - characteristic curves
+#' # Characteristic curves
 #' plot(x)
 #' plot(x, item = x$DIFitems)
 #' plot(x, item = 1)
 #' plot(x, item = "Item1")
+#'
+#' # Characteristic curves without empirical probabilities
+#' plot(x, item = 1, draw.empirical = FALSE)
+#'
+#' # Characteristic curves without empirical probabilities but with CI
+#' plot(x, item = 1, draw.empirical = FALSE, draw.CI = TRUE)
 #'
 #' # Graphical devices - test statistics
 #' plot(x, plot.type = "stat")
 #' }
 #' @export
 plot.difNLR <- function(x, plot.type = "cc", item = "all",
-                        col = c("dodgerblue2", "goldenrod2"), shape = 21,
-                        size = .8, linetype = c(2, 1), title, group.names, ...) {
-  plotstat <- function(x, size = size, title = title) {
+                        group.names, draw.empirical = TRUE, draw.CI = FALSE, ...) {
+
+  plotstat <- function(x) {
     if (x$conv.fail != 0) {
       if (length(x$conv.fail) == sum(!is.na(x$Sval))) {
-        switch(x$test, "F" = stop("None of items does converge.
-                                  F-statistic values not plotted", call. = FALSE),
-          "LR" = stop("None of items does converge.
-                           LR-statistic values not plotted", call. = FALSE)
+        switch(x$test,
+          "F" = stop(
+            "None of items does converge. F-statistic values not plotted",
+            call. = FALSE
+          ),
+          "LR" = stop(
+            "None of items does converge. LR-statistic values not plotted",
+            call. = FALSE
+          )
         )
       } else {
-        switch(x$test, "F" = warning(paste("Item ", x$conv.fail.which,
-          " does not converge. F-statistic value not plotted",
-          sep = "", collapse = "\n"
-        ), call. = FALSE),
-        "LR" = warning(paste("Item ", x$conv.fail.which,
-          " does not converge. LR-statistic value not plotted",
-          sep = "", collapse = "\n"
-        ), call. = FALSE)
+        switch(x$test,
+          "F" = warning(paste("Item ", x$conv.fail.which,
+            " does not converge. F-statistic value not plotted",
+            sep = "", collapse = "\n"
+          ), call. = FALSE),
+          "LR" = warning(paste("Item ", x$conv.fail.which,
+            " does not converge. LR-statistic value not plotted",
+            sep = "", collapse = "\n"
+          ), call. = FALSE)
         )
       }
     }
 
-    if (missing(title)) {
-      title <- "Non-linear regression DIF detection with none multiple comparison correction"
-    }
+    title <- "Non-linear regression DIF detection with none multiple comparison correction"
+
     n <- dim(x$Data)[1]
     if (x$test == "F") {
       if (dim(unique(x$df))[1] == 1) {
@@ -956,7 +964,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       geom_text() +
       scale_color_manual(values = c("black", "red")) +
       ### critical value
-      geom_hline(yintercept = Sval_critical, size = size) +
+      geom_hline(yintercept = Sval_critical) +
       ### theme
       ggtitle(title) +
       labs(x = "Item", y = switch(x$test,
@@ -981,13 +989,22 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   if (missing(group.names)) {
     group.names <- x$group.names
     if (all(group.names %in% c(0, 1))) group.names <- c("Reference", "Focal")
+  } else {
+    if (length(group.names) > 2) {
+      group.names <- group.names[1:2]
+      warning("Only first two values for 'group.names' argument are used.", call. = FALSE)
+    } else {
+      if (length(group.names) < 2) {
+        group.names <- c("Reference", "Focal")
+        warning("Argument 'group.names' need to have length of two. Default value is used.", call. = FALSE)
+      }
+    }
   }
 
-  plotCC <- function(x, item = item,
-                     col = col, shape = shape, size = size,
-                     linetype = linetype, title = title, group.names = group.names) {
+  plotCC <- function(x, item = item) {
     m <- length(x$nlrPAR)
     nams <- colnames(x$Data)
+
     if (class(item) == "character") {
       if (item != "all" & !item %in% nams) {
         stop("Invalid value for 'item'. Item must be either character 'all', or
@@ -1017,16 +1034,6 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       }
     }
 
-    if (length(col) == 1) {
-      col <- rep(col, 2)
-    } else {
-      if (length(col) > 2) {
-        col <- col[1:2]
-        warning("Length of 'col' is greater than 2. Only first two values are used.",
-          call. = FALSE
-        )
-      }
-    }
     if (any(x$conv.fail.which %in% items)) {
       if (length(setdiff(items, x$conv.fail.which)) == 0) {
         stop(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
@@ -1043,26 +1050,6 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         items <- setdiff(items, x$conv.fail.which)
       }
     }
-    if (length(linetype) != 2) {
-      if (length(linetype) == 1) {
-        linetype <- rep(linetype, 2)
-      } else {
-        linetype <- linetype[1:2]
-        warning("Length of 'linetype' is greater than 2. Only first two values are used.",
-          call. = FALSE
-        )
-      }
-    }
-    if (length(group.names) > 2) {
-      group.names <- group.names[1:2]
-      warning("Only first two values for 'group.names' argument are used.", call. = FALSE)
-    } else {
-      if (length(group.names) < 2) {
-        group.names <- c("Reference", "Focal")
-        warning("Argument 'group.names' need to have length of two. Default value is used.", call. = FALSE)
-      }
-    }
-
 
     if (x$purification) {
       anchor <- c(1:m)[!c(1:m) %in% x$DIFitems]
@@ -1070,7 +1057,6 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       anchor <- 1:m
     }
 
-    ### Data
     if (length(x$match) > 1) {
       xlab <- "Matching criterion"
       xR <- x$match[x$group == 0]
@@ -1087,86 +1073,97 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       }
     }
 
-    max_sts <- max(
+    max_match <- max(
       as.numeric(levels(as.factor(xR))),
-      as.numeric(levels(as.factor(xF)))
+      as.numeric(levels(as.factor(xF))),
+      na.rm = TRUE
     )
-    min_sts <- min(
+    min_match <- min(
       as.numeric(levels(as.factor(xR))),
-      as.numeric(levels(as.factor(xF)))
+      as.numeric(levels(as.factor(xF))),
+      na.rm = TRUE
     )
-    alpha <- 0.5
+
     plot_CC <- list()
 
     for (i in items) {
-      hv_R <- data.frame(cbind(
+      df_point_0 <- data.frame(cbind(
         as.numeric(levels(as.factor(xR))),
         tapply(
           x$Data[x$group == 0, i],
           as.factor(xR), mean
         )
       ))
-      hv_F <- data.frame(cbind(
+      df_point_1 <- data.frame(cbind(
         as.numeric(levels(as.factor(xF))),
         tapply(
           x$Data[x$group == 1, i],
           as.factor(xF), mean
         )
       ))
-      hv <- data.frame(rbind(
-        cbind(hv_R, Group = "Reference"),
-        cbind(hv_F, Group = "Focal")
+      df_point <- data.frame(rbind(
+        cbind(df_point_0, group = "0"),
+        cbind(df_point_1, group = "1")
       ))
-      rownames(hv) <- 1:dim(hv)[1]
-      hv$size <- c(table(xR), table(xF))
+      colnames(df_point) <- c("match", "prob", "group")
+      rownames(df_point) <- NULL
+      df_point$size <- c(table(xR), table(xF))
 
-      if (!missing(title)) {
-        TITLE <- title
-      } else {
-        TITLE <- colnames(x$Data)[i]
+      TITLE <- colnames(x$Data)[i]
+
+      df_line <- predict.difNLR(x,
+        item = i,
+        match = rep(
+          seq(floor(min_match),
+            ceiling(max_match),
+            length.out = 100
+          ),
+          2
+        ),
+        group = rep(c(0, 1), each = 100),
+        interval = "confidence"
+      )
+
+      g <- ggplot() +
+        geom_line(
+          data = df_line, aes_string(
+            x = "match", y = "prob",
+            col = "group", linetype = "group"
+          ),
+          size = .8
+        )
+      if (draw.empirical) {
+        g <- g +
+          geom_point(
+            data = df_point, aes_string(
+              x = "match", y = "prob",
+              col = "group", fill = "group",
+              size = "size"
+            ),
+            shape = 21, alpha = 0.5
+          )
+      }
+      if (draw.CI) {
+        g <- g +
+          geom_ribbon(
+            data = df_line, aes_string(
+              x = "match", y = "prob",
+              ymin = "lwr.conf", ymax = "upr.conf",
+              col = "group", fill = "group"
+            ),
+            alpha = 0.25
+          )
       }
 
-      PAR <- data.frame(
-        a = 1, b = 0, c = 0, d = 1,
-        aDif = 0, bDif = 0, cDif = 0, dDif = 0
-      )
-      PAR[names(x$nlrPAR[[i]])] <- x$nlrPAR[[i]]
-      PARR <- PAR[1:4]
-      PARF <- PAR[1:4] + PAR[5:8]
-
-      plot_CC[[i]] <- ggplot(hv, aes_string("X1", "X2")) +
-        ### points
-        geom_point(aes_string(
-          colour = "Group",
-          fill = "Group",
-          size = "size"
-        ),
-        alpha = alpha, shape = shape
-        ) +
-        ### lines
-        stat_function(aes(
-          colour = "Reference",
-          linetype = "Reference"
-        ),
-        fun = .gNLR_group,
-        args = as.list(PARR),
-        size = size,
-        geom = "line"
-        ) +
-        stat_function(aes(colour = "Focal", linetype = "Focal"),
-          fun = .gNLR_group,
-          args = as.list(PARF),
-          size = size,
-          geom = "line"
-        ) +
-        ### style
-        scale_colour_manual(breaks = levels(hv$Group), values = col, name = "Group", labels = group.names) +
-        scale_fill_manual(breaks = levels(hv$Group), values = col, name = "Group", labels = group.names) +
-        scale_linetype_manual(breaks = levels(hv$Group), values = linetype, name = "Group", labels = group.names) +
-        ### theme
+      g <- g +
+        # adjusting colours
+        scale_fill_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
+        scale_colour_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
+        scale_linetype_manual(values = c("solid", "dashed"), labels = group.names) +
         ggtitle(TITLE) +
         labs(x = xlab, y = "Probability of correct answer") +
         scale_y_continuous(limits = c(0, 1)) +
+        # theme
         theme_bw() +
         theme(
           axis.line = element_line(colour = "black"),
@@ -1191,6 +1188,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
           fill = guide_legend(title = "Group", order = 2),
           linetype = guide_legend(title = "Group", order = 2)
         )
+      plot_CC[[i]] <- g
     }
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     return(plot_CC)
@@ -1202,13 +1200,9 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     )
   } else {
     if (plot.type == "cc") {
-      plotCC(x,
-        item = item,
-        col = col, shape = shape, size = size,
-        linetype = linetype, title = title, group.names = group.names
-      )
+      plotCC(x, item = item)
     } else {
-      plotstat(x, size = size, title = title)
+      plotstat(x)
     }
   }
 }

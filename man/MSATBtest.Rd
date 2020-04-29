@@ -4,11 +4,13 @@
 \name{MSATBtest}
 \alias{MSATBtest}
 \title{Dataset of School Admission Test in Biology.}
-\format{A \code{MSATBtest} data frame consists of 1,407 observations on the following 21 variables:
+\format{
+A \code{MSATBtest} data frame consists of 1,407 observations on the following 21 variables:
 \describe{
 \item{Item}{nominal items of the test}
 \item{gender}{gender of respondents, \code{"0"} males, \code{"1"} females}
-}}
+}
+}
 \usage{
 data(MSATBtest)
 }

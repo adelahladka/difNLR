@@ -4,11 +4,13 @@
 \name{GMAT2}
 \alias{GMAT2}
 \title{Dichotomous dataset based on GMAT.}
-\format{A \code{GMAT2} data frame consists of 1,000 observations on the following 21 variables:
+\format{
+A \code{GMAT2} data frame consists of 1,000 observations on the following 21 variables:
 \describe{
 \item{Item1-Item20}{dichotomously scored items of the test}
 \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
-}}
+}
+}
 \usage{
 data(GMAT2)
 }
