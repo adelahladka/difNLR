@@ -63,7 +63,7 @@ predict(x, item = 1, match = new.match, group = new.group)
 
 # Predicted values for new observations with confidence intervals
 predict(x, item = 1, match = new.match, group = new.group, interval = "confidence")
-predict(x, item = c(1, 2), match = new.match, group = new.group, interval = "confidence")
+predict(x, item = c(2, 4), match = new.match, group = new.group, interval = "confidence")
 }
 
 }

@@ -1370,7 +1370,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #'
 #' # Predicted values for new observations with confidence intervals
 #' predict(x, item = 1, match = new.match, group = new.group, interval = "confidence")
-#' predict(x, item = c(1, 2), match = new.match, group = new.group, interval = "confidence")
+#' predict(x, item = c(2, 4), match = new.match, group = new.group, interval = "confidence")
 #' }
 #'
 #' @export
@@ -1504,18 +1504,19 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
       )
     )
     VCOV_par <- lapply(1:m, function(i) VCOV_par)
-    VCOV_par <- lapply(ITEMS, function(i) {
+    VCOV_par[ITEMS] <- lapply(ITEMS, function(i) {
       if (i %in% object$DIFitems) {
         tmp <- colnames(object$covM1[[i]])
         VCOV_par[[i]][tmp, tmp] <- object$covM1[[i]]
       } else {
-        VCOV_par <- colnames(object$covM0[[i]])
+        tmp <- colnames(object$covM0[[i]])
         VCOV_par[[i]][tmp, tmp] <- object$covM0[[i]]
       }
       return(VCOV_par[[i]])
     })
 
-    SE_new <- lapply(ITEMS, function(i) {
+    SE_new <- const <- lwr <- upp <- lapply(1:m, function(i) c())
+    SE_new[ITEMS] <- lapply(ITEMS, function(i) {
       sqrt(diag(DELTA_new[[i]] %*% VCOV_par[[i]] %*% t(DELTA_new[[i]])))
     })
 
@@ -1526,10 +1527,10 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
     })
     df <- n - d
 
-    const <- lapply(ITEMS, function(i) SE_new[[i]] * qt(1 - alpha / 2, df = df)[ITEMS])
+    const[ITEMS] <- lapply(ITEMS, function(i) SE_new[[i]] * qt(1 - alpha / 2, df = df)[i])
 
-    lwr <- lapply(ITEMS, function(i) NEW[[i]] - const[[i]])
-    upp <- lapply(ITEMS, function(i) NEW[[i]] + const[[i]])
+    lwr[ITEMS] <- lapply(ITEMS, function(i) NEW[[i]] - const[[i]])
+    upp[ITEMS] <- lapply(ITEMS, function(i) NEW[[i]] + const[[i]])
 
     res <- lapply(ITEMS, function(i) {
       data.frame(cbind(
