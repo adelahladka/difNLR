@@ -133,7 +133,6 @@
 #'
 #' # Testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
-#'
 #' \dontrun{
 #' # Graphical devices
 #' plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
@@ -733,7 +732,6 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
         ),
         alpha = 0.5, shape = 21
       ) +
-
       ylim(0, 1) +
       ggtitle(TITLE) +
       labs(

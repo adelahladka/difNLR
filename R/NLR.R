@@ -416,78 +416,106 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 
   # covariance structure
   cov.m0 <- cov.m1 <- as.list(rep(NA, m))
-  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
-  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
+  extractVCOV <- function(x) {
+    return(tryCatch(vcov(x), error = function(e) NULL))
+  }
+  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], extractVCOV)
+  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], extractVCOV)
+  if (any(sapply(cov.m1[which(!cfM1)], is.null)) | any(sapply(cov.m0[which(!cfM0)], is.null))) {
+    warning(paste(
+      "Covariance matrix cannot be computed for item",
+      which(sapply(cov.m1[which(!cfM1)], is.null) | sapply(cov.m0[which(!cfM0)], is.null)),
+      "\n"
+    ),
+    call. = FALSE
+    )
+  }
+  conv.m0 <- setdiff(1:m, unique(c(which(cfM0), which(sapply(cov.m0[which(!cfM0)], function(x) is.null(x))))))
+  conv.m1 <- setdiff(1:m, unique(c(which(cfM1), which(sapply(cov.m1[which(!cfM1)], function(x) is.null(x))))))
   # se
-  se.m1[which(!cfM1)] <- lapply(cov.m1[which(!cfM1)], function(x) sqrt(diag(x)))
-  se.m0[which(!cfM0)] <- lapply(cov.m0[which(!cfM0)], function(x) sqrt(diag(x)))
+  se.m0[conv.m0] <- lapply(cov.m0[conv.m0], function(x) sqrt(diag(x)))
+  se.m1[conv.m1] <- lapply(cov.m1[conv.m1], function(x) sqrt(diag(x)))
 
   # delta method
-  for (i in which(!cfM0)) {
+  for (i in 1:m) {
     if (parameterization[i] == "alternative") {
-      nms.m0 <- which(c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF") %in% names(par.m0[[i]]))
+      if (!(i %in% conv.m0)) {
+        names(par.m0[[i]]) <- names(se.m0[[i]]) <- gsub("cF", "cDif", names(par.m0[[i]]))
+        names(par.m0[[i]]) <- names(se.m0[[i]]) <- gsub("dF", "dDif", names(par.m0[[i]]))
+        names(par.m0[[i]]) <- names(se.m0[[i]]) <- gsub("cR", "c", names(par.m0[[i]]))
+        names(par.m0[[i]]) <- names(se.m0[[i]]) <- gsub("dR", "d", names(par.m0[[i]]))
+      } else {
+        nms.m0 <- which(c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF") %in% names(par.m0[[i]]))
 
-      par.tmp.m0 <- setNames(
-        rep(0, 8),
-        c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
-      )
-      par.tmp.m0[nms.m0] <- par.m0[[i]]
-      par.m0[[i]] <- setNames(
-        c(par.tmp.m0[1:6], par.tmp.m0[7] - par.tmp.m0[3], par.tmp.m0[8] - par.tmp.m0[4]),
-        c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
-      )[nms.m0]
-
-      cov.tmp.m0 <- matrix(
-        0,
-        ncol = 8, nrow = 8,
-        dimnames = list(
-          c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
+        par.tmp.m0 <- setNames(
+          rep(0, 8),
           c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
         )
-      )
-      cov.tmp.m0[nms.m0, nms.m0] <- cov.m0[[i]]
-      cov.m0[[i]] <- deltamethod(
-        list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
-        par.tmp.m0,
-        cov.tmp.m0,
-        ses = FALSE
-      )[nms.m0, nms.m0]
-      colnames(cov.m0[[i]]) <- rownames(cov.m0[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m0]
-      se.m0[[i]] <- sqrt(diag(cov.m0[[i]]))
+        par.tmp.m0[nms.m0] <- par.m0[[i]]
+        par.m0[[i]] <- setNames(
+          c(par.tmp.m0[1:6], par.tmp.m0[7] - par.tmp.m0[3], par.tmp.m0[8] - par.tmp.m0[4]),
+          c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+        )[nms.m0]
+
+        cov.tmp.m0 <- matrix(
+          0,
+          ncol = 8, nrow = 8,
+          dimnames = list(
+            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
+            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+          )
+        )
+        cov.tmp.m0[nms.m0, nms.m0] <- cov.m0[[i]]
+        cov.m0[[i]] <- deltamethod(
+          list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
+          par.tmp.m0,
+          cov.tmp.m0,
+          ses = FALSE
+        )[nms.m0, nms.m0]
+        colnames(cov.m0[[i]]) <- rownames(cov.m0[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m0]
+        se.m0[[i]] <- sqrt(diag(cov.m0[[i]]))
+      }
     }
   }
 
-  for (i in which(!cfM1)) {
+  for (i in 1:m) {
     if (parameterization[i] == "alternative") {
-      nms.m1 <- which(c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF") %in% names(par.m1[[i]]))
+      if (!(i %in% conv.m1)) {
+        names(par.m1[[i]]) <- names(se.m1[[i]]) <- gsub("cF", "cDif", names(par.m1[[i]]))
+        names(par.m1[[i]]) <- names(se.m1[[i]]) <- gsub("dF", "dDif", names(par.m1[[i]]))
+        names(par.m1[[i]]) <- names(se.m1[[i]]) <- gsub("cR", "c", names(par.m1[[i]]))
+        names(par.m1[[i]]) <- names(se.m1[[i]]) <- gsub("dR", "d", names(par.m1[[i]]))
+      } else {
+        nms.m1 <- which(c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF") %in% names(par.m1[[i]]))
 
-      par.tmp.m1 <- setNames(
-        rep(0, 8),
-        c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
-      )
-      par.tmp.m1[nms.m1] <- par.m1[[i]]
-      par.m1[[i]] <- setNames(
-        c(par.tmp.m1[1:6], par.tmp.m1[7] - par.tmp.m1[3], par.tmp.m1[8] - par.tmp.m1[4]),
-        c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
-      )[nms.m1]
-
-      cov.tmp.m1 <- matrix(
-        0,
-        ncol = 8, nrow = 8,
-        dimnames = list(
-          c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
+        par.tmp.m1 <- setNames(
+          rep(0, 8),
           c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
         )
-      )
-      cov.tmp.m1[nms.m1, nms.m1] <- cov.m1[[i]]
-      cov.m1[[i]] <- deltamethod(
-        list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
-        par.tmp.m1,
-        cov.tmp.m1,
-        ses = FALSE
-      )[nms.m1, nms.m1]
-      colnames(cov.m1[[i]]) <- rownames(cov.m1[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m1]
-      se.m1[[i]] <- sqrt(diag(cov.m1[[i]]))
+        par.tmp.m1[nms.m1] <- par.m1[[i]]
+        par.m1[[i]] <- setNames(
+          c(par.tmp.m1[1:6], par.tmp.m1[7] - par.tmp.m1[3], par.tmp.m1[8] - par.tmp.m1[4]),
+          c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+        )[nms.m1]
+
+        cov.tmp.m1 <- matrix(
+          0,
+          ncol = 8, nrow = 8,
+          dimnames = list(
+            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
+            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+          )
+        )
+        cov.tmp.m1[nms.m1, nms.m1] <- cov.m1[[i]]
+        cov.m1[[i]] <- deltamethod(
+          list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
+          par.tmp.m1,
+          cov.tmp.m1,
+          ses = FALSE
+        )[nms.m1, nms.m1]
+        colnames(cov.m1[[i]]) <- rownames(cov.m1[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m1]
+        se.m1[[i]] <- sqrt(diag(cov.m1[[i]]))
+      }
     }
   }
 

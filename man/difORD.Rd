@@ -135,7 +135,6 @@ group <- dataMedicalgraded[, 101]
 
 # Testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
-
 \dontrun{
 # Graphical devices
 plot(x, item = 3)

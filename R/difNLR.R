@@ -503,14 +503,22 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       nlrPAR <- nlrSE <- lapply(
         1:length(PROV$par.m1),
         function(i) {
-          structure(rep(0, length(PROV$par.m1[[i]])),
-            names = names(PROV$par.m1[[i]])
-          )
+          if (i %in% PROV$conv.fail.which) {
+            structure(rep(NA, length(PROV$par.m1[[i]])),
+              names = names(PROV$par.m1[[i]])
+            )
+          } else {
+            structure(rep(0, length(PROV$par.m1[[i]])),
+              names = names(PROV$par.m1[[i]])
+            )
+          }
         }
       )
       for (i in 1:length(PROV$par.m1)) {
-        nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
-        nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
+        if (!(i %in% PROV$conv.fail.which)) {
+          nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
+          nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
+        }
       }
 
       if (length(significant) > 0) {
@@ -617,17 +625,26 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         PROV <- prov2
         STATS <- stats2
         significant1 <- which(PROV$adjusted.pval < alpha)
+
         nlrPAR <- nlrSE <- lapply(
           1:length(PROV$par.m1),
           function(i) {
-            structure(rep(0, length(PROV$par.m1[[i]])),
-              names = names(PROV$par.m1[[i]])
-            )
+            if (i %in% PROV$conv.fail.which) {
+              structure(rep(NA, length(PROV$par.m1[[i]])),
+                names = names(PROV$par.m1[[i]])
+              )
+            } else {
+              structure(rep(0, length(PROV$par.m1[[i]])),
+                names = names(PROV$par.m1[[i]])
+              )
+            }
           }
         )
         for (i in 1:length(PROV$par.m1)) {
-          nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
-          nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
+          if (!(i %in% PROV$conv.fail.which)) {
+            nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
+            nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
+          }
         }
 
         if (length(significant1) > 0) {
@@ -902,7 +919,6 @@ print.difNLR <- function(x, ...) {
 #' @export
 plot.difNLR <- function(x, plot.type = "cc", item = "all",
                         group.names, draw.empirical = TRUE, draw.CI = FALSE, ...) {
-
   plotstat <- function(x) {
     if (x$conv.fail != 0) {
       if (length(x$conv.fail) == sum(!is.na(x$Sval))) {

@@ -7,6 +7,11 @@
 #### BUGFIXING
   * Bug in calculation of standard errors for estimates of `difNLR()` 
     was fixed.
+  * Bug in coefficients of `difNLR()` for non-converged items including naming 
+    of parameters was fixed (Reported by Jan Netik).
+  * In case that covariance matrix cannot be computed in `NLR()`, function 
+    gives warning and `NA` values for covariance matrix and vector of standard
+    errors are returned.
     
 #### MAJOR UPDATES
   * Confidence intervals were added into `predict.difNLR()` method.
@@ -20,6 +25,8 @@
   * `plot.difNLR()` now offers possibility to plot confidence intervals for 
     predicted values as offered in `predict.difNLR()` using argument 
     `draw.CI = TRUE`.
+  * Starting values calculated via `startNLR()` were improved for `score` as 
+    matching criterion using argument `match`.
 
 #### DOCUMENTATION
   * Documentation of the package was updated.
