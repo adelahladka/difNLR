@@ -175,6 +175,12 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
     }
   }
 
+  M_R <- mean(MATCH[group == 0], na.rm = TRUE)
+  M_F <- mean(MATCH[group == 1], na.rm = TRUE)
+  SD_R <- sd(MATCH[group == 0], na.rm = TRUE)
+  SD_F <- sd(MATCH[group == 1], na.rm = TRUE)
+  MATCH <- scale(MATCH)
+
   line <- startNLR_line(MATCH, DATA = Data)
 
   data_R <- data.frame(Data[group == 0, ]) ### reference group
@@ -243,6 +249,11 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
 
   b_R <- ((d_R + c_R) / 2 - line_R$q) / line_R$k
   b_F <- ((d_F + c_F) / 2 - line_F$q) / line_F$k
+
+  a_R <- a_R / SD_R
+  a_F <- a_F / SD_F
+  b_R <- b_R * SD_R + M_R
+  b_F <- b_F * SD_F + M_F
 
   if (length(unique(parameterization)) == 1 & simplify) {
     results <- switch(unique(parameterization),
