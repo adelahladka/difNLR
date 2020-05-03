@@ -261,7 +261,10 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
 
     if (itemtype == "ordinal") {
       uval <- lapply(1:m, function(i) sort(unique(answer[, i])))
-      answer <- as.data.frame(sapply(1:m, function(i) factor(answer[, i], levels = uval[[i]], ordered = T)))
+      answer <- as.data.frame(answer)
+      for (i in 1:m) {
+        answer[, i] <- factor(answer[, i], ordered = TRUE)
+      }
     }
 
     if (itemtype == "nominal") {

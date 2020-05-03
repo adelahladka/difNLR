@@ -1035,7 +1035,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
       df.emp.cat$group <- as.factor(df.emp.cat$group)
       levels(df.emp.cat$category) <- paste0("P(Y = ", levels(df.emp.cat$category), ")")
 
-      cbPalette <- c("#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
+      cbPalette <- c("black", "#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
       num.col <- ceiling(length(levels(df.probs.cat$category)) / 8)
       cols <- rep(cbPalette, num.col)[1:length(levels(df.probs.cat$category))]
 
