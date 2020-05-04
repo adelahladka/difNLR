@@ -37,6 +37,9 @@ For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}
 \code{plot.type = "cc"}, returns list of objects of class \code{"ggplot"}.
 
 Outputs can be edited and modified as standard \code{"ggplot"} object including colours, titles, shapes or linetypes.
+
+Note that option \code{draw.CI = TRUE} returns confidence intervals for predicted values as calculated by
+\code{\link[difNLR]{predict.difNLR}}. Confidence intervals may overlapped even in case that item functions differently.
 }
 \description{
 Plot method for an object of \code{"difNLR"} class using \pkg{ggplot2}.
@@ -90,6 +93,7 @@ Journal of Educational Measurement, 27(4), 361-370,
 }
 \seealso{
 \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+\code{\link[difNLR]{predict.difNLR}} for prediction.
 \code{\link[ggplot2]{ggplot}} for general function to plot a \code{"ggplot"} object.
 }
 \author{

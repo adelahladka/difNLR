@@ -863,6 +863,9 @@ print.difNLR <- function(x, ...) {
 #'
 #' Outputs can be edited and modified as standard \code{"ggplot"} object including colours, titles, shapes or linetypes.
 #'
+#' Note that option \code{draw.CI = TRUE} returns confidence intervals for predicted values as calculated by
+#' \code{\link[difNLR]{predict.difNLR}}. Confidence intervals may overlapped even in case that item functions differently.
+#'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
@@ -887,6 +890,7 @@ print.difNLR <- function(x, ...) {
 #'
 #' @seealso
 #' \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+#' \code{\link[difNLR]{predict.difNLR}} for prediction.
 #' \code{\link[ggplot2]{ggplot}} for general function to plot a \code{"ggplot"} object.
 #'
 #' @examples
