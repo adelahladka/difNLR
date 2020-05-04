@@ -864,7 +864,7 @@ print.difNLR <- function(x, ...) {
 #' Outputs can be edited and modified as standard \code{"ggplot"} object including colours, titles, shapes or linetypes.
 #'
 #' Note that option \code{draw.CI = TRUE} returns confidence intervals for predicted values as calculated by
-#' \code{\link[difNLR]{predict.difNLR}}. Confidence intervals may overlapped even in case that item functions differently.
+#' \code{\link[difNLR]{predict.difNLR}}. Confidence intervals may overlap even in case that item functions differently.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr

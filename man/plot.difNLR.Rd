@@ -39,7 +39,7 @@ For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}
 Outputs can be edited and modified as standard \code{"ggplot"} object including colours, titles, shapes or linetypes.
 
 Note that option \code{draw.CI = TRUE} returns confidence intervals for predicted values as calculated by
-\code{\link[difNLR]{predict.difNLR}}. Confidence intervals may overlapped even in case that item functions differently.
+\code{\link[difNLR]{predict.difNLR}}. Confidence intervals may overlap even in case that item functions differently.
 }
 \description{
 Plot method for an object of \code{"difNLR"} class using \pkg{ggplot2}.
