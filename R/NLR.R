@@ -421,10 +421,15 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   }
   cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], extractVCOV)
   cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], extractVCOV)
-  if (any(sapply(cov.m1[which(!cfM1)], is.null)) | any(sapply(cov.m0[which(!cfM0)], is.null))) {
+
+  cov.fail1 <- which(sapply(cov.m1, is.null))
+  cov.fail0 <- which(sapply(cov.m0, is.null))
+  cov.fail <- sort(union(cov.fail1, cov.fail0))
+
+  if (length(cov.fail) > 0) {
     warning(paste(
       "Covariance matrix cannot be computed for item",
-      which(sapply(cov.m1[which(!cfM1)], is.null) | sapply(cov.m0[which(!cfM0)], is.null)),
+      cov.fail,
       "\n"
     ),
     call. = FALSE
@@ -457,23 +462,25 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
           c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
         )[nms.m0]
 
-        cov.tmp.m0 <- matrix(
-          0,
-          ncol = 8, nrow = 8,
-          dimnames = list(
-            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
-            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+        if (!(i %in% cov.fail0)) {
+          cov.tmp.m0 <- matrix(
+            0,
+            ncol = 8, nrow = 8,
+            dimnames = list(
+              c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
+              c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+            )
           )
-        )
-        cov.tmp.m0[nms.m0, nms.m0] <- cov.m0[[i]]
-        cov.m0[[i]] <- deltamethod(
-          list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
-          par.tmp.m0,
-          cov.tmp.m0,
-          ses = FALSE
-        )[nms.m0, nms.m0]
-        colnames(cov.m0[[i]]) <- rownames(cov.m0[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m0]
-        se.m0[[i]] <- sqrt(diag(cov.m0[[i]]))
+          cov.tmp.m0[nms.m0, nms.m0] <- cov.m0[[i]]
+          cov.m0[[i]] <- deltamethod(
+            list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
+            par.tmp.m0,
+            cov.tmp.m0,
+            ses = FALSE
+          )[nms.m0, nms.m0]
+          colnames(cov.m0[[i]]) <- rownames(cov.m0[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m0]
+          se.m0[[i]] <- sqrt(diag(cov.m0[[i]]))
+        }
       }
     }
   }
@@ -498,23 +505,25 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
           c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
         )[nms.m1]
 
-        cov.tmp.m1 <- matrix(
-          0,
-          ncol = 8, nrow = 8,
-          dimnames = list(
-            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
-            c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+        if (!(i %in% cov.fail1)) {
+          cov.tmp.m1 <- matrix(
+            0,
+            ncol = 8, nrow = 8,
+            dimnames = list(
+              c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF"),
+              c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+            )
           )
-        )
-        cov.tmp.m1[nms.m1, nms.m1] <- cov.m1[[i]]
-        cov.m1[[i]] <- deltamethod(
-          list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
-          par.tmp.m1,
-          cov.tmp.m1,
-          ses = FALSE
-        )[nms.m1, nms.m1]
-        colnames(cov.m1[[i]]) <- rownames(cov.m1[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m1]
-        se.m1[[i]] <- sqrt(diag(cov.m1[[i]]))
+          cov.tmp.m1[nms.m1, nms.m1] <- cov.m1[[i]]
+          cov.m1[[i]] <- deltamethod(
+            list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4),
+            par.tmp.m1,
+            cov.tmp.m1,
+            ses = FALSE
+          )[nms.m1, nms.m1]
+          colnames(cov.m1[[i]]) <- rownames(cov.m1[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")[nms.m1]
+          se.m1[[i]] <- sqrt(diag(cov.m1[[i]]))
+        }
       }
     }
   }

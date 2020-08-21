@@ -8,9 +8,9 @@ citEntry(entry = "Article",
          author = personList(as.person("Adela Hladka"),
                              as.person("Patricia Martinkova")),
          year = "2020",
-         note = "Under review",
+         note = "Accepted",
          journal = "The R Journal",
-         textVersion = "Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection. The R Journal. Under review.")
+         textVersion = "Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection. The R Journal. Accepted.")
 
 citEntry(entry = "Manual",
          title = "{difNLR}: {DIF} and {DDF} Detection by Non-Linear Regression Models.",

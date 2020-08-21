@@ -26,13 +26,13 @@ Or you can get the newest development version from GitHub:
 devtools::install_github("adelahladka/difNLR")
 ```
 ## Version
-Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.3.3. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.3.3.
+Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is 1.3.4. The newest development version available on [**GitHub**](https://github.com/drabinova/difNLR) is 1.3.4.
 
 ## Reference
 To cite `difNLR` package in publications, please, use:
 
   Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection. 
-  The R journal. Under review.
+  The R journal. Accepted.
 
   Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with
   Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. Journal of
