@@ -5,7 +5,7 @@
 **_THIS IS A CRAN VERSION_**
 
 #### BUGFIXING
-  * Error when covariance matrix cannot be computed for some items in difNLR()
+  * Error when covariance matrix cannot be computed for some items in `difNLR()`
     function was fixed.
 
 ------  
