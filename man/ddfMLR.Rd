@@ -120,6 +120,7 @@ Missing values are allowed but discarded for item estimation. They must be coded
 for both, \code{Data} and \code{group} arguments.
 }
 \examples{
+\dontrun{
 # Loading data based on GMAT
 data(GMATtest, GMATkey)
 
@@ -129,7 +130,7 @@ key <- GMATkey
 
 # Testing both DDF effects
 (x <- ddfMLR(Data, group, focal.name = 1, key))
-\dontrun{
+
 # Graphical devices
 plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 plot(x, item = x$DDFitems)

@@ -1,6 +1,6 @@
 ## Changes and developments in the difNLR package
 
-### Changes in version 1.3.4 (2020-08-21)
+### Changes in version 1.3.4/1.3.5 (2020-08-24)
 
 **_THIS IS A CRAN VERSION_**
 
@@ -8,6 +8,9 @@
   * Error when covariance matrix cannot be computed for some items in `difNLR()`
     function was fixed.
 
+#### DOCUMENTATION
+  * URLs for GH were updated.
+  
 ------  
   
 ### Changes in version 1.3.3 (2020-04-29)

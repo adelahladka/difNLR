@@ -124,6 +124,7 @@
 #' \code{\link[nnet]{multinom}} for estimation function using neural networks.
 #'
 #' @examples
+#' \dontrun{
 #' # Loading data based on GMAT
 #' data(GMATtest, GMATkey)
 #'
@@ -133,7 +134,7 @@
 #'
 #' # Testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
-#' \dontrun{
+#'
 #' # Graphical devices
 #' plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 #' plot(x, item = x$DDFitems)

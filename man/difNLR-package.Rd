@@ -17,8 +17,8 @@ functioning (DDF) based on multinomial log-linear regression model.
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.3.4\cr
-Date: 2020-08-21\cr
+Version: 1.3.5\cr
+Date: 2020-08-24\cr
 Depends: R (>= 3.1)\cr
 Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 Suggests: ShinyItemAnalysis\cr
