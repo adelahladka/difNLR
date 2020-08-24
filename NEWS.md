@@ -7,7 +7,8 @@
 #### BUGFIXING
   * Error when covariance matrix cannot be computed for some items in difNLR()
     function was fixed.
-  
+
+------  
   
 ### Changes in version 1.3.3 (2020-04-29)
 
