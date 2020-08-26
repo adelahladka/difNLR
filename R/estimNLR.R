@@ -166,7 +166,7 @@ print.lkl <- function(x, ...) {
 #' @rdname lkl
 #' @export
 vcov.lkl <- function(object, ...) {
-  object$hessian
+  solve(object$hessian)
 }
 
 #' @rdname lkl
