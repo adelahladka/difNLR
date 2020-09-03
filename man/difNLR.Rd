@@ -6,7 +6,7 @@
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
        match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-       alpha = 0.05, p.adjust.method = "none", start, initboot = T, nrBo = 20)
+       alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
@@ -50,7 +50,8 @@ Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
 \item{nrIter}{numeric: the maximal number of iterations in the item purification (default is 10).}
 
 \item{test}{character: test to be performed for DIF detection. Can be either \code{"LR"} for
-likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a submodel.}
+likelihood ratio test of a submodel (default), \code{"W"} for Wald test, or \code{"F"} for F-test
+of a submodel.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 
@@ -218,7 +219,10 @@ AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
 
-# Testing both DIF effects using F test and
+# Testing both DIF effects using Wald test and
+# 3PL model with fixed guessing for groups
+difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "W")
+#' # Testing both DIF effects using F test and
 # 3PL model with fixed guessing for groups
 difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
 

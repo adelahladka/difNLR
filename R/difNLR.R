@@ -36,7 +36,8 @@
 #' @param purify logical: should the item purification be applied? (default is \code{FALSE}).
 #' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
 #' @param test character: test to be performed for DIF detection. Can be either \code{"LR"} for
-#' likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a submodel.
+#' likelihood ratio test of a submodel (default), \code{"W"} for Wald test, or \code{"F"} for F-test
+#' of a submodel.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param p.adjust.method character: method for multiple comparison correction. Possible values are
 #' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
@@ -57,7 +58,7 @@
 #' @usage
 #' difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
 #'        match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-#'        alpha = 0.05, p.adjust.method = "none", start, initboot = T, nrBo = 20)
+#'        alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20)
 #'
 #' @details
 #' DIF detection procedure based on non-linear regression is the extension of logistic regression
@@ -233,7 +234,10 @@
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
 #'
-#' # Testing both DIF effects using F test and
+#' # Testing both DIF effects using Wald test and
+#' # 3PL model with fixed guessing for groups
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "W")
+#' #' # Testing both DIF effects using F test and
 #' # 3PL model with fixed guessing for groups
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
 #'
@@ -273,7 +277,7 @@
 difNLR <- function(Data, group, focal.name, model, constraints, type = "all", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start,
-                   initboot = T, nrBo = 20) {
+                   initboot = TRUE, nrBo = 20) {
   if (any(type == "nudif" & model == "1PL")) {
     stop("Detection of non-uniform DIF is not possible with 1PL model.", call. = FALSE)
   }
@@ -306,8 +310,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     stop("Purification not allowed when matching variable is not 'zscore' or 'score'.", call. = FALSE)
   }
   ### test
-  if (!test %in% c("F", "LR") | !is.character(type)) {
-    stop("Invalid value for 'test'. Test for DIF detection must be either 'F' or 'LR'.", call. = FALSE)
+  if (!test %in% c("F", "LR", "W") | !is.character(type)) {
+    stop("Invalid value for 'test'. Test for DIF detection must be either 'LR', 'W', or 'F'.", call. = FALSE)
   }
   ### significance level
   if (alpha > 1 | alpha < 0) {
@@ -725,7 +729,8 @@ print.difNLR <- function(x, ...) {
     paste("\n\nGeneralized logistic regression ",
       switch(x$test,
         "F" = "F-test",
-        "LR" = "likelihood ratio chi-square"
+        "LR" = "likelihood ratio chi-square",
+        "W" = "Wald test"
       ),
       " statistics",
       ifelse(length(unique(x$model)) == 1,
@@ -792,20 +797,22 @@ print.difNLR <- function(x, ...) {
     tab <- matrix(cbind(tab, sign), ncol = 3)
     colnames(tab) <- switch(x$test,
       "F" = c("F-value", "P-value", ""),
-      "LR" = c("Chisq-value", "P-value", "")
+      "LR" = c("Chisq-value", "P-value", ""),
+      "W" = c("Chisq-value", "P-value", "")
     )
   } else {
     tab <- format(round(cbind(x$Sval, x$pval, x$adj.pval), 4))
     tab <- matrix(cbind(tab, sign), ncol = 4)
     colnames(tab) <- switch(x$test,
       "F" = c("F-value", "P-value", "Adj. P-value", ""),
-      "LR" = c("Chisq-value", "P-value", "Adj. P-value", "")
+      "LR" = c("Chisq-value", "P-value", "Adj. P-value", ""),
+      "W" = c("Chisq-value", "P-value", "Adj. P-value", "")
     )
   }
 
   rownames(tab) <- colnames(x$Data)
 
-  print(tab, quote = F, digits = 4, zero.print = F)
+  print(tab, quote = FALSE, digits = 4, zero.print = F)
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
 
   if (x$test == "F") {

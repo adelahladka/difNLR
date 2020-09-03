@@ -53,7 +53,8 @@ in these parameters between reference and focal group.}
 \code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.}
 
 \item{test}{character: test to be performed for DIF detection. Can be either \code{"LR"} for
-likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a submodel.}
+likelihood ratio test of a submodel (default), \code{"W"} for Wald test, or \code{"F"} for F-test
+of a submodel.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 

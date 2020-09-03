@@ -6,6 +6,7 @@
   * Sandwich estimator for covariance matrix in case that `method = "nls"` was 
     implemented into the `vcov()` method for the output of the `estimNLR()` 
     function.
+  * Wald test for implemented for the `difNLR()` function.
 
 ------  
 

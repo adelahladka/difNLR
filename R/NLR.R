@@ -39,7 +39,8 @@
 #' group. Parameters \code{"aDif"}, \code{"bDif"}, \code{"cDif"}, and \code{"dDif"} are then differences
 #' in these parameters between reference and focal group.
 #' @param test character: test to be performed for DIF detection. Can be either \code{"LR"} for
-#' likelihood ratio test of a submodel (default), or \code{"F"} for F-test of a submodel.
+#' likelihood ratio test of a submodel (default), \code{"W"} for Wald test, or \code{"F"} for F-test
+#' of a submodel.
 #' @param alpha numeric: significance level (default is 0.05).
 #' @param initboot logical: in case of convergence issues, should be starting values re-calculated based on
 #' bootstraped samples? (default is \code{TRUE}; newly calculated initial values are applied only to
@@ -366,9 +367,15 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     RSS0[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m0[[l]])^2))
     RSS1[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
 
-    Fval <- ((RSS0 - RSS1) / df[, 1]) / (RSS1 / df[, 2])
-    pval <- 1 - pf(Fval, df[, 1], df[, 2])
-  } else {
+    Fval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) ((RSS0[l] - RSS1[l]) / df[l, 1]) / (RSS1[l] / df[l, 2])
+    )
+    pval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) (1 - pf(Fval[l], df[l, 1], df[l, 2]))
+    )
+  } else if (test == "LR") {
     pval <- LRval <- rep(NA, m)
 
     n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
@@ -383,6 +390,27 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     pval[which(!(cfM1 | cfM0))] <- sapply(
       which(!(cfM1 | cfM0)),
       function(l) (1 - pchisq(LRval[l], df[l]))
+    )
+  } else if (test == "W") {
+    pval <- Wval <- rep(NA, m)
+
+    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
+    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
+
+    df <- n1 - n0
+
+    Wval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) {
+        nams <- M[[l]]$M1$parameters[grepl("Dif", M[[l]]$M1$parameters)]
+        V <- vcov(m1[[l]])[nams, nams]
+        par <- coef(m1[[l]])[nams]
+        par %*% solve(V) %*% par
+      }
+    )
+    pval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) (1 - pchisq(Wval[l], df[l]))
     )
   }
   # likelihood
@@ -528,7 +556,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   names(par.m1) <- names(par.m0) <- names(se.m1) <- names(se.m0) <- names(cov.m0) <- names(cov.m1) <- colnames(Data)
 
   results <- list(
-    Sval = switch(test, "F" = Fval, "LR" = LRval),
+    Sval = switch(test, "F" = Fval, "LR" = LRval, "W" = Wval),
     pval = pval, adjusted.pval = adjusted.pval,
     df = df, test = test,
     par.m0 = par.m0, se.m0 = se.m0, cov.m0 = cov.m0,
