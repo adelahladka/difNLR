@@ -53,6 +53,7 @@
 #' coef(fitNLSM0)
 #' logLik(fitNLSM0)
 #' vcov(fitNLSM0)
+#' vcov(fitNLSM0, sandwich = TRUE)
 #' fitted(fitNLSM0)
 #' residuals(fitNLSM0)
 #'
@@ -71,7 +72,6 @@
 #' residuals(fitLKLM0)
 #' @keywords DIF
 #' @export
-#' @importFrom stats optim binomial glm residuals
 #'
 estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
   M <- switch(method,
@@ -101,7 +101,7 @@ estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
       finally = ""
     )
   )
-
+  class(M) <- c("estNLR", class(M))
   return(M)
 }
 
@@ -165,12 +165,6 @@ print.lkl <- function(x, ...) {
 
 #' @rdname lkl
 #' @export
-vcov.lkl <- function(object, ...) {
-  solve(object$hessian)
-}
-
-#' @rdname lkl
-#' @export
 logLik.lkl <- function(object, ...) {
   -object$value
 }
@@ -191,4 +185,97 @@ fitted.lkl <- function(object, ...) {
 #' @export
 residuals.lkl <- function(object, ...) {
   object$data$y - object$fitted
+}
+
+#' @rdname estNLR
+#' @export
+vcov.estNLR <- function(object, sandwich = FALSE, ...) {
+  if (class(object)[2] == "nls") {
+    if (sandwich) {
+      e <- object$m$getEnv()
+      y <- e$y
+      x <- e$x
+      g <- e$g
+      cov.object <- .sandwich.cov.nls(formula = object$m$formula(), y, x, g, par = object$m$getPars())
+    } else {
+      cov.object <- tryCatch(
+        {
+          sm <- summary(object)
+          sm$cov.unscaled * sm$sigma^2
+        },
+        error = function(e) NULL
+      )
+    }
+  } else {
+    if (sandwich) {
+      warning("Sandwich estimator of covariance not available for method = 'likelihood'. ",
+        call = FALSE
+      )
+      cov.object <- solve(object$hessian)
+    } else {
+      cov.object <- solve(object$hessian)
+    }
+  }
+  return(cov.object)
+}
+
+#' @noRd
+.sandwich.cov.nls <- function(formula, y, x, group, par) {
+  n <- length(y)
+  f <- paste0("(y - ", "(", gsub("y ~ ", "", deparse(formula)), "))^2")
+
+  psi <- derivative(
+    f = f,
+    var = names(par)
+  )
+  psi.fun <- eval(
+    parse(
+      text =
+        paste0(
+          "function(",
+          paste(c("y", "x", "g", names(par)), collapse = ", "), ") {
+      return(list(", paste(as.list(psi), collapse = ", "), "))}"
+        )
+    )
+  )
+
+  hess <- hessian(
+    f = f,
+    var = names(par)
+  )
+
+  hess.fun <- eval(
+    parse(text = paste0(
+      "function(",
+      paste(c("y", "x", "g", names(par)), collapse = ", "), ") {
+      return(list(", paste(as.list(hess), collapse = ", "), "))}"
+    ))
+  )
+
+
+  psi.val <- do.call(
+    cbind,
+    do.call(
+      psi.fun,
+      append(list(y = y, x = x, g = group), par)
+    )
+  )
+
+  # calculating matrix Sigma
+  mat.sigma <- t(psi.val) %*% psi.val / n
+  # calculating matrix Gamma
+  mat.gamma <- matrix(
+    sapply(
+      do.call(
+        hess.fun,
+        append(list(y = y, x = x, g = group), par)
+      ),
+      mean
+    ),
+    ncol = length(par), nrow = length(par)
+  )
+  # sandwich estimator of covariance matrix
+  cov.sandwich <- solve(mat.gamma) %*% mat.sigma %*% solve(mat.gamma) / n
+  rownames(cov.sandwich) <- colnames(cov.sandwich) <- names(par)
+  return(cov.sandwich)
 }

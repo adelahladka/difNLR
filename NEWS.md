@@ -1,5 +1,14 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.3.5-1 (2020-09-03)
+
+#### MAJOR UPDATES
+  * Sandwich estimator for covariance matrix in case that `method = "nls"` was 
+    implemented into the `vcov()` method for the output of the `estimNLR()` 
+    function.
+
+------  
+
 ### Changes in version 1.3.4/1.3.5 (2020-08-24)
 
 **_THIS IS A CRAN VERSION_**

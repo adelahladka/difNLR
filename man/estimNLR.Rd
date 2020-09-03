@@ -54,6 +54,7 @@ fitNLSM0
 coef(fitNLSM0)
 logLik(fitNLSM0)
 vcov(fitNLSM0)
+vcov(fitNLSM0, sandwich = TRUE)
 fitted(fitNLSM0)
 residuals(fitNLSM0)
 

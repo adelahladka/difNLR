@@ -416,11 +416,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 
   # covariance structure
   cov.m0 <- cov.m1 <- as.list(rep(NA, m))
-  extractVCOV <- function(x) {
-    return(tryCatch(vcov(x), error = function(e) NULL))
-  }
-  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], extractVCOV)
-  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], extractVCOV)
+  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
+  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
 
   cov.fail1 <- which(sapply(cov.m1, is.null))
   cov.fail0 <- which(sapply(cov.m0, is.null))
