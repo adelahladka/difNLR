@@ -6,7 +6,8 @@
 \usage{
 difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
        match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-       alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20)
+       alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20,
+       sandwich = FALSE)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
@@ -73,6 +74,9 @@ items/models with convergence issues).}
 
 \item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
 bootstraped samples (default is 20).}
+
+\item{sandwich}{logical: should be sandwich estimator used for covariance matrix of parameters when using
+\code{method = "nls"}? Default is \code{FALSE}.}
 }
 \value{
 The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
@@ -225,6 +229,11 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "W")
 #' # Testing both DIF effects using F test and
 # 3PL model with fixed guessing for groups
 difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
+
+# Testing both DIF effects using
+# 3PL model with fixed guessing for groups and sandwich estimator
+# of the covariance matrices
+difNLR(Data, group, focal.name = 1, model = "3PLcg", sandwich = TRUE)
 
 # Testing both DIF effects using LR test,
 # 3PL model with fixed guessing for groups

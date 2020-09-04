@@ -47,11 +47,13 @@
 #' items/models with convergence issues).
 #' @param nrBo numeric: the maximal number of iterations for calculation of starting values using
 #' bootstraped samples (default is 20).
+#' @param sandwich logical: should be sandwich estimator used for covariance matrix of parameters when using
+#' \code{method = "nls"}? Default is \code{FALSE}.
 #'
 #' @usage
 #' NLR(Data, group, model, constraints = NULL, type = "all", method = "nls",
 #'     match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
-#'     alpha = 0.05, initboot = TRUE, nrBo = 20)
+#'     alpha = 0.05, initboot = TRUE, nrBo = 20, sandwich = FALSE)
 #'
 #' @details
 #' Calculation of the test statistics using DIF detection procedure based on non-linear regression
@@ -178,7 +180,7 @@
 NLR <- function(Data, group, model, constraints = NULL, type = "all",
                 method = "nls", match = "zscore", anchor = 1:ncol(Data),
                 start, p.adjust.method = "none", test = "LR", alpha = 0.05,
-                initboot = TRUE, nrBo = 20) {
+                initboot = TRUE, nrBo = 20, sandwich = FALSE) {
   if (match[1] == "zscore") {
     x <- scale(apply(as.data.frame(Data[, anchor]), 1, sum))
   } else {
@@ -352,7 +354,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   }
 
   if (conv.fail > 0) {
-    warning(paste("Convergence failure in item", conv.fail.which, "\n"), call. = FALSE)
+    message(paste("Convergence failure in item", conv.fail.which, "\n"))
   }
   # test
   if (test == "F") {
@@ -403,7 +405,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
       which(!(cfM1 | cfM0)),
       function(l) {
         nams <- M[[l]]$M1$parameters[grepl("Dif", M[[l]]$M1$parameters)]
-        V <- vcov(m1[[l]])[nams, nams]
+        V <- vcov(m1[[l]], sandwich)[nams, nams]
         par <- coef(m1[[l]])[nams]
         par %*% solve(V) %*% par
       }
@@ -444,20 +446,19 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 
   # covariance structure
   cov.m0 <- cov.m1 <- as.list(rep(NA, m))
-  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov)
-  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov)
+  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov, sandwich)
+  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov, sandwich)
 
   cov.fail1 <- which(sapply(cov.m1, is.null))
   cov.fail0 <- which(sapply(cov.m0, is.null))
   cov.fail <- sort(union(cov.fail1, cov.fail0))
 
   if (length(cov.fail) > 0) {
-    warning(paste(
+    message(paste(
       "Covariance matrix cannot be computed for item",
       cov.fail,
       "\n"
-    ),
-    call. = FALSE
+    )
     )
   }
   conv.m0 <- setdiff(1:m, unique(c(which(cfM0), which(sapply(cov.m0[which(!cfM0)], function(x) is.null(x))))))

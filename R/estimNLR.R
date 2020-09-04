@@ -101,7 +101,9 @@ estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
       finally = ""
     )
   )
-  class(M) <- c("estNLR", class(M))
+  if (!is.null(M)) {
+    class(M) <- c("estNLR", class(M))
+  }
   return(M)
 }
 
@@ -119,10 +121,11 @@ estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
   h <- eval(h., envir = param)
 
   l <- -sum((y * log(h)) + ((1 - y) * log(1 - h)), na.rm = T)
+  return(l)
 }
 
 #' @noRd
-lkl <- function(formula, data, par, lower, upper, fitv) {
+lkl <- function(formula, data, par, lower, upper) {
   m <- optim(
     par = par,
     fn = .param.likel,
@@ -208,13 +211,13 @@ vcov.estNLR <- function(object, sandwich = FALSE, ...) {
     }
   } else {
     if (sandwich) {
-      warning("Sandwich estimator of covariance not available for method = 'likelihood'. ",
-        call = FALSE
-      )
-      cov.object <- solve(object$hessian)
-    } else {
-      cov.object <- solve(object$hessian)
+      message("Sandwich estimator of covariance not available for method = 'likelihood'. ")
     }
+    cov.object <- tryCatch(
+      {
+        solve(object$hessian)},
+      error = function(e) NULL
+    )
   }
   return(cov.object)
 }

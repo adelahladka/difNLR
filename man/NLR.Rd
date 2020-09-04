@@ -6,7 +6,7 @@
 \usage{
 NLR(Data, group, model, constraints = NULL, type = "all", method = "nls",
     match = "zscore", anchor = 1:ncol(Data), start, p.adjust.method = "none", test = "LR",
-    alpha = 0.05, initboot = TRUE, nrBo = 20)
+    alpha = 0.05, initboot = TRUE, nrBo = 20, sandwich = FALSE)
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
@@ -64,6 +64,9 @@ items/models with convergence issues).}
 
 \item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
 bootstraped samples (default is 20).}
+
+\item{sandwich}{logical: should be sandwich estimator used for covariance matrix of parameters when using
+\code{method = "nls"}? Default is \code{FALSE}.}
 }
 \value{
 A list with the following arguments:

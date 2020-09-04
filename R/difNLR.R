@@ -54,11 +54,14 @@
 #' items/models with convergence issues).
 #' @param nrBo numeric: the maximal number of iterations for calculation of starting values using
 #' bootstraped samples (default is 20).
+#' @param sandwich logical: should be sandwich estimator used for covariance matrix of parameters when using
+#' \code{method = "nls"}? Default is \code{FALSE}.
 #'
 #' @usage
 #' difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
 #'        match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-#'        alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20)
+#'        alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20,
+#'        sandwich = FALSE)
 #'
 #' @details
 #' DIF detection procedure based on non-linear regression is the extension of logistic regression
@@ -241,6 +244,11 @@
 #' # 3PL model with fixed guessing for groups
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
 #'
+#' # Testing both DIF effects using
+#' # 3PL model with fixed guessing for groups and sandwich estimator
+#' # of the covariance matrices
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", sandwich = TRUE)
+#'
 #' # Testing both DIF effects using LR test,
 #' # 3PL model with fixed guessing for groups
 #' # and Benjamini-Hochberg correction
@@ -277,7 +285,7 @@
 difNLR <- function(Data, group, focal.name, model, constraints, type = "all", method = "nls",
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start,
-                   initboot = TRUE, nrBo = 20) {
+                   initboot = TRUE, nrBo = 20, sandwich = FALSE) {
   if (any(type == "nudif" & model == "1PL")) {
     stop("Detection of non-uniform DIF is not possible with 1PL model.", call. = FALSE)
   }
@@ -498,7 +506,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       PROV <- suppressWarnings(NLR(DATA, GROUP,
         model = model, constraints = constraints, type = type, method = method,
         match = match, anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method,
-        test = test, alpha = alpha, initboot = initboot, nrBo = nrBo
+        test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
       ))
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
@@ -561,7 +569,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       prov1 <- suppressWarnings(NLR(DATA, GROUP,
         model = model, constraints = constraints, type = type, method = method,
         match = match, start = start, p.adjust.method = p.adjust.method, test = test,
-        alpha = alpha, initboot = initboot, nrBo = nrBo
+        alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
       ))
       stats1 <- prov1$Sval
       pval1 <- prov1$pval
@@ -599,7 +607,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
             prov2 <- suppressWarnings(NLR(DATA, GROUP,
               model = model, constraints = constraints, type = type, method = method,
               match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
-              test = test, alpha = alpha, initboot = initboot, nrBo = nrBo
+              test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
             ))
             stats2 <- prov2$Sval
             pval2 <- prov2$pval
