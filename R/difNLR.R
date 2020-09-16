@@ -466,6 +466,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         if (any(sapply(1:dim(DATA)[2], function(i) (all(!is.na(constraints[[i]])) & (types[[i]] %in% constraints[[i]]))))) {
           stop("The difference in constrained parameters cannot be tested.", call. = FALSE)
         }
+      } else {
+        types <- NULL
       }
     } else {
       constraints <- as.list(rep(NA, dim(DATA)[2]))

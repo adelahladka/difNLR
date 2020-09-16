@@ -356,80 +356,12 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   if (conv.fail > 0) {
     message(paste("Convergence failure in item", conv.fail.which, "\n"))
   }
-  # test
-  if (test == "F") {
-    pval <- Fval <- rep(NA, m)
-    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
-    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
 
-    df <- cbind(n1 - n0, n - n1)
-
-    RSS0 <- rep(NA, m)
-    RSS1 <- rep(NA, m)
-    RSS0[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m0[[l]])^2))
-    RSS1[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
-
-    Fval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
-      function(l) ((RSS0[l] - RSS1[l]) / df[l, 1]) / (RSS1[l] / df[l, 2])
-    )
-    pval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
-      function(l) (1 - pf(Fval[l], df[l, 1], df[l, 2]))
-    )
-  } else if (test == "LR") {
-    pval <- LRval <- rep(NA, m)
-
-    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
-    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
-
-    df <- n1 - n0
-
-    LRval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
-      function(l) -2 * c(logLik(m0[[l]]) - logLik(m1[[l]]))
-    )
-    pval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
-      function(l) (1 - pchisq(LRval[l], df[l]))
-    )
-  } else if (test == "W") {
-    pval <- Wval <- rep(NA, m)
-
-    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
-    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
-
-    df <- n1 - n0
-
-    Wval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
-      function(l) {
-        nams <- M[[l]]$M1$parameters[grepl("Dif", M[[l]]$M1$parameters)]
-        V <- vcov(m1[[l]], sandwich)[nams, nams]
-        par <- coef(m1[[l]])[nams]
-        par %*% solve(V) %*% par
-      }
-    )
-    pval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
-      function(l) (1 - pchisq(Wval[l], df[l]))
-    )
-  }
   # likelihood
   ll.m0 <- ll.m1 <- rep(NA, m)
   ll.m0[which(!cfM0)] <- sapply(m0[which(!cfM0)], logLik)
   ll.m1[which(!cfM1)] <- sapply(m1[which(!cfM1)], logLik)
 
-  # R2 computation
-  # N <- dim(Data)[1]
-  # r2cs <- 1 - exp(-2/N * (ll.m0 - ll.m1)) # Cox and Snell
-  # r2n  <- r2cs / (1 - exp(2*ll.m1/N))     # Nagelkerge
-  #
-  # symnum(r2n, c(0, 0.13, 0.26, 1), symbols = c("A", "B", "C"))  # Zumbo & Thomas
-  # symnum(r2n, c(0, 0.035, 0.07, 1), symbols = c("A", "B", "C")) # Jodoin & Gierl
-
-  # adjusted p-values
-  adjusted.pval <- p.adjust(pval, method = p.adjust.method)
   # parameters
   par.m1 <- se.m1 <- lapply(1:m, function(i) {
     structure(rep(NA, length(M[[i]]$M1$parameters)),
@@ -555,6 +487,68 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   }
 
   names(par.m1) <- names(par.m0) <- names(se.m1) <- names(se.m0) <- names(cov.m0) <- names(cov.m1) <- colnames(Data)
+
+  # test
+  if (test == "F") {
+    pval <- Fval <- rep(NA, m)
+    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
+    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
+
+    df <- cbind(n1 - n0, n - n1)
+
+    RSS0 <- rep(NA, m)
+    RSS1 <- rep(NA, m)
+    RSS0[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m0[[l]])^2))
+    RSS1[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
+
+    Fval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) ((RSS0[l] - RSS1[l]) / df[l, 1]) / (RSS1[l] / df[l, 2])
+    )
+    pval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) (1 - pf(Fval[l], df[l, 1], df[l, 2]))
+    )
+  } else if (test == "LR") {
+    pval <- LRval <- rep(NA, m)
+
+    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
+    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
+
+    df <- n1 - n0
+
+    LRval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) -2 * c(logLik(m0[[l]]) - logLik(m1[[l]]))
+    )
+    pval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) (1 - pchisq(LRval[l], df[l]))
+    )
+  } else if (test == "W") {
+    pval <- Wval <- rep(NA, m)
+
+    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
+    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
+
+    df <- n1 - n0
+
+    Wval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) {
+        nams <- which(M[[l]]$M1$parameters == setdiff(M[[l]]$M1$parameters, M[[l]]$M0$parameters))
+        V <- cov.m1[[l]][nams, nams]
+        par <- par.m1[[l]][nams]
+        par %*% solve(V) %*% par
+      }
+    )
+    pval[which(!(cfM1 | cfM0))] <- sapply(
+      which(!(cfM1 | cfM0)),
+      function(l) (1 - pchisq(Wval[l], df[l]))
+    )
+  }
+  # adjusted p-values
+  adjusted.pval <- p.adjust(pval, method = p.adjust.method)
 
   results <- list(
     Sval = switch(test, "F" = Fval, "LR" = LRval, "W" = Wval),

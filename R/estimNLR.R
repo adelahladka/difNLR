@@ -225,7 +225,8 @@ vcov.estNLR <- function(object, sandwich = FALSE, ...) {
 #' @noRd
 .sandwich.cov.nls <- function(formula, y, x, group, par) {
   n <- length(y)
-  f <- paste0("(y - ", "(", gsub("y ~ ", "", deparse(formula)), "))^2")
+  f <- paste0("(y - ", "(", gsub("y ~ ", "", paste(deparse(formula), collapse = "")), "))^2")
+  f <- gsub("  ", "", f)
 
   psi <- derivative(
     f = f,

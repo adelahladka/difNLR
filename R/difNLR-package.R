@@ -15,11 +15,11 @@
 #' @importFrom CTT score
 #' @importFrom grDevices hcl
 #' @importFrom methods is
+#' @importFrom msm deltamethod
 #' @importFrom nnet multinom
 #' @importFrom plyr ldply
 #' @importFrom reshape2 melt
 #' @importFrom stats AIC as.formula anova BIC binomial coef complete.cases deriv3 deviance fitted glm logLik na.omit nls optim p.adjust p.adjust.methods pf pchisq rbinom relevel residuals rnorm sd setNames symnum qf qchisq qt quantile vcov
-#' @importFrom msm deltamethod
 #' @importFrom VGAM acat AICvlm BICvlm cumulative lrtest_vglm
 #'
 #' @section Functions:
