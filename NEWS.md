@@ -323,20 +323,20 @@
 
 ### Changes in version 1.2.1-2 (2018-03-19)
 #### BUGFIXING
-  * difNLR
+  * `difNLR()`
     - Check for constraints was fixed.
-  * NLR
-    - initboot = F now works properly.
+  * `NLR()`
+    - `initboot = FALSE` now works properly.
 
 ------
 
 ### Changes in version 1.2.1-1 (2018-03-16)
 #### BUGFIXING
-  * difNLR:
+  * `difNLR()`:
     - P-value adjustment is now performed in the last iteration of purification
       as described.
     - In difPur output columns are properly named.
-  * ddfMLR:
+  * `ddfMLR()`:
     - P-value adjustment is now performed in the last iteration of purification
       as described.
     - In difPur output columns are properly named.
@@ -382,9 +382,9 @@
   * `difNLR()` documentation was improved.
 
 #### BUGFIXING:
-    - S3 methods for class `difNLR` can now properly handle items with
-      convergence issues.
-    - `NLR()` now detects DIF correctly with F test.
+  * S3 methods for class `difNLR` can now properly handle items with convergence 
+    issues.
+  * `NLR()` now detects DIF correctly with F test.
 
 #### MINOR UPDATES
   * Typos were fixed.
