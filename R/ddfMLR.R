@@ -266,6 +266,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
 
     GROUP <- df[, "GROUP"]
     DATA <- data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
+    DATA[] <- lapply(DATA[], as.factor)
+    DATA[] <- lapply(DATA[], droplevels)
 
     if (length(match) > 1) {
       match <- df[, "match"]

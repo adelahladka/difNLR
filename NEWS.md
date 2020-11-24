@@ -1,5 +1,13 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.3.5-2 (2020-11-24)
+
+#### BUGFIXING
+  * Empty factor levels were removed from `Data` in `ddfMLR()` to fix bug
+    when plotting.
+
+------  
+
 ### Changes in version 1.3.5-1 (2020-09-03)
 
 #### MAJOR UPDATES
