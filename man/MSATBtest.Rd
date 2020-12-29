@@ -22,8 +22,8 @@ Possible answers were A, B, C, and D, while any combination of these can be corr
 gender of students, where 0 indicates males (reference group) and 1 indicates females (focal group).
 }
 \references{
-Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
+A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
 \url{https://doi.org/10.1111/jedm.12158}.
 
 Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).

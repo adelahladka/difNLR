@@ -16,12 +16,12 @@ The \code{GMATkey} is a vector of factors representing correct answers of
 generated \code{GMATtest} data set based on Graduate Management Admission Test (GMAT, Kingston et al., 1985).
 }
 \references{
-Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
-Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
+methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2): 1--64.
 
 Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
-Checking equity: Why Differential Item Functioning Analysis Should Be a Routine Part of Developing Conceptual
-Assessments. CBE-Life Sciences Education, 16(2), rm2, \url{https://doi.org/10.1187/cbe.16-10-0307}.
+Checking equity: Why differential item functioning analysis should be a routine part of developing conceptual
+assessments. CBE--Life Sciences Education, 16(2), rm2, \url{https://doi.org/10.1187/cbe.16-10-0307}.
 }
 \seealso{
 \code{\link{GMAT}}, \code{\link{GMATtest}}

@@ -1,12 +1,12 @@
 #' DIF and DDF Detection by Non-Linear Regression Models.
 #'
-#' @description The difNLR package containts method for detection of differential item functioning (DIF)
+#' @description The difNLR package contains method for detection of differential item functioning (DIF)
 #' based on non-linear regression. Both uniform and non-uniform DIF effects can be detected when considering
-#' one focal group. The method also allows to test the difference in guessing or inattention parameters
-#' between reference and focal group. DIF detection method is based either on likelihood-ratio test, or on F-test
-#' of a submodel. Package also offers method for DIF detection among ordinal data using adjacent category logit or
-#' cumulative logit models. Moreover, the difNLR package containts method for detection of differential distractor
-#' functioning (DDF) based on multinomial log-linear regression model.
+#' one focal group. The method also allows to test the difference in guessing or inattention parameters between
+#' reference and focal group. DIF detection method is based either on likelihood-ratio test, F-test or Wald test
+#' of a submodel. Package also offers methods for detection of differential distractor functioning (DDF) based
+#' on multinomial log-linear regression model and newly methods for DIF detection among ordinal data via adjacent
+#' category logit and cumulative logit regression models.
 #'
 #' @aliases difNLR-package
 #'
@@ -45,8 +45,8 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.3.5-2\cr
-#' Date: 2020-11-24\cr
+#' Version: 1.3.6\cr
+#' Date: 2020-12-29\cr
 #' Depends: R (>= 3.1)\cr
 #' Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 #' Suggests: ShinyItemAnalysis\cr
@@ -67,24 +67,24 @@
 #' @references
 #' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 #'
-#' Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-#' Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+#' Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
+#' A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
 #' \url{https://doi.org/10.1111/jedm.12158}.
 #'
 #' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-#' The R journal. Accepted.
+#' The R journal, 12(1), 300--323, \url{https://doi.org/10.32614/RJ-2020-014}.
 #'
-#' Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response Theory
-#' Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+#' Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
+#' methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2): 1--64.
 #'
 #' Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
-#' Checking equity: Why Differential Item Functioning Analysis Should Be a Routine Part of Developing Conceptual
-#' Assessments. CBE-Life Sciences Education, 16(2), \url{https://doi.org/10.1187/cbe.16-10-0307}.
+#' Checking equity: Why differential item functioning analysis should be a routine part of developing conceptual
+#' assessments. CBE--Life Sciences Education, 16(2), rm2, \url{https://doi.org/10.1187/cbe.16-10-0307}.
 #'
-#' Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-#' Journal of Educational Measurement, 27, 361-370, \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
+#' Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
+#' Journal of Educational Measurement, 27(4), 361--370, \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 #'
-#' Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
+#' Vlckova, K. (2014). Test and item fairness (Unpublished master's thesis).
 #'
 #' @note This package was supported by grant funded by Czech Science foundation under number GJ15-15856Y.
 #'

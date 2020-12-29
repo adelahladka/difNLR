@@ -24,12 +24,12 @@ group membership, where 0 indicates reference group and 1 indicates focal group.
 Groups are the same size (i.e. 500 per group).
 }
 \references{
-Kingston, N., Leary, L., & Wightman, L. (1985). An Exploratory Study of the Applicability of Item Response
-Theory Methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2) : 1-64.
+Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
+methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2): 1--64.
 
-Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
-\url{https://doi.org/10.1111/jedm.12158}.
+Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
+Checking equity: Why differential item functioning analysis should be a routine part of developing conceptual
+assessments. CBE--Life Sciences Education, 16(2), rm2, \url{https://doi.org/10.1187/cbe.16-10-0307}.
 }
 \seealso{
 \code{\link{GMAT2test}}, \code{\link{GMAT2key}}

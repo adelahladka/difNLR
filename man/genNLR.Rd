@@ -97,8 +97,8 @@ genNLR(N = 300, itemtype = "nominal", a = a, b = b)
 genNLR(N = 300, itemtype = "nominal", ratio = 5, a = a, b = b)
 }
 \references{
-Drabinova, A. & Martinkova P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
+A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
 \url{https://doi.org/10.1111/jedm.12158}.
 }
 \seealso{

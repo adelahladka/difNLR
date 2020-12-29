@@ -1,5 +1,16 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.3.6 (2020-12-29)
+
+**_THIS IS A CRAN VERSION_**
+
+#### MINOR UPDATES
+  * doi in DESCRIPTION file updated.
+  * CITATION file updated.
+  * References were updated.
+  
+------  
+
 ### Changes in version 1.3.5-2 (2020-11-24)
 
 #### BUGFIXING

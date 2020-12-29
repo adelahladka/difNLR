@@ -135,7 +135,7 @@ of a submodel.
 }
 \details{
 DIF detection procedure based on non-linear regression is the extension of logistic regression
-procedure (Swaminathan and Rogers, 1990; Drabinova and Martinkova, 2017).
+procedure (Swaminathan & Rogers, 1990; Drabinova & Martinkova, 2017).
 
 The unconstrained form of 4PL generalized logistic regression model for probability of correct
 answer (i.e., \eqn{y = 1}) is
@@ -268,13 +268,15 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
 
 }
 \references{
-Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with NonLinear Regression:
-Non-IRT Approach Accounting for Guessing. Journal of Educational Measurement, 54(4), 498-517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
+A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
 \url{https://doi.org/10.1111/jedm.12158}.
 
-Swaminathan, H. & Rogers, H. J. (1990). Detecting Differential Item Functioning Using Logistic Regression Procedures.
-Journal of Educational Measurement, 27(4), 361-370,
-\url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
+The R journal, 12(1), 300--323, \url{https://doi.org/10.32614/RJ-2020-014}.
+
+Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
+Journal of Educational Measurement, 27(4), 361--370, \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
 }
 \seealso{
 \code{\link[difNLR]{plot.difNLR}} for graphical representation of item characteristic curves and DIF statistics. \cr
