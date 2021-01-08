@@ -21,7 +21,7 @@ methods to the Graduate Management Admission Test. ETS Research Report Series, 1
 
 Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
 Checking equity: Why differential item functioning analysis should be a routine part of developing conceptual
-assessments. CBE--Life Sciences Education, 16(2), rm2, \url{https://doi.org/10.1187/cbe.16-10-0307}.
+assessments. CBE--Life Sciences Education, 16(2), rm2, \doi{10.1187/cbe.16-10-0307}.
 }
 \seealso{
 \code{\link{GMAT2}}, \code{\link{GMAT2test}}

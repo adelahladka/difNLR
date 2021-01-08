@@ -59,7 +59,7 @@
 #' @references
 #' Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
 #' A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
-#' \url{https://doi.org/10.1111/jedm.12158}.
+#' \doi{10.1111/jedm.12158}.
 #'
 #' @seealso \code{\link[difNLR]{difNLR}}, \code{\link[difNLR]{difORD}}, \code{\link[difNLR]{ddfMLR}}
 #'

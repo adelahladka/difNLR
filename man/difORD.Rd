@@ -186,7 +186,7 @@ coef(x, simplify = TRUE)
 Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R journal, 12(1), 300--323, \url{https://doi.org/10.32614/RJ-2020-014}.
+The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 }
 \seealso{
 \code{\link[difNLR]{plot.difORD}} for graphical representation of item characteristic curves. \cr

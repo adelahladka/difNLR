@@ -4,84 +4,103 @@
 \alias{difNLR}
 \title{DIF detection using non-linear regression method.}
 \usage{
-difNLR(Data, group, focal.name, model, constraints, type = "all", method = "nls",
-       match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-       alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20,
-       sandwich = FALSE)
+difNLR(
+  Data, group, focal.name, model, constraints, type = "all", method = "nls",
+  match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
+  alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20,
+  sandwich = FALSE
+)
 }
 \arguments{
-\item{Data}{data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
-correct, \code{"0"} incorrect) and columns correspond to the items. In addition, \code{Data} can
-hold the vector of group membership.}
+\item{Data}{data.frame or matrix: dataset which rows represent scored
+examinee answers (\code{"1"} correct, \code{"0"} incorrect) and columns
+correspond to the items. In addition, \code{Data} can hold the vector of
+group membership.}
 
-\item{group}{numeric or character: a dichotomous vector of the same length as \code{nrow(Data)}
-or a column identifier of \code{Data}.}
+\item{group}{numeric or character: a dichotomous vector of the same length as
+\code{nrow(Data)} or a column identifier of \code{Data}.}
 
-\item{focal.name}{numeric or character: indicates the level of \code{group} which corresponds to
-focal group.}
+\item{focal.name}{numeric or character: indicates the level of \code{group}
+which corresponds to focal group.}
 
-\item{model}{character: generalized logistic regression model to be fitted. See \strong{Details}.}
-
-\item{constraints}{character: which parameters should be the same for both groups. Possible values
-are any combinations of parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}.
+\item{model}{character: generalized logistic regression model to be fitted.
 See \strong{Details}.}
 
-\item{type}{character: type of DIF to be tested. Possible values are \code{"all"} for detecting
-difference in any parameter (default), \code{"udif"} for uniform DIF only (i.e., difference in
-difficulty parameter \code{"b"}), \code{"nudif"} for non-uniform DIF only (i.e., difference in
-discrimination parameter \code{"a"}), \code{"both"} for uniform and non-uniform DIF (i.e.,
-difference in parameters \code{"a"} and \code{"b"}), or combination of parameters \code{"a"},
-\code{"b"}, \code{"c"}, and \code{"d"}. Can be specified as a single value (for all items) or as
-an item-specific vector.}
+\item{constraints}{character: which parameters should be the same for both
+groups. Possible values are any combinations of parameters \code{"a"},
+\code{"b"}, \code{"c"}, and \code{"d"}. See \strong{Details}.}
 
-\item{method}{character: method used to estimate parameters. Either \code{"nls"} for
-non-linear least squares (default), or \code{"likelihood"} for maximum likelihood method.}
+\item{type}{character: type of DIF to be tested. Possible values are
+\code{"all"} for detecting difference in any parameter (default),
+\code{"udif"} for uniform DIF only (i.e., difference in difficulty
+parameter \code{"b"}), \code{"nudif"} for non-uniform DIF only (i.e.,
+difference in discrimination parameter \code{"a"}), \code{"both"} for
+uniform and non-uniform DIF (i.e., difference in parameters \code{"a"} and
+\code{"b"}), or combination of parameters \code{"a"}, \code{"b"},
+\code{"c"}, and \code{"d"}. Can be specified as a single value (for all
+items) or as an item-specific vector.}
 
-\item{match}{numeric or character: matching criterion to be used as an estimate of trait. Can be
-either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
-or vector of the same length as number of observations in \code{Data}.}
+\item{method}{character: method used to estimate parameters. Either
+\code{"nls"} for non-linear least squares (default), or \code{"likelihood"}
+for maximum likelihood method.}
 
-\item{anchor}{numeric or character: specification of DIF free items. Either \code{NULL} (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number) determining which items are currently considered as anchor (DIF free) items.
-Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
+\item{match}{numeric or character: matching criterion to be used as an
+estimate of trait. Can be either \code{"zscore"} (default, standardized
+total score), \code{"score"} (total test score), or vector of the same
+length as number of observations in \code{Data}.}
 
-\item{purify}{logical: should the item purification be applied? (default is \code{FALSE}).}
+\item{anchor}{numeric or character: specification of DIF free items. Either
+\code{NULL} (default), or a vector of item names (column names of
+\code{Data}), or item identifiers (integers specifying the column number)
+determining which items are currently considered as anchor (DIF free)
+items. Argument is ignored if \code{match} is not \code{"zscore"} or
+\code{"score"}.}
 
-\item{nrIter}{numeric: the maximal number of iterations in the item purification (default is 10).}
+\item{purify}{logical: should the item purification be applied? (default is
+\code{FALSE}).}
 
-\item{test}{character: test to be performed for DIF detection. Can be either \code{"LR"} for
-likelihood ratio test of a submodel (default), \code{"W"} for Wald test, or \code{"F"} for F-test
-of a submodel.}
+\item{nrIter}{numeric: the maximal number of iterations in the item
+purification (default is 10).}
+
+\item{test}{character: test to be performed for DIF detection. Can be either
+\code{"LR"} for likelihood ratio test of a submodel (default), \code{"W"}
+for Wald test, or \code{"F"} for F-test of a submodel.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
 
-\item{p.adjust.method}{character: method for multiple comparison correction. Possible values are
-\code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
-\code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.}
+\item{p.adjust.method}{character: method for multiple comparison correction.
+Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
+\code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
+\code{"none"} (default). For more details see
+\code{\link[stats]{p.adjust}}.}
 
-\item{start}{numeric: initial values for estimation of parameters. If not specified, starting
-values are calculated with \code{\link[difNLR]{startNLR}} function. Otherwise, list with as many
-elements as a number of items. Each element is a named numeric vector of length 8 representing initial
-values for parameter estimation. Specifically, parameters \code{"a"}, \code{"b"}, \code{"c"}, and
-\code{"d"} are initial values for discrimination, difficulty, guessing, and inattention for reference
-group. Parameters \code{"aDif"}, \code{"bDif"}, \code{"cDif"}, and \code{"dDif"} are then differences
-in these parameters between reference and focal group.}
+\item{start}{numeric: initial values for estimation of parameters. If not
+specified, starting values are calculated with
+\code{\link[difNLR]{startNLR}} function. Otherwise, list with as many
+elements as a number of items. Each element is a named numeric vector of
+length 8 representing initial values for parameter estimation.
+Specifically, parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}
+are initial values for discrimination, difficulty, guessing, and
+inattention for reference group. Parameters \code{"aDif"}, \code{"bDif"},
+\code{"cDif"}, and \code{"dDif"} are then differences in these parameters
+between reference and focal group.}
 
-\item{initboot}{logical: in case of convergence issues, should be starting values re-calculated based
-on bootstraped samples? (default is \code{TRUE}; newly calculated initial values are applied only to
+\item{initboot}{logical: in case of convergence issues, should be starting
+values re-calculated based on bootstrapped samples? (default is
+\code{TRUE}; newly calculated initial values are applied only to
 items/models with convergence issues).}
 
-\item{nrBo}{numeric: the maximal number of iterations for calculation of starting values using
-bootstraped samples (default is 20).}
+\item{nrBo}{numeric: the maximal number of iterations for calculation of
+starting values using bootstrapped samples (default is 20).}
 
-\item{sandwich}{logical: should be sandwich estimator used for covariance matrix of parameters when using
-\code{method = "nls"}? Default is \code{FALSE}.}
+\item{sandwich}{logical: should be sandwich estimator used for covariance
+matrix of parameters when using \code{method = "nls"}? Default is
+\code{FALSE}.}
 }
 \value{
-The \code{difNLR()} function returns an object of class \code{"difNLR"}. The output
-including values of the test statistics, p-values, and items detected as function differently
-is displayed by the \code{print()} method.
+The \code{difNLR()} function returns an object of class \code{"difNLR"}. The
+output including values of the test statistics, p-values, and items detected
+as function differently is displayed by the \code{print()} method.
 
 Object of class \code{"difNLR"} is a list with the following components:
 \describe{
@@ -126,28 +145,34 @@ Object of class \code{"difNLR"} is a list with the following components:
   \item{\code{match}}{matching criterion.}
 }
 
-For an object of class \code{"difNLR"} several methods are available (e.g. \code{methods(class = "difNLR")}).
+For an object of class \code{"difNLR"} several methods are available (e.g.,
+\code{methods(class = "difNLR")}).
 }
 \description{
 Performs DIF detection procedure for dichotomous data based on non-linear
-regression model (generalized logistic regression) and either likelihood-ratio or F test
-of a submodel.
+regression model (generalized logistic regression) and either
+likelihood-ratio test, F-test, or Wald's test of a submodel.
 }
 \details{
-DIF detection procedure based on non-linear regression is the extension of logistic regression
-procedure (Swaminathan & Rogers, 1990; Drabinova & Martinkova, 2017).
+DIF detection procedure based on non-linear regression is the extension of
+the logistic regression procedure (Swaminathan & Rogers, 1990) accounting for
+possible guessing and/or inattention when responding (Drabinova & Martinkova,
+2017; Hladka & Martinkova, 2020).
 
-The unconstrained form of 4PL generalized logistic regression model for probability of correct
-answer (i.e., \eqn{y = 1}) is
-\deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
-where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
-Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
-Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
-(reference and focal) in relevant parameters.
+The unconstrained form of 4PL generalized logistic regression model for
+probability of correct answer (i.e., \eqn{y = 1}) is \deqn{P(y = 1) = (c +
+cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b
+- bDif * g))), } where \eqn{x} is by default standardized total score (also
+called Z-score) and \eqn{g} is a group membership. Parameters \eqn{a},
+\eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and
+inattention. Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then
+represent differences between two groups (reference and focal) in relevant
+parameters.
 
-This 4PL model can be further constrained by \code{model} and \code{constraints} arguments.
-The arguments \code{model} and \code{constraints} can be also combined. Both arguments can
-be specified as a single value (for all items) or as an item-specific vector (where each
+This 4PL model can be further constrained by \code{model} and
+\code{constraints} arguments. The arguments \code{model} and
+\code{constraints} can be also combined. Both arguments can be specified as a
+single value (for all items) or as an item-specific vector (where each
 element correspond to one item).
 
 The \code{model} argument offers several predefined models. The options are as follows:
@@ -163,17 +188,20 @@ The \code{model} argument offers several predefined models. The options are as f
 \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
 or \code{4PL} for 4PL model.
 
-The \code{model} can be specified in more detail with \code{constraints} argument which specifies what
-parameters should be fixed for both groups. For example, choice \code{"ad"} means that discrimination
-(parameter \code{"a"}) and inattention (parameter \code{"d"}) are fixed for both groups and other parameters
-(\code{"b"} and \code{"c"}) are not. The \code{NA} value for \code{constraints} means no constraints.
+The \code{model} can be specified in more detail with \code{constraints}
+argument which specifies what parameters should be fixed for both groups. For
+example, choice \code{"ad"} means that discrimination (parameter \code{"a"})
+and inattention (parameter \code{"d"}) are fixed for both groups and other
+parameters (\code{"b"} and \code{"c"}) are not. The \code{NA} value for
+\code{constraints} means no constraints.
 
-Missing values are allowed but discarded for item estimation. They must be coded as
-\code{NA} for both, \code{Data} and \code{group} arguments.
+Missing values are allowed but discarded for item estimation. They must be
+coded as \code{NA} for both, \code{Data} and \code{group} arguments.
 
-In case that model considers difference in guessing or inattention parameter, the different parameterization is
-used and parameters with standard errors are re-calculated by delta method. However, covariance matrices stick
-with alternative parameterization.
+In case that model considers difference in guessing or inattention parameter,
+the different parameterization is used and parameters with standard errors
+are re-calculated by delta method. However, covariance matrices stick with
+alternative parameterization.
 }
 \examples{
 # Loading data based on GMAT
@@ -268,15 +296,18 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
 
 }
 \references{
-Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
-A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
-\url{https://doi.org/10.1111/jedm.12158}.
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+functioning with nonlinear regression: A non-IRT approach accounting for
+guessing. Journal of Educational Measurement, 54(4), 498--517,
+\doi{10.1111/jedm.12158}.
 
-Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R journal, 12(1), 300--323, \url{https://doi.org/10.32614/RJ-2020-014}.
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+models for DIF and DDF detection. The R journal, 12(1), 300--323,
+\doi{10.32614/RJ-2020-014}.
 
-Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
-Journal of Educational Measurement, 27(4), 361--370, \url{https://doi.org/10.1111/j.1745-3984.1990.tb00754.x}
+Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item
+functioning using logistic regression procedures. Journal of Educational
+Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
 }
 \seealso{
 \code{\link[difNLR]{plot.difNLR}} for graphical representation of item characteristic curves and DIF statistics. \cr
