@@ -1,5 +1,12 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.3.7-1 (2021-02-16)
+
+#### BUGFIXING
+  * Bug in plotting empirical probabilities in `plot.difNLR()` fixed. 
+
+------  
+
 ### Changes in version 1.3.6/1.3.7 (2021-01-07)
 
 **_THIS IS A CRAN VERSION_**

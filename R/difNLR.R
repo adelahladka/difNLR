@@ -1133,30 +1133,21 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
     if (length(x$match) > 1) {
       xlab <- "Matching criterion"
-      xR <- x$match[x$group == 0]
-      xF <- x$match[x$group == 1]
+      match <- x$match
     } else {
       if (x$match == "score") {
         xlab <- "Total score"
-        xR <- c(apply(x$Data[x$group == 0, anchor], 1, sum))
-        xF <- c(apply(x$Data[x$group == 1, anchor], 1, sum))
+        match <- rowSums(as.data.frame(x$Data[, anchor]))
       } else {
         xlab <- "Standardized total score"
-        xR <- c(scale(apply(x$Data[x$group == 0, anchor], 1, sum)))
-        xF <- c(scale(apply(x$Data[x$group == 1, anchor], 1, sum)))
+        match <- scale(rowSums(as.data.frame(x$Data[, anchor])))
       }
     }
+    xR <- match[x$group == 0]
+    xF <- match[x$group == 1]
 
-    max_match <- max(
-      as.numeric(levels(as.factor(xR))),
-      as.numeric(levels(as.factor(xF))),
-      na.rm = TRUE
-    )
-    min_match <- min(
-      as.numeric(levels(as.factor(xR))),
-      as.numeric(levels(as.factor(xF))),
-      na.rm = TRUE
-    )
+    max_match <- max(c(xR, xF), na.rm = TRUE)
+    min_match <- min(c(xR, xF), na.rm = TRUE)
 
     plot_CC <- list()
 
