@@ -1368,7 +1368,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
 
 #' Predicted values for an object of \code{"difNLR"} class.
 #'
-#' @description S3 method for predictions from the model used in the object if \code{"difNLR"} class.
+#' @description S3 method for predictions from the model used in the object of \code{"difNLR"} class.
 #'
 #' @param object an object of \code{"difNLR"} class.
 #' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),

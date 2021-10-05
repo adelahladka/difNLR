@@ -1,5 +1,13 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.3.7-2 (2021-10-05)
+
+#### MAJOR UPDATES
+  * First version of `predicted.difORD()` to compute predicted values for 
+    `difORD` object was implemented. 
+
+------  
+
 ### Changes in version 1.3.7-1 (2021-02-16)
 
 #### BUGFIXING

@@ -131,6 +131,7 @@
 #' @seealso
 #' \code{\link[difNLR]{plot.difORD}} for graphical representation of item characteristic curves. \cr
 #' \code{\link[difNLR]{coef.difORD}} for extraction of item parameters with their standard errors. \cr
+#' \code{\link[difNLR]{predict.difORD}} for calculation of predicted values. \cr
 #' \code{\link[difNLR]{logLik.difORD}}, \code{\link[difNLR]{AIC.difORD}}, \code{\link[difNLR]{BIC.difORD}}
 #' for extraction of loglikelihood and information criteria. \cr
 #'
@@ -1177,7 +1178,6 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
       df.emp.cat$group <- as.factor(df.emp.cat$group)
       levels(df.emp.cat$category) <- paste0("P(Y = ", levels(df.emp.cat$category), ")")
 
-
       # empirical cumulative values
       df.emp.cum0 <- prop.table(tmp0, 1)
       df.emp.cum0 <- cbind(
@@ -1335,4 +1335,218 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
   }
   plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
   return(plot_CC)
+}
+
+#' Predicted values for an object of \code{"difORD"} class.
+#'
+#' @description S3 method for predictions from the model used in the object of \code{"difORD"} class.
+#'
+#' @param object an object of \code{"difORD"} class.
+#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
+#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+#' the column number).
+#' @param match numeric: matching criterion for new observations.
+#' @param group numeric: group membership for new observations.
+#' @param type character: type of probability to be computed. Either \code{"category"} for category probabilities
+#' or \code{"cumulative"} for cumulative probabilities. Cumulative probabilities are available only for cumulative
+#' logit model.
+#' @param ... other generic parameters for \code{predict()} function.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @references
+#' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
+#' The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+#'
+#' @seealso
+#' \code{\link[difNLR]{difORD}} for DIF detection among ordinal data using either cumulative logit or adjacent category logit model. \cr
+#' \code{\link[stats]{predict}} for generic function for prediction.
+#'
+#' @examples
+#' \dontrun{
+#' # Loading data
+#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
+#' Data <- dataMedicalgraded[, 1:5]
+#' group <- dataMedicalgraded[, 101]
+#' match <- rowSums(dataMedicalgraded[, 1:100])
+#'
+#' # Testing both DIF effects with cumulative logit model
+#' (x <- difORD(Data, group, match = match, focal.name = 1, model = "cumulative"))
+#'
+#' predict(x, item = "X2003", match = 300, group = c(0, 1))
+#' predict(x, item = "X2003", match = 300, group = c(0, 1), type = "cumulative")
+#'
+#' # Testing both DIF effects with adjacent category logit model
+#' (x <- difORD(Data, group, match = match, focal.name = 1, model = "adjacent"))
+#'
+#' predict(x, item = "X2003", match = 300, group = c(0, 1))
+#' }
+#'
+#' @export
+predict.difORD <- function(object, item = "all", match, group, type = "category", ...) {
+  m <- dim(object$Data)[2]
+  nams <- colnames(object$Data)
+
+  if (class(item) == "character") {
+    if (item != "all" & !item %in% nams) {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+        call. = FALSE
+      )
+    }
+    if (item[1] == "all") {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
+    }
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+        call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+          call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
+  }
+
+  if (missing(match)) {
+    if (length(object$match) > 1) {
+      match <- object$match
+    } else {
+      if (object$match == "score") {
+        match <- c(apply(object$Data, 1, sum))
+      } else {
+        match <- c(scale(apply(object$Data, 1, sum)))
+      }
+    }
+  }
+
+  if (missing(group)) {
+    group <- object$group
+  }
+  if (length(match) != length(group)) {
+    if (length(match) == 1) {
+      match <- rep(match, length(group))
+    } else if (length(group) == 1) {
+      group <- rep(group, length(match))
+    } else {
+      stop("Arguments 'match' and 'group' must be of the same length.",
+        call. = FALSE
+      )
+    }
+  }
+
+  if (object$model == "adjacent" & type != "category") {
+    warning("Argument 'type' is ignored for adjacent category logit model. Category probabilities are returned. ")
+  }
+  if (!type %in% c("category", "cumulative")) {
+    stop("'type' can be either 'category' or 'cumulative'. ")
+  }
+
+  mat0 <- switch(object$type,
+    "both"  = cbind("intercept" = 1, "match" = match, "group" = 0, "x:match" = 0),
+    "udif"  = cbind("intercept" = 1, "match" = match, "group" = 0, "x:match" = 0),
+    "nudif" = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = 0)
+  )
+  mat1 <- switch(object$type,
+    "both"  = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = match),
+    "udif"  = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = 0),
+    "nudif" = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = match)
+  )
+
+  for (i in items) {
+    cat <- sort(unique(object$Data[, i]))
+    num.cat <- length(cat)
+    num.cat.est <- num.cat - 1
+    cat.est <- cat[-1]
+
+    coefs <- object$ordPAR[[i]]
+
+    if (object$model == "adjacent") {
+      if (object$parametrization == "classic") {
+        coefs <- c(coefs, rep(0, num.cat.est + 3 - length(coefs)))
+      } else {
+        a <- coefs["a"]
+        b <- coefs[paste0("b", cat.est)]
+        aDIF <- coefs["aDIF"]
+        bDIF <- coefs[paste0("bDIF", cat.est)]
+        coefs <- c(-a * b, a, unique(round(-a * bDIF - aDIF * b - aDIF * bDIF, 7)), aDIF)
+      }
+      coefs <- sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
+
+      # calculation probabilities on formula exp(\sum_{t = 0}^{k} b_{0t} + b1X)/(\sum_{r = 0}^{K}exp(\sum_{t=0}^{r}b_{0t} + b1X))
+      df.probs.cat <- matrix(0,
+        nrow = 2 * length(match), ncol = num.cat,
+        dimnames = list(NULL, cat)
+      )
+      df.probs.cat[, as.character(cat.est)] <- rbind(
+        mat0 %*% coefs,
+        mat1 %*% coefs
+      )
+      # cumulative sum
+      df.probs.cat <- t(apply(df.probs.cat, 1, cumsum))
+      # exponential
+      df.probs.cat <- exp(df.probs.cat)
+      # norming
+      df.probs.cat <- df.probs.cat / rowSums(df.probs.cat)
+      colnames(df.probs.cat) <- paste0("P(Y = ", cat, ")")
+      df.probs.cat <- as.data.frame(df.probs.cat)
+    } else {
+      if (object$parametrization == "classic") {
+        coefs <- c(coefs, rep(0, num.cat.est + 3 - length(coefs)))
+      } else {
+        a <- coefs["a"]
+        b <- coefs[paste0("b", cat.est)]
+        aDIF <- coefs["aDIF"]
+        bDIF <- coefs[paste0("bDIF", cat.est)]
+        coefs <- c(-a * b, a, unique(round(-a * bDIF - aDIF * b - aDIF * bDIF, 7)), aDIF)
+      }
+      coefs <- sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
+
+      # cumulative probabilities
+      df.probs.cum <- matrix(1,
+        nrow = 2 * length(match), ncol = num.cat,
+        dimnames = list(NULL, cat)
+      )
+
+      # calculation of cumulative probabilities based on formula P(Y >= k) = exp(b0 + b1*x)/(1 + exp(b0 + b1*x))
+      df.probs.cum[, as.character(cat.est)] <- exp(rbind(mat0 %*% coefs, mat1 %*% coefs)) / (1 + exp(rbind(mat0 %*% coefs, mat1 %*% coefs)))
+
+      # if column between non-ones valued columns consist of ones, it has to be changed to value on the left side
+      need.correction <- which(sapply(2:num.cat, function(i) (all(df.probs.cum[, i] == 1) & all(df.probs.cum[, i - 1] != 1))))
+      df.probs.cum[, need.correction + 1] <- df.probs.cum[, need.correction]
+      colnames(df.probs.cum) <- paste0("P(Y <= ", cat, ")")
+      df.probs.cum <- as.data.frame(df.probs.cum)
+
+      # category probabilities
+      df.probs.cat <- data.frame(
+        sapply(1:(num.cat - 1), function(i) df.probs.cum[, i] - df.probs.cum[, i + 1]),
+        df.probs.cum[, num.cat]
+      )
+      colnames(df.probs.cat) <- paste0("P(Y = ", cat, ")")
+      df.probs.cat <- as.data.frame(df.probs.cat)
+    }
+  }
+
+  if (type == "category") {
+    prob <- df.probs.cat
+  } else {
+    prob <- df.probs.cum
+  }
+
+  return(prob)
 }

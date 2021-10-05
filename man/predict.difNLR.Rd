@@ -33,7 +33,7 @@ for confidence interval.}
 \item{...}{other generic parameters for \code{predict()} function.}
 }
 \description{
-S3 method for predictions from the model used in the object if \code{"difNLR"} class.
+S3 method for predictions from the model used in the object of \code{"difNLR"} class.
 }
 \examples{
 \dontrun{

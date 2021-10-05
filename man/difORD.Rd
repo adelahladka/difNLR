@@ -191,6 +191,7 @@ The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 \seealso{
 \code{\link[difNLR]{plot.difORD}} for graphical representation of item characteristic curves. \cr
 \code{\link[difNLR]{coef.difORD}} for extraction of item parameters with their standard errors. \cr
+\code{\link[difNLR]{predict.difORD}} for calculation of predicted values. \cr
 \code{\link[difNLR]{logLik.difORD}}, \code{\link[difNLR]{AIC.difORD}}, \code{\link[difNLR]{BIC.difORD}}
 for extraction of loglikelihood and information criteria. \cr
 
