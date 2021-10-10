@@ -1457,16 +1457,7 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
     stop("'type' can be either 'category' or 'cumulative'. ")
   }
 
-  mat0 <- switch(object$type,
-    "both"  = cbind("intercept" = 1, "match" = match, "group" = 0, "x:match" = 0),
-    "udif"  = cbind("intercept" = 1, "match" = match, "group" = 0, "x:match" = 0),
-    "nudif" = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = 0)
-  )
-  mat1 <- switch(object$type,
-    "both"  = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = match),
-    "udif"  = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = 0),
-    "nudif" = cbind("intercept" = 1, "match" = match, "group" = 1, "x:match" = match)
-  )
+  mat <- cbind("intercept" = 1, "match" = match, "group" = group, "x:match" = match * group)
 
   for (i in items) {
     cat <- sort(unique(object$Data[, i]))
@@ -1490,13 +1481,10 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
 
       # calculation probabilities on formula exp(\sum_{t = 0}^{k} b_{0t} + b1X)/(\sum_{r = 0}^{K}exp(\sum_{t=0}^{r}b_{0t} + b1X))
       df.probs.cat <- matrix(0,
-        nrow = 2 * length(match), ncol = num.cat,
+        nrow = nrow(mat), ncol = num.cat,
         dimnames = list(NULL, cat)
       )
-      df.probs.cat[, as.character(cat.est)] <- rbind(
-        mat0 %*% coefs,
-        mat1 %*% coefs
-      )
+      df.probs.cat[, as.character(cat.est)] <- mat %*% coefs
       # cumulative sum
       df.probs.cat <- t(apply(df.probs.cat, 1, cumsum))
       # exponential
@@ -1519,12 +1507,12 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
 
       # cumulative probabilities
       df.probs.cum <- matrix(1,
-        nrow = 2 * length(match), ncol = num.cat,
+        nrow = nrow(mat), ncol = num.cat,
         dimnames = list(NULL, cat)
       )
 
       # calculation of cumulative probabilities based on formula P(Y >= k) = exp(b0 + b1*x)/(1 + exp(b0 + b1*x))
-      df.probs.cum[, as.character(cat.est)] <- exp(rbind(mat0 %*% coefs, mat1 %*% coefs)) / (1 + exp(rbind(mat0 %*% coefs, mat1 %*% coefs)))
+      df.probs.cum[, as.character(cat.est)] <- exp(mat %*% coefs) / (1 + exp(mat %*% coefs))
 
       # if column between non-ones valued columns consist of ones, it has to be changed to value on the left side
       need.correction <- which(sapply(2:num.cat, function(i) (all(df.probs.cum[, i] == 1) & all(df.probs.cum[, i - 1] != 1))))
