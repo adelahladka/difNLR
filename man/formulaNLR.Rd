@@ -39,7 +39,7 @@ based on model specification and DIF type to be tested.
 \details{
 The unconstrained form of 4PL generalized logistic regression model for probability of correct
 answer (i.e., \eqn{y = 1}) is
-\deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
+\deqn{P(y = 1) = (c + cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b - bDif * g))), }
 where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
 Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
 Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
@@ -62,7 +62,7 @@ Three possible parameterization can be specified in \code{"parameterization"} ar
 returns IRT parameters of reference group and differences in these parameters between reference and focal group.
 \code{"alternative"} returns IRT parameters of reference group, the differences in parameters \code{"a"} and
 \code{"b"} between two groups and parameters \code{"c"} and \code{"d"} for focal group.
-\code{"logistic"} returns parameters in logistic regression parameterization.
+\code{"logistic"} returns parameters in logistic regression parameterization and it is available only for 2PL model.
 }
 \examples{
 # 3PL model with the same guessing for both groups
@@ -83,6 +83,9 @@ formulaNLR(model = "4PL", type = "all", parameterization = "alternative")
 # 4PL model with fixed a and c parameter
 # to test difference in b with alternative parameterization
 formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "alternative")
+
+# 2PL model with logistic parameterization
+formulaNLR(model = "2PL", parameterization = "logistic")
 }
 \seealso{
 \code{\link[difNLR]{difNLR}}

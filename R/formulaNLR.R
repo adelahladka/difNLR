@@ -29,7 +29,7 @@
 #' @details
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct
 #' answer (i.e., \eqn{y = 1}) is
-#' \deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
+#' \deqn{P(y = 1) = (c + cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b - bDif * g))), }
 #' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
 #' Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
 #' Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
@@ -52,7 +52,7 @@
 #' returns IRT parameters of reference group and differences in these parameters between reference and focal group.
 #' \code{"alternative"} returns IRT parameters of reference group, the differences in parameters \code{"a"} and
 #' \code{"b"} between two groups and parameters \code{"c"} and \code{"d"} for focal group.
-#' \code{"logistic"} returns parameters in logistic regression parameterization.
+#' \code{"logistic"} returns parameters in logistic regression parameterization and it is available only for 2PL model.
 #'
 #' @return A list of two models. Both includes formula, parameters to be estimated and their lower and upper constraints.
 #'
@@ -87,9 +87,11 @@
 #' # 4PL model with fixed a and c parameter
 #' # to test difference in b with alternative parameterization
 #' formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "alternative")
+#'
+#' # 2PL model with logistic parameterization
+#' formulaNLR(model = "2PL", parameterization = "logistic")
 #' @export
 #' @importFrom stats as.formula
-
 formulaNLR <- function(model, constraints = NULL, type = "all", parameterization = "classic", outcome) {
   if (missing(model)) {
     stop("Argument 'model' is missing.", call. = FALSE)
@@ -103,17 +105,21 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     }
   }
 
+  if (parameterization == "logistic" & model != "2PL") {
+    stop("Logistic parameterization is available only for 2PL model", call. = FALSE)
+  }
+
   # constraints for model
-  cons <- rep(T, 8)
+  cons <- rep(TRUE, 8)
   names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
 
   if (!is.null(constraints)) {
     if (!is.na(constraints)) {
       constr <- unlist(strsplit(constraints, split = ""))
       if (!all(constr %in% letters[1:4])) {
-        warning("Constraints can be only 'a', 'b', 'c' or 'd'!", call. = F)
+        warning("Constraints can be only 'a', 'b', 'c' or 'd'!", call. = FALSE)
       }
-      cons[paste(constr, "Dif", sep = "")] <- F
+      cons[paste0(constr, "Dif")] <- FALSE
     }
   }
 
@@ -121,23 +127,23 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
   mod <- logical(8)
   mod <- switch(model,
     # 1 PL models
-    "Rasch"   = c(F, T, F, F, F, T, F, F),
-    "1PL"     = c(T, T, F, F, F, T, F, F),
+    "Rasch"   = c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
+    "1PL"     = c(TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
     # 2 PL models
-    "2PL"     = c(T, T, F, F, T, T, F, F),
+    "2PL"     = c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE),
     # 3 PL models
-    "3PLcg"   = c(T, T, T, F, T, T, F, F),
-    "3PLdg"   = c(T, T, F, T, T, T, F, F),
-    "3PLc"    = c(T, T, T, F, T, T, T, F),
-    "3PL"     = c(T, T, T, F, T, T, T, F),
-    "3PLd"    = c(T, T, F, T, T, T, F, T),
+    "3PLcg"   = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE),
+    "3PLdg"   = c(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE),
+    "3PLc"    = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE),
+    "3PL"     = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE),
+    "3PLd"    = c(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE),
     # 4PL models
-    "4PLcgdg" = c(T, T, T, T, T, T, F, F),
-    "4PLcgd"  = c(T, T, T, T, T, T, F, T),
-    "4PLd"    = c(T, T, T, T, T, T, F, T),
-    "4PLcdg"  = c(T, T, T, T, T, T, T, F),
-    "4PLc"    = c(T, T, T, T, T, T, T, F),
-    "4PL"     = c(T, T, T, T, T, T, T, T)
+    "4PLcgdg" = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE),
+    "4PLcgd"  = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE),
+    "4PLd"    = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE),
+    "4PLcdg"  = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE),
+    "4PLc"    = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE),
+    "4PL"     = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
   )
 
   names(mod) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
@@ -152,7 +158,7 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
       stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c', or 'd' can be tested
            or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'", call. = FALSE)
     }
-    typcons[paste(types, "Dif", sep = "")] <- F
+    typcons[paste0(types, "Dif")] <- FALSE
     type <- "other"
   }
 
@@ -199,84 +205,114 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
   mod0 <- typ
   mod1 <- mod
 
-  # parameters in model 0 and model 1
-  param0 <- param1 <- list()
+  if (parameterization == "logistic") {
+    mod0 <- c(as.logical(mod0[["b"]]),
+              as.logical(mod0[["a"]]),
+              as.logical(-mod0[["a"]] * mod0[["bDif"]] -
+                          mod0[["aDif"]] * mod0[["b"]] -
+                          mod0[["aDif"]] * mod0[["bDif"]]),
+              as.logical(mod0[["aDif"]])
+              )
+    mod1 <- c(as.logical(mod1[["b"]]),
+              as.logical(mod1[["a"]]),
+              as.logical(-mod1[["a"]] * mod1[["bDif"]] -
+                           mod1[["aDif"]] * mod1[["b"]] -
+                           mod1[["aDif"]] * mod1[["bDif"]]),
+              as.logical(mod1[["aDif"]])
+    )
+    names(mod0) <- names(mod1) <- c("(Intercept)", "x", "g", "x:g")
+    part_regr0 <- names(mod0[-1])[mod0[-1]]
+    part_regr0 <- paste(part_regr0[part_regr0 != ""], collapse = " + ")
+    part_regr1 <- names(mod1[-1])[mod1[-1]]
+    part_regr1 <- paste(part_regr1[part_regr1 != ""], collapse = " + ")
+  } else {
+    # parameters in model 0 and model 1
+    param0 <- param1 <- list()
 
-  for (i in 1:4) {
-    param0[[i]] <- paste(names(which(mod0[c(i, i + 4)])), collapse = " + g * ")
-    param1[[i]] <- paste(names(which(mod1[c(i, i + 4)])), collapse = " + g * ")
-  }
-
-  if (parameterization == "alternative") {
-    names(mod0)[3:4] <- names(mod1)[3:4] <- c("cR", "dR")
-    names(mod0)[7:8] <- names(mod1)[7:8] <- c("cF", "dF")
-    for (i in 3:4) {
-      param0[[i]] <- ifelse(length(which(mod0[c(i, i + 4)])) == 1,
-        names(which(mod0[c(i, i + 4)])),
-        paste(names(which(mod0[c(i, i + 4)])), c("* (1 - g)", "* g")[mod0[c(i, i + 4)]], collapse = " + ")
-      )
-      param1[[i]] <- ifelse(length(which(mod1[c(i, i + 4)])) == 1,
-        names(which(mod1[c(i, i + 4)])),
-        paste(names(which(mod1[c(i, i + 4)])), c("* (1 - g)", "* g")[mod1[c(i, i + 4)]], collapse = " + ")
-      )
+    for (i in 1:4) {
+      param0[[i]] <- paste(names(which(mod0[c(i, i + 4)])), collapse = " + g * ")
+      param1[[i]] <- paste(names(which(mod1[c(i, i + 4)])), collapse = " + g * ")
     }
+
+    if (parameterization == "alternative") {
+      names(mod0)[3:4] <- names(mod1)[3:4] <- c("cR", "dR")
+      names(mod0)[7:8] <- names(mod1)[7:8] <- c("cF", "dF")
+      for (i in 3:4) {
+        param0[[i]] <- ifelse(length(which(mod0[c(i, i + 4)])) == 1,
+          names(which(mod0[c(i, i + 4)])),
+          paste(names(which(mod0[c(i, i + 4)])), c("* (1 - g)", "* g")[mod0[c(i, i + 4)]], collapse = " + ")
+        )
+        param1[[i]] <- ifelse(length(which(mod1[c(i, i + 4)])) == 1,
+          names(which(mod1[c(i, i + 4)])),
+          paste(names(which(mod1[c(i, i + 4)])), c("* (1 - g)", "* g")[mod1[c(i, i + 4)]], collapse = " + ")
+        )
+      }
+    }
+
+    if (param0[[3]] == "") param0[[3]] <- "0"
+    if (param0[[4]] == "") param0[[4]] <- "1"
+
+    if (param1[[3]] == "") param1[[3]] <- "0"
+    if (param1[[4]] == "") param1[[4]] <- "1"
+
+    if (param0[[1]] == "") param0[[1]] <- "1"
+    if (param1[[1]] == "") param1[[1]] <- "1"
+
+    # formulas for model 0 and model 1
+    param0[grepl(" ", param0)] <- paste0("(", param0[grepl(" ", param0)], ")")
+    param1[grepl(" ", param1)] <- paste0("(", param1[grepl(" ", param1)], ")")
+
+    # (d - c)
+    part_dc0 <- paste(c(param0[4], param0[3]), collapse = " - ")
+    part_dc0[grepl(" ", part_dc0)] <- paste0("(", part_dc0[grepl(" ", part_dc0)], ")")
+    part_dc1 <- paste(c(param1[4], param1[3]), collapse = " - ")
+    part_dc1[grepl(" ", part_dc1)] <- paste0("(", part_dc1[grepl(" ", part_dc1)], ")")
+
+    # c + (d - c)
+    part_cdc0 <- paste(c(param0[3], part_dc0), collapse = " + ")
+    part_cdc1 <- paste(c(param1[3], part_dc1), collapse = " + ")
+
+    # x - b
+    part_xb0 <- paste0("(x - ", param0[2], ")")
+    part_xb1 <- paste0("(x - ", param1[2], ")")
+
+    # a * (x - b)
+    part_axb0 <- paste(param0[1], " * ", part_xb0)
+    part_axb1 <- paste(param1[1], " * ", part_xb1)
+
+    # 1 + exp(- a * (x - b))
+    if (parameterization == "logistic") {
+      part_exp0 <- part_axb0
+      part_exp1 <- part_axb1
+    } else {
+      part_exp0 <- paste0("1 + exp(-", part_axb0, ")")
+      part_exp0 <- paste0("(", part_exp0, ")")
+      part_exp1 <- paste0("1 + exp(-", part_axb1, ")")
+      part_exp1 <- paste0("(", part_exp1, ")")
+    }
+
+    # model
+    part_regr0 <- paste(part_cdc0, "/", part_exp0)
+    part_regr1 <- paste(part_cdc1, "/", part_exp1)
   }
 
-  if (param0[[3]] == "") param0[[3]] <- "0"
-  if (param0[[4]] == "") param0[[4]] <- "1"
-
-  if (param1[[3]] == "") param1[[3]] <- "0"
-  if (param1[[4]] == "") param1[[4]] <- "1"
-
-  if (param0[[1]] == "") param0[[1]] <- "1"
-  if (param1[[1]] == "") param1[[1]] <- "1"
-
-  # formulas for model 0 and model 1
-  param0[grepl(" ", param0)] <- paste("(", param0[grepl(" ", param0)], ")", sep = "")
-  param1[grepl(" ", param1)] <- paste("(", param1[grepl(" ", param1)], ")", sep = "")
-
-  ### (d - c)
-  part_dc0 <- paste(c(param0[4], param0[3]), collapse = " - ")
-  part_dc0[grepl(" ", part_dc0)] <- paste("(", part_dc0[grepl(" ", part_dc0)], ")", sep = "")
-  part_dc1 <- paste(c(param1[4], param1[3]), collapse = " - ")
-  part_dc1[grepl(" ", part_dc1)] <- paste("(", part_dc1[grepl(" ", part_dc1)], ")", sep = "")
-
-  ### c + (d - c)
-  part_cdc0 <- paste(c(param0[3], part_dc0), collapse = " + ")
-  part_cdc1 <- paste(c(param1[3], part_dc1), collapse = " + ")
-
-  ### x - b
-  part_xb0 <- paste("(x - ", param0[2], ")", sep = "")
-  part_xb1 <- paste("(x - ", param1[2], ")", sep = "")
-
-  ### a*(x - b)
-  part_axb0 <- paste(param0[1], "*", part_xb0)
-  part_axb1 <- paste(param1[1], "*", part_xb1)
-
-  ### 1 + exp(-a*(x - b))
-  part_exp0 <- paste("1 + exp(-", part_axb0, ")", sep = "")
-  part_exp0 <- paste("(", part_exp0, ")", sep = "")
-  part_exp1 <- paste("1 + exp(-", part_axb1, ")", sep = "")
-  part_exp1 <- paste("(", part_exp1, ")", sep = "")
-
-  # model
-  part_abcd0 <- paste(part_cdc0, "/", part_exp0)
-  part_abcd1 <- paste(part_cdc1, "/", part_exp1)
-
-  ### formula
+  # formula - adding outcome
   if (missing(outcome)) {
     outcome <- "y"
   }
-  form0 <- paste(outcome, "~", part_abcd0)
-  form1 <- paste(outcome, "~", part_abcd1)
+  form0 <- paste(outcome, "~", part_regr0)
+  form1 <- paste(outcome, "~", part_regr1)
 
-  if (parameterization == "classic") {
-    lower <- c(-Inf, -Inf, 0, 0, -Inf, -Inf, -1, -1)
-    upper <- c(Inf, Inf, 1, 1, Inf, Inf, 1, 1)
-  } else {
-    lower <- c(-Inf, -Inf, 0, 0, -Inf, -Inf, 0, 0)
-    upper <- c(Inf, Inf, 1, 1, Inf, Inf, 1, 1)
-  }
+  lower <- switch(parameterization,
+    "classic" = c(-Inf, -Inf, 0, 0, -Inf, -Inf, -1, -1),
+    "alternative" = c(-Inf, -Inf, 0, 0, -Inf, -Inf, 0, 0),
+    "logistic" = NULL
+  )
+  upper <- switch(parameterization,
+    "classic" = c(Inf, Inf, 1, 1, Inf, Inf, 1, 1),
+    "alternative" = c(Inf, Inf, 1, 1, Inf, Inf, 1, 1),
+    "logistic" = NULL
+  )
 
   return(list(
     M0 = list(

@@ -1,5 +1,17 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.3.7-3 (2022-02-11)
+
+#### BUGFIXING
+  * Option `parameterization = "logistic"` was fixed in `formulaNLR()` 
+    function. 
+    
+#### MAJOR UPDATES
+  * First version of iteratively reweighted least squares algorithm 
+    was implemented in `difNLR()`, `NLR()`, and `estimNLR()` functions.
+
+------
+
 ### Changes in version 1.3.7-2 (2021-10-05)
 
 #### MAJOR UPDATES

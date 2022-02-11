@@ -40,9 +40,11 @@ uniform and non-uniform DIF (i.e., difference in parameters \code{"a"} and
 \code{"c"}, and \code{"d"}. Can be specified as a single value (for all
 items) or as an item-specific vector.}
 
-\item{method}{character: method used to estimate parameters. Either
-\code{"nls"} for non-linear least squares (default), or \code{"likelihood"}
-for maximum likelihood method.}
+\item{method}{character: method used to estimate parameters. The options
+are \code{"nls"} for non-linear least squares (default),
+\code{"likelihood"} for maximum likelihood method with \code{"L-BFGS-B"}
+algorithm, or \code{"iwls"} for maximum likelihood method with iteratively
+reweighted least squares (available only for \code{model = "2PL"}).}
 
 \item{match}{numeric or character: matching criterion to be used as an
 estimate of trait. Can be either \code{"zscore"} (default, standardized
@@ -204,40 +206,39 @@ are re-calculated by delta method. However, covariance matrices stick with
 alternative parameterization.
 }
 \examples{
-# Loading data based on GMAT
+# loading data
 data(GMAT)
+Data <- GMAT[, 1:20] # items
+group <- GMAT[, "group"] # group membership variable
 
-Data <- GMAT[, 1:20]
-group <- GMAT[, "group"]
-
-# Testing both DIF effects using likelihood-ratio test and
+# testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 \dontrun{
-# Graphical devices
+# graphical devices
 plot(x, item = x$DIFitems)
 plot(x, item = "Item1")
 plot(x, item = 1, group.names = c("Group 1", "Group 2"))
 plot(x, plot.type = "stat")
 
-# Coefficients
+# coefficients
 coef(x)
 coef(x, SE = TRUE)
 coef(x, SE = TRUE, simplify = TRUE)
 
-# Fitted values
+# fitted values
 fitted(x)
 fitted(x, item = 1)
 
-# Residuals
+# residuals
 residuals(x)
 residuals(x, item = 1)
 
-# Predicted values
+# predicted values
 predict(x)
 predict(x, item = 1)
 
-# Predicted values for new subjects
+# predicted values for new subjects
 predict(x, item = 1, match = 0, group = 0)
 predict(x, item = 1, match = 0, group = 1)
 
@@ -251,47 +252,52 @@ AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
 
-# Testing both DIF effects using Wald test and
+# testing both DIF effects using Wald test and
 # 3PL model with fixed guessing for groups
 difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "W")
-#' # Testing both DIF effects using F test and
+
+# testing both DIF effects using F test and
 # 3PL model with fixed guessing for groups
 difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")
 
-# Testing both DIF effects using
+# testing both DIF effects using
 # 3PL model with fixed guessing for groups and sandwich estimator
 # of the covariance matrices
 difNLR(Data, group, focal.name = 1, model = "3PLcg", sandwich = TRUE)
 
-# Testing both DIF effects using LR test,
+# testing both DIF effects using LR test,
 # 3PL model with fixed guessing for groups
 # and Benjamini-Hochberg correction
 difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")
 
-# Testing both DIF effects using LR test,
+# testing both DIF effects using LR test,
 # 3PL model with fixed guessing for groups
 # and item purification
 difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = TRUE)
 
-# Testing both DIF effects using 3PL model with fixed guessing for groups
+# testing both DIF effects using 3PL model with fixed guessing for groups
 # and total score as matching criterion
 difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score")
 
-# Testing uniform DIF effects using 4PL model with the same
+# testing uniform DIF effects using 4PL model with the same
 # guessing and inattention
 difNLR(Data, group, focal.name = 1, model = "4PLcgdg", type = "udif")
 
-# Testing non-uniform DIF effects using 2PL model
+# testing non-uniform DIF effects using 2PL model
 difNLR(Data, group, focal.name = 1, model = "2PL", type = "nudif")
 
-# Testing difference in parameter b using 4PL model with fixed
+# testing difference in parameter b using 4PL model with fixed
 # a and c parameters
 difNLR(Data, group, focal.name = 1, model = "4PL", constraints = "ac", type = "b")
 
-# Testing both DIF effects using LR test,
+# testing both DIF effects using LR test,
 # 3PL model with fixed guessing for groups
-# with maximum likelihood estimation method
+# using maximum likelihood estimation method with L-BFGS-B algorithm
 difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
+
+# testing both DIF effects using LR test and 2PL model
+# using maximum likelihood estimation method with iteratively reweighted least squares algorithm
+difNLR(Data, group, focal.name = 1, model = "2PL", method = "iwls")
 }
 
 }

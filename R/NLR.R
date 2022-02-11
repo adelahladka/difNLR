@@ -14,7 +14,9 @@
 #' are any combinations of parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}. Default value
 #' is \code{NULL}. See \strong{Details}.
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for
-#' non-linear least squares (default) and \code{"likelihood"} for maximum likelihood method.
+#' non-linear least squares (default), \code{"likelihood"} for maximum likelihood method with
+#' \code{"L-BFGS-B"} algorithm, or \code{"iwls"} for maximum likelihood method with iteratively
+#' reweighted least squares (available only for \code{model = "2PL"}).
 #' @param match character or numeric: matching criterion to be used as estimate of trait. Can be
 #' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
 #' or numeric vector of the same length as number of observations in \code{Data}.
@@ -61,7 +63,7 @@
 #'
 #' The unconstrained form of 4PL generalized logistic regression model for probability of correct
 #' answer (i.e., \eqn{y = 1}) is
-#' \deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
+#' \deqn{P(y = 1) = (c + cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b - bDif * g))), }
 #' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
 #' Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
 #' Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
@@ -90,7 +92,7 @@
 #' (parameter \code{"a"}) and inattention (parameter \code{"d"}) are fixed for both groups and other parameters
 #' (\code{"b"} and \code{"c"}) are not. The \code{NA} value for \code{constraints} means no constraints.
 #'
-#' In case that model considers difference in guessing or inattention parameter, the different parameterization is
+#' In case that the model considers a difference in guessing or inattention parameter, different parameterization is
 #' used and parameters with standard errors are re-calculated by delta method.
 #'
 #' @return A list with the following arguments:
@@ -98,7 +100,7 @@
 #'   \item{\code{Sval}}{the values of \code{test} statistics.}
 #'   \item{\code{pval}}{the p-values by \code{test}.}
 #'   \item{\code{adjusted.pval}}{adjusted p-values by \code{p.adjust.method}.}
-#'   \item{\code{df}}{the degress of freedom of \code{test}.}
+#'   \item{\code{df}}{the degrees of freedom of \code{test}.}
 #'   \item{\code{test}}{used test.}
 #'   \item{\code{par.m0}}{the matrix of estimated item parameters for m0 model.}
 #'   \item{\code{se.m0}}{the matrix of standard errors of item parameters for m0 model.}
@@ -146,20 +148,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' # loading data based on GMAT
+#' # loading data
 #' data(GMAT)
+#' Data <- GMAT[, 1:20] # items
+#' group <- GMAT[, "group"] # group membership variable
 #'
-#' Data <- GMAT[, 1:20]
-#' group <- GMAT[, "group"]
-#'
-#' # Testing both DIF effects using LR test (default)
+#' # testing both DIF effects using LR test (default)
 #' # and model with fixed guessing for both groups
 #' NLR(Data, group, model = "3PLcg")
 #'
-#' # Using F test
+#' # using F test
 #' NLR(Data, group, model = "3PLcg", test = "F")
 #'
-#' # Testing both DIF effects with Benjamini-Hochberg correction
+#' # testing both DIF effects with Benjamini-Hochberg correction
 #' NLR(Data, group, model = "3PLcg", p.adjust.method = "BH")
 #'
 #' # 4PL model with the same guessing and inattention
@@ -173,8 +174,11 @@
 #' # to test difference in b
 #' NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
 #'
-#' # using maximum likelihood estimation method
+#' # using maximum likelihood estimation method with L-BFGS-B algorithm
 #' NLR(Data, group, model = "3PLcg", method = "likelihood")
+#'
+#' # using maximum likelihood estimation method with iteratively reweighted least squares algorithm
+#' NLR(Data, group, model = "2PL", method = "iwls")
 #' }
 #'
 #' @keywords DIF
@@ -214,26 +218,35 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     type <- rep(type, m)
   }
 
-  parameterization <- ifelse(model %in% c(
-    "3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg",
-    "4PLc", "4PL"
-  ),
-  "alternative",
-  "classic"
-  )
-  if (missing(start)) {
-    start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+  if (method == "iwls") {
+    parameterization <- rep("logistic", m)
   } else {
-    if (is.null(start)) {
+    parameterization <- ifelse(model %in% c(
+      "3PLc", "3PL", "3PLd", "4PLcgd", "4PLd", "4PLcdg",
+      "4PLc", "4PL"
+    ),
+    "alternative",
+    "classic"
+    )
+  }
+
+  if (method == "iwls") {
+    start <- NULL
+  } else {
+    if (missing(start)) {
       start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
     } else {
-      for (i in 1:m) {
-        if (parameterization[i] == "alternative") {
-          start[[i]]["cDif"] <- start[[i]]["c"] + start[[i]]["cDif"]
-          start[[i]]["dDif"] <- start[[i]]["d"] + start[[i]]["dDif"]
-          names(start[[i]]) <- c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
-        } else {
-          names(start[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+      if (is.null(start)) {
+        start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+      } else {
+        for (i in 1:m) {
+          if (parameterization[i] == "alternative") {
+            start[[i]]["cDif"] <- start[[i]]["c"] + start[[i]]["cDif"]
+            start[[i]]["dDif"] <- start[[i]]["d"] + start[[i]]["dDif"]
+            names(start[[i]]) <- c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
+          } else {
+            names(start[[i]]) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+          }
         }
       }
     }
@@ -280,9 +293,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   conv.fail <- sum(cfM0, cfM1)
   conv.fail.which <- which(cfM0 | cfM1)
 
-  # using starting values for bootstraped samples
-
-  if (initboot) {
+  # using starting values for bootstrapped samples
+  if (initboot & conv.fail > 0) {
     startM0 <- startM1 <- start
     startBo0 <- rep(0, m)
     startBo1 <- rep(0, m)
@@ -291,7 +303,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     set.seed(42)
     for (i in 1:nrBo) {
       if (conv.fail > 0) {
-        samp <- sample(1:dim(Data)[1], size = dim(Data)[1], replace = T)
+        samp <- sample(1:dim(Data)[1], size = dim(Data)[1], replace = TRUE)
         startalt <- startNLR(Data[samp, ], group[samp], model,
           match = x,
           parameterization = parameterization
@@ -359,33 +371,37 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     message(paste("Convergence failure in item", conv.fail.which, "\n"))
   }
 
-  # likelihood
+  # log-likelihood
   ll.m0 <- ll.m1 <- rep(NA, m)
   ll.m0[which(!cfM0)] <- sapply(m0[which(!cfM0)], logLik)
   ll.m1[which(!cfM1)] <- sapply(m1[which(!cfM1)], logLik)
 
   # parameters
+  par.m0 <- se.m0 <- lapply(1:m, function(i) {
+    structure(rep(NA, length(M[[i]]$M0$parameters)),
+              names = M[[i]]$M0$parameters
+    )
+  })
   par.m1 <- se.m1 <- lapply(1:m, function(i) {
     structure(rep(NA, length(M[[i]]$M1$parameters)),
       names = M[[i]]$M1$parameters
     )
   })
-  par.m0 <- se.m0 <- lapply(1:m, function(i) {
-    structure(rep(NA, length(M[[i]]$M0$parameters)),
-      names = M[[i]]$M0$parameters
-    )
-  })
-  par.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], coef)
   par.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], coef)
+  par.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], coef)
 
   # covariance structure
   cov.m0 <- cov.m1 <- as.list(rep(NA, m))
-  cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov, sandwich)
-  cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov, sandwich)
-
-  cov.fail1 <- which(sapply(cov.m1, is.null))
+  if (method == "iwls") {
+    cov.m0[which(!cfM0)] <- lapply(lapply(m0[which(!cfM0)], summary), vcov)
+    cov.m1[which(!cfM1)] <- lapply(lapply(m1[which(!cfM1)], summary), vcov)
+  } else {
+    cov.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], vcov, sandwich)
+    cov.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], vcov, sandwich)
+  }
   cov.fail0 <- which(sapply(cov.m0, is.null))
-  cov.fail <- sort(union(cov.fail1, cov.fail0))
+  cov.fail1 <- which(sapply(cov.m1, is.null))
+  cov.fail <- sort(union(cov.fail0, cov.fail1))
 
   if (length(cov.fail) > 0) {
     message(paste(
@@ -397,7 +413,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   }
   conv.m0 <- setdiff(1:m, unique(c(which(cfM0), which(sapply(cov.m0[which(!cfM0)], function(x) is.null(x))))))
   conv.m1 <- setdiff(1:m, unique(c(which(cfM1), which(sapply(cov.m1[which(!cfM1)], function(x) is.null(x))))))
-  # se
+  # standard errors
   se.m0[conv.m0] <- lapply(cov.m0[conv.m0], function(x) sqrt(diag(x)))
   se.m1[conv.m1] <- lapply(cov.m1[conv.m1], function(x) sqrt(diag(x)))
 
