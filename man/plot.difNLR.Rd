@@ -56,29 +56,28 @@ are used.
 }
 \examples{
 \dontrun{
-# Loading data based on GMAT
+# loading data
 data(GMAT)
+Data <- GMAT[, 1:20] # items
+group <- GMAT[, "group"] # group membership variable
 
-Data <- GMAT[, 1:20]
-group <- GMAT[, "group"]
-
-# Testing both DIF effects using likelihood-ratio test and
+# testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
-# Characteristic curves
+# item characteristic curves
 plot(x)
 plot(x, item = x$DIFitems)
 plot(x, item = 1)
 plot(x, item = "Item1")
 
-# Characteristic curves without empirical probabilities
+# item characteristic curves without empirical probabilities
 plot(x, item = 1, draw.empirical = FALSE)
 
-# Characteristic curves without empirical probabilities but with CI
+# item characteristic curves without empirical probabilities but with CI
 plot(x, item = 1, draw.empirical = FALSE, draw.CI = TRUE)
 
-# Graphical devices - test statistics
+# graphical devices - test statistics
 plot(x, plot.type = "stat")
 }
 }

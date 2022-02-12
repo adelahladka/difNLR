@@ -4,7 +4,7 @@
 \alias{logLik.difNLR}
 \alias{AIC.difNLR}
 \alias{BIC.difNLR}
-\title{Loglikelihood and information criteria for an object of \code{"difNLR"} class.}
+\title{Log-likelihood and information criteria for an object of \code{"difNLR"} class.}
 \usage{
 \method{logLik}{difNLR}(object, item = "all", ...)
 
@@ -22,18 +22,16 @@ the column number).}
 \item{...}{other generic parameters for S3 methods.}
 }
 \description{
-S3 methods for extracting loglikelihood, Akaike's information criterion (AIC) and
+S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
 Schwarz's Bayesian criterion (BIC) for an object of \code{"difNLR"} class.
 }
 \examples{
 \dontrun{
-# Loading data based on GMAT
 data(GMAT)
+Data <- GMAT[, 1:20] # items
+group <- GMAT[, "group"] # group membership variable
 
-Data <- GMAT[, 1:20]
-group <- GMAT[, "group"]
-
-# Testing both DIF effects using likelihood-ratio test and
+# testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 

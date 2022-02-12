@@ -22,7 +22,7 @@
 #' @importFrom nnet multinom
 #' @importFrom plyr ldply
 #' @importFrom reshape2 melt
-#' @importFrom stats AIC as.formula anova BIC binomial coef complete.cases deriv3 deviance fitted glm logLik na.omit nls optim p.adjust p.adjust.methods pf pchisq rbinom relevel residuals rnorm sd setNames symnum qf qchisq qt quantile vcov
+#' @importFrom stats AIC as.formula anova BIC binomial coef complete.cases deriv3 deviance fitted glm logLik na.omit nls optim p.adjust p.adjust.methods pf pchisq rbinom relevel residuals rnorm sd setNames symnum qf qchisq qnorm qt quantile vcov
 #' @importFrom VGAM acat AICvlm BICvlm cumulative lrtest_vglm
 #'
 #' @section Functions:
@@ -75,7 +75,7 @@
 #' \doi{10.1111/jedm.12158}.
 #'
 #' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-#' The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+#' The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 #'
 #' Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
 #' methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2): 1--64.

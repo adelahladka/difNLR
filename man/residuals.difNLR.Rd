@@ -24,21 +24,19 @@ S3 methods for extracting fitted values and residuals for an object of \code{"di
 }
 \examples{
 \dontrun{
-# Loading data based on GMAT
 data(GMAT)
+Data <- GMAT[, 1:20] # items
+group <- GMAT[, "group"] # group membership variable
 
-Data <- GMAT[, 1:20]
-group <- GMAT[, "group"]
-
-# Testing both DIF effects using likelihood-ratio test and
+# testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
-# Fitted values
+# fitted values
 fitted(x)
 fitted(x, item = 1)
 
-# Residuals
+# residuals
 residuals(x)
 residuals(x, item = 1)
 }

@@ -334,15 +334,15 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     stop("Detection of non-uniform DIF is not possible with Rasch model.", call. = FALSE)
   }
   # input check
-  ### model
+  # model
   if (missing(model)) {
     stop("'model' is missing", call. = FALSE)
   }
-  ### constraints
+  # constraints
   if (missing(constraints)) {
     constraints <- NULL
   }
-  ### matching criterion
+  # matching criterion
   if (!(match[1] %in% c("score", "zscore"))) {
     if (is.null(dim(Data))) {
       no <- length(Data)
@@ -354,30 +354,30 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
            of observations in 'Data'.")
     }
   }
-  ### purification
+  # purification
   if (purify & !(match[1] %in% c("score", "zscore"))) {
     stop("Purification not allowed when matching variable is not 'zscore' or 'score'.", call. = FALSE)
   }
-  ### test
+  # test
   if (!test %in% c("F", "LR", "W") | !is.character(type)) {
     stop("Invalid value for 'test'. Test for DIF detection must be either 'LR', 'W', or 'F'.", call. = FALSE)
   }
-  ### significance level
+  # significance level
   if (alpha > 1 | alpha < 0) {
     stop("Argument 'alpha' must be between 0 and 1.", call. = FALSE)
   }
-  ### starting values
+  # starting values
   if (missing(start)) {
     start <- NULL
   }
-  ### starting values with bootstraped samples
+  # starting values with bootstraped samples
   if (initboot) {
     if (nrBo < 1) {
       stop("The maximal number of iterations for calculation of starting values using bootstraped
            samples 'nrBo' need to be greater than 1.", call. = FALSE)
     }
   }
-  ### estimation method
+  # estimation method
   if (!(method %in% c("nls", "likelihood", "iwls"))) {
     stop("Invalid value for 'method'. Estimation method must be either 'nls', 'likelihood', or 'iwls'. ", call. = FALSE)
   }
@@ -447,7 +447,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       match <- df[, "match"]
     }
 
-    ### model
+    # model
     if (length(model) == 1) {
       model <- rep(model, dim(DATA)[2])
     } else {
@@ -463,7 +463,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       stop("Invalid value for 'model'.", call. = FALSE)
     }
 
-    ### type of DIF to be tested
+    # type of DIF to be tested
     if (length(type) == 1) {
       type <- rep(type, dim(DATA)[2])
     } else {
@@ -484,7 +484,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       }
     }
 
-    ### constraints
+    # constraints
     if (!(is.null(constraints))) {
       if (length(constraints) == 1) {
         constraints <- rep(constraints, dim(DATA)[2])
@@ -514,7 +514,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       constraints <- as.list(rep(NA, dim(DATA)[2]))
       types <- NULL
     }
-    ### anchors
+    # anchors
     if (!is.null(anchor)) {
       if (is.numeric(anchor)) {
         ANCHOR <- anchor
@@ -527,7 +527,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     } else {
       ANCHOR <- 1:dim(DATA)[2]
     }
-    ### parameterization
+    # parameterization
     parameterization <- ifelse(model %in% c(
       "3PLc", "3PL", "3PLd", "4PLcgd", "4PLd",
       "4PLcdg", "4PLc", "4PL"
@@ -540,7 +540,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         stop("Invalid value for 'start'. Initial values must be a list with as many elements
              as number of items in Data.", call. = FALSE)
       }
-      if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste(letters[1:4], "Dif", sep = "")))) {
+      if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste0(letters[1:4], "Dif")))) {
         stop("Invalid names in 'start'. Each element of 'start' need to be a numeric vector
              with names 'a', 'b', 'c', 'd', 'aDif', 'bDif', 'cDif' and 'dDif'.", call. = FALSE)
       }
@@ -670,8 +670,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
               if (sum(dif == dif2) == length(dif)) {
                 noLoop <- TRUE
                 break
-              }
-              else {
+              } else {
                 dif <- dif2
               }
             }
@@ -713,7 +712,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         }
       }
       if (!is.null(difPur)) {
-        rownames(difPur) <- paste("Step", 0:(dim(difPur)[1] - 1), sep = "")
+        rownames(difPur) <- paste0("Step", 0:(dim(difPur)[1] - 1))
         colnames(difPur) <- colnames(DATA)
       }
 
@@ -742,10 +741,9 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     }
     if (purify) {
       if (!noLoop) {
-        warning(paste("Item purification process not converged after ",
+        warning(paste0("Item purification process not converged after ",
           nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
-          "Results are based on the last iteration of the item purification.\n",
-          sep = ""
+          "Results are based on the last iteration of the item purification.\n"
         ),
         call. = FALSE
         )
@@ -761,7 +759,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
 
 #' @export
 print.difNLR <- function(x, ...) {
-  cat(paste("Detection of ",
+  cat(paste0("Detection of ",
     ifelse(length(unique(x$type)) == 1,
       switch(unique(x$type),
         both = "both types of ",
@@ -773,11 +771,10 @@ print.difNLR <- function(x, ...) {
       ""
     ),
     "differential item functioning\n",
-    "using generalized logistic regression model",
-    sep = ""
+    "using generalized logistic regression model"
   ))
   cat(
-    paste("\n\nGeneralized logistic regression ",
+    paste0("\n\nGeneralized logistic regression ",
       switch(x$test,
         "F" = "F-test",
         "LR" = "likelihood ratio chi-square",
@@ -785,13 +782,17 @@ print.difNLR <- function(x, ...) {
       ),
       " statistics",
       ifelse(length(unique(x$model)) == 1,
-        paste(
+        paste0(
           "\nbased on",
           switch(unique(x$model),
-            "Rasch" = "Rasch model", "1PL" = "1PL model", "2PL" = "2PL model",
-            "3PL" = "3PL model", "3PLcg" = "3PL model with fixed guessing for groups",
+            "Rasch" = "Rasch model",
+            "1PL" = "1PL model",
+            "2PL" = "2PL model",
+            "3PL" = "3PL model",
+            "3PLcg" = "3PL model with fixed guessing for groups",
             "3PLdg" = "3PL model with fixed inattention parameter for groups",
-            "3PLc" = "3PL model", "3PLd" = "3PL model with inattention parameter",
+            "3PLc" = "3PL model",
+            "3PLd" = "3PL model with inattention parameter",
             "4PLcgdg" = "4PL model with fixed guessing and inattention parameter for groups",
             "4PLcgd" = "4PL model with fixed guessing for groups",
             "4PLd" = "4PL model with fixed guessing for groups",
@@ -799,10 +800,8 @@ print.difNLR <- function(x, ...) {
             "4PLc" = "4PL model with fixed inattention parameter for groups",
             "4PL" = "4PL model"
           )
-        ),
-        ""
-      ),
-      sep = ""
+        )
+      )
     ),
     ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
       paste(
@@ -813,17 +812,19 @@ print.difNLR <- function(x, ...) {
       "\n"
     )
   )
-  cat(paste("\nParameters were estimated with", ifelse(x$method == "nls",
-    "non-linear least squares\n",
-    "maximum likelihood method\n"
-  )))
-  cat(paste("\nItem purification was",
+  cat(paste(
+    "\nParameters were estimated using",
+    switch(x$method,
+      "nls" = "non-linear least squares\n",
+      "likelihood" = "maximum likelihood method \nwith L-BFGS-B algorithm\n",
+      "iwls" = "maximum likelihood method \nwith iteratively reweighted least squares algorithm\n"
+    )
+  ))
+  cat(paste0("\nItem purification was",
     ifelse(x$purification, " ", " not "), "applied",
-    ifelse(x$purification, paste(" with ", x$nrPur,
-      ifelse(x$nrPur <= 1, " iteration.", " iterations."),
-      sep = ""
-    ), ""), "\n",
-    sep = ""
+    ifelse(x$purification, paste0(" with ", x$nrPur,
+      ifelse(x$nrPur <= 1, " iteration.", " iterations.")
+    ), ""), "\n"
   ))
   if (x$p.adjust.method == "none") {
     cat("No p-value adjustment for multiple comparisons\n\n")
@@ -831,9 +832,13 @@ print.difNLR <- function(x, ...) {
     cat(paste(
       "Multiple comparisons made with",
       switch(x$p.adjust.method,
-        holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
-        bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
-        BY = "Benjamini-Yekutieli", fdr = "FDR"
+        holm = "Holm",
+        hochberg = "Hochberg",
+        hommel = "Hommel",
+        bonferroni = "Bonferroni",
+        BH = "Benjamini-Hochberg",
+        BY = "Benjamini-Yekutieli",
+        fdr = "FDR"
       ), "adjustment of p-values\n\n"
     ))
   }
@@ -880,14 +885,14 @@ print.difNLR <- function(x, ...) {
     }
   }
   if (!is.null(critical)) {
-    cat(paste("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")", sep = ""))
+    cat(paste0("\nDetection thresholds: ", round(critical, 4), " (significance level: ", x$alpha, ")"))
   }
 
   if (is.character(x$DIFitems)) {
     cat("\nNone of items is detected as DIF \n")
   } else {
     cat("\n\nItems detected as DIF items:")
-    cat("\n", paste(colnames(x$Data)[x$DIFitems], "\n", sep = ""))
+    cat("\n", paste0(colnames(x$Data)[x$DIFitems], "\n"))
   }
 }
 
@@ -955,29 +960,28 @@ print.difNLR <- function(x, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+#' # loading data
 #' data(GMAT)
+#' Data <- GMAT[, 1:20] # items
+#' group <- GMAT[, "group"] # group membership variable
 #'
-#' Data <- GMAT[, 1:20]
-#' group <- GMAT[, "group"]
-#'
-#' # Testing both DIF effects using likelihood-ratio test and
+#' # testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # Characteristic curves
+#' # item characteristic curves
 #' plot(x)
 #' plot(x, item = x$DIFitems)
 #' plot(x, item = 1)
 #' plot(x, item = "Item1")
 #'
-#' # Characteristic curves without empirical probabilities
+#' # item characteristic curves without empirical probabilities
 #' plot(x, item = 1, draw.empirical = FALSE)
 #'
-#' # Characteristic curves without empirical probabilities but with CI
+#' # item characteristic curves without empirical probabilities but with CI
 #' plot(x, item = 1, draw.empirical = FALSE, draw.CI = TRUE)
 #'
-#' # Graphical devices - test statistics
+#' # graphical devices - test statistics
 #' plot(x, plot.type = "stat")
 #' }
 #' @export
@@ -998,13 +1002,13 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         )
       } else {
         switch(x$test,
-          "F" = warning(paste("Item ", x$conv.fail.which,
+          "F" = warning(paste0("Item ", x$conv.fail.which,
             " does not converge. F-statistic value not plotted",
-            sep = "", collapse = "\n"
+            collapse = "\n"
           ), call. = FALSE),
-          "LR" = warning(paste("Item ", x$conv.fail.which,
+          "LR" = warning(paste0("Item ", x$conv.fail.which,
             " does not converge. LR-statistic value not plotted",
-            sep = "", collapse = "\n"
+            collapse = "\n"
           ), call. = FALSE)
         )
       }
@@ -1040,12 +1044,12 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       label = "V1",
       col = "g"
     )) +
-      ### points
+      # points
       geom_text() +
       scale_color_manual(values = c("black", "red")) +
-      ### critical value
+      # critical value
       geom_hline(yintercept = Sval_critical) +
-      ### theme
+      # theme
       ggtitle(title) +
       labs(x = "Item", y = switch(x$test,
         "F" = "F-statistic",
@@ -1116,14 +1120,14 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
     if (any(x$conv.fail.which %in% items)) {
       if (length(setdiff(items, x$conv.fail.which)) == 0) {
-        stop(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
-          sep = "", collapse = "\n"
+        stop(paste0("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
+          collapse = "\n"
         ),
         call. = FALSE
         )
       } else {
-        warning(paste("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
-          sep = "", collapse = "\n"
+        warning(paste0("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
+          collapse = "\n"
         ),
         call. = FALSE
         )
@@ -1245,7 +1249,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
           legend.background = element_rect(fill = "transparent", colour = NA),
           legend.box.background = element_rect(fill = "transparent", colour = NA)
         ) +
-        ### legend
+        # legend
         theme(
           legend.box.just = "top",
           legend.justification = c("left", "top"),
@@ -1264,7 +1268,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
     return(plot_CC)
   }
-  ### checking input
+  # checking input
   if (!(plot.type %in% c("cc", "stat"))) {
     stop("Invalid value for 'plot.type'. Possible values of 'plot.type' is 'cc' or 'stat'.",
       call. = FALSE
@@ -1282,7 +1286,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 #' @aliases residuals.difNLR
 #' @export
 fitted.difNLR <- function(object, item = "all", ...) {
-  ### checking input
+  # checking input
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
@@ -1317,14 +1321,14 @@ fitted.difNLR <- function(object, item = "all", ...) {
 
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-        sep = "", collapse = "\n"
+      stop(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
+        collapse = "\n"
       ),
       call. = FALSE
       )
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-        sep = "", collapse = "\n"
+      warning(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+        collapse = "\n"
       ),
       call. = FALSE
       )
@@ -1342,7 +1346,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
     PAR[i, names(object$nlrPAR[[i]])] <- object$nlrPAR[[i]]
   }
 
-  ### data
+  # data
   if (length(object$match) > 1) {
     match <- object$match
   } else {
@@ -1353,7 +1357,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
     }
   }
 
-  ### fitted values
+  # fitted values
   FV <- as.list(rep(NA, m))
   FV[ITEMS] <- lapply(ITEMS, function(i) {
     .gNLR(
@@ -1417,38 +1421,37 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+#' # loading data
 #' data(GMAT)
+#' Data <- GMAT[, 1:20] # items
+#' group <- GMAT[, "group"] # group membership variable
 #'
-#' Data <- GMAT[, 1:20]
-#' group <- GMAT[, "group"]
-#'
-#' # Testing both DIF effects using likelihood-ratio test and
+#' # testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # Predicted values
+#' # predicted values
 #' summary(predict(x))
 #' predict(x, item = 1)
 #' predict(x, item = "Item1")
 #'
-#' # Predicted values for new observations - average score
+#' # predicted values for new observations - average score
 #' predict(x, item = 1, match = 0, group = 0) # reference group
 #' predict(x, item = 1, match = 0, group = 1) # focal group
 #'
-#' # Predicted values for new observations - various z-scores and groups
+#' # predicted values for new observations - various z-scores and groups
 #' new.match <- rep(c(-1, 0, 1), 2)
 #' new.group <- rep(c(0, 1), each = 3)
 #' predict(x, item = 1, match = new.match, group = new.group)
 #'
-#' # Predicted values for new observations with confidence intervals
+#' # predicted values for new observations with confidence intervals
 #' predict(x, item = 1, match = new.match, group = new.group, interval = "confidence")
 #' predict(x, item = c(2, 4), match = new.match, group = new.group, interval = "confidence")
 #' }
 #'
 #' @export
 predict.difNLR <- function(object, item = "all", match, group, interval = "none", level = 0.95, ...) {
-  ### checking input
+  # checking input
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
@@ -1510,14 +1513,14 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-        sep = "", collapse = "\n"
+      stop(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
+        collapse = "\n"
       ),
       call. = FALSE
       )
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-        sep = "", collapse = "\n"
+      warning(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+        collapse = "\n"
       ),
       call. = FALSE
       )
@@ -1543,7 +1546,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
     PAR[i, names(object$nlrPAR[[i]])] <- object$nlrPAR[[i]]
   }
 
-  ### predicted values
+  # predicted values
   NEW <- lapply(1:m, function(i) {
     if (i %in% ITEMS) {
       .gNLR(
@@ -1643,7 +1646,9 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 #' @param object an object of \code{"difNLR"} class.
 #' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
 #' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
-#' @param ... other generic parameters for \code{predict()} function.
+#' @param IRTpars logical: should the estimated parameters be returned in IRT parameterization? (default is \code{TRUE}).
+#' @param CI numeric: level of confidence interval for parameters, default is \code{0.95} for 95\% confidence interval.
+#' @param ... other generic parameters for \code{coef()} function.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -1675,23 +1680,25 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+#' # loading data
 #' data(GMAT)
+#' Data <- GMAT[, 1:20] # items
+#' group <- GMAT[, "group"] # group membership variable
 #'
-#' Data <- GMAT[, 1:20]
-#' group <- GMAT[, "group"]
-#'
-#' # Testing both DIF effects using likelihood-ratio test and
+#' # testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # Coefficients
+#' # coefficients
 #' coef(x)
 #' coef(x, SE = TRUE)
 #' coef(x, SE = TRUE, simplify = TRUE)
+#' coef(x, IRTpars = FALSE)
+#' coef(x, IRTpars = FALSE, SE = TRUE, simplify = TRUE)
+#' coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
 #' }
 #' @export
-coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
+coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
   if (class(SE) != "logical") {
     stop("Invalid value for 'SE'. 'SE' need to be logical. ",
       call. = FALSE
@@ -1702,27 +1709,75 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
       call. = FALSE
     )
   }
+  if (class(IRTpars) != "logical") {
+    stop("Invalid value for 'IRTpars'. 'IRTpars' need to be logical. ",
+         call. = FALSE
+    )
+  }
+  if (CI > 1 | CI < 0 | !is.numeric(CI)) {
+    stop("Invalid value for 'CI'. 'CI' must be numeric value between 0 and 1. ",
+         call. = FALSE
+    )
+  }
 
   m <- dim(object$Data)[2]
   nams <- colnames(object$Data)
 
-  coefs <- object$nlrPAR
-  names(coefs) <- nams
+  if (IRTpars) {
+    pars <- object$nlrPAR
+    se <- object$nlrSE
+  } else {
+    nlrPAR <- ifelse(1:m %in% object$DIFitems, object$parM1, object$parM0)
+    nlrCOV <- ifelse(1:m %in% object$DIFitems, object$covM1, object$covM0)
+    nlrDM <- lapply(1:m, function(i)
+      .deltamethod.irt2log(
+        par = nlrPAR[[i]], cov = nlrCOV[[i]],
+        conv = !(i %in% object$conv.fail.which),
+        cov_fail = is.null(nlrCOV[[i]])
+      )
+    )
+    pars <- lapply(nlrDM, function(x) x$par)
+    se <- lapply(nlrDM, function(x) x$se)
+  }
+  names(pars) <- nams
+  names(se) <- nams
 
   if (SE) {
-    se <- object$nlrSE
-    names(se) <- nams
-    coefs <- lapply(nams, function(i) rbind(coefs[[i]], se[[i]]))
+    coefs <- lapply(nams, function(i) rbind(pars[[i]], se[[i]]))
     coefs <- lapply(coefs, "rownames<-", c("estimate", "SE"))
+    names(coefs) <- nams
+  } else {
+    coefs <- pars
+  }
+
+  if (CI > 0) {
+    alpha <- (1 - CI) / 2
+    CIlow <- lapply(nams, function(i) pars[[i]] - qnorm(1 - alpha) * se[[i]])
+    CIupp <- lapply(nams, function(i) pars[[i]] + qnorm(1 - alpha) * se[[i]])
+    names(CIlow) <- names(CIupp) <- nams
+    coefs <- lapply(nams, function(i) rbind(coefs[[i]], CIlow[[i]], CIupp[[i]]))
+    if (SE) {
+      coefs <- lapply(coefs, "rownames<-", c("estimate", "SE", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+    } else {
+      coefs <- lapply(coefs, "rownames<-", c("estimate", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+    }
     names(coefs) <- nams
   }
 
   if (simplify) {
     res <- as.data.frame(plyr::ldply(coefs, rbind))
     if (SE) {
-      resnams <- paste(res[, 1], c("estimate", "SE"))
+      if (CI > 0) {
+        resnams <- paste(res[, 1], c("estimate", "SE", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+      } else {
+        resnams <- paste(res[, 1], c("estimate", "SE"))
+      }
     } else {
-      resnams <- res[, 1]
+      if (CI > 0) {
+        resnams <- paste(res[, 1], c("estimate", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+      } else {
+        resnams <- res[, 1]
+      }
     }
     res <- res[, -1]
     rownames(res) <- resnams
@@ -1734,12 +1789,12 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
   return(res)
 }
 
-#' Loglikelihood and information criteria for an object of \code{"difNLR"} class.
+#' Log-likelihood and information criteria for an object of \code{"difNLR"} class.
 #'
 #' @aliases AIC.difNLR BIC.difNLR
 #' @rdname logLik.difNLR
 #'
-#' @description S3 methods for extracting loglikelihood, Akaike's information criterion (AIC) and
+#' @description S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
 #' Schwarz's Bayesian criterion (BIC) for an object of \code{"difNLR"} class.
 #'
 #' @param object an object of \code{"difNLR"} class.
@@ -1779,13 +1834,12 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+# loading data
 #' data(GMAT)
+#' Data <- GMAT[, 1:20] # items
+#' group <- GMAT[, "group"] # group membership variable
 #'
-#' Data <- GMAT[, 1:20]
-#' group <- GMAT[, "group"]
-#'
-#' # Testing both DIF effects using likelihood-ratio test and
+#' # testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
@@ -1834,14 +1888,14 @@ logLik.difNLR <- function(object, item = "all", ...) {
 
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-        sep = "", collapse = "\n"
+      stop(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
+        collapse = "\n"
       ),
       call. = FALSE
       )
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-        sep = "", collapse = "\n"
+      warning(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+        collapse = "\n"
       ),
       call. = FALSE
       )
@@ -1908,14 +1962,14 @@ AIC.difNLR <- function(object, item = "all", ...) {
 
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-        sep = "", collapse = "\n"
+      stop(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
+        collapse = "\n"
       ),
       call. = FALSE
       )
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-        sep = "", collapse = "\n"
+      warning(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+        collapse = "\n"
       ),
       call. = FALSE
       )
@@ -1974,14 +2028,14 @@ BIC.difNLR <- function(object, item = "all", ...) {
 
   if (any(object$conv.fail.which %in% items)) {
     if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-        sep = "", collapse = "\n"
+      stop(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
+        collapse = "\n"
       ),
       call. = FALSE
       )
     } else {
-      warning(paste("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-        sep = "", collapse = "\n"
+      warning(paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
+        collapse = "\n"
       ),
       call. = FALSE
       )
@@ -2046,27 +2100,26 @@ BIC.difNLR <- function(object, item = "all", ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+# loading data
 #' data(GMAT)
+#' Data <- GMAT[, 1:20] # items
+#' group <- GMAT[, "group"] # group membership variable
 #'
-#' Data <- GMAT[, 1:20]
-#' group <- GMAT[, "group"]
-#'
-#' # Testing both DIF effects using likelihood-ratio test and
+#' # testing both DIF effects using likelihood-ratio test and
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # Fitted values
+#' # fitted values
 #' fitted(x)
 #' fitted(x, item = 1)
 #'
-#' # Residuals
+#' # residuals
 #' residuals(x)
 #' residuals(x, item = 1)
 #' }
 #' @export
 residuals.difNLR <- function(object, item = "all", ...) {
-  ### checking input
+  # checking input
   n <- dim(object$Data)[1]
 
   m <- length(object$nlrPAR)

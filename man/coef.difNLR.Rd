@@ -5,7 +5,7 @@
 \alias{coefficients.difNLR}
 \title{Extract model coefficients from an object of \code{"difNLR"} class.}
 \usage{
-\method{coef}{difNLR}(object, SE = FALSE, simplify = FALSE, ...)
+\method{coef}{difNLR}(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...)
 }
 \arguments{
 \item{object}{an object of \code{"difNLR"} class.}
@@ -14,27 +14,33 @@
 
 \item{simplify}{logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).}
 
-\item{...}{other generic parameters for \code{predict()} function.}
+\item{IRTpars}{logical: should the estimated parameters be returned in IRT parameterization? (default is \code{TRUE}).}
+
+\item{CI}{numeric: level of confidence interval for parameters, default is \code{0.95} for 95\% confidence interval.}
+
+\item{...}{other generic parameters for \code{coef()} function.}
 }
 \description{
 S3 method for extracting model coefficients from an object of \code{"difNLR"} class.
 }
 \examples{
 \dontrun{
-# Loading data based on GMAT
+# loading data
 data(GMAT)
+Data <- GMAT[, 1:20] # items
+group <- GMAT[, "group"] # group membership variable
 
-Data <- GMAT[, 1:20]
-group <- GMAT[, "group"]
-
-# Testing both DIF effects using likelihood-ratio test and
+# testing both DIF effects using likelihood-ratio test and
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
-# Coefficients
+# coefficients
 coef(x)
 coef(x, SE = TRUE)
 coef(x, SE = TRUE, simplify = TRUE)
+coef(x, IRTpars = FALSE)
+coef(x, IRTpars = FALSE, SE = TRUE, simplify = TRUE)
+coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
 }
 }
 \references{

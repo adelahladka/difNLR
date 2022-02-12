@@ -9,7 +9,14 @@
 #### MAJOR UPDATES
   * First version of iteratively reweighted least squares algorithm 
     was implemented in `difNLR()`, `NLR()`, and `estimNLR()` functions.
+  * `coef.difNLR()` method now includes delta method for IRT and 
+    logistic parameterizations. 
+  * `coef.difNLR()` method now includes confidence intervals. 
 
+#### MINOR UPDATES
+  * Some typos fixed.
+  * Examples in functions were updated. 
+  
 ------
 
 ### Changes in version 1.3.7-2 (2021-10-05)

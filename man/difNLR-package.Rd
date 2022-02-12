@@ -64,7 +64,7 @@ A non-IRT approach accounting for guessing. Journal of Educational Measurement, 
 \doi{10.1111/jedm.12158}.
 
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 
 Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
 methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2): 1--64.
