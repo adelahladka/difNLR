@@ -15,7 +15,7 @@
 #' is \code{NULL}. See \strong{Details}.
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for
 #' non-linear least squares (default), \code{"likelihood"} for maximum likelihood method with
-#' \code{"L-BFGS-B"} algorithm, or \code{"iwls"} for maximum likelihood method with iteratively
+#' \code{"L-BFGS-B"} algorithm, or \code{"irls"} for maximum likelihood method with iteratively
 #' reweighted least squares (available only for \code{model = "2PL"}).
 #' @param match character or numeric: matching criterion to be used as estimate of trait. Can be
 #' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
@@ -181,7 +181,7 @@
 #' NLR(Data, group, model = "3PLcg", method = "likelihood")
 #'
 #' # using maximum likelihood estimation method with iteratively reweighted least squares algorithm
-#' NLR(Data, group, model = "2PL", method = "iwls")
+#' NLR(Data, group, model = "2PL", method = "irls")
 #' }
 #'
 #' @keywords DIF
@@ -221,7 +221,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     type <- rep(type, m)
   }
 
-  if (method == "iwls") {
+  if (method == "irls") {
     parameterization <- rep("logistic", m)
   } else {
     parameterization <- ifelse(model %in% c(
@@ -233,7 +233,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     )
   }
 
-  if (method == "iwls") {
+  if (method == "irls") {
     start <- NULL
   } else {
     if (missing(start)) {
@@ -395,7 +395,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 
   # covariance structure
   cov.m0 <- cov.m1 <- as.list(rep(NA, m))
-  if (method == "iwls") {
+  if (method == "irls") {
     cov.m0[which(!cfM0)] <- lapply(lapply(m0[which(!cfM0)], summary), vcov)
     cov.m1[which(!cfM1)] <- lapply(lapply(m1[which(!cfM1)], summary), vcov)
   } else {

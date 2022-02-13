@@ -31,7 +31,7 @@ an item-specific vector.}
 
 \item{method}{character: method used to estimate parameters. The options are \code{"nls"} for
 non-linear least squares (default), \code{"likelihood"} for maximum likelihood method with
-\code{"L-BFGS-B"} algorithm, or \code{"iwls"} for maximum likelihood method with iteratively
+\code{"L-BFGS-B"} algorithm, or \code{"irls"} for maximum likelihood method with iteratively
 reweighted least squares (available only for \code{model = "2PL"}).}
 
 \item{match}{character or numeric: matching criterion to be used as estimate of trait. Can be
@@ -170,7 +170,7 @@ NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
 NLR(Data, group, model = "3PLcg", method = "likelihood")
 
 # using maximum likelihood estimation method with iteratively reweighted least squares algorithm
-NLR(Data, group, model = "2PL", method = "iwls")
+NLR(Data, group, model = "2PL", method = "irls")
 }
 
 }

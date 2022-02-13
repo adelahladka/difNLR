@@ -43,7 +43,7 @@ items) or as an item-specific vector.}
 \item{method}{character: method used to estimate parameters. The options
 are \code{"nls"} for non-linear least squares (default),
 \code{"likelihood"} for maximum likelihood method with \code{"L-BFGS-B"}
-algorithm, or \code{"iwls"} for maximum likelihood method with iteratively
+algorithm, or \code{"irls"} for maximum likelihood method with iteratively
 reweighted least squares (available only for \code{model = "2PL"}).}
 
 \item{match}{numeric or character: matching criterion to be used as an
@@ -297,7 +297,7 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
 
 # testing both DIF effects using LR test and 2PL model
 # using maximum likelihood estimation method with iteratively reweighted least squares algorithm
-difNLR(Data, group, focal.name = 1, model = "2PL", method = "iwls")
+difNLR(Data, group, focal.name = 1, model = "2PL", method = "irls")
 }
 
 }

@@ -10,7 +10,7 @@
 #' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.
 #' @param formula formula: specification of the model. Can be obtained by \code{formulaNLR()} function.
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
-#' squares (default), \code{"likelihood"} for maximum likelihood method, and \code{"iwls"} for maximum likelihood
+#' squares (default), \code{"likelihood"} for maximum likelihood method, and \code{"irls"} for maximum likelihood
 #' estimation with iteratively reweighted least squares. See \strong{Details}.
 #' @param lower numeric: lower bounds for parameters of model specified in \code{formula}.
 #' @param upper numeric: upper bounds for parameters of model specified in \code{formula}.
@@ -83,17 +83,17 @@
 #'
 #' # iteratively reweighted least squares for 2PL model
 #' M <- formulaNLR(model = "2PL", parameterization = "logistic")
-#' fitIWLSM1 <- estimNLR(
+#' fitIRLSM1 <- estimNLR(
 #'   y = y, match = match, group = group,
-#'   formula = M$M1$formula, method = "iwls"
+#'   formula = M$M1$formula, method = "irls"
 #' )
-#' fitIWLSM1
+#' fitIRLSM1
 #'
-#' coef(fitIWLSM1)
-#' logLik(fitIWLSM1)
-#' vcov(summary(fitIWLSM1))
-#' fitted(fitIWLSM1)
-#' residuals(fitIWLSM1)
+#' coef(fitIRLSM1)
+#' logLik(fitIRLSM1)
+#' vcov(summary(fitIRLSM1))
+#' fitted(fitIRLSM1)
+#' residuals(fitIRLSM1)
 #' @keywords DIF
 #' @export
 #'
@@ -120,7 +120,7 @@ estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
     error = function(e) {},
     finally = ""
     ),
-    iwls = tryCatch(glm(
+    irls = tryCatch(glm(
       formula = formula,
       family = binomial(),
       data = data.frame(y = y, x = match, g = group)

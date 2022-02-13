@@ -32,7 +32,7 @@
 #' @param method character: method used to estimate parameters. The options
 #'   are \code{"nls"} for non-linear least squares (default),
 #'   \code{"likelihood"} for maximum likelihood method with \code{"L-BFGS-B"}
-#'   algorithm, or \code{"iwls"} for maximum likelihood method with iteratively
+#'   algorithm, or \code{"irls"} for maximum likelihood method with iteratively
 #'   reweighted least squares (available only for \code{model = "2PL"}).
 #' @param match numeric or character: matching criterion to be used as an
 #'   estimate of trait. Can be either \code{"zscore"} (default, standardized
@@ -321,7 +321,7 @@
 #'
 #' # testing both DIF effects using LR test and 2PL model
 #' # using maximum likelihood estimation method with iteratively reweighted least squares algorithm
-#' difNLR(Data, group, focal.name = 1, model = "2PL", method = "iwls")
+#' difNLR(Data, group, focal.name = 1, model = "2PL", method = "irls")
 #' }
 #'
 #' @keywords DIF
@@ -381,8 +381,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     }
   }
   # estimation method
-  if (!(method %in% c("nls", "likelihood", "iwls"))) {
-    stop("Invalid value for 'method'. Estimation method must be either 'nls', 'likelihood', or 'iwls'. ", call. = FALSE)
+  if (!(method %in% c("nls", "likelihood", "irls"))) {
+    stop("Invalid value for 'method'. Estimation method must be either 'nls', 'likelihood', or 'irls'. ", call. = FALSE)
   }
   # internal NLR function
   internalNLR <- function() {
@@ -820,7 +820,7 @@ print.difNLR <- function(x, ...) {
     switch(x$method,
       "nls" = "non-linear least squares\n",
       "likelihood" = "maximum likelihood method \nwith L-BFGS-B algorithm\n",
-      "iwls" = "maximum likelihood method \nwith iteratively reweighted least squares algorithm\n"
+      "irls" = "maximum likelihood method \nwith iteratively reweighted least squares algorithm\n"
     )
   ))
   cat(paste0("\nItem purification was",
