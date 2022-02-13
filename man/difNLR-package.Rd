@@ -63,6 +63,9 @@ Drabinova, A. & Martinkova, P. (2017). Detection of differential item functionin
 A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
+Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
+Faculty of Mathematics and Physics, Charles University.
+
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
 The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 

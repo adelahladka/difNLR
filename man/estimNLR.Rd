@@ -92,6 +92,10 @@ vcov(summary(fitIWLSM1))
 fitted(fitIWLSM1)
 residuals(fitIWLSM1)
 }
+\references{
+Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
+Faculty of Mathematics and Physics, Charles University.
+}
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr

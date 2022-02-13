@@ -34,6 +34,10 @@
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
+#' @references
+#' Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
+#' Faculty of Mathematics and Physics, Charles University.
+#'
 #' @examples
 #' # loading data
 #' data(GMAT)

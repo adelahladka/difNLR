@@ -11,11 +11,13 @@
     was implemented in `difNLR()`, `NLR()`, and `estimNLR()` functions.
   * `coef.difNLR()` method now includes delta method for IRT and 
     logistic parameterizations. 
-  * `coef.difNLR()` method now includes confidence intervals. 
+  * `coef.difNLR()` method now includes calculation of confidence 
+    intervals. 
 
 #### MINOR UPDATES
   * Some typos fixed.
   * Examples in functions were updated. 
+  * References were updated.
   
 ------
 

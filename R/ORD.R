@@ -92,8 +92,11 @@
 #' @references
 #' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
 #'
+#' Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
+#' Faculty of Mathematics and Physics, Charles University.
+#'
 #' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-#' The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+#' The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 #'
 #' @seealso \code{\link[stats]{p.adjust}} \code{\link[VGAM]{vglm}}
 #'
