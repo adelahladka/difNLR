@@ -128,20 +128,21 @@ Missing values are allowed but discarded for item estimation. They must be coded
 for both, \code{Data} and \code{group} parameters.
 }
 \examples{
-# Loading data
+# loading data
 data(dataMedicalgraded, package = "ShinyItemAnalysis")
-Data <- dataMedicalgraded[, 1:5]
-group <- dataMedicalgraded[, 101]
+Data <- dataMedicalgraded[, 1:5] # items
+group <- dataMedicalgraded[, 101] # group membership variable
 
-# Testing both DIF effects with adjacent category logit model
+# testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
+
 \dontrun{
-# Graphical devices
+# graphical devices
 plot(x, item = 3)
 plot(x, item = "X2003")
 plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 
-# Estimated parameters
+# estimated parameters
 coef(x)
 coef(x, SE = TRUE) # with SE
 coef(x, SE = TRUE, simplify = TRUE) # with SE, simplified
@@ -156,29 +157,29 @@ AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
 
-# Testing both DIF effects with Benjamini-Hochberg adjustment method
+# testing both DIF effects with Benjamini-Hochberg adjustment method
 difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 
-# Testing both DIF effects with item purification
+# testing both DIF effects with item purification
 difORD(Data, group, focal.name = 1, model = "adjacent", purify = TRUE)
 
-# Testing uniform DIF effects
+# testing uniform DIF effects
 difORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")
-# Testing non-uniform DIF effects
+# testing non-uniform DIF effects
 difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 
-# Testing both DIF effects with total score as matching criterion
+# testing both DIF effects with total score as matching criterion
 difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 
-# Testing both DIF effects with cumulative logit model
+# testing both DIF effects with cumulative logit model
 # using IRT parametrization
 (x <- difORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt"))
 
-# Graphical devices
+# graphical devices
 plot(x, item = 3, plot.type = "cumulative")
 plot(x, item = 3, plot.type = "category")
 
-# Estimated parameters in IRT parametrization
+# estimated parameters in IRT parametrization
 coef(x, simplify = TRUE)
 }
 }

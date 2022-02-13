@@ -83,20 +83,19 @@ interaction with matching criterion, i.e. \eqn{b_0k + b_1k*x + b_2k*g + b_3k*x*g
 }
 \examples{
 \dontrun{
-# loading data based on GMAT
+# loading data
 data(GMATtest, GMATkey)
+Data <- GMATtest[, 1:20] # items
+group <- GMATtest[, "group"] # group membership variable
+key <- GMATkey # correct answers
 
-Data <- GMATtest[, 1:20]
-group <- GMATtest[, "group"]
-key <- GMATkey
-
-# Testing both DDF effects
+# testing both DDF effects
 MLR(Data, group, key, type = "both")
 
-# Testing uniform DDF effects
+# testing uniform DDF effects
 MLR(Data, group, key, type = "udif")
 
-# Testing non-uniform DDF effects
+# testing non-uniform DDF effects
 MLR(Data, group, key, type = "nudif")
 }
 

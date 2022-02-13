@@ -32,19 +32,19 @@ also cumulative probabilities may be plotted.
 }
 \examples{
 \dontrun{
-# Loading data
+# loading data
 data(dataMedicalgraded, package = "ShinyItemAnalysis")
-Data <- dataMedicalgraded[, 1:5]
-group <- dataMedicalgraded[, 101]
+Data <- dataMedicalgraded[, 1:5] # items
+group <- dataMedicalgraded[, 101] # group membership variable
 
-# Testing both DIF effects with adjacent category logit model
+# testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 
-# Graphical devices
+# graphical devices
 plot(x, item = 3)
 plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 
-# Testing both DIF effects with cumulative logit model
+# testing both DIF effects with cumulative logit model
 (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
 plot(x, item = 3, plot.type = "cumulative")
 plot(x, item = 3, plot.type = "category")

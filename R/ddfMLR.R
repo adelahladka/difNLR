@@ -134,17 +134,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+#' # loading data
 #' data(GMATtest, GMATkey)
+#' Data <- GMATtest[, 1:20] # items
+#' group <- GMATtest[, "group"] # group membership variable
+#' key <- GMATkey # correct answers
 #'
-#' Data <- GMATtest[, 1:20]
-#' group <- GMATtest[, "group"]
-#' key <- GMATkey
-#'
-#' # Testing both DDF effects
+#' # testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
-#' # Graphical devices
+#' # graphical devices
 #' plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 #' plot(x, item = x$DDFitems)
 #' plot(x, item = 1)
@@ -159,26 +158,26 @@
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
 #'
-#' # Estimates
+#' # estimated parameters
 #' coef(x)
 #' coef(x, SE = TRUE)
 #' coef(x, SE = TRUE, simplify = TRUE)
 #'
-#' # Testing both DDF effects with Benjamini-Hochberg adjustment method
+#' # testing both DDF effects with Benjamini-Hochberg adjustment method
 #' ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")
 #'
-#' # Testing both DDF effects with item purification
+#' # testing both DDF effects with item purification
 #' ddfMLR(Data, group, focal.name = 1, key, purify = TRUE)
 #'
-#' # Testing uniform DDF effects
+#' # testing uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "udif")
-#' # Testing non-uniform DDF effects
+#' # testing non-uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 #'
-#' # Testing both DDF effects with total score as matching criterion
+#' # testing both DDF effects with total score as matching criterion
 #' ddfMLR(Data, group, focal.name = 1, key, match = "score")
 #'
-#' # Testing both DDF effects using classic parametrization
+#' # testing both DDF effects using classic parametrization
 #' ddfMLR(Data, group, focal.name = 1, key, parametrization = "classic")
 #' }
 #'
@@ -562,17 +561,16 @@ print.ddfMLR <- function(x, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+#' # loading data
 #' data(GMATtest, GMATkey)
+#' Data <- GMATtest[, 1:20] # items
+#' group <- GMATtest[, "group"] # group membership variable
+#' key <- GMATkey # correct answers
 #'
-#' Data <- GMATtest[, 1:20]
-#' group <- GMATtest[, "group"]
-#' key <- GMATkey
-#'
-#' # Testing both DDF effects
+#' # testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
-#' # Graphical devices
+#' # graphical devices
 #' plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 #' plot(x, item = x$DDFitems)
 #' plot(x, item = 1)
@@ -811,17 +809,16 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+#' # loading data
 #' data(GMATtest, GMATkey)
+#' Data <- GMATtest[, 1:20] # items
+#' group <- GMATtest[, "group"] # group membership variable
+#' key <- GMATkey # correct answers
 #'
-#' Data <- GMATtest[, 1:20]
-#' group <- GMATtest[, "group"]
-#' key <- GMATkey
-#'
-#' # Testing both DDF effects
+#' # testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
-#' # Estimated parameters
+#' # estimated parameters
 #' coef(x)
 #' coef(x, SE = TRUE)
 #' coef(x, simplify = TRUE)
@@ -905,14 +902,13 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data based on GMAT
+#' # loading data
 #' data(GMATtest, GMATkey)
+#' Data <- GMATtest[, 1:20] # items
+#' group <- GMATtest[, "group"] # group membership variable
+#' key <- GMATkey # correct answers
 #'
-#' Data <- GMATtest[, 1:20]
-#' group <- GMATtest[, "group"]
-#' key <- GMATkey
-#'
-#' # Testing both DDF effects
+#' # testing both DDF effects
 #' (x <- ddfMLR(Data, group, focal.name = 1, key))
 #'
 #' # AIC, BIC, log-likelihood

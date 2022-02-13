@@ -34,12 +34,15 @@ group <- GMAT[, "group"] # group membership variable
 # 3PL model with fixed guessing for groups
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 
-# coefficients
+# estimated parameters
 coef(x)
+# includes standard errors
 coef(x, SE = TRUE)
+# includes standard errors and simplifies to matrix
 coef(x, SE = TRUE, simplify = TRUE)
+# intercept-slope parameterization
 coef(x, IRTpars = FALSE)
-coef(x, IRTpars = FALSE, SE = TRUE, simplify = TRUE)
+# intercept-slope parameterization, simplifies to matrix, turn off confidence intervals
 coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
 }
 }

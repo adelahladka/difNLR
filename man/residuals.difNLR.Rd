@@ -24,6 +24,7 @@ S3 methods for extracting fitted values and residuals for an object of \code{"di
 }
 \examples{
 \dontrun{
+# loading data
 data(GMAT)
 Data <- GMAT[, 1:20] # items
 group <- GMAT[, "group"] # group membership variable

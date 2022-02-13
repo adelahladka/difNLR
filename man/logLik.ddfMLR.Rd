@@ -27,14 +27,13 @@ Schwarz's Bayesian criterion (BIC) for an object of \code{"ddfMLR"} class.
 }
 \examples{
 \dontrun{
-# Loading data based on GMAT
+# loading data
 data(GMATtest, GMATkey)
+Data <- GMATtest[, 1:20] # items
+group <- GMATtest[, "group"] # group membership variable
+key <- GMATkey # correct answers
 
-Data <- GMATtest[, 1:20]
-group <- GMATtest[, "group"]
-key <- GMATkey
-
-# Testing both DDF effects
+# testing both DDF effects
 (x <- ddfMLR(Data, group, focal.name = 1, key))
 
 # AIC, BIC, log-likelihood

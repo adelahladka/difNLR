@@ -223,7 +223,7 @@
 #' \code{\link[difNLR]{fitted.difNLR}} and \code{\link[difNLR]{residuals.difNLR}} for extraction of fitted
 #' values and residuals. \cr
 #' \code{\link[difNLR]{logLik.difNLR}}, \code{\link[difNLR]{AIC.difNLR}}, \code{\link[difNLR]{BIC.difNLR}}
-#' for extraction of loglikelihood and information criteria. \cr
+#' for extraction of log-likelihood and information criteria. \cr
 #'
 #' \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
 #' \code{\link[stats]{nls}} for nonlinear least squares estimation. \cr
@@ -1692,12 +1692,15 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 #' # 3PL model with fixed guessing for groups
 #' (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 #'
-#' # coefficients
+#' # estimated parameters
 #' coef(x)
+#' # includes standard errors
 #' coef(x, SE = TRUE)
+#' # includes standard errors and simplifies to matrix
 #' coef(x, SE = TRUE, simplify = TRUE)
+#' # intercept-slope parameterization
 #' coef(x, IRTpars = FALSE)
-#' coef(x, IRTpars = FALSE, SE = TRUE, simplify = TRUE)
+#' # intercept-slope parameterization, simplifies to matrix, turn off confidence intervals
 #' coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
 #' }
 #' @export
@@ -1832,12 +1835,12 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
 #'
 #' @seealso
 #' \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
-#' \code{\link[stats]{logLik}} for generic function extracting loglikelihood. \cr
+#' \code{\link[stats]{logLik}} for generic function extracting log-likelihood. \cr
 #' \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
 #'
 #' @examples
 #' \dontrun{
-# loading data
+#' # loading data
 #' data(GMAT)
 #' Data <- GMAT[, 1:20] # items
 #' group <- GMAT[, "group"] # group membership variable
@@ -1860,6 +1863,7 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
 logLik.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
+
   if (class(item) == "character") {
     if (item != "all" & !item %in% nams) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
@@ -2103,7 +2107,7 @@ BIC.difNLR <- function(object, item = "all", ...) {
 #'
 #' @examples
 #' \dontrun{
-# loading data
+#' # loading data
 #' data(GMAT)
 #' Data <- GMAT[, 1:20] # items
 #' group <- GMAT[, "group"] # group membership variable

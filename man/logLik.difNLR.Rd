@@ -27,6 +27,7 @@ Schwarz's Bayesian criterion (BIC) for an object of \code{"difNLR"} class.
 }
 \examples{
 \dontrun{
+# loading data
 data(GMAT)
 Data <- GMAT[, 1:20] # items
 group <- GMAT[, "group"] # group membership variable
@@ -59,7 +60,7 @@ Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.19
 }
 \seealso{
 \code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
-\code{\link[stats]{logLik}} for generic function extracting loglikelihood. \cr
+\code{\link[stats]{logLik}} for generic function extracting log-likelihood. \cr
 \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
 }
 \author{

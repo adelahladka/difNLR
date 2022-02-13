@@ -325,7 +325,7 @@ Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
 \code{\link[difNLR]{fitted.difNLR}} and \code{\link[difNLR]{residuals.difNLR}} for extraction of fitted
 values and residuals. \cr
 \code{\link[difNLR]{logLik.difNLR}}, \code{\link[difNLR]{AIC.difNLR}}, \code{\link[difNLR]{BIC.difNLR}}
-for extraction of loglikelihood and information criteria. \cr
+for extraction of log-likelihood and information criteria. \cr
 
 \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
 \code{\link[stats]{nls}} for nonlinear least squares estimation. \cr

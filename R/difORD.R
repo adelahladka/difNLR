@@ -143,20 +143,21 @@
 #'
 #'
 #' @examples
-#' # Loading data
+#' # loading data
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5]
-#' group <- dataMedicalgraded[, 101]
+#' Data <- dataMedicalgraded[, 1:5] # items
+#' group <- dataMedicalgraded[, 101] # group membership variable
 #'
-#' # Testing both DIF effects with adjacent category logit model
+#' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
+#'
 #' \dontrun{
-#' # Graphical devices
+#' # graphical devices
 #' plot(x, item = 3)
 #' plot(x, item = "X2003")
 #' plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 #'
-#' # Estimated parameters
+#' # estimated parameters
 #' coef(x)
 #' coef(x, SE = TRUE) # with SE
 #' coef(x, SE = TRUE, simplify = TRUE) # with SE, simplified
@@ -171,29 +172,29 @@
 #' BIC(x, item = 1)
 #' logLik(x, item = 1)
 #'
-#' # Testing both DIF effects with Benjamini-Hochberg adjustment method
+#' # testing both DIF effects with Benjamini-Hochberg adjustment method
 #' difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")
 #'
-#' # Testing both DIF effects with item purification
+#' # testing both DIF effects with item purification
 #' difORD(Data, group, focal.name = 1, model = "adjacent", purify = TRUE)
 #'
-#' # Testing uniform DIF effects
+#' # testing uniform DIF effects
 #' difORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")
-#' # Testing non-uniform DIF effects
+#' # testing non-uniform DIF effects
 #' difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 #'
-#' # Testing both DIF effects with total score as matching criterion
+#' # testing both DIF effects with total score as matching criterion
 #' difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 #'
-#' # Testing both DIF effects with cumulative logit model
+#' # testing both DIF effects with cumulative logit model
 #' # using IRT parametrization
 #' (x <- difORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt"))
 #'
-#' # Graphical devices
+#' # graphical devices
 #' plot(x, item = 3, plot.type = "cumulative")
 #' plot(x, item = 3, plot.type = "category")
 #'
-#' # Estimated parameters in IRT parametrization
+#' # estimated parameters in IRT parametrization
 #' coef(x, simplify = TRUE)
 #' }
 #' @keywords DIF
@@ -575,15 +576,15 @@ print.difORD <- function(x, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data
+#' # loading data
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5]
-#' group <- dataMedicalgraded[, 101]
+#' Data <- dataMedicalgraded[, 1:5] # items
+#' group <- dataMedicalgraded[, 101] # group membership variable
 #'
-#' # Testing both DIF effects with adjacent category logit model
+#' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
-#' # Estimated parameters
+#' # estimated parameters
 #' coef(x)
 #' coef(x, SE = TRUE)
 #' coef(x, simplify = TRUE)
@@ -672,12 +673,12 @@ coef.difORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data
+#' # loading data
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5]
-#' group <- dataMedicalgraded[, 101]
+#' Data <- dataMedicalgraded[, 1:5] # items
+#' group <- dataMedicalgraded[, 101] # group membership variable
 #'
-#' # Testing both DIF effects with adjacent category logit model
+#' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
 #' # AIC, BIC, log-likelihood
@@ -854,19 +855,19 @@ BIC.difORD <- function(object, item = "all", ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data
+#' # loading data
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5]
-#' group <- dataMedicalgraded[, 101]
+#' Data <- dataMedicalgraded[, 1:5] # items
+#' group <- dataMedicalgraded[, 101] # group membership variable
 #'
-#' # Testing both DIF effects with adjacent category logit model
+#' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
-#' # Graphical devices
+#' # graphical devices
 #' plot(x, item = 3)
 #' plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
 #'
-#' # Testing both DIF effects with cumulative logit model
+#' # testing both DIF effects with cumulative logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
 #' plot(x, item = 3, plot.type = "cumulative")
 #' plot(x, item = 3, plot.type = "category")
@@ -1374,19 +1375,19 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
 #'
 #' @examples
 #' \dontrun{
-#' # Loading data
+#' # loading data
 #' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5]
-#' group <- dataMedicalgraded[, 101]
-#' match <- rowSums(dataMedicalgraded[, 1:100])
+#' Data <- dataMedicalgraded[, 1:5] # items
+#' group <- dataMedicalgraded[, 101] # group membership variable
+#' match <- rowSums(dataMedicalgraded[, 1:100]) # matching criterion
 #'
-#' # Testing both DIF effects with cumulative logit model
+#' # testing both DIF effects with cumulative logit model
 #' (x <- difORD(Data, group, match = match, focal.name = 1, model = "cumulative"))
 #'
 #' predict(x, item = "X2003", match = 300, group = c(0, 1))
 #' predict(x, item = "X2003", match = 300, group = c(0, 1), type = "cumulative")
 #'
-#' # Testing both DIF effects with adjacent category logit model
+#' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, match = match, focal.name = 1, model = "adjacent"))
 #'
 #' predict(x, item = "X2003", match = 300, group = c(0, 1))

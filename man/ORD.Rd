@@ -96,21 +96,20 @@ interaction with matching criterion, i.e. \eqn{b_0k + b_1*x + b_2k*g + b_3*x*g} 
 # loading data
 data(dataMedicalgraded, package = "ShinyItemAnalysis")
 df <- dataMedicalgraded[, c(1:5, 101)]
-df <- df[complete.cases(df), ]
+df <- df[complete.cases(df), ] # omitting missing values
+Data <- df[, 1:5] # items
+group <- df[, 6] # group membership variable
 
-Data <- df[, 1:5]
-group <- df[, 6]
-
-# Testing both DIF effects
+# testing both DIF effects
 ORD(Data, group, type = "both")
 
-# Testing uniform DIF effects
+# testing uniform DIF effects
 ORD(Data, group, type = "udif")
 
-# Testing non-uniform DIF effects
+# testing non-uniform DIF effects
 ORD(Data, group, type = "nudif")
 
-# Testing DIF using cumulative logit model
+# testing DIF using cumulative logit model
 ORD(Data, group, model = "cumulative")
 }
 

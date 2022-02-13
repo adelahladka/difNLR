@@ -76,11 +76,10 @@
 #' @seealso \code{\link[difNLR]{difNLR}}
 #'
 #' @examples
-#' # loading data based on GMAT
+#' # loading data
 #' data(GMAT)
-#'
-#' Data <- GMAT[, 1:20]
-#' group <- GMAT[, "group"]
+#' Data <- GMAT[, 1:20] # items
+#' group <- GMAT[, "group"] # group membership variable
 #'
 #' # starting values for 3PL model
 #' startNLR(Data, group, model = "3PL")
