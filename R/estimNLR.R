@@ -91,7 +91,7 @@
 #'
 #' coef(fitIRLSM1)
 #' logLik(fitIRLSM1)
-#' vcov(summary(fitIRLSM1))
+#' vcov(fitIRLSM1)
 #' fitted(fitIRLSM1)
 #' residuals(fitIRLSM1)
 #' @keywords DIF
@@ -182,20 +182,6 @@ lkl <- function(formula, data, par, lower, upper) {
 
 #' @rdname lkl
 #' @export
-print.lkl <- function(x, ...) {
-  cat(
-    "Nonlinear regression model \n",
-    "model: ", paste(x$formula[2], x$formula[1], x$formula[3]), "\n"
-  )
-  print(x$par)
-  cat(
-    "\n",
-    "Algorithm L-BFGS-B"
-  )
-}
-
-#' @rdname lkl
-#' @export
 logLik.lkl <- function(object, ...) {
   -object$value
 }
@@ -216,6 +202,33 @@ fitted.lkl <- function(object, ...) {
 #' @export
 residuals.lkl <- function(object, ...) {
   object$data$y - object$fitted
+}
+
+#' @rdname estNLR
+#' @export
+print.estNLR <- function(x, ...) {
+  formula <- switch(class(x)[2],
+    "nls" = paste(x$m$formula()[2], x$m$formula()[1], x$m$formula()[3]),
+    "lkl" = paste(x$formula[2], x$formula[1], x$formula[3]),
+    "glm" = paste0(x$formula[2], " ", x$formula[1], " exp(", x$formula[3], ") / (1 + exp(", x$formula[3], "))")
+  )
+  cat(
+    "Nonlinear regression model \n\n",
+    "Model: ", formula, "\n"
+  )
+  pars <- switch(class(x)[2],
+    "nls" = x$m$getPars(),
+    "lkl" = x$par,
+    "glm" = x$coefficients
+  )
+  alg <- switch(class(x)[2],
+    "nls" = "Nonlinear least squares estimation",
+    "lkl" = "Maximum likelihood estimation using L-BFGS-B algorithm",
+    "glm" = "Maximum likelihood estimation using iteratively reweighted least squares algorithm"
+  )
+  cat("\nCoefficients:\n")
+  print(round(pars, 4))
+  cat("\n", alg)
 }
 
 #' @rdname estNLR
@@ -241,12 +254,21 @@ vcov.estNLR <- function(object, sandwich = FALSE, ...) {
     if (sandwich) {
       message("Sandwich estimator of covariance not available for method = 'likelihood'. ")
     }
-    cov.object <- tryCatch(
-      {
-        solve(object$hessian)
-      },
-      error = function(e) NULL
-    )
+    if (class(object)[2] == "lkl") {
+      cov.object <- tryCatch(
+        {
+          solve(object$hessian)
+        },
+        error = function(e) NULL
+      )
+    } else {
+      cov.object <- tryCatch(
+        {
+          vcov(summary(object))
+        },
+        error = function(e) NULL
+      )
+    }
   }
   return(cov.object)
 }

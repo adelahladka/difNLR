@@ -88,7 +88,7 @@ fitIRLSM1
 
 coef(fitIRLSM1)
 logLik(fitIRLSM1)
-vcov(summary(fitIRLSM1))
+vcov(fitIRLSM1)
 fitted(fitIRLSM1)
 residuals(fitIRLSM1)
 }
