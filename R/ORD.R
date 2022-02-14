@@ -41,7 +41,7 @@
 #'
 #' Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
 #' categories is
-#' \deqn{log(P(y = k)/P(y = k-1)) = (a + aDif*g)*(x - b_k - b_kDif*g),}
+#' \deqn{log(P(y = k)/P(y = k - 1)) = (a + aDif * g) * (x - b_k - b_kDif * g),}
 #' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
 #' membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
 #' for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
@@ -51,15 +51,15 @@
 #' 2PL model, i.e.,
 #' \deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
 #' The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
-#' \eqn{P(Y = k) = P(Y >= k) - P(Y >= k + 1)}.
+#' \eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
 #'
 #' Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
 #'
 #' Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
 #' Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
 #' Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
-#' interaction with matching criterion, i.e. \eqn{b_0k + b_1*x + b_2k*g + b_3*x*g} instead of
-#' \eqn{(a + a_Dif*g)*(x - b_k - b_kDif*g))}.
+#' interaction with matching criterion, i.e. \eqn{b_0k + b_1 * x + b_2k * g + b_3 * x:g} instead of
+#' \eqn{(a + a_Dif * g) * (x - b_k - b_kDif * g))}.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -127,7 +127,10 @@
 ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore",
                 anchor = 1:ncol(Data), p.adjust.method = "none",
                 parametrization = "irt", alpha = 0.05) {
-  for (i in 1:dim(Data)[2]) {
+  m <- dim(Data)[2]
+  n <- dim(Data)[1]
+
+  for (i in 1:m) {
     Data[, i] <- as.numeric(paste(Data[, i]))
   }
 
@@ -146,9 +149,7 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     }
   }
 
-  m <- dim(Data)[2]
-  n <- dim(Data)[1]
-
+  # reordering data
   uval <- lapply(Data, function(x) sort(unique(x)))
   for (i in 1:dim(Data)[2]) {
     Data[, i] <- factor(Data[, i], levels = uval[[i]], ordered = TRUE)
@@ -183,7 +184,6 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
       ORDtest[[i]]$Df[2]
     )
   })
-
   adjusted.pval <- p.adjust(ORDstat[2, ], method = p.adjust.method)
 
   par.m0 <- lapply(m0, coef)
@@ -259,7 +259,7 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     se.m0 <- lapply(1:m, function(i) {
       c(
         sapply(1:num.b0s[[i]], function(j) {
-          deltamethod(
+          msm::deltamethod(
             ~ -x1 / x2,
             par.m0.tmp[[i]][c(b0s[[i]][j], "x")],
             cov.m0.tmp[[i]][c(b0s[[i]][j], "x"), c(b0s[[i]][j], "x")]
@@ -267,7 +267,7 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
         }),
         sqrt(cov.m0.tmp[[i]]["x", "x"]),
         sapply(1:num.b0s[[i]], function(j) {
-          deltamethod(
+          msm::deltamethod(
             ~ (x1 * x4 - x2 * x3) / (x2 * x2 + x2 * x4),
             par.m0.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group")],
             cov.m0.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group"), c(b0s[[i]][j], "x", "group", "x:group")]
@@ -362,3 +362,103 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
   )
   return(results)
 }
+
+#' @noRd
+.deltamethod.ORD.log2irt <- function(par, cov) {
+  # par.m1[[1]]
+  # cov.m1[[1]]
+  # sqrt(diag(cov.m1[[1]]))
+  # IRT <- .deltamethod.ORD.log2irt(par = par.m1[[1]], cov = cov.m1[[1]])
+  # .deltamethod.ORD.irt2log(par = IRT$par, cov = IRT$cov)
+  cats <- as.numeric(paste(gsub("\\(Intercept\\)\\:", "", names(par)[(grepl("Intercept", names(par)))])))
+  par_new <- setNames(
+    c(
+      -par[grepl("Intercept", names(par))] / par["x"],
+      par["x"],
+      (par[grepl("Intercept", names(par))] * par["x:group"] - par["x"] * par["group"]) / (par["x"]^2 + par["x"] * par["x:group"]),
+      par["x:group"]
+    ),
+    c(paste0("b", as.numeric(paste(cats))), "a", paste0("bDIF", as.numeric(paste(cats))), "aDIF")
+  )
+
+  num_cats <- length(cats)
+
+  betas0 <- paste0("x", cats)
+  beta1 <- paste0("x", num_cats + 1)
+  beta2 <- paste0("x", num_cats + 2)
+  beta3 <- paste0("x", num_cats + 3)
+
+  a <- beta1
+  aDIF <- beta3
+  bk <- paste0("-", betas0, "/", beta1)
+  bkDIF <- paste0("(", beta1, "*", beta2, "-", betas0, "*", beta3, ")/(", beta1, "*(", beta1, "+", beta3, "))")
+
+  formulas <- append(append(
+    append(as.list(bk), as.list(a)),
+    as.list(bkDIF)
+  ), as.list(aDIF))
+  formulas <- lapply(formulas, function(x) paste0("~", x))
+  formulas <- lapply(formulas, as.formula)
+  formulas <- formulas[!is.na(par_new)]
+  cov_new <- msm::deltamethod(
+    formulas,
+    par,
+    cov,
+    ses = FALSE
+  )
+  se_new <- sqrt(diag(cov_new))
+  par_new <- par_new[!is.na(par_new)]
+  nams <- names(par_new)
+  rownames(cov_new) <- colnames(cov_new) <- names(se_new) <- nams
+  return(list(par = par_new, cov = cov_new, se = se_new))
+}
+
+#' @noRd
+.deltamethod.ORD.irt2log <- function(par, cov) {
+  cats <- names(par)[grepl("b", names(par))]
+  cats <- as.numeric(paste(gsub("b", "", cats[nchar(cats) < 4])))
+  par_new <- c(
+      -par["a"] * par[paste0("b", cats)],
+      par["a"],
+      -par["aDIF"] * par[paste0("b", cats)] - par["a"] * par[paste0("bDIF", cats)] - par["aDIF"] * par[paste0("bDIF", cats)],
+      par["aDIF"]
+    )
+  num_cats <- length(cats)
+  duplicates <- duplicated(round(par_new, 11))
+
+  bk <- paste0("x", 1:num_cats)
+  bkDIF <- paste0("x", 1:num_cats + num_cats + 1)
+  a <- paste0("x", num_cats + 1)
+  aDIF <- paste0("x", 2 * num_cats + 2)
+
+  betas0 <- paste0("-", a, "*", bk)
+  beta1 <- a
+  betas2 <- paste0("-", aDIF, "*", bk, "-", a, "*", bkDIF, "-", aDIF, "*", bkDIF)
+  beta3 <- aDIF
+
+  formulas <- append(append(
+    append(as.list(betas0), as.list(beta1)),
+    as.list(betas2)
+  ), as.list(beta3))
+  formulas <- lapply(formulas, function(x) paste0("~", x))
+  formulas <- lapply(formulas, as.formula)
+  formulas <- formulas[!is.na(par_new)]
+  cov_new <- msm::deltamethod(
+    formulas,
+    par,
+    cov,
+    ses = FALSE
+  )
+  cov_new <- cov_new[!duplicates, !duplicates]
+  se_new <- sqrt(diag(cov_new))
+
+  # SE for group is not well defined
+  # cov_new <- cov_new[!is.na(par_new), !is.na(par_new)]
+  par_new <- par_new[!duplicates]
+  names(par_new) <- c(paste0("(Intercept):", cats), "x", "group", "x:group")
+  par_new <- par_new[!is.na(par_new)]
+  nams <- names(par_new)
+  rownames(cov_new) <- colnames(cov_new) <- names(se_new) <- nams
+  return(list(par = par_new, cov = cov_new, se = se_new))
+}
+
