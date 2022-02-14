@@ -1736,7 +1736,7 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
     nlrPAR <- ifelse(1:m %in% object$DIFitems, object$parM1, object$parM0)
     nlrCOV <- ifelse(1:m %in% object$DIFitems, object$covM1, object$covM0)
     nlrDM <- lapply(1:m, function(i)
-      .deltamethod.irt2log(
+      .deltamethod.NLR.irt2log(
         par = nlrPAR[[i]], cov = nlrCOV[[i]],
         conv = !(i %in% object$conv.fail.which),
         cov_fail = is.null(nlrCOV[[i]])

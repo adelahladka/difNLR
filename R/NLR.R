@@ -422,12 +422,12 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   # delta method
   dm.m0 <- lapply(1:m, function(i) {
     switch(parameterization[[i]],
-      "logistic" = .deltamethod.log2irt(
+      "logistic" = .deltamethod.NLR.log2irt(
         par = par.m0[[i]], cov = cov.m0[[i]],
         conv = (i %in% conv.m0),
         cov_fail = cfM0[i]
       ),
-      "alternative" = .deltamethod.alt2irt(
+      "alternative" = .deltamethod.NLR.alt2irt(
         par = par.m0[[i]], cov = cov.m0[[i]],
         conv = (i %in% conv.m0),
         cov_fail = cfM0[i]
@@ -441,12 +441,12 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 
   dm.m1 <- lapply(1:m, function(i) {
     switch(parameterization[[i]],
-      "logistic" = .deltamethod.log2irt(
+      "logistic" = .deltamethod.NLR.log2irt(
         par = par.m1[[i]], cov = cov.m1[[i]],
         conv = (i %in% conv.m1),
         cov_fail = cfM1[i]
       ),
-      "alternative" = .deltamethod.alt2irt(
+      "alternative" = .deltamethod.NLR.alt2irt(
         par = par.m1[[i]], cov = cov.m1[[i]],
         conv = (i %in% conv.m1),
         cov_fail = cfM1[i]
@@ -541,7 +541,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 
 #' @noRd
 #' only for 2PL model
-.deltamethod.log2irt <- function(par, cov, conv, cov_fail) {
+.deltamethod.NLR.log2irt <- function(par, cov, conv, cov_fail) {
   if (conv) {
     par_names <- which(c("(Intercept)", "x", "g", "x:g") %in% names(par))
     par_tmp <- setNames(
@@ -586,7 +586,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 }
 
 #' @noRd
-.deltamethod.irt2log <- function(par, cov, conv, cov_fail) {
+.deltamethod.NLR.irt2log <- function(par, cov, conv, cov_fail) {
   if (conv) {
     par_names <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif") %in% names(par)
     par_names_new <- as.logical(c(-par_names[1] * par_names[2],
@@ -649,7 +649,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 }
 
 #' @noRd
-.deltamethod.alt2irt <- function(par, cov, conv, cov_fail) {
+.deltamethod.NLR.alt2irt <- function(par, cov, conv, cov_fail) {
   if (conv) {
     par_names <- which(c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF") %in% names(par))
     par_tmp <- setNames(

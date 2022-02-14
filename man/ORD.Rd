@@ -71,7 +71,7 @@ or on cumulative logit model for ordinal data.
 
 Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
 categories is
-\deqn{log(P(y = k)/P(y = k-1)) = (a + aDif*g)*(x - b_k - b_kDif*g),}
+\deqn{log(P(y = k)/P(y = k - 1)) = (a + aDif * g) * (x - b_k - b_kDif * g),}
 where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
 membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
 for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
@@ -81,15 +81,15 @@ Using cumulative logit model, probability of gaining at least \eqn{k} points is 
 2PL model, i.e.,
 \deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
 The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
-\eqn{P(Y = k) = P(Y >= k) - P(Y >= k + 1)}.
+\eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
 
 Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
 
 Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
 Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
 Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
-interaction with matching criterion, i.e. \eqn{b_0k + b_1*x + b_2k*g + b_3*x*g} instead of
-\eqn{(a + a_Dif*g)*(x - b_k - b_kDif*g))}.
+interaction with matching criterion, i.e. \eqn{b_0k + b_1 * x + b_2k * g + b_3 * x:g} instead of
+\eqn{(a + a_Dif * g) * (x - b_k - b_kDif * g))}.
 }
 \examples{
 \dontrun{

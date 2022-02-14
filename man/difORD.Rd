@@ -104,7 +104,7 @@ or on cumulative logit model.
 
 Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
 categories is
-\deqn{log(P(y = k)/P(y = k - 1)) = (a + aDif*g)*(x - b_k - b_kDif*g),}
+\deqn{log(P(y = k)/P(y = k - 1)) = (a + aDif * g) * (x - b_k - b_kDif * g),}
 where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
 membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
 for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
