@@ -182,7 +182,7 @@ The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 \code{\link[difNLR]{plot.ddfMLR}} for graphical representation of item characteristic curves. \cr
 \code{\link[difNLR]{coef.ddfMLR}} for extraction of item parameters with their standard errors. \cr
 \code{\link[difNLR]{logLik.ddfMLR}}, \code{\link[difNLR]{AIC.ddfMLR}}, \code{\link[difNLR]{BIC.ddfMLR}}
-for extraction of loglikelihood and information criteria. \cr
+for extraction of log-likelihood and information criteria. \cr
 
 \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
 \code{\link[nnet]{multinom}} for estimation function using neural networks.

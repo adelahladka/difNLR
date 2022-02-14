@@ -112,17 +112,17 @@ between two groups (reference and focal) in relevant parameters.
 
 Using cumulative logit model, probability of gaining at least \eqn{k} points is given by
 2PL model, i.e.,
-\deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
+\deqn{P(y >= k) = exp((a + aDif * g) * (x - b_k - b_kDif * g)) / (1 + exp((a + aDif * g) * (x - b_k - b_kDif * g))).}
 The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
-\eqn{P(Y = k) = P(Y >= k) - P(Y >= k + 1)}.
+\eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
 
 Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
 
-Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
-Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
-Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
-interaction with matching criterion, i.e. \eqn{b_0k + b_1*x + b_2k*g + b_3*x*g} instead of
-\eqn{(a + a_Dif*g)*(x - b_k - b_kDif*g))}.
+Argument \code{parametrization} is a character which specifies parameterization of regression parameters.
+Default option is \code{"irt"} which returns IRT parameterization (difficulty-discrimination, see above).
+Option \code{"classic"} returns intercept-slope parameterization with effect of group membership and
+interaction with matching criterion, i.e. \eqn{b_0k + b_1 * x + b_2k * g + b_3 * x:g} instead of
+\eqn{(a + a_Dif * g) * (x - b_k - b_kDif * g))}.
 
 Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 for both, \code{Data} and \code{group} parameters.
@@ -197,7 +197,7 @@ The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 \code{\link[difNLR]{coef.difORD}} for extraction of item parameters with their standard errors. \cr
 \code{\link[difNLR]{predict.difORD}} for calculation of predicted values. \cr
 \code{\link[difNLR]{logLik.difORD}}, \code{\link[difNLR]{AIC.difORD}}, \code{\link[difNLR]{BIC.difORD}}
-for extraction of loglikelihood and information criteria. \cr
+for extraction of log-likelihood and information criteria. \cr
 
 \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
 \code{\link[VGAM]{vglm}} for estimation function using iteratively reweighted least squares.

@@ -54,17 +54,17 @@
 #'
 #' Using cumulative logit model, probability of gaining at least \eqn{k} points is given by
 #' 2PL model, i.e.,
-#' \deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
+#' \deqn{P(y >= k) = exp((a + aDif * g) * (x - b_k - b_kDif * g)) / (1 + exp((a + aDif * g) * (x - b_k - b_kDif * g))).}
 #' The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
-#' \eqn{P(Y = k) = P(Y >= k) - P(Y >= k + 1)}.
+#' \eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
 #'
 #' Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
 #'
-#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
-#' Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
-#' Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
-#' interaction with matching criterion, i.e. \eqn{b_0k + b_1*x + b_2k*g + b_3*x*g} instead of
-#' \eqn{(a + a_Dif*g)*(x - b_k - b_kDif*g))}.
+#' Argument \code{parametrization} is a character which specifies parameterization of regression parameters.
+#' Default option is \code{"irt"} which returns IRT parameterization (difficulty-discrimination, see above).
+#' Option \code{"classic"} returns intercept-slope parameterization with effect of group membership and
+#' interaction with matching criterion, i.e. \eqn{b_0k + b_1 * x + b_2k * g + b_3 * x:g} instead of
+#' \eqn{(a + a_Dif * g) * (x - b_k - b_kDif * g))}.
 #'
 #' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
 #' for both, \code{Data} and \code{group} parameters.
@@ -136,7 +136,7 @@
 #' \code{\link[difNLR]{coef.difORD}} for extraction of item parameters with their standard errors. \cr
 #' \code{\link[difNLR]{predict.difORD}} for calculation of predicted values. \cr
 #' \code{\link[difNLR]{logLik.difORD}}, \code{\link[difNLR]{AIC.difORD}}, \code{\link[difNLR]{BIC.difORD}}
-#' for extraction of loglikelihood and information criteria. \cr
+#' for extraction of log-likelihood and information criteria. \cr
 #'
 #' \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
 #' \code{\link[VGAM]{vglm}} for estimation function using iteratively reweighted least squares.
@@ -642,12 +642,12 @@ coef.difORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
   return(res)
 }
 
-#' Loglikelihood and information criteria for an object of \code{"difORD"} class.
+#' Log-likelihood and information criteria for an object of \code{"difORD"} class.
 #'
 #' @aliases AIC.difORD BIC.difORD
 #' @rdname logLik.difORD
 #'
-#' @description S3 methods for extracting loglikelihood, Akaike's information criterion (AIC) and
+#' @description S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
 #' Schwarz's Bayesian criterion (BIC) for an object of \code{"difORD"} class.
 #'
 #' @param object an object of \code{"difORD"} class.
@@ -668,7 +668,7 @@ coef.difORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #'
 #' @seealso
 #' \code{\link[difNLR]{difORD}} for DIF detection among ordinal data. \cr
-#' \code{\link[stats]{logLik}} for generic function extracting loglikelihood. \cr
+#' \code{\link[stats]{logLik}} for generic function extracting log-likelihood. \cr
 #' \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
 #'
 #' @examples
@@ -963,7 +963,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
     }
   }
 
-  match <- seq(min(matching, na.rm = T), max(matching, na.rm = T), length.out = 300)
+  match <- seq(min(matching, na.rm = TRUE), max(matching, na.rm = TRUE), length.out = 300)
 
   mat0 <- switch(x$type,
     "both"  = cbind("intercept" = 1, "match" = match, "group" = 0, "x:match" = 0),
@@ -1367,7 +1367,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
 #'
 #' @references
 #' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-#' The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+#' The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 #'
 #' @seealso
 #' \code{\link[difNLR]{difORD}} for DIF detection among ordinal data using either cumulative logit or adjacent category logit model. \cr
@@ -1427,14 +1427,20 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
     }
   }
 
+  if (object$purification) {
+    anchor <- c(1:m)[!c(1:m) %in% object$DIFitems]
+  } else {
+    anchor <- 1:m
+  }
+
   if (missing(match)) {
     if (length(object$match) > 1) {
       match <- object$match
     } else {
       if (object$match == "score") {
-        match <- c(apply(object$Data, 1, sum))
+        match <- rowSums(as.data.frame(object$Data[, anchor]))
       } else {
-        match <- c(scale(apply(object$Data, 1, sum)))
+        match <- scale(rowSums(as.data.frame(object$Data[, anchor])))
       }
     }
   }
@@ -1483,7 +1489,7 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
       }
       coefs <- sapply(1:num.cat.est, function(j) coefs[c(j, (num.cat.est + 1):length(coefs))])
 
-      # calculation probabilities on formula exp(\sum_{t = 0}^{k} b_{0t} + b1X)/(\sum_{r = 0}^{K}exp(\sum_{t=0}^{r}b_{0t} + b1X))
+      # calculation probabilities on formula exp(\sum_{t = 0}^{k} b_{0t} + b1X)/(\sum_{r = 0}^{K}exp(\sum_{t = 0}^{r}b_{0t} + b1X))
       df.probs.cat <- matrix(0,
         nrow = nrow(mat), ncol = num.cat,
         dimnames = list(NULL, cat)

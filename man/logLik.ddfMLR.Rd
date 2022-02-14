@@ -4,7 +4,7 @@
 \alias{logLik.ddfMLR}
 \alias{AIC.ddfMLR}
 \alias{BIC.ddfMLR}
-\title{Loglikelihood and information criteria for an object of \code{"ddfMLR"} class.}
+\title{Log-likelihood and information criteria for an object of \code{"ddfMLR"} class.}
 \usage{
 \method{logLik}{ddfMLR}(object, item = "all", ...)
 
@@ -22,7 +22,7 @@ the column number).}
 \item{...}{other generic parameters for S3 methods.}
 }
 \description{
-S3 methods for extracting loglikelihood, Akaike's information criterion (AIC) and
+S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
 Schwarz's Bayesian criterion (BIC) for an object of \code{"ddfMLR"} class.
 }
 \examples{
@@ -49,7 +49,7 @@ logLik(x, item = 1)
 }
 \seealso{
 \code{\link[difNLR]{ddfMLR}} for DDF detection among nominal data. \cr
-\code{\link[stats]{logLik}} for generic function extracting loglikelihood. \cr
+\code{\link[stats]{logLik}} for generic function extracting log-likelihood. \cr
 \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
 }
 \author{

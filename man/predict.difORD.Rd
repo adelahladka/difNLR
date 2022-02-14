@@ -49,7 +49,7 @@ predict(x, item = "X2003", match = 300, group = c(0, 1))
 }
 \references{
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 }
 \seealso{
 \code{\link[difNLR]{difORD}} for DIF detection among ordinal data using either cumulative logit or adjacent category logit model. \cr
