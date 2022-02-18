@@ -2,64 +2,69 @@
 #'
 #' @aliases ORD
 #'
-#' @description Calculates DIF likelihood ratio statistics for ordinal data based either on adjacent
-#' category logit regression model or on cumulative logit regression model.
+#' @description Calculates DIF likelihood ratio statistics for ordinal
+#'   data based either on adjacent category logit regression model or
+#'   on cumulative logit regression model.
 #'
-#' @param Data data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and
-#' columns correspond to the items.
-#' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for
-#' focal group.
-#' @param model character: logistic regression model for ordinal data (either \code{"adjacent"} (default) or \code{"cumulative"}).
-#' See \strong{Details}.
-#' @param type character: type of DIF to be tested. Either \code{"both"} for uniform and non-uniform
-#' DIF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
-#' uniform DIF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
-#' non-uniform DIF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
-#' as a single value (for all items) or as an item-specific vector.
-#' @param match numeric or character: matching criterion to be used as an estimate of trait. Can be
-#' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
-#' or vector of the same length as number of observations in \code{Data}.
-#' @param anchor character or numeric: specification of DIF free items. A vector of item identifiers
-#' (integers specifying the column  number) specifying which items are currently considered as anchor
-#' (DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-#' @param p.adjust.method character: method for multiple comparison correction. Possible values are
-#' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
-#' \code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.
-#' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
-#' intercept-slope parametrization. See \strong{Details}.
+#' @param Data data.frame or matrix: dataset which rows represent
+#'   ordinaly scored examinee answers and columns correspond to the
+#'   items.
+#' @param group numeric: binary vector of group membership. \code{"0"}
+#'   for reference group, \code{"1"} for focal group.
+#' @param model character: logistic regression model for ordinal data
+#'   (either \code{"adjacent"} (default) or \code{"cumulative"}). See
+#'   \strong{Details}.
+#' @param type character: type of DIF to be tested. Either
+#'   \code{"both"} for uniform and non-uniform DIF (i.e., difference
+#'   in parameters \code{"a"} and \code{"b"}) (default), or
+#'   \code{"udif"} for uniform DIF only (i.e., difference in
+#'   difficulty parameter \code{"b"}), or \code{"nudif"} for
+#'   non-uniform DIF only (i.e., difference in discrimination
+#'   parameter \code{"a"}). Can be specified as a single value (for
+#'   all items) or as an item-specific vector.
+#' @param match numeric or character: matching criterion to be used as
+#'   an estimate of trait. Can be either \code{"zscore"} (default,
+#'   standardized total score), \code{"score"} (total test score), or
+#'   vector of the same length as number of observations in
+#'   \code{Data}.
+#' @param anchor character or numeric: specification of DIF free
+#'   items. A vector of item identifiers (integers specifying the
+#'   column  number) specifying which items are currently considered
+#'   as anchor (DIF free) items. Argument is ignored if \code{match}
+#'   is not \code{"zscore"} or \code{"score"}.
+#' @param p.adjust.method character: method for multiple comparison
+#'   correction. Possible values are \code{"holm"}, \code{"hochberg"},
+#'   \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+#'   \code{"fdr"}, and \code{"none"} (default). For more details see
+#'   \code{\link[stats]{p.adjust}}.
 #' @param alpha numeric: significance level (default is 0.05).
+#' @param parametrization deprecated. Use
+#'   \code{\link[difNLR]{coef.difORD}} for different
+#'   parameterizations.
 #'
 #' @usage
 #' ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
-#'     anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
-#'     alpha = 0.05)
+#'     anchor = 1:ncol(Data), p.adjust.method = "none",
+#'     alpha = 0.05, parametrization)
 #'
 #' @details
-#' Calculates DIF likelihood ratio statistics based either on adjacent category logit model
-#' or on cumulative logit model for ordinal data.
+#' Calculates DIF likelihood ratio statistics based either on adjacent
+#' category logit model or on cumulative logit model for ordinal data.
 #'
-#' Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
-#' categories is
-#' \deqn{log(P(y = k)/P(y = k - 1)) = (a + aDif * g) * (x - b_k - b_kDif * g),}
-#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
-#' membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
-#' for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
-#' between two groups (reference and focal) in relevant parameters.
+#' Using adjacent category logit model, logarithm of ratio of
+#' probabilities of two adjacent categories is
+#' \deqn{log(P(y = k) / P(y = k - 1)) = b_0k + b_1 * x + b_2k * g + b_3 * x:g,}
+#' where \eqn{x} is by default standardized total score (also called
+#' Z-score) and \eqn{g} is a group membership.
 #'
-#' Using cumulative logit model, probability of gaining at least \eqn{k} points is given by
-#' 2PL model, i.e.,
-#' \deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
-#' The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
-#' \eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
+#' Using cumulative logit model, probability of gaining at least
+#' \eqn{k} points is given by 2PL model, i.e.,
+#' \deqn{P(y >= k) = exp(b_0k + b_1 * x + b_2k * g + b_3 * x:g) / (1 + exp(b_0k + b_1 * x + b_2k * g + b_3 * x:g)).}
+#' The category probability (i.e., probability of gaining exactly
+#' \eqn{k} points) is then \eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
 #'
-#' Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
-#'
-#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
-#' Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
-#' Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
-#' interaction with matching criterion, i.e. \eqn{b_0k + b_1 * x + b_2k * g + b_3 * x:g} instead of
-#' \eqn{(a + a_Dif * g) * (x - b_k - b_kDif * g))}.
+#' Both models are estimated by iteratively reweighted least squares.
+#' For more details see \code{\link[VGAM]{vglm}}.
 #'
 #' @return A list with the following arguments:
 #' \describe{
@@ -126,9 +131,15 @@
 #' @export
 ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore",
                 anchor = 1:ncol(Data), p.adjust.method = "none",
-                parametrization = "irt", alpha = 0.05) {
+                alpha = 0.05, parametrization) {
+  # deprecated args handling
+  if (!missing(parametrization)) {
+    warning("Argument 'parametrization' is deprecated; please use 'coef.difORD()' method for different parameterizations. ",
+      call. = FALSE
+    )
+  }
+
   m <- dim(Data)[2]
-  n <- dim(Data)[1]
 
   for (i in 1:m) {
     Data[, i] <- as.numeric(paste(Data[, i]))
@@ -192,154 +203,10 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
   cov.m0 <- lapply(m0, vcov)
   cov.m1 <- lapply(m1, vcov)
 
-  cats <- lapply(Data, function(x) sort(unique(x))[-1])
+  se.m0 <- lapply(lapply(cov.m0, diag), sqrt)
+  se.m1 <- lapply(lapply(cov.m1, diag), sqrt)
 
-  if (parametrization == "irt") {
-    b0s <- lapply(par.m0, function(x) names(x)[grepl("Intercept", names(x))])
-    num.b0s <- sapply(b0s, length)
-
-    par.m0.tmp <- lapply(1:m, function(i) c(par.m0[[i]], rep(0, num.b0s[i] + 3 - length(par.m0[[i]]))))
-    par.m0.tmp <- lapply(1:m, function(i) {
-      names(par.m0.tmp[[i]])[-c(1:num.b0s[[i]])] <- c("x", "group", "x:group")
-      par.m0.tmp[[i]]
-    })
-    par.m1.tmp <- lapply(1:m, function(i) c(par.m1[[i]], rep(0, num.b0s[i] + 3 - length(par.m1[[i]]))))
-    par.m1.tmp <- lapply(1:m, function(i) {
-      names(par.m1.tmp[[i]])[-c(1:num.b0s[[i]])] <- c("x", "group", "x:group")
-      par.m1.tmp[[i]]
-    })
-
-    par.m0.delta <- lapply(par.m0.tmp, function(x) {
-      c(
-        -x[grepl("Intercept", names(x))] / x["x"],
-        x["x"],
-        (x[grepl("Intercept", names(x))] * x["x:group"] - x["x"] * x["group"]) / (x["x"]^2 + x["x"] * x["x:group"]),
-        x["x:group"]
-      )
-    })
-    par.m1.delta <- lapply(par.m1.tmp, function(x) {
-      c(
-        -x[grepl("Intercept", names(x))] / x["x"],
-        x["x"],
-        (x[grepl("Intercept", names(x))] * x["x:group"] - x["x"] * x["group"]) / (x["x"]^2 + x["x"] * x["x:group"]),
-        x["x:group"]
-      )
-    })
-
-    nams.m0 <- lapply(par.m0.tmp, names)
-    nams.m1 <- lapply(par.m1.tmp, names)
-
-    nams.cov.m0 <- lapply(cov.m0, rownames)
-    nams.cov.m1 <- lapply(cov.m1, rownames)
-
-    nams.add.m0 <- lapply(1:m, function(i) c(nams.m0[[i]][nams.m0[[i]] %in% nams.cov.m0[[i]]], nams.m0[[i]][!nams.m0[[i]] %in% nams.cov.m0[[i]]]))
-    nams.add.m1 <- lapply(1:m, function(i) c(nams.m1[[i]][nams.m1[[i]] %in% nams.cov.m1[[i]]], nams.m1[[i]][!nams.m1[[i]] %in% nams.cov.m1[[i]]]))
-
-    cov.m0.tmp <- lapply(1:m, function(i) {
-      rbind(
-        cbind(cov.m0[[i]], matrix(0, nrow = nrow(cov.m0[[i]]), ncol = num.b0s[i] + 3 - nrow(cov.m0[[i]]))),
-        matrix(0, nrow = num.b0s[i] + 3 - nrow(cov.m0[[i]]), ncol = num.b0s[i] + 3)
-      )
-    })
-    cov.m0.tmp <- lapply(1:m, function(i) {
-      colnames(cov.m0.tmp[[i]]) <- rownames(cov.m0.tmp[[i]]) <- nams.add.m0[[i]]
-      cov.m0.tmp[[i]]
-    })
-    cov.m1.tmp <- lapply(1:m, function(i) {
-      rbind(
-        cbind(cov.m1[[i]], matrix(0, nrow = nrow(cov.m1[[i]]), ncol = num.b0s[i] + 3 - nrow(cov.m1[[i]]))),
-        matrix(0, nrow = num.b0s[i] + 3 - nrow(cov.m1[[i]]), ncol = num.b0s[i] + 3)
-      )
-    })
-    cov.m1.tmp <- lapply(1:m, function(i) {
-      colnames(cov.m1.tmp[[i]]) <- rownames(cov.m1.tmp[[i]]) <- nams.add.m1[[i]]
-      cov.m1.tmp[[i]]
-    })
-
-    se.m0 <- lapply(1:m, function(i) {
-      c(
-        sapply(1:num.b0s[[i]], function(j) {
-          msm::deltamethod(
-            ~ -x1 / x2,
-            par.m0.tmp[[i]][c(b0s[[i]][j], "x")],
-            cov.m0.tmp[[i]][c(b0s[[i]][j], "x"), c(b0s[[i]][j], "x")]
-          )
-        }),
-        sqrt(cov.m0.tmp[[i]]["x", "x"]),
-        sapply(1:num.b0s[[i]], function(j) {
-          msm::deltamethod(
-            ~ (x1 * x4 - x2 * x3) / (x2 * x2 + x2 * x4),
-            par.m0.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group")],
-            cov.m0.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group"), c(b0s[[i]][j], "x", "group", "x:group")]
-          )
-        }),
-        sqrt(cov.m0.tmp[[i]]["x:group", "x:group"])
-      )
-    })
-    se.m1 <- lapply(1:m, function(i) {
-      c(
-        sapply(1:num.b0s[[i]], function(j) {
-          deltamethod(
-            ~ -x1 / x2,
-            par.m1.tmp[[i]][c(b0s[[i]][j], "x")],
-            cov.m1.tmp[[i]][c(b0s[[i]][j], "x"), c(b0s[[i]][j], "x")]
-          )
-        }),
-        sqrt(cov.m1.tmp[[i]]["x", "x"]),
-        sapply(1:num.b0s[[i]], function(j) {
-          deltamethod(
-            ~ (x1 * x4 - x2 * x3) / (x2 * x2 + x2 * x4),
-            par.m1.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group")],
-            cov.m1.tmp[[i]][c(b0s[[i]][j], "x", "group", "x:group"), c(b0s[[i]][j], "x", "group", "x:group")]
-          )
-        }),
-        sqrt(cov.m1.tmp[[i]]["x:group", "x:group"])
-      )
-    })
-
-    se.m0 <- lapply(1:m, function(i) {
-      names(se.m0[[i]]) <- c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
-      se.m0[[i]]
-    })
-    se.m1 <- lapply(1:m, function(i) {
-      names(se.m1[[i]]) <- c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
-      se.m1[[i]]
-    })
-
-    par.m0 <- par.m0.delta
-    par.m1 <- par.m1.delta
-    par.m0 <- lapply(1:m, function(i) {
-      names(par.m0[[i]]) <- c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
-      par.m0[[i]]
-    })
-    par.m1 <- lapply(1:m, function(i) {
-      names(par.m1[[i]]) <- c(paste0("b", as.numeric(paste(cats[[i]]))), "a", paste0("bDIF", as.numeric(paste(cats[[i]]))), "aDIF")
-      par.m1[[i]]
-    })
-  } else {
-    se.m1 <- lapply(lapply(cov.m1, diag), sqrt)
-    se.m0 <- lapply(lapply(cov.m0, diag), sqrt)
-
-    se.m0 <- lapply(1:m, function(i) {
-      names(se.m0[[i]]) <- c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m0[[i]])]
-      se.m0[[i]]
-    })
-    se.m1 <- lapply(1:m, function(i) {
-      names(se.m1[[i]]) <- c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m1[[i]])]
-      se.m1[[i]]
-    })
-
-    par.m0 <- lapply(1:m, function(i) {
-      names(par.m0[[i]]) <- c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m0[[i]])]
-      par.m0[[i]]
-    })
-    par.m1 <- lapply(1:m, function(i) {
-      names(par.m1[[i]]) <- c(paste0("(Intercept):", as.numeric(paste(cats[[i]]))), "x", "group", "x:group")[1:length(se.m1[[i]])]
-      par.m1[[i]]
-    })
-  }
-
-  names(par.m0) <- names(par.m1) <- names(se.m0) <- names(par.m1) <- colnames(Data)[1:m]
+  names(par.m0) <- names(par.m1) <- names(cov.m0) <- names(cov.m1) <- names(se.m0) <- names(se.m1) <- colnames(Data)[1:m]
 
   ll.m0 <- sapply(m0, logLik)
   ll.m1 <- sapply(m1, logLik)
@@ -354,8 +221,8 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     Sval = ORDstat[1, ],
     pval = ORDstat[2, ], adjusted.pval = adjusted.pval,
     df = ORDstat[3, ],
-    par.m0 = par.m0, se.m0 = se.m0,
-    par.m1 = par.m1, se.m1 = se.m1,
+    par.m0 = par.m0, se.m0 = se.m0, cov.m0 = cov.m0,
+    par.m1 = par.m1, se.m1 = se.m1, cov.m1 = cov.m1,
     ll.m0 = ll.m0, ll.m1 = ll.m1,
     AIC.m0 = AIC.m0, AIC.m1 = AIC.m1,
     BIC.m0 = BIC.m0, BIC.m1 = BIC.m1
@@ -365,11 +232,6 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
 
 #' @noRd
 .deltamethod.ORD.log2irt <- function(par, cov) {
-  # par.m1[[1]]
-  # cov.m1[[1]]
-  # sqrt(diag(cov.m1[[1]]))
-  # IRT <- .deltamethod.ORD.log2irt(par = par.m1[[1]], cov = cov.m1[[1]])
-  # .deltamethod.ORD.irt2log(par = IRT$par, cov = IRT$cov)
   cats <- as.numeric(paste(gsub("\\(Intercept\\)\\:", "", names(par)[(grepl("Intercept", names(par)))])))
   par_new <- setNames(
     c(
@@ -413,52 +275,53 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
   return(list(par = par_new, cov = cov_new, se = se_new))
 }
 
-#' @noRd
-.deltamethod.ORD.irt2log <- function(par, cov) {
-  cats <- names(par)[grepl("b", names(par))]
-  cats <- as.numeric(paste(gsub("b", "", cats[nchar(cats) < 4])))
-  par_new <- c(
-      -par["a"] * par[paste0("b", cats)],
-      par["a"],
-      -par["aDIF"] * par[paste0("b", cats)] - par["a"] * par[paste0("bDIF", cats)] - par["aDIF"] * par[paste0("bDIF", cats)],
-      par["aDIF"]
-    )
-  num_cats <- length(cats)
-  duplicates <- duplicated(round(par_new, 11))
-
-  bk <- paste0("x", 1:num_cats)
-  bkDIF <- paste0("x", 1:num_cats + num_cats + 1)
-  a <- paste0("x", num_cats + 1)
-  aDIF <- paste0("x", 2 * num_cats + 2)
-
-  betas0 <- paste0("-", a, "*", bk)
-  beta1 <- a
-  betas2 <- paste0("-", aDIF, "*", bk, "-", a, "*", bkDIF, "-", aDIF, "*", bkDIF)
-  beta3 <- aDIF
-
-  formulas <- append(append(
-    append(as.list(betas0), as.list(beta1)),
-    as.list(betas2)
-  ), as.list(beta3))
-  formulas <- lapply(formulas, function(x) paste0("~", x))
-  formulas <- lapply(formulas, as.formula)
-  formulas <- formulas[!is.na(par_new)]
-  cov_new <- msm::deltamethod(
-    formulas,
-    par,
-    cov,
-    ses = FALSE
-  )
-  cov_new <- cov_new[!duplicates, !duplicates]
-  se_new <- sqrt(diag(cov_new))
-
-  # SE for group is not well defined
-  # cov_new <- cov_new[!is.na(par_new), !is.na(par_new)]
-  par_new <- par_new[!duplicates]
-  names(par_new) <- c(paste0("(Intercept):", cats), "x", "group", "x:group")
-  par_new <- par_new[!is.na(par_new)]
-  nams <- names(par_new)
-  rownames(cov_new) <- colnames(cov_new) <- names(se_new) <- nams
-  return(list(par = par_new, cov = cov_new, se = se_new))
-}
-
+#' #' @noRd
+#' .deltamethod.ORD.irt2log <- function(par, cov) {
+#'   cats <- names(par)[grepl("b", names(par))]
+#'   cats <- as.numeric(paste(gsub("b", "", cats[nchar(cats) < 4])))
+#'   par_new <- c(
+#'       -par["a"] * par[paste0("b", cats)],
+#'       par["a"],
+#'       # -par["aDIF"] * par[paste0("b", cats)] - par["a"] * par[paste0("bDIF", cats)] - par["aDIF"] * par[paste0("bDIF", cats)],
+#'       par["tmp"],
+#'       par["aDIF"]
+#'     )
+#'   num_cats <- length(cats)
+#'   # duplicates <- duplicated(round(par_new, 11))
+#'
+#'   bk <- paste0("x", 1:num_cats)
+#'   tmp <- paste0("x", 2 * num_cats + 3)
+#'   a <- paste0("x", num_cats + 1)
+#'   aDIF <- paste0("x", 2 * num_cats + 2)
+#'
+#'   betas0 <- paste0("-", a, "*", bk)
+#'   beta1 <- a
+#'   # betas2 <- paste0("-", aDIF, "*", bk, "-", a, "*", bkDIF, "-", aDIF, "*", bkDIF)
+#'   beta2 <- tmp
+#'   beta3 <- aDIF
+#'
+#'   formulas <- append(append(
+#'     append(as.list(betas0), as.list(beta1)),
+#'     as.list(beta2)
+#'   ), as.list(beta3))
+#'   formulas <- lapply(formulas, function(x) paste0("~", x))
+#'   formulas <- lapply(formulas, as.formula)
+#'   formulas <- formulas[!is.na(par_new)]
+#'   cov_new <- msm::deltamethod(
+#'     formulas,
+#'     par,
+#'     cov,
+#'     ses = FALSE
+#'   )
+#'   cov_new <- cov_new#[!duplicates, !duplicates]
+#'   se_new <- sqrt(diag(cov_new))
+#'
+#'   # SE for group is not well defined
+#'   # cov_new <- cov_new[!is.na(par_new), !is.na(par_new)]
+#'   # par_new <- par_new[!duplicates]
+#'   names(par_new) <- c(paste0("(Intercept):", cats), "x", "group", "x:group")
+#'   par_new <- par_new[!is.na(par_new)]
+#'   nams <- names(par_new)
+#'   rownames(cov_new) <- colnames(cov_new) <- names(se_new) <- nams
+#'   return(list(par = par_new, cov = cov_new, se = se_new))
+#' }

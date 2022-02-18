@@ -2,76 +2,84 @@
 #'
 #' @aliases difORD
 #'
-#' @description Performs DIF detection procedure for ordinal data based either on adjacent category logit
-#' model or on cumulative logit model and likelihood ratio test of a submodel.
+#' @description Performs DIF detection procedure for ordinal data
+#'   based either on adjacent category logit model or on cumulative
+#'   logit model and likelihood ratio test of a submodel.
 #'
-#' @param Data data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and
-#' columns correspond to the items. In addition, \code{Data} can hold the vector of group membership.
-#' @param group numeric or character: a dichotomous vector of the same length as \code{nrow(Data)}
-#' or a column identifier of \code{Data}.
-#' @param focal.name numeric or character: indicates the level of \code{group} which corresponds to
-#' focal group.
-#' @param model character: logistic regression model for ordinal data (either \code{"adjacent"} (default)
-#' or \code{"cumulative"}). See \strong{Details}.
-#' @param type character: type of DIF to be tested. Either \code{"both"} for uniform and non-uniform
-#' DIF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
-#' uniform DIF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
-#' non-uniform DIF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
-#' as a single value (for all items) or as an item-specific vector.
-#' @param match numeric or character: matching criterion to be used as an estimate of trait. Can be
-#' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
-#' or vector of the same length as number of observations in \code{Data}.
-#' @param anchor numeric or character: specification of DIF free items. Either \code{NULL} (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number) determining which items are currently considered as anchor (DIF free) items.
-#' Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-#' @param purify logical: should the item purification be applied? (default is \code{FALSE}).
-#' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
-#' @param p.adjust.method character: method for multiple comparison correction. Possible values are
-#' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
-#' \code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.
-#' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
-#' intercept-slope parametrization. See \strong{Details}.
+#' @param Data data.frame or matrix: dataset which rows represent
+#'   ordinaly scored examinee answers and columns correspond to the
+#'   items. In addition, \code{Data} can hold the vector of group
+#'   membership.
+#' @param group numeric or character: a dichotomous vector of the same
+#'   length as \code{nrow(Data)} or a column identifier of
+#'   \code{Data}.
+#' @param focal.name numeric or character: indicates the level of
+#'   \code{group} which corresponds to focal group.
+#' @param model character: logistic regression model for ordinal data
+#'   (either \code{"adjacent"} (default) or \code{"cumulative"}). See
+#'   \strong{Details}.
+#' @param type character: type of DIF to be tested. Either
+#'   \code{"both"} for uniform and non-uniform DIF (default), or
+#'   \code{"udif"} for uniform DIF only, or \code{"nudif"} for
+#'   non-uniform DIF only. Can be specified as a single value (for all
+#'   items) or as an item-specific vector.
+#' @param match numeric or character: matching criterion to be used as
+#'   an estimate of trait. Can be either \code{"zscore"} (default,
+#'   standardized total score), \code{"score"} (total test score), or
+#'   vector of the same length as number of observations in
+#'   \code{Data}.
+#' @param anchor numeric or character: specification of DIF free
+#'   items. Either \code{NULL} (default), or a vector of item names
+#'   (column names of \code{Data}), or item identifiers (integers
+#'   specifying the column number) determining which items are
+#'   currently considered as anchor (DIF free) items. Argument is
+#'   ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' @param purify logical: should the item purification be applied?
+#'   (default is \code{FALSE}).
+#' @param nrIter numeric: the maximal number of iterations in the item
+#'   purification (default is 10).
+#' @param p.adjust.method character: method for multiple comparison
+#'   correction. Possible values are \code{"holm"}, \code{"hochberg"},
+#'   \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+#'   \code{"fdr"}, and \code{"none"} (default). For more details see
+#'   \code{\link[stats]{p.adjust}}.
 #' @param alpha numeric: significance level (default is 0.05).
+#' @param parametrization deprecated. Use
+#'   \code{\link[difNLR]{coef.difORD}} for different
+#'   parameterizations.
 #'
 #' @usage
 #' difORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
 #'        anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
-#'        parametrization = "irt", alpha = 0.05)
+#'        alpha = 0.05, parametrization)
 #'
 #' @details
-#' Performs DIF detection procedure for ordinal data based either on adjacent category logit model
-#' or on cumulative logit model.
+#' Calculates DIF likelihood ratio statistics based either on adjacent
+#' category logit model or on cumulative logit model for ordinal data.
 #'
-#' Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
-#' categories is
-#' \deqn{log(P(y = k)/P(y = k - 1)) = (a + aDif * g) * (x - b_k - b_kDif * g),}
-#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
-#' membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
-#' for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
-#' between two groups (reference and focal) in relevant parameters.
+#' Using adjacent category logit model, logarithm of ratio of
+#' probabilities of two adjacent categories is
+#' \deqn{log(P(y = k) / P(y = k - 1)) = b_0k + b_1 * x + b_2k * g + b_3 * x:g,}
+#' where \eqn{x} is by default standardized total score (also called
+#' Z-score) and \eqn{g} is a group membership.
 #'
-#' Using cumulative logit model, probability of gaining at least \eqn{k} points is given by
-#' 2PL model, i.e.,
-#' \deqn{P(y >= k) = exp((a + aDif * g) * (x - b_k - b_kDif * g)) / (1 + exp((a + aDif * g) * (x - b_k - b_kDif * g))).}
-#' The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
-#' \eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
+#' Using cumulative logit model, probability of gaining at least
+#' \eqn{k} points is given by 2PL model, i.e.,
+#' \deqn{P(y >= k) = exp(b_0k + b_1 * x + b_2k * g + b_3 * x:g) / (1 + exp(b_0k + b_1 * x + b_2k * g + b_3 * x:g)).}
+#' The category probability (i.e., probability of gaining exactly
+#' \eqn{k} points) is then \eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
 #'
-#' Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
+#' Both models are estimated by iteratively reweighted least squares.
+#' For more details see \code{\link[VGAM]{vglm}}.
 #'
-#' Argument \code{parametrization} is a character which specifies parameterization of regression parameters.
-#' Default option is \code{"irt"} which returns IRT parameterization (difficulty-discrimination, see above).
-#' Option \code{"classic"} returns intercept-slope parameterization with effect of group membership and
-#' interaction with matching criterion, i.e. \eqn{b_0k + b_1 * x + b_2k * g + b_3 * x:g} instead of
-#' \eqn{(a + a_Dif * g) * (x - b_k - b_kDif * g))}.
+#' Missing values are allowed but discarded for item estimation. They
+#' must be coded as \code{NA} for both, \code{Data} and \code{group}
+#' parameters.
 #'
-#' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
-#' for both, \code{Data} and \code{group} parameters.
-#'
-#' @return The \code{difORD()} function returns an object of class \code{"difORD"}. The output
-#' including values of the test statistics, p-values, and items marked as DIF is displayed by the
-#' \code{print()} method.
+#' @return The \code{difORD()} function returns an object of class
+#'   \code{"difORD"}. The output including values of the test
+#'   statistics, p-values, and items marked as DIF is displayed by the
+#'   \code{print()} method.
 #'
 #' A list of class \code{"difORD"} with the following arguments:
 #' \describe{
@@ -90,7 +98,6 @@
 #'   \code{"No DIF item detected"} in case no item was detected as DIF.}
 #'   \item{\code{model}}{model used for DIF detection.}
 #'   \item{\code{type}}{character: type of DIF that was tested.}
-#'   \item{\code{parametrization}}{Parameters' parametrization.}
 #'   \item{\code{purification}}{\code{purify} value.}
 #'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
 #'   is \code{TRUE}.}
@@ -110,7 +117,7 @@
 #'   \item{\code{match}}{matching criterion.}
 #'   }
 #'
-#' For an object of class \code{"difORD"} several methods are available (e.g. \code{methods(class = "difORD")}).
+#' For an object of class \code{"difORD"} several methods are available (e.g., \code{methods(class = "difORD")}).
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -186,22 +193,25 @@
 #' # testing both DIF effects with total score as matching criterion
 #' difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 #'
-#' # testing both DIF effects with cumulative logit model
-#' # using IRT parametrization
-#' (x <- difORD(Data, group, focal.name = 1, model = "cumulative", parametrization = "irt"))
-#'
 #' # graphical devices
 #' plot(x, item = 3, plot.type = "cumulative")
 #' plot(x, item = 3, plot.type = "category")
 #'
-#' # estimated parameters in IRT parametrization
+#' # estimated parameters
 #' coef(x, simplify = TRUE)
 #' }
 #' @keywords DIF
 #' @export
 difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", match = "zscore",
                    anchor = NULL, purify = FALSE, nrIter = 10, p.adjust.method = "none",
-                   parametrization = "irt", alpha = 0.05) {
+                   alpha = 0.05, parametrization) {
+  # deprecated args handling
+  if (!missing(parametrization)) {
+    warning("Argument 'parametrization' is deprecated; please use 'coef.difORD()' method for different parameterizations. ",
+            call. = FALSE
+    )
+  }
+
   if (!type %in% c("udif", "nudif", "both") | !is.character(type)) {
     stop("'type' must be either 'udif', 'nudif', or 'both'.",
       call. = FALSE
@@ -217,12 +227,7 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
       call. = FALSE
     )
   }
-  if (!parametrization %in% c("classic", "irt")) {
-    stop("Invalid value for 'parametrization'. Possible values are 'classic' and 'irt'.",
-      call. = FALSE
-    )
-  }
-  ### matching criterion
+  # matching criterion
   if (!(match[1] %in% c("score", "zscore"))) {
     if (is.null(dim(Data))) {
       no <- length(Data)
@@ -234,7 +239,7 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
            of observations in 'Data'.", call. = FALSE)
     }
   }
-  ### purification
+  # purification
   if (purify & !(match[1] %in% c("score", "zscore"))) {
     stop("Purification not allowed when matching variable is not 'zscore' or 'score'.", call. = FALSE)
   }
@@ -311,7 +316,7 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(ORD(DATA, GROUP,
         model = model, match = match, anchor = ANCHOR,
-        type = type, p.adjust.method = p.adjust.method, parametrization = parametrization,
+        type = type, p.adjust.method = p.adjust.method,
         alpha = alpha
       ))
 
@@ -339,15 +344,14 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         Sval = STATS,
         ordPAR = ordPAR,
         ordSE = ordSE,
-        parM0 = PROV$par.m0,
-        parM1 = PROV$par.m1,
+        parM0 = PROV$par.m0, parM1 = PROV$par.m1,
+        covM0 = PROV$cov.m0, covM1 = PROV$cov.m1,
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
         DIFitems = DIFitems,
         model = model,
         type = type,
-        parametrization = parametrization,
         purification = purify,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
         df = PROV$df,
@@ -360,7 +364,7 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
       noLoop <- FALSE
       prov1 <- suppressWarnings(ORD(DATA, GROUP,
         model = model, type = type, match = match,
-        p.adjust.method = p.adjust.method, parametrization = parametrization,
+        p.adjust.method = p.adjust.method,
         alpha = alpha
       ))
       stats1 <- prov1$Sval
@@ -396,7 +400,7 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
             }
             prov2 <- suppressWarnings(ORD(DATA, GROUP,
               model = model, anchor = nodif, type = type, match = match,
-              p.adjust.method = p.adjust.method, parametrization = parametrization,
+              p.adjust.method = p.adjust.method,
               alpha = alpha
             ))
             stats2 <- prov2$Sval
@@ -449,15 +453,14 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
         Sval = STATS,
         ordPAR = ordPAR,
         ordSE = ordSE,
-        parM0 = PROV$par.m0,
-        parM1 = PROV$par.m1,
+        parM0 = PROV$par.m0, parM1 = PROV$par.m1,
+        covM0 = PROV$cov.m0, covM1 = PROV$cov.m1,
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
         DIFitems = DIFitems,
         model = model,
         type = type,
-        parametrization = parametrization,
         purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
         df = PROV$df,
@@ -552,13 +555,20 @@ print.difORD <- function(x, ...) {
 
 #' Extract model coefficients from an object of \code{"difORD"} class.
 #'
-#' @description S3 method for extracting estimated model coefficients from an object of \code{"difORD"} class.
+#' @description S3 method for extracting estimated model coefficients
+#'   from an object of \code{"difORD"} class.
 #' @aliases coefficients.difORD
 #'
 #' @param object an object of \code{"difORD"} class.
-#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
-#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
-#' @param ... other generic parameters for \code{coef()} method.
+#' @param SE logical: should the standard errors of estimated
+#'   parameters be also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the estimated parameters be
+#'   simplified to a matrix? (default is \code{FALSE}).
+#' @param IRTpars logical: should the estimated parameters be returned
+#'   in IRT parameterization? (default is \code{TRUE}).
+#' @param CI numeric: level of confidence interval for parameters,
+#'   default is \code{0.95} for 95\% confidence interval.
+#' @param ... other generic parameters for \code{coef()} function.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -586,55 +596,98 @@ print.difORD <- function(x, ...) {
 #'
 #' # estimated parameters
 #' coef(x)
+#' # includes standard errors
 #' coef(x, SE = TRUE)
-#' coef(x, simplify = TRUE)
+#' # includes standard errors and simplifies to matrix
 #' coef(x, SE = TRUE, simplify = TRUE)
+#' # intercept-slope parameterization
+#' coef(x, IRTpars = FALSE)
+#' # intercept-slope parameterization, simplifies to matrix, turn off confidence intervals
+#' coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
 #' }
 #' @export
-coef.difORD <- function(object, SE = FALSE, simplify = FALSE, ...) {
+coef.difORD <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
   if (class(SE) != "logical") {
-    stop("Invalid value for 'SE'. 'SE' need to be logical.",
-      call. = FALSE
+    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+         call. = FALSE
     )
   }
   if (class(simplify) != "logical") {
-    stop("Invalid value for 'simplify'. 'simplify' need to be logical.",
-      call. = FALSE
+    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+         call. = FALSE
+    )
+  }
+  if (class(IRTpars) != "logical") {
+    stop("Invalid value for 'IRTpars'. 'IRTpars' need to be logical. ",
+         call. = FALSE
+    )
+  }
+  if (CI > 1 | CI < 0 | !is.numeric(CI)) {
+    stop("Invalid value for 'CI'. 'CI' must be numeric value between 0 and 1. ",
+         call. = FALSE
     )
   }
 
   m <- dim(object$Data)[2]
   nams <- colnames(object$Data)
 
-  coefs <- object$ordPAR
-  names(coefs) <- nams
+  if (!IRTpars) {
+    pars <- object$ordPAR
+    se <- object$ordSE
+  } else {
+    ordPAR <- object$ordPAR
+    ordCOV <- ifelse(1:m %in% object$DIFitems, object$covM1, object$covM0)
+    ordDM <- lapply(1:m, function(i)
+      .deltamethod.ORD.log2irt(
+        par = ordPAR[[i]], cov = ordCOV[[i]]
+      )
+    )
+    pars <- lapply(ordDM, function(x) x$par)
+    se <- lapply(ordDM, function(x) x$se)
+  }
+  names(pars) <- nams
+  names(se) <- nams
 
   if (SE) {
-    se <- object$ordSE
-    names(se) <- nams
-    coefs <- lapply(nams, function(i) rbind(coefs[[i]], se[[i]]))
+    coefs <- lapply(nams, function(i) rbind(pars[[i]], se[[i]]))
     coefs <- lapply(coefs, "rownames<-", c("estimate", "SE"))
+    names(coefs) <- nams
+  } else {
+    coefs <- pars
+  }
+
+  if (CI > 0) {
+    alpha <- (1 - CI) / 2
+    CIlow <- lapply(nams, function(i) pars[[i]] - qnorm(1 - alpha) * se[[i]])
+    CIupp <- lapply(nams, function(i) pars[[i]] + qnorm(1 - alpha) * se[[i]])
+    names(CIlow) <- names(CIupp) <- nams
+    coefs <- lapply(nams, function(i) rbind(coefs[[i]], CIlow[[i]], CIupp[[i]]))
+    if (SE) {
+      coefs <- lapply(coefs, "rownames<-", c("estimate", "SE", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+    } else {
+      coefs <- lapply(coefs, "rownames<-", c("estimate", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+    }
     names(coefs) <- nams
   }
 
   if (simplify) {
     res <- as.data.frame(plyr::ldply(coefs, rbind))
-
     if (SE) {
-      resnams <- paste(res[, 1], c("estimate", "SE"))
+      if (CI > 0) {
+        resnams <- paste(res[, 1], c("estimate", "SE", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+      } else {
+        resnams <- paste(res[, 1], c("estimate", "SE"))
+      }
     } else {
-      resnams <- res[, 1]
+      if (CI > 0) {
+        resnams <- paste(res[, 1], c("estimate", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha))))
+      } else {
+        resnams <- res[, 1]
+      }
     }
     res <- res[, -1]
     rownames(res) <- resnams
     res[is.na(res)] <- 0
-
-    cat.est <- sort(unique(unlist(lapply(object$Data, function(x) sort(unique(x))[-1]))))
-    if (object$parametrization == "irt") {
-      res <- res[, c(paste0("b", cat.est), "a", paste0("bDIF", cat.est), "aDIF")]
-    } else {
-      res <- res[, c(paste0("(Intercept):", cat.est), "x", "group", "x:group")[1:ncol(res)]]
-    }
   } else {
     res <- coefs
   }
@@ -1085,7 +1138,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
           legend.background = element_rect(fill = "transparent", colour = NA),
           legend.box.background = element_rect(fill = "transparent", colour = NA)
         ) +
-        ### legend
+        # legend
         theme(
           legend.box.just = "top",
           legend.justification = c("left", "top"),
@@ -1266,7 +1319,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
             legend.background = element_rect(fill = "transparent", colour = NA),
             legend.box.background = element_rect(fill = "transparent", colour = NA)
           ) +
-          ### legend
+          # legend
           theme(
             legend.box.just = "top",
             legend.justification = c("right", "bottom"),

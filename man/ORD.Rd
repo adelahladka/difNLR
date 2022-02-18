@@ -5,42 +5,53 @@
 \title{DIF likelihood ratio statistics for ordinal data.}
 \usage{
 ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
-    anchor = 1:ncol(Data), p.adjust.method = "none", parametrization = "irt",
-    alpha = 0.05)
+    anchor = 1:ncol(Data), p.adjust.method = "none",
+    alpha = 0.05, parametrization)
 }
 \arguments{
-\item{Data}{data.frame or matrix: dataset which rows represent ordinaly scored examinee answers and
-columns correspond to the items.}
+\item{Data}{data.frame or matrix: dataset which rows represent
+ordinaly scored examinee answers and columns correspond to the
+items.}
 
-\item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for
-focal group.}
+\item{group}{numeric: binary vector of group membership. \code{"0"}
+for reference group, \code{"1"} for focal group.}
 
-\item{model}{character: logistic regression model for ordinal data (either \code{"adjacent"} (default) or \code{"cumulative"}).
-See \strong{Details}.}
+\item{model}{character: logistic regression model for ordinal data
+(either \code{"adjacent"} (default) or \code{"cumulative"}). See
+\strong{Details}.}
 
-\item{type}{character: type of DIF to be tested. Either \code{"both"} for uniform and non-uniform
-DIF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
-uniform DIF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
-non-uniform DIF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
-as a single value (for all items) or as an item-specific vector.}
+\item{type}{character: type of DIF to be tested. Either
+\code{"both"} for uniform and non-uniform DIF (i.e., difference
+in parameters \code{"a"} and \code{"b"}) (default), or
+\code{"udif"} for uniform DIF only (i.e., difference in
+difficulty parameter \code{"b"}), or \code{"nudif"} for
+non-uniform DIF only (i.e., difference in discrimination
+parameter \code{"a"}). Can be specified as a single value (for
+all items) or as an item-specific vector.}
 
-\item{match}{numeric or character: matching criterion to be used as an estimate of trait. Can be
-either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
-or vector of the same length as number of observations in \code{Data}.}
+\item{match}{numeric or character: matching criterion to be used as
+an estimate of trait. Can be either \code{"zscore"} (default,
+standardized total score), \code{"score"} (total test score), or
+vector of the same length as number of observations in
+\code{Data}.}
 
-\item{anchor}{character or numeric: specification of DIF free items. A vector of item identifiers
-(integers specifying the column  number) specifying which items are currently considered as anchor
-(DIF free) items. Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
+\item{anchor}{character or numeric: specification of DIF free
+items. A vector of item identifiers (integers specifying the
+column  number) specifying which items are currently considered
+as anchor (DIF free) items. Argument is ignored if \code{match}
+is not \code{"zscore"} or \code{"score"}.}
 
-\item{p.adjust.method}{character: method for multiple comparison correction. Possible values are
-\code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
-\code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.}
-
-\item{parametrization}{character: parametrization of regression coefficients. Possible options are
-\code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
-intercept-slope parametrization. See \strong{Details}.}
+\item{p.adjust.method}{character: method for multiple comparison
+correction. Possible values are \code{"holm"}, \code{"hochberg"},
+\code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+\code{"fdr"}, and \code{"none"} (default). For more details see
+\code{\link[stats]{p.adjust}}.}
 
 \item{alpha}{numeric: significance level (default is 0.05).}
+
+\item{parametrization}{deprecated. Use
+\code{\link[difNLR]{coef.difORD}} for different
+parameterizations.}
 }
 \value{
 A list with the following arguments:
@@ -62,34 +73,28 @@ A list with the following arguments:
   }
 }
 \description{
-Calculates DIF likelihood ratio statistics for ordinal data based either on adjacent
-category logit regression model or on cumulative logit regression model.
+Calculates DIF likelihood ratio statistics for ordinal
+  data based either on adjacent category logit regression model or
+  on cumulative logit regression model.
 }
 \details{
-Calculates DIF likelihood ratio statistics based either on adjacent category logit model
-or on cumulative logit model for ordinal data.
+Calculates DIF likelihood ratio statistics based either on adjacent
+category logit model or on cumulative logit model for ordinal data.
 
-Using adjacent category logit model, logarithm of ratio of probabilities of two adjacent
-categories is
-\deqn{log(P(y = k)/P(y = k - 1)) = (a + aDif * g) * (x - b_k - b_kDif * g),}
-where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
-membership. Parameter \eqn{a} is a discrimination of the item and parameter \eqn{b_k} is difficulty
-for the \eqn{k}-th category of the item. Terms \eqn{a_Dif} and \eqn{b_kDif} then represent differences
-between two groups (reference and focal) in relevant parameters.
+Using adjacent category logit model, logarithm of ratio of
+probabilities of two adjacent categories is
+\deqn{log(P(y = k) / P(y = k - 1)) = b_0k + b_1 * x + b_2k * g + b_3 * x:g,}
+where \eqn{x} is by default standardized total score (also called
+Z-score) and \eqn{g} is a group membership.
 
-Using cumulative logit model, probability of gaining at least \eqn{k} points is given by
-2PL model, i.e.,
-\deqn{P(y >= k) = exp((a + aDif*g)*(x - b_k - b_kDif*g))/(1 + exp((a + aDif*g)*(x - b_k - b_kDif*g))).}
-The category probability (i.e., probability of gaining exactly \eqn{k} points) is then
-\eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
+Using cumulative logit model, probability of gaining at least
+\eqn{k} points is given by 2PL model, i.e.,
+\deqn{P(y >= k) = exp(b_0k + b_1 * x + b_2k * g + b_3 * x:g) / (1 + exp(b_0k + b_1 * x + b_2k * g + b_3 * x:g)).}
+The category probability (i.e., probability of gaining exactly
+\eqn{k} points) is then \eqn{P(y = k) = P(y >= k) - P(y >= k + 1)}.
 
-Both models are estimated by iteratively reweighted least squares. For more details see \code{\link[VGAM]{vglm}}.
-
-Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
-Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
-Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
-interaction with matching criterion, i.e. \eqn{b_0k + b_1 * x + b_2k * g + b_3 * x:g} instead of
-\eqn{(a + a_Dif * g) * (x - b_k - b_kDif * g))}.
+Both models are estimated by iteratively reweighted least squares.
+For more details see \code{\link[VGAM]{vglm}}.
 }
 \examples{
 \dontrun{
