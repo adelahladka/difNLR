@@ -1643,14 +1643,19 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 
 #' Extract model coefficients from an object of \code{"difNLR"} class.
 #'
-#' @description S3 method for extracting model coefficients from an object of \code{"difNLR"} class.
+#' @description S3 method for extracting model coefficients from an
+#'   object of \code{"difNLR"} class.
 #' @aliases coefficients.difNLR
 #'
 #' @param object an object of \code{"difNLR"} class.
-#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
-#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
-#' @param IRTpars logical: should the estimated parameters be returned in IRT parameterization? (default is \code{TRUE}).
-#' @param CI numeric: level of confidence interval for parameters, default is \code{0.95} for 95\% confidence interval.
+#' @param SE logical: should the standard errors of estimated
+#'   parameters be also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the estimated parameters be
+#'   simplified to a matrix? (default is \code{FALSE}).
+#' @param IRTpars logical: should the estimated parameters be returned
+#'   in IRT parameterization? (default is \code{TRUE}).
+#' @param CI numeric: level of confidence interval for parameters,
+#'   default is \code{0.95} for 95\% confidence interval.
 #' @param ... other generic parameters for \code{coef()} function.
 #'
 #' @author

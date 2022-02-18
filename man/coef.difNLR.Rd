@@ -10,18 +10,23 @@
 \arguments{
 \item{object}{an object of \code{"difNLR"} class.}
 
-\item{SE}{logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).}
+\item{SE}{logical: should the standard errors of estimated
+parameters be also returned? (default is \code{FALSE}).}
 
-\item{simplify}{logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).}
+\item{simplify}{logical: should the estimated parameters be
+simplified to a matrix? (default is \code{FALSE}).}
 
-\item{IRTpars}{logical: should the estimated parameters be returned in IRT parameterization? (default is \code{TRUE}).}
+\item{IRTpars}{logical: should the estimated parameters be returned
+in IRT parameterization? (default is \code{TRUE}).}
 
-\item{CI}{numeric: level of confidence interval for parameters, default is \code{0.95} for 95\% confidence interval.}
+\item{CI}{numeric: level of confidence interval for parameters,
+default is \code{0.95} for 95\% confidence interval.}
 
 \item{...}{other generic parameters for \code{coef()} function.}
 }
 \description{
-S3 method for extracting model coefficients from an object of \code{"difNLR"} class.
+S3 method for extracting model coefficients from an
+  object of \code{"difNLR"} class.
 }
 \examples{
 \dontrun{
