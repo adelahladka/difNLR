@@ -201,7 +201,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
       call. = FALSE
     )
   }
-  ### matching criterion
+  # matching criterion
   if (!(match[1] %in% c("score", "zscore"))) {
     if (is.null(dim(Data))) {
       no <- length(Data)
@@ -213,7 +213,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
            of observations in 'Data'.")
     }
   }
-  ### purification
+  # purification
   if (purify & !(match[1] %in% c("score", "zscore"))) {
     stop("Purification not allowed when matching variable is not 'zscore' or 'score'.", call. = FALSE)
   }
@@ -754,24 +754,9 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
       ) +
       scale_color_manual(values = cols) +
       scale_fill_manual(values = cols) +
-      theme_bw() +
-      theme(
-        axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        plot.background = element_rect(fill = "transparent", colour = NA),
-        legend.key = element_rect(fill = "white", colour = NA),
-        legend.background = element_rect(fill = "transparent", colour = NA),
-        legend.box.background = element_rect(fill = "transparent", colour = NA)
-      ) +
-      ### legend
-      theme(
-        legend.box.just = "top",
-        legend.justification = c("left", "top"),
-        legend.position = c(0.02, 0.98),
-        legend.box = "horizontal",
-        legend.box.margin = margin(3, 3, 3, 3)
-      ) +
+      .plot.theme() +
+      # legend
+      .plot.theme.legend() +
       guides(
         size = guide_legend(title = "Count", order = 1),
         colour = guide_legend(title = "Answer", order = 2),

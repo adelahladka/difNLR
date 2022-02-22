@@ -1242,24 +1242,9 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         labs(x = xlab, y = "Probability of correct answer") +
         scale_y_continuous(limits = c(0, 1)) +
         # theme
-        theme_bw() +
-        theme(
-          axis.line = element_line(colour = "black"),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          plot.background = element_rect(fill = "transparent", colour = NA),
-          legend.key = element_rect(fill = "white", colour = NA),
-          legend.background = element_rect(fill = "transparent", colour = NA),
-          legend.box.background = element_rect(fill = "transparent", colour = NA)
-        ) +
+        .plot.theme() +
         # legend
-        theme(
-          legend.box.just = "top",
-          legend.justification = c("left", "top"),
-          legend.position = c(0.02, 0.98),
-          legend.box = "horizontal",
-          legend.box.margin = margin(3, 3, 3, 3)
-        ) +
+        .plot.theme.legend() +
         guides(
           size = guide_legend(title = "Count", order = 1),
           colour = guide_legend(title = "Group", order = 2),

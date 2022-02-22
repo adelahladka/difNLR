@@ -22,7 +22,7 @@
 #' @importFrom nnet multinom
 #' @importFrom plyr ldply
 #' @importFrom reshape2 melt
-#' @importFrom stats AIC as.formula anova BIC binomial coef complete.cases deriv3 deviance fitted glm logLik na.omit nls optim p.adjust p.adjust.methods pf pchisq rbinom relevel residuals rnorm sd setNames symnum qf qchisq qnorm qt quantile vcov
+#' @importFrom stats AIC as.formula anova BIC binomial coef complete.cases deriv3 deviance fitted glm logLik na.omit nls optim p.adjust p.adjust.methods pf pchisq predict rbinom relevel residuals rnorm sd setNames symnum qf qchisq qnorm qt quantile vcov
 #' @importFrom VGAM acat AICvlm BICvlm cumulative lrtest_vglm
 #'
 #' @section Functions:

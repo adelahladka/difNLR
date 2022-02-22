@@ -9,22 +9,25 @@
 \arguments{
 \item{object}{an object of \code{"difORD"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
+\item{item}{numeric or character: either character \code{"all"} to
+apply for all converged items (default), or a vector of item
+names (column names of \code{Data}), or item identifiers
+(integers specifying the column number).}
 
 \item{match}{numeric: matching criterion for new observations.}
 
 \item{group}{numeric: group membership for new observations.}
 
-\item{type}{character: type of probability to be computed. Either \code{"category"} for category probabilities
-or \code{"cumulative"} for cumulative probabilities. Cumulative probabilities are available only for cumulative
-logit model.}
+\item{type}{character: type of probability to be computed. Either
+\code{"category"} for category probabilities or
+\code{"cumulative"} for cumulative probabilities. Cumulative
+probabilities are available only for cumulative logit model.}
 
 \item{...}{other generic parameters for \code{predict()} function.}
 }
 \description{
-S3 method for predictions from the model used in the object of \code{"difORD"} class.
+S3 method for predictions from the model used in the
+  object of \code{"difORD"} class.
 }
 \examples{
 \dontrun{
@@ -37,8 +40,8 @@ match <- rowSums(dataMedicalgraded[, 1:100]) # matching criterion
 # testing both DIF effects with cumulative logit model
 (x <- difORD(Data, group, match = match, focal.name = 1, model = "cumulative"))
 
-predict(x, item = "X2003", match = 300, group = c(0, 1))
-predict(x, item = "X2003", match = 300, group = c(0, 1), type = "cumulative")
+predict(x, item = "X2003", match = 350, group = c(0, 1))
+predict(x, item = "X2003", match = 350, group = c(0, 1), type = "cumulative")
 
 # testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, match = match, focal.name = 1, model = "adjacent"))
