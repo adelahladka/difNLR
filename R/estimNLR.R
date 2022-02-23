@@ -279,7 +279,7 @@ vcov.estNLR <- function(object, sandwich = FALSE, ...) {
   f <- paste0("(y - ", "(", gsub("y ~ ", "", paste(deparse(formula), collapse = "")), "))^2")
   f <- gsub("  ", "", f)
 
-  psi <- derivative(
+  psi <- calculus::derivative(
     f = f,
     var = names(par)
   )
@@ -294,7 +294,7 @@ vcov.estNLR <- function(object, sandwich = FALSE, ...) {
     )
   )
 
-  hess <- hessian(
+  hess <- calculus::hessian(
     f = f,
     var = names(par)
   )
