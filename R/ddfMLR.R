@@ -629,11 +629,11 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   }
 
   if (x$match[1] == "zscore") {
-    score <- c(scale(unlist(CTT::score(as.data.frame(x$Data[, anchor]), x$key))))
+    score <- c(scale(unlist(.score(as.data.frame(x$Data[, anchor]), x$key))))
     xlab <- "Standardized total score"
   } else {
     if (x$match[1] == "score") {
-      score <- c(unlist(CTT::score(as.data.frame(x$Data[, anchor]), x$key)))
+      score <- c(unlist(.score(as.data.frame(x$Data[, anchor]), x$key)))
       xlab <- "Total score"
     } else {
       if (length(x$match) == dim(x$Data)[1]) {

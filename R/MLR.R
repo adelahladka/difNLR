@@ -113,10 +113,10 @@
 MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:ncol(Data), p.adjust.method = "none",
                 parametrization = "irt", alpha = 0.05) {
   if (match[1] == "zscore") {
-    x <- c(scale(unlist(CTT::score(as.data.frame(Data[, anchor]), key[anchor]))))
+    x <- c(scale(unlist(.score(as.data.frame(Data[, anchor]), key[anchor]))))
   } else {
     if (match[1] == "score") {
-      x <- c(unlist(CTT::score(as.data.frame(Data[, anchor]), key[anchor])))
+      x <- c(unlist(.score(as.data.frame(Data[, anchor]), key[anchor])))
     } else {
       if (length(match) == dim(Data)[1]) {
         x <- match
@@ -384,4 +384,21 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     BIC.m0 = BIC.m0, BIC.m1 = BIC.m1
   )
   return(results)
+}
+
+#' @noRd
+.score <- function(Data, key) {
+  if (is.vector(key)) {
+    key <- matrix(key)
+  }
+  colname <- colnames(Data)
+  X <- matrix(0L, nrow(Data), ncol(Data))
+  colnames(X) <- colname
+  for (i in 1L:ncol(X)) {
+    if (all(is.na(key[i, ]))) {
+      next
+    }
+    X[, i] <- Data[, i] %in% key[i, ] + 0L
+  }
+  rowSums(X)
 }

@@ -15,7 +15,6 @@
 #'
 #' @import ggplot2
 #' @importFrom calculus derivative hessian
-#' @importFrom CTT score
 #' @importFrom grDevices hcl
 #' @importFrom methods is
 #' @importFrom msm deltamethod
@@ -51,7 +50,7 @@
 #' Version: 1.3.7-3\cr
 #' Date: 2022-02-11\cr
 #' Depends: R (>= 3.1)\cr
-#' Imports: CTT, ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
+#' Imports: ggplot2 (>= 2.2.1), grDevices, methods, msm, nnet, plyr, reshape2, stats, VGAM\cr
 #' Suggests: ShinyItemAnalysis\cr
 #' License: GPL-3\cr
 #' BugReports: \url{https://github.com/adelahladka/difNLR/issues}\cr

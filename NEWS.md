@@ -18,7 +18,8 @@
   * Some typos fixed.
   * Examples in functions were updated. 
   * References were updated.
-  * Output of `estimNLR()` function is now unified via `print()` method. 
+  * Output of `estimNLR()` function is now unified via `print()` method.
+  * CTT package is no longer imported. 
   
 ------
 
