@@ -11,8 +11,6 @@ Depends:
 Imports:
     calculus,
     ggplot2 (>= 2.2.1),
-    grDevices,
-    methods,
     msm,
     nnet,
     plyr,
