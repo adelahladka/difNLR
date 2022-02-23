@@ -724,44 +724,44 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
     num.col <- ceiling(length(levels(df$variable)) / 8)
     cols <- rep(cbPalette, num.col)[1:length(levels(df$variable))]
 
-    plot_CC[[j]] <- ggplot() +
-      geom_line(
+    plot_CC[[j]] <- ggplot2::ggplot() +
+      ggplot2::geom_line(
         data = df,
-        aes_string(
+        ggplot2::aes_string(
           x = "score", y = "value",
           colour = "variable", linetype = "group"
         ),
         size = 0.8
       ) +
-      geom_point(
+      ggplot2::geom_point(
         data = df2,
-        aes_string(
+        ggplot2::aes_string(
           x = "score", y = "Freq",
           colour = "answ", fill = "answ",
           size = "Freq.1"
         ),
         alpha = 0.5, shape = 21
       ) +
-      ylim(0, 1) +
-      ggtitle(TITLE) +
-      labs(
+      ggplot2::ylim(0, 1) +
+      ggplot2::ggtitle(TITLE) +
+      ggplot2::labs(
         x = xlab,
         y = "Probability of answer"
       ) +
-      scale_linetype_manual(
+      ggplot2::scale_linetype_manual(
         breaks = c("R", "F"), labels = group.names,
         values = c("solid", "dashed")
       ) +
-      scale_color_manual(values = cols) +
-      scale_fill_manual(values = cols) +
+      ggplot2::scale_color_manual(values = cols) +
+      ggplot2::scale_fill_manual(values = cols) +
       .plot.theme() +
       # legend
       .plot.theme.legend() +
-      guides(
-        size = guide_legend(title = "Count", order = 1),
-        colour = guide_legend(title = "Answer", order = 2),
-        fill = guide_legend(title = "Answer", order = 2),
-        linetype = guide_legend(title = "Group", order = 3)
+      ggplot2::guides(
+        size = ggplot2::guide_legend(title = "Count", order = 1),
+        colour = ggplot2::guide_legend(title = "Answer", order = 2),
+        fill = ggplot2::guide_legend(title = "Answer", order = 2),
+        linetype = ggplot2::guide_legend(title = "Group", order = 3)
       )
   }
   plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)

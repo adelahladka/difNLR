@@ -1042,31 +1042,27 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     hv <- na.omit(as.data.frame(cbind(1:length(x$Sval), x$Sval, g)))
     hv$g <- as.factor(hv$g)
     hv$V1 <- as.factor(hv$V1)
-    plot_stat <- ggplot(hv, aes_string(
+    plot_stat <- ggplot2::ggplot(hv, ggplot2::aes_string(
       x = "V1", y = "V2",
       label = "V1",
       col = "g"
     )) +
       # points
-      geom_text() +
-      scale_color_manual(values = c("black", "red")) +
+      ggplot2::geom_text() +
+      ggplot2::scale_color_manual(values = c("black", "red")) +
       # critical value
-      geom_hline(yintercept = Sval_critical) +
+      ggplot2::geom_hline(yintercept = Sval_critical) +
       # theme
-      ggtitle(title) +
-      labs(x = "Item", y = switch(x$test,
+      ggplot2::ggtitle(title) +
+      ggplot2::labs(x = "Item", y = switch(x$test,
         "F" = "F-statistic",
         "LR" = "Chisq-statistic"
       )) +
-      theme_bw() +
-      theme(
-        plot.title = element_text(face = "bold", vjust = 1.5),
-        axis.line = element_line(colour = "black"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        plot.background = element_rect(fill = "transparent", colour = NA),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
+      .plot.theme() +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(face = "bold", vjust = 1.5),
+        axis.text.x = ggplot2::element_blank(),
+        axis.ticks.x = ggplot2::element_blank(),
         legend.position = "none"
       )
 
@@ -1202,9 +1198,9 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         interval = "confidence"
       )
 
-      g <- ggplot() +
-        geom_line(
-          data = df_line, aes_string(
+      g <- ggplot2::ggplot() +
+        ggplot2::geom_line(
+          data = df_line, ggplot2::aes_string(
             x = "match", y = "prob",
             col = "group", linetype = "group"
           ),
@@ -1212,8 +1208,8 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         )
       if (draw.empirical) {
         g <- g +
-          geom_point(
-            data = df_point, aes_string(
+          ggplot2::geom_point(
+            data = df_point, ggplot2::aes_string(
               x = "match", y = "prob",
               col = "group", fill = "group",
               size = "size"
@@ -1223,8 +1219,8 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       }
       if (draw.CI) {
         g <- g +
-          geom_ribbon(
-            data = df_line, aes_string(
+          ggplot2::geom_ribbon(
+            data = df_line, ggplot2::aes_string(
               x = "match", y = "prob",
               ymin = "lwr.conf", ymax = "upr.conf",
               col = "group", fill = "group"
@@ -1235,21 +1231,21 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
       g <- g +
         # adjusting colours
-        scale_fill_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
-        scale_colour_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
-        scale_linetype_manual(values = c("solid", "dashed"), labels = group.names) +
-        ggtitle(TITLE) +
-        labs(x = xlab, y = "Probability of correct answer") +
-        scale_y_continuous(limits = c(0, 1)) +
+        ggplot2::scale_fill_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
+        ggplot2::scale_colour_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
+        ggplot2::scale_linetype_manual(values = c("solid", "dashed"), labels = group.names) +
+        ggplot2::ggtitle(TITLE) +
+        ggplot2::labs(x = xlab, y = "Probability of correct answer") +
+        ggplot2::scale_y_continuous(limits = c(0, 1)) +
         # theme
         .plot.theme() +
         # legend
         .plot.theme.legend() +
-        guides(
-          size = guide_legend(title = "Count", order = 1),
-          colour = guide_legend(title = "Group", order = 2),
-          fill = guide_legend(title = "Group", order = 2),
-          linetype = guide_legend(title = "Group", order = 2)
+        ggplot2::guides(
+          size = ggplot2::guide_legend(title = "Count", order = 1),
+          colour = ggplot2::guide_legend(title = "Group", order = 2),
+          fill = ggplot2::guide_legend(title = "Group", order = 2),
+          linetype = ggplot2::guide_legend(title = "Group", order = 2)
         )
       plot_CC[[i]] <- g
     }
