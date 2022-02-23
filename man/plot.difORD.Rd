@@ -9,12 +9,15 @@
 \arguments{
 \item{x}{an object of \code{"difORD"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
+\item{item}{numeric or character: either character \code{"all"} to
+apply for all converged items (default), or a vector of item
+names (column names of \code{Data}), or item identifiers
+(integers specifying the column number).}
 
-\item{plot.type}{character: which plot should be displayed for cumulative logit regression model. Either
-\code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.}
+\item{plot.type}{character: which plot should be displayed for
+cumulative logit regression model. Either \code{"category"}
+(default) for category probabilities or \code{"cumulative"} for
+cumulative probabilities.}
 
 \item{group.names}{character: names of reference and focal group.}
 
@@ -24,11 +27,13 @@ the column number).}
 Returns list of objects of class \code{"ggplot"}.
 }
 \description{
-Plot method for an object of \code{"difORD"} class using \pkg{ggplot2}.
+Plot method for an object of \code{"difORD"} class
+  using \pkg{ggplot2}.
 
-The characteristic curves (category probabilities) for an item specified in \code{item}
-argument are plotted. Plotted curves represent the best model. For cumulative logit model,
-also cumulative probabilities may be plotted.
+  The characteristic curves (category probabilities) for an item
+  specified in \code{item} argument are plotted. Plotted curves
+  represent the best model. For cumulative logit model, also
+  cumulative probabilities may be plotted.
 }
 \examples{
 \dontrun{

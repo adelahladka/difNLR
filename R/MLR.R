@@ -385,20 +385,3 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   )
   return(results)
 }
-
-#' @noRd
-.score <- function(Data, key) {
-  if (is.vector(key)) {
-    key <- matrix(key)
-  }
-  colname <- colnames(Data)
-  X <- matrix(0L, nrow(Data), ncol(Data))
-  colnames(X) <- colname
-  for (i in 1L:ncol(X)) {
-    if (all(is.na(key[i, ]))) {
-      next
-    }
-    X[, i] <- Data[, i] %in% key[i, ] + 0L
-  }
-  rowSums(X)
-}

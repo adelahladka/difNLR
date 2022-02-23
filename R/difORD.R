@@ -696,18 +696,21 @@ coef.difORD <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
   return(res)
 }
 
-#' Log-likelihood and information criteria for an object of \code{"difORD"} class.
+#' Log-likelihood and information criteria for an object of
+#' \code{"difORD"} class.
 #'
 #' @aliases AIC.difORD BIC.difORD
 #' @rdname logLik.difORD
 #'
-#' @description S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
-#' Schwarz's Bayesian criterion (BIC) for an object of \code{"difORD"} class.
+#' @description S3 methods for extracting log-likelihood, Akaike's
+#'   information criterion (AIC) and Schwarz's Bayesian criterion
+#'   (BIC) for an object of \code{"difORD"} class.
 #'
 #' @param object an object of \code{"difORD"} class.
-#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number).
+#' @param item numeric or character: either character \code{"all"} to
+#'   apply for all converged items (default), or a vector of item
+#'   names (column names of \code{Data}), or item identifiers
+#'   (integers specifying the column number).
 #' @param ... other generic parameters for S3 methods.
 #'
 #' @author
@@ -720,10 +723,10 @@ coef.difORD <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
-#' @seealso
-#' \code{\link[difNLR]{difORD}} for DIF detection among ordinal data. \cr
-#' \code{\link[stats]{logLik}} for generic function extracting log-likelihood. \cr
-#' \code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
+#' @seealso \code{\link[difNLR]{difORD}} for DIF detection among
+#' ordinal data. \cr \code{\link[stats]{logLik}} for generic function
+#' extracting log-likelihood. \cr \code{\link[stats]{AIC}} for generic
+#' function calculating AIC and BIC.
 #'
 #' @examples
 #' \dontrun{
@@ -876,18 +879,23 @@ BIC.difORD <- function(object, item = "all", ...) {
 
 #' ICC plots for an object of \code{"difORD"} class.
 #'
-#' @description Plot method for an object of \code{"difORD"} class using \pkg{ggplot2}.
+#' @description Plot method for an object of \code{"difORD"} class
+#'   using \pkg{ggplot2}.
 #'
-#' The characteristic curves (category probabilities) for an item specified in \code{item}
-#' argument are plotted. Plotted curves represent the best model. For cumulative logit model,
-#' also cumulative probabilities may be plotted.
+#'   The characteristic curves (category probabilities) for an item
+#'   specified in \code{item} argument are plotted. Plotted curves
+#'   represent the best model. For cumulative logit model, also
+#'   cumulative probabilities may be plotted.
 #'
 #' @param x an object of \code{"difORD"} class.
-#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number).
-#' @param plot.type character: which plot should be displayed for cumulative logit regression model. Either
-#' \code{"category"} (default) for category probabilities or \code{"cumulative"} for cumulative probabilities.
+#' @param item numeric or character: either character \code{"all"} to
+#'   apply for all converged items (default), or a vector of item
+#'   names (column names of \code{Data}), or item identifiers
+#'   (integers specifying the column number).
+#' @param plot.type character: which plot should be displayed for
+#'   cumulative logit regression model. Either \code{"category"}
+#'   (default) for category probabilities or \code{"cumulative"} for
+#'   cumulative probabilities.
 #' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for \code{plot()} function.
 #'
@@ -1333,30 +1341,4 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
   }
 
   return(prob)
-}
-
-#' @noRd
-.plot.theme <- function() {
-  ggplot2::theme_bw() +
-    ggplot2::theme(
-      axis.line = ggplot2::element_line(colour = "black"),
-      panel.grid.major = ggplot2::element_blank(),
-      panel.grid.minor = ggplot2::element_blank(),
-      plot.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.key = ggplot2::element_rect(fill = "white", colour = NA),
-      legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA)
-    )
-}
-
-#' @noRd
-.plot.theme.legend <- function() {
-  ggplot2::theme(
-    legend.box.just = "top",
-    legend.justification = c("left", "top"),
-    legend.position = c(0.02, 0.98),
-    legend.box = "horizontal",
-    legend.box.margin = ggplot2::margin(3, 3, 3, 3),
-    legend.key = ggplot2::element_rect(fill = "white", colour = NA)
-  )
 }

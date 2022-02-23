@@ -1,20 +1,24 @@
 #' Calculates starting values for non-linear regression DIF models.
 #'
-#' @param Data Data data.frame or matrix: dataset which rows represent scored examinee answers (\code{"1"}
-#' correct, \code{"0"} incorrect) and columns correspond to the items.
-#' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for
-#' focal group.
-#' @param model character: generalized logistic regression model for which starting values should be
-#' estimated. See \strong{Details}.
-#' @param match character or numeric: matching criterion to be used as estimate of trait. Can be
-#' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
-#' or numeric vector of the same length as number of observations in \code{Data}.
+#' @param Data Data data.frame or matrix: dataset which rows represent
+#'   scored examinee answers (\code{"1"} correct, \code{"0"}
+#'   incorrect) and columns correspond to the items.
+#' @param group numeric: binary vector of group membership. \code{"0"}
+#'   for reference group, \code{"1"} for focal group.
+#' @param model character: generalized logistic regression model for
+#'   which starting values should be estimated. See \strong{Details}.
+#' @param match character or numeric: matching criterion to be used as
+#'   estimate of trait. Can be either \code{"zscore"} (default,
+#'   standardized total score), \code{"score"} (total test score), or
+#'   numeric vector of the same length as number of observations in
+#'   \code{Data}.
 #' @param parameterization character: parameterization of regression
-#' coefficients. Possible options are \code{"classic"} (IRT parameterization),
-#' \code{"alternative"} (default) and \code{"logistic"} (logistic regression).
-#' See \strong{Details}.
-#' @param simplify logical: should initial values be simplified into the matrix?
-#' This is only applicable when parameterization is the same for all items.
+#'   coefficients. Possible options are \code{"classic"} (IRT
+#'   parameterization), \code{"alternative"} (default) and
+#'   \code{"logistic"} (logistic regression). See \strong{Details}.
+#' @param simplify logical: should initial values be simplified into
+#'   the matrix? This is only applicable when parameterization is the
+#'   same for all items.
 #'
 #' @description Calculates starting values for \code{difNLR()} function based
 #' on linear approximation.
@@ -24,13 +28,15 @@
 #'          simplify = FALSE)
 #'
 #' @details
-#' The unconstrained form of 4PL generalized logistic regression model for probability of correct
-#' answer (i.e., \eqn{y = 1}) is
-#' \deqn{P(y = 1) = (c + cDif*g) + (d + dDif*g - c - cDif*g)/(1 + exp(-(a + aDif*g)*(x - b - bDif*g))), }
-#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
-#' Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
-#' Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
-#' (reference and focal) in relevant parameters.
+#' The unconstrained form of 4PL generalized logistic regression model
+#' for probability of correct answer (i.e., \eqn{y = 1}) is
+#' \deqn{P(y = 1) = (c + cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b - bDif * g))), }
+#' where \eqn{x} is by default standardized total score (also called
+#' Z-score) and \eqn{g} is a group membership. Parameters \eqn{a},
+#' \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty,
+#' guessing, and inattention. Terms \eqn{aDif}, \eqn{bDif},
+#' \eqn{cDif}, and \eqn{dDif} then represent differences between two
+#' groups (reference and focal) in relevant parameters.
 #'
 #' The \code{model} argument offers several predefined models. The options are as follows:
 #' \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
@@ -45,15 +51,19 @@
 #' \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
 #' or \code{4PL} for 4PL model.
 #'
-#' Three possible parameterization can be specified in \code{"parameterization"} argument: \code{"classic"}
-#' returns IRT parameters of reference group and differences in these parameters between reference and focal group.
-#' \code{"alternative"} returns IRT parameters of reference group, the differences in parameters \code{"a"} and
-#' \code{"b"} between two groups and parameters \code{"c"} and \code{"d"} for focal group.
-#' \code{"logistic"} returns parameters in logistic regression parameterization.
+#' Three possible parameterization can be specified in
+#' \code{"parameterization"} argument: \code{"classic"} returns IRT
+#' parameters of reference group and differences in these parameters
+#' between reference and focal group. \code{"alternative"} returns IRT
+#' parameters of reference group, the differences in parameters
+#' \code{"a"} and \code{"b"} between two groups and parameters
+#' \code{"c"} and \code{"d"} for focal group. \code{"logistic"}
+#' returns parameters in logistic regression parameterization.
 #'
 #' @return
-#' A list containing elements representing items. Each element is a named numeric vector of length 8
-#' with initial values for generalized logistic regression model.
+#' A list containing elements representing items. Each element is a
+#' named numeric vector of length 8 with initial values for
+#' generalized logistic regression model.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -199,10 +209,10 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
         c_R[i] <- c_F[i] <- 0
       } else {
         if (grepl("cg", model[i])) {
-          c_R[i] <- c_F[i] <- checkInterval(line$k * (-4) + line$q, c(0, 0.99))[i]
+          c_R[i] <- c_F[i] <- .checkInterval(line$k * (-4) + line$q, c(0, 0.99))[i]
         } else {
-          c_R[i] <- checkInterval(line_R$k * (-4) + line_R$q, c(0, 0.99))[i]
-          c_F[i] <- checkInterval(line_F$k * (-4) + line_F$q, c(0, 0.99))[i]
+          c_R[i] <- .checkInterval(line_R$k * (-4) + line_R$q, c(0, 0.99))[i]
+          c_F[i] <- .checkInterval(line_F$k * (-4) + line_F$q, c(0, 0.99))[i]
         }
       }
       return(c(c_R[i], c_F[i]))
@@ -218,10 +228,10 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
         d_R[i] <- d_F[i] <- 1
       } else {
         if (grepl("dg", model[i])) {
-          d_R[i] <- d_F[i] <- checkInterval(line$k * 4 + line$q, c(0.01, 1))[i]
+          d_R[i] <- d_F[i] <- .checkInterval(line$k * 4 + line$q, c(0.01, 1))[i]
         } else {
-          d_R[i] <- checkInterval(line_R$k * 4 + line_R$q, c(0.01, 1))[i]
-          d_F[i] <- checkInterval(line_F$k * 4 + line_F$q, c(0.01, 1))[i]
+          d_R[i] <- .checkInterval(line_R$k * 4 + line_R$q, c(0.01, 1))[i]
+          d_F[i] <- .checkInterval(line_F$k * 4 + line_F$q, c(0.01, 1))[i]
         }
       }
       return(c(d_R[i], d_F[i]))

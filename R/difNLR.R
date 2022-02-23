@@ -2173,17 +2173,3 @@ residuals.difNLR <- function(object, item = "all", ...) {
 
   return(residuals)
 }
-
-# private functions
-.gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
-  return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
-}
-
-.gNLR_group <- function(x, a, b, c, d) {
-  return(c + (d - c) / (1 + exp(-(a * (x - b)))))
-}
-
-.delta.gNLR <- deriv(y ~ (c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))),
-  namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
-  function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {}
-)
