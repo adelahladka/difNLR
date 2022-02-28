@@ -96,7 +96,6 @@
 #' residuals(fitIRLSM1)
 #' @keywords DIF
 #' @export
-#'
 estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
   M <- switch(method,
     nls = tryCatch(nls(
