@@ -76,6 +76,8 @@
 #'   \item{\code{par.m1}}{the estimates of alternative model.}
 #'   \item{\code{se.m0}}{standard errors of parameters in null model.}
 #'   \item{\code{se.m1}}{standard errors of parameters in alternative model.}
+#'   \item{\code{cov.m0}}{list of covariance matrices of item parameters for null model.}
+#'   \item{\code{cov.m1}}{list of covariance matrices of item parameters for alternative model.}
 #'   \item{\code{ll.m0}}{log-likelihood of null model.}
 #'   \item{\code{ll.m1}}{log-likelihood of alternative model.}
 #'   \item{\code{AIC.m0}}{AIC of null model.}
@@ -253,7 +255,7 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
   a <- beta1
   aDIF <- beta3
   bk <- paste0("-", betas0, "/", beta1)
-  bkDIF <- paste0("(", beta1, "*", beta2, "-", betas0, "*", beta3, ")/(", beta1, "*(", beta1, "+", beta3, "))")
+  bkDIF <- paste0("(", betas0, "*", beta3, "-", beta1, "*", beta2, ")/(", beta1, "*(", beta1, "+", beta3, "))")
 
   formulas <- append(append(
     append(as.list(bk), as.list(a)),

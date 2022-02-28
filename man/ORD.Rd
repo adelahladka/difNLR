@@ -64,6 +64,8 @@ A list with the following arguments:
   \item{\code{par.m1}}{the estimates of alternative model.}
   \item{\code{se.m0}}{standard errors of parameters in null model.}
   \item{\code{se.m1}}{standard errors of parameters in alternative model.}
+  \item{\code{cov.m0}}{list of covariance matrices of item parameters for null model.}
+  \item{\code{cov.m1}}{list of covariance matrices of item parameters for alternative model.}
   \item{\code{ll.m0}}{log-likelihood of null model.}
   \item{\code{ll.m1}}{log-likelihood of alternative model.}
   \item{\code{AIC.m0}}{AIC of null model.}
