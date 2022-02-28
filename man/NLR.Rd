@@ -78,22 +78,22 @@ A list with the following arguments:
   \item{\code{adjusted.pval}}{adjusted p-values by \code{p.adjust.method}.}
   \item{\code{df}}{the degrees of freedom of \code{test}.}
   \item{\code{test}}{used test.}
-  \item{\code{par.m0}}{the matrix of estimated item parameters for m0 model.}
-  \item{\code{se.m0}}{the matrix of standard errors of item parameters for m0 model.}
-  \item{\code{cov.m0}}{list of covariance matrices of item parameters for m0 model.}
-  \item{\code{par.m1}}{the matrix of estimated item parameters for m1 model.}
-  \item{\code{se.m1}}{the matrix of standard errors of item parameters for m1 model.}
-  \item{\code{cov.m1}}{list of covariance matrices of item parameters for m1 model.}
+  \item{\code{par.m0}}{the matrix of estimated item parameters for null model.}
+  \item{\code{se.m0}}{the matrix of standard errors of item parameters for null model.}
+  \item{\code{cov.m0}}{list of covariance matrices of item parameters for null model.}
+  \item{\code{par.m1}}{the matrix of estimated item parameters for alternative model.}
+  \item{\code{se.m1}}{the matrix of standard errors of item parameters for alternative model.}
+  \item{\code{cov.m1}}{list of covariance matrices of item parameters for alternative model.}
   \item{\code{conv.fail}}{numeric: number of convergence issues.}
   \item{\code{conv.fail.which}}{the indicators of the items which did not converge.}
-  \item{\code{ll.m0}}{log-likelihood of m0 model.}
-  \item{\code{ll.m1}}{log-likelihood of m1 model.}
+  \item{\code{ll.m0}}{log-likelihood of null model.}
+  \item{\code{ll.m1}}{log-likelihood of alternative model.}
   \item{\code{startBo0}}{the binary matrix. Columns represents iterations of initial values
-  re-calculations, rows represents items. The value of 0 means no convergence issue in m0 model,
-  1 means convergence issue in m0 model.}
+  re-calculations, rows represents items. The value of 0 means no convergence issue in null model,
+  1 means convergence issue in null model.}
   \item{\code{startBo1}}{the binary matrix. Columns represents iterations of initial values
-  re-calculations, rows represents items. The value of 0 means no convergence issue in m1 model,
-  1 means convergence issue in m1 model.}
+  re-calculations, rows represents items. The value of 0 means no convergence issue in alternative model,
+  1 means convergence issue in alternative model.}
 }
 }
 \description{
