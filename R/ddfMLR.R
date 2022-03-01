@@ -261,10 +261,12 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         call. = FALSE
       )
     }
-    if (is.vector(key)) {
-      KEY <- matrix(key)
+    if (is.matrix(key) | is.data.frame(key)) {
+      KEY <- c(unlist(key))
+    } else {
+      KEY <- key
     }
-    if (dim(KEY)[1] != dim(DATA)[2]) {
+    if (length(KEY)[1] != dim(DATA)[2]) {
       stop("Number of items in 'Data' is not equal to the length of 'key'.",
         call. = FALSE
       )
@@ -311,7 +313,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
       ANCHOR <- 1:dim(DATA)[2]
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
-      PROV <- suppressWarnings(MLR(DATA, GROUP,
+      PROV <- suppressWarnings(MLR(Data = DATA, group = GROUP,
         key = KEY, match = match, anchor = ANCHOR,
         type = type, p.adjust.method = p.adjust.method,
         alpha = alpha
@@ -366,7 +368,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
       nrPur <- 0
       ddfPur <- NULL
       noLoop <- FALSE
-      prov1 <- suppressWarnings(MLR(DATA, GROUP,
+      prov1 <- suppressWarnings(MLR(Data = DATA, group = GROUP,
         key = KEY, type = type,
         p.adjust.method = p.adjust.method,
         alpha = alpha
@@ -402,7 +404,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
                 }
               }
             }
-            prov2 <- suppressWarnings(MLR(DATA, GROUP,
+            prov2 <- suppressWarnings(MLR(Data = DATA, group = GROUP,
               key = KEY, anchor = nodif, type = type,
               p.adjust.method = p.adjust.method,
               alpha = alpha

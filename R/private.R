@@ -1,5 +1,5 @@
 .score <- function(Data, key) {
-  if (is.vector(key)) {
+  if (!is.matrix(key)) {
     key <- matrix(key)
   }
   colname <- colnames(Data)
