@@ -15,15 +15,17 @@
 \arguments{
 \item{object}{an object of \code{"ddfMLR"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
+\item{item}{numeric or character: either character \code{"all"} to
+apply for all converged items (default), or a vector of item
+names (column names of \code{Data}), or item identifiers
+(integers specifying the column number).}
 
 \item{...}{other generic parameters for S3 methods.}
 }
 \description{
-S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
-Schwarz's Bayesian criterion (BIC) for an object of \code{"ddfMLR"} class.
+S3 methods for extracting log-likelihood, Akaike's
+  information criterion (AIC) and Schwarz's Bayesian criterion
+  (BIC) for an object of \code{"ddfMLR"} class.
 }
 \examples{
 \dontrun{

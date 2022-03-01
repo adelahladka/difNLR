@@ -5,19 +5,28 @@
 \alias{coefficients.ddfMLR}
 \title{Extract model coefficients from an object of \code{"ddfMLR"} class.}
 \usage{
-\method{coef}{ddfMLR}(object, SE = FALSE, simplify = FALSE, ...)
+\method{coef}{ddfMLR}(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...)
 }
 \arguments{
 \item{object}{an object of \code{"ddfMLR"} class.}
 
-\item{SE}{logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).}
+\item{SE}{logical: should the standard errors of estimated
+parameters be also returned? (default is \code{FALSE}).}
 
-\item{simplify}{logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).}
+\item{simplify}{logical: should the estimated parameters be
+simplified to a matrix? (default is \code{FALSE}).}
 
-\item{...}{other generic parameters for \code{coef()} method.}
+\item{IRTpars}{logical: should the estimated parameters be returned
+in IRT parameterization? (default is \code{TRUE}).}
+
+\item{CI}{numeric: level of confidence interval for parameters,
+default is \code{0.95} for 95\% confidence interval.}
+
+\item{...}{other generic parameters for \code{coef()} function.}
 }
 \description{
-S3 method for extracting estimated model coefficients from an object of \code{"ddfMLR"} class.
+S3 method for extracting estimated model coefficients
+  from an object of \code{"ddfMLR"} class.
 }
 \examples{
 \dontrun{
@@ -32,9 +41,14 @@ key <- GMATkey # correct answers
 
 # estimated parameters
 coef(x)
+# includes standard errors
 coef(x, SE = TRUE)
-coef(x, simplify = TRUE)
+# includes standard errors and simplifies to matrix
 coef(x, SE = TRUE, simplify = TRUE)
+# intercept-slope parameterization
+coef(x, IRTpars = FALSE)
+# intercept-slope parameterization, simplifies to matrix, turn off confidence intervals
+coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
 }
 }
 \seealso{

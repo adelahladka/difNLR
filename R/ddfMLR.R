@@ -2,69 +2,84 @@
 #'
 #' @aliases ddfMLR
 #'
-#' @description Performs DDF detection procedure for nominal data based on multinomial
-#' log-linear regression model and likelihood ratio test of a submodel.
+#' @description Performs DDF detection procedure for nominal data
+#'   based on multinomial log-linear regression model and likelihood
+#'   ratio test of a submodel.
 #'
-#' @param Data data.frame or matrix: dataset which rows represent unscored examinee answers (nominal)
-#' and columns correspond to the items. In addition, \code{Data} can hold the vector of
-#' group membership.
-#' @param group numeric or character: a dichotomous vector of the same length as \code{nrow(Data)}
-#' or a column identifier of \code{Data}.
-#' @param focal.name numeric or character: indicates the level of \code{group} which corresponds to
-#' focal group.
-#' @param key character: the answer key. Each element corresponds to the correct answer of one item.
-#' @param type character: type of DDF to be tested. Either \code{"both"} for uniform and non-uniform
-#' DDF (i.e., difference in parameters \code{"a"} and \code{"b"}) (default), or \code{"udif"} for
-#' uniform DDF only (i.e., difference in difficulty parameter \code{"b"}), or \code{"nudif"} for
-#' non-uniform DDF only (i.e., difference in discrimination parameter \code{"a"}). Can be specified
-#' as a single value (for all items) or as an item-specific vector.
-#' @param match numeric or character: matching criterion to be used as an estimate of trait. Can be
-#' either \code{"zscore"} (default, standardized total score), \code{"score"} (total test score),
-#' or vector of the same length as number of observations in \code{Data}.
-#' @param anchor numeric or character: specification of DDF free items. Either \code{NULL} (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number) determining which items are currently considered as anchor (DDF free) items.
-#' Argument is ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-#' @param purify logical: should the item purification be applied? (default is \code{FALSE}).
-#' @param nrIter numeric: the maximal number of iterations in the item purification (default is 10).
-#' @param p.adjust.method character: method for multiple comparison correction. Possible values are
-#' \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
-#' \code{"fdr"}, and \code{"none"} (default). For more details see \code{\link[stats]{p.adjust}}.
-#' @param parametrization character: parametrization of regression coefficients. Possible options are
-#' \code{"irt"} for difficulty-discrimination parametrization (default) and \code{"classic"} for
-#' intercept-slope parametrization. See \strong{Details}.
+#' @param Data data.frame or matrix: dataset which rows represent
+#'   unscored examinee answers (nominal) and columns correspond to the
+#'   items. In addition, \code{Data} can hold the vector of group
+#'   membership.
+#' @param group numeric or character: a dichotomous vector of the same
+#'   length as \code{nrow(Data)} or a column identifier of
+#'   \code{Data}.
+#' @param focal.name numeric or character: indicates the level of
+#'   \code{group} which corresponds to focal group.
+#' @param key character: the answer key. Each element corresponds to
+#'   the correct answer of one item.
+#' @param type character: type of DDF to be tested. Either
+#'   \code{"both"} for uniform and non-uniform DDF (i.e., difference
+#'   in parameters \code{"a"} and \code{"b"}) (default), or
+#'   \code{"udif"} for uniform DDF only (i.e., difference in
+#'   difficulty parameter \code{"b"}), or \code{"nudif"} for
+#'   non-uniform DDF only (i.e., difference in discrimination
+#'   parameter \code{"a"}). Can be specified as a single value (for
+#'   all items) or as an item-specific vector.
+#' @param match numeric or character: matching criterion to be used as
+#'   an estimate of trait. Can be either \code{"zscore"} (default,
+#'   standardized total score), \code{"score"} (total test score), or
+#'   vector of the same length as number of observations in
+#'   \code{Data}.
+#' @param anchor numeric or character: specification of DDF free
+#'   items. Either \code{NULL} (default), or a vector of item names
+#'   (column names of \code{Data}), or item identifiers (integers
+#'   specifying the column number) determining which items are
+#'   currently considered as anchor (DDF free) items. Argument is
+#'   ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
+#' @param purify logical: should the item purification be applied?
+#'   (default is \code{FALSE}).
+#' @param nrIter numeric: the maximal number of iterations in the item
+#'   purification (default is 10).
+#' @param p.adjust.method character: method for multiple comparison
+#'   correction. Possible values are \code{"holm"}, \code{"hochberg"},
+#'   \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+#'   \code{"fdr"}, and \code{"none"} (default). For more details see
+#'   \code{\link[stats]{p.adjust}}.
 #' @param alpha numeric: significance level (default is 0.05).
+#' @param parametrization deprecated. Use
+#'   \code{\link[difNLR]{coef.ddfMLR}} for different
+#'   parameterizations.
 #'
 #' @usage
 #' ddfMLR(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-#'        purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
-#'        alpha = 0.05)
+#'        purify = FALSE, nrIter = 10, p.adjust.method = "none",
+#'        alpha = 0.05, parametrization)
 #'
 #' @details
-#' Performs DDF detection procedure for nominal data based on multinomial
-#' log-linear regression model and likelihood ratio test of submodel. Probability of selection the
-#' \eqn{k}-th category (distractor) is
-#' \deqn{P(y = k) = exp((a_k + a_kDif*g)*(x - b_k - b_kDif*g)))/(1 + \sum exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))), }
-#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group
-#' membership. Parameters \eqn{a_k} and \eqn{b_k} are discrimination and difficulty for the \eqn{k}-th
-#' category. Terms \eqn{a_kDif} and \eqn{b_kDif} then represent differences between two groups
-#' (reference and focal) in relevant parameters. Probability of correct answer (specified in argument
+#' Performs DDF detection procedure for nominal data based on
+#' multinomial log-linear regression model and likelihood ratio test
+#' of submodel. Probability of selection the \eqn{k}-th category
+#' (distractor) is
+#' \deqn{P(y = k) = exp((a_k + a_kDif * g) * (x - b_k - b_kDif * g))) / (1 + \sum exp((a_l + a_lDif * g) * (x - b_l - b_lDif * g))), }
+#' where \eqn{x} is by default standardized total score (also called
+#' Z-score) and \eqn{g} is a group membership. Parameters \eqn{a_k}
+#' and \eqn{b_k} are discrimination and difficulty for the \eqn{k}-th
+#' category. Terms \eqn{a_kDif} and \eqn{b_kDif} then represent
+#' differences between two groups (reference and focal) in relevant
+#' parameters. Probability of correct answer (specified in argument
 #' \code{key}) is
-#' \deqn{P(y = k) = 1/(1 + \sum exp((a_l + a_lDif*g)*(x - b_l - b_lDif*g))). }
-#' Parameters are estimated via neural networks. For more details see \code{\link[nnet]{multinom}}.
+#' \deqn{P(y = k) = 1/(1 + \sum exp((a_l + a_lDif * g)*(x - b_l - b_lDif * g))). }
+#' Parameters are estimated via neural networks. For more details see
+#' \code{\link[nnet]{multinom}}.
 #'
-#' Argument \code{parametrization} is a character which specifies parametrization of regression parameters.
-#' Default option is \code{"irt"} which returns IRT parametrization (difficulty-discrimination, see above).
-#' Option \code{"classic"} returns intercept-slope parametrization with effect of group membership and
-#' interaction with matching criterion, i.e. \eqn{b_0k + b_1k*x + b_2k*g + b_3k*x*g} instead of
-#' \eqn{(a_k + a_kDif*g)*(x - b_k - b_kDif*g))}.
+#' Missing values are allowed but discarded for item estimation. They
+#' must be coded as \code{NA} for both, \code{Data} and \code{group}
+#' arguments.
 #'
-#' Missing values are allowed but discarded for item estimation. They must be coded as \code{NA}
-#' for both, \code{Data} and \code{group} arguments.
-#'
-#' @return The \code{ddfMLR()} function returns an object of class \code{"ddfMLR"}. The output
-#' including values of the test statistics, p-values, and items marked as DDF is displayed by the
-#' \code{print()} method.
+#' @return The \code{ddfMLR()} function returns an object of class
+#'   \code{"ddfMLR"}. The output including values of the test
+#'   statistics, p-values, and items marked as DDF is displayed by the
+#'   \code{print()} method.
 #'
 #' A list of class \code{"ddfMLR"} with the following arguments:
 #' \describe{
@@ -184,8 +199,15 @@
 #' @keywords DDF
 #' @export
 ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
-                   purify = FALSE, nrIter = 10, p.adjust.method = "none", parametrization = "irt",
-                   alpha = 0.05) {
+                   purify = FALSE, nrIter = 10, p.adjust.method = "none",
+                   alpha = 0.05, parametrization) {
+  # deprecated args handling
+  if (!missing(parametrization)) {
+    warning("Argument 'parametrization' is deprecated; please use 'coef.difORD()' method for different parameterizations. ",
+      call. = FALSE
+    )
+  }
+
   if (!type %in% c("udif", "nudif", "both") | !is.character(type)) {
     stop("'type' must be either 'udif', 'nudif', or 'both'.",
       call. = FALSE
@@ -193,11 +215,6 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
   }
   if (alpha > 1 | alpha < 0) {
     stop("'alpha' must be between 0 and 1.",
-      call. = FALSE
-    )
-  }
-  if (!parametrization %in% c("classic", "irt")) {
-    stop("Invalid value for 'parametrization'. Possible values are 'classic' and 'irt'.",
       call. = FALSE
     )
   }
@@ -296,7 +313,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(MLR(DATA, GROUP,
         key = key, match = match, anchor = ANCHOR,
-        type = type, p.adjust.method = p.adjust.method, parametrization = parametrization,
+        type = type, p.adjust.method = p.adjust.method,
         alpha = alpha
       ))
 
@@ -334,11 +351,12 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         mlrPAR = mlrPAR,
         mlrSE = mlrSE,
         parM0 = PROV$par.m0, parM1 = PROV$par.m1,
+        covM0 = PROV$cov.m0, covM1 = PROV$cov.m1,
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
         DDFitems = DDFitems,
-        type = type, parametrization = parametrization,
+        type = type,
         purification = purify,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
         alpha = alpha,
@@ -350,7 +368,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
       noLoop <- FALSE
       prov1 <- suppressWarnings(MLR(DATA, GROUP,
         key = key, type = type,
-        p.adjust.method = p.adjust.method, parametrization = parametrization,
+        p.adjust.method = p.adjust.method,
         alpha = alpha
       ))
       stats1 <- prov1$Sval
@@ -386,7 +404,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
             }
             prov2 <- suppressWarnings(MLR(DATA, GROUP,
               key = key, anchor = nodif, type = type,
-              p.adjust.method = p.adjust.method, parametrization = parametrization,
+              p.adjust.method = p.adjust.method,
               alpha = alpha
             ))
             stats2 <- prov2$Sval
@@ -407,8 +425,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
               if (sum(dif == dif2) == length(dif)) {
                 noLoop <- TRUE
                 break
-              }
-              else {
+              } else {
                 dif <- dif2
               }
             }
@@ -440,11 +457,12 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         mlrPAR = mlrPAR,
         mlrSE = mlrSE,
         parM0 = PROV$par.m0, parM1 = PROV$par.m1,
+        covM0 = PROV$cov.m0, covM1 = PROV$cov.m1,
         llM0 = PROV$ll.m0, llM1 = PROV$ll.m1,
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
         DDFitems = DDFitems,
-        type = type, parametrization = parametrization,
+        type = type,
         purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
         alpha = alpha,
@@ -482,14 +500,17 @@ print.ddfMLR <- function(x, ...) {
   }
   if (x$p.adjust.method == "none") {
     cat("No p-value adjustment for multiple comparisons\n\n")
-  }
-  else {
+  } else {
     cat(paste(
       "Multiple comparisons made with",
       switch(x$p.adjust.method,
-        holm = "Holm", hochberg = "Hochberg", hommel = "Hommel",
-        bonferroni = "Bonferroni", BH = "Benjamini-Hochberg",
-        BY = "Benjamini-Yekutieli", fdr = "FDR"
+        holm = "Holm",
+        hochberg = "Hochberg",
+        hommel = "Hommel",
+        bonferroni = "Bonferroni",
+        BH = "Benjamini-Hochberg",
+        BY = "Benjamini-Yekutieli",
+        fdr = "FDR"
       ), "adjustment of p-values\n\n"
     ))
   }
@@ -515,13 +536,14 @@ print.ddfMLR <- function(x, ...) {
   cat("\nSignif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
 
   if (is.character(x$DDFitems)) {
-    switch(x$type, both = cat("\nNone of items is detected as DDF"),
+    switch(x$type,
+      both = cat("\nNone of items is detected as DDF"),
       udif = cat("\nNone of items is detected as uniform DDF"),
       nudif = cat("\nNone of items is detected as non-uniform DDF")
     )
-  }
-  else {
-    switch(x$type, both = cat("\nItems detected as DDF items:"),
+  } else {
+    switch(x$type,
+      both = cat("\nItems detected as DDF items:"),
       udif = cat("\nItems detected as uniform DDF items:"),
       nudif = cat("\nItems detected as non-uniform DDF items:")
     )
@@ -531,15 +553,17 @@ print.ddfMLR <- function(x, ...) {
 
 #' ICC plots for an object of \code{"ddfMLR"} class.
 #'
-#' @description Plot method for an object of \code{"ddfMLR"} class using \pkg{ggplot2}.
+#' @description Plot method for an object of \code{"ddfMLR"} class
+#'   using \pkg{ggplot2}.
 #'
-#' The characteristic curves for an item specified in \code{item} argument are plotted.
-#' Plotted curves represent the best model.
+#'   The characteristic curves for an item specified in \code{item}
+#'   argument are plotted. Plotted curves represent the best model.
 #'
 #' @param x an object of \code{"ddfMLR"} class.
-#' @param item numeric or character: either character \code{"all"} to apply for all items (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number).
+#' @param item numeric or character: either character \code{"all"} to
+#'   apply for all items (default), or a vector of item names (column
+#'   names of \code{Data}), or item identifiers (integers specifying
+#'   the column number).
 #' @param group.names character: names of reference and focal group.
 #' @param ... other generic parameters for \code{plot()} function.
 #'
@@ -646,7 +670,7 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
     }
   }
 
-  sq <- seq(min(score, na.rm = T), max(score, na.rm = T), length.out = 300)
+  sq <- seq(min(score, na.rm = TRUE), max(score, na.rm = TRUE), length.out = 300)
   sqR <- as.matrix(data.frame(1, sq, 0, 0))
   sqF <- as.matrix(data.frame(1, sq, 1, sq))
 
@@ -770,13 +794,20 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
 
 #' Extract model coefficients from an object of \code{"ddfMLR"} class.
 #'
-#' @description S3 method for extracting estimated model coefficients from an object of \code{"ddfMLR"} class.
+#' @description S3 method for extracting estimated model coefficients
+#'   from an object of \code{"ddfMLR"} class.
 #' @aliases coefficients.ddfMLR
 #'
 #' @param object an object of \code{"ddfMLR"} class.
-#' @param SE logical: should the standard errors of estimated parameters be also returned? (default is \code{FALSE}).
-#' @param simplify logical: should the estimated parameters be simplified to a matrix? (default is \code{FALSE}).
-#' @param ... other generic parameters for \code{coef()} method.
+#' @param SE logical: should the standard errors of estimated
+#'   parameters be also returned? (default is \code{FALSE}).
+#' @param simplify logical: should the estimated parameters be
+#'   simplified to a matrix? (default is \code{FALSE}).
+#' @param IRTpars logical: should the estimated parameters be returned
+#'   in IRT parameterization? (default is \code{TRUE}).
+#' @param CI numeric: level of confidence interval for parameters,
+#'   default is \code{0.95} for 95\% confidence interval.
+#' @param ... other generic parameters for \code{coef()} function.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -805,12 +836,17 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
 #'
 #' # estimated parameters
 #' coef(x)
+#' # includes standard errors
 #' coef(x, SE = TRUE)
-#' coef(x, simplify = TRUE)
+#' # includes standard errors and simplifies to matrix
 #' coef(x, SE = TRUE, simplify = TRUE)
+#' # intercept-slope parameterization
+#' coef(x, IRTpars = FALSE)
+#' # intercept-slope parameterization, simplifies to matrix, turn off confidence intervals
+#' coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
 #' }
 #' @export
-coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
+coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
   if (class(SE) != "logical") {
     stop("Invalid value for 'SE'. 'SE' need to be logical. ",
       call. = FALSE
@@ -821,34 +857,74 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
       call. = FALSE
     )
   }
+  if (class(IRTpars) != "logical") {
+    stop("Invalid value for 'IRTpars'. 'IRTpars' need to be logical. ",
+      call. = FALSE
+    )
+  }
+  if (CI > 1 | CI < 0 | !is.numeric(CI)) {
+    stop("Invalid value for 'CI'. 'CI' must be numeric value between 0 and 1. ",
+      call. = FALSE
+    )
+  }
 
   m <- dim(object$Data)[2]
   nams <- colnames(object$Data)
 
-  coefs <- object$mlrPAR
-  names(coefs) <- nams
+  if (!IRTpars) {
+    pars <- object$mlrPAR
+    se <- object$mlrSE
+  } else {
+    mlrPAR <- object$mlrPAR
+    mlrCOV <- ifelse(1:m %in% object$DDFitems, object$covM1, object$covM0)
+    mlrDM <- lapply(1:m, function(i) {
+      .deltamethod.MLR.log2irt(
+        par = mlrPAR[[i]], cov = mlrCOV[[i]]
+      )
+    })
+    pars <- lapply(mlrDM, function(x) x$par)
+    se <- lapply(mlrDM, function(x) x$se)
+  }
+  names(pars) <-  nams
+  cats <- lapply(nams, function(i) rownames(pars[[i]]))
+  names(se) <- names(cats) <- nams
 
   if (SE) {
-    se <- object$mlrSE
-    names(se) <- nams
+    se_matrix <- sapply(nams, function(i) matrix(se[[i]], nrow = nrow(pars[[i]]), ncol = ncol(pars[[i]]),
+                                                 dimnames = list(rownames(pars[[i]]), colnames(pars[[i]]))),
+                        USE.NAMES = TRUE)
+    coefs <- sapply(nams, function(i) rbind(pars[[i]], se_matrix[[i]]), USE.NAMES = TRUE)
+    coefs <- sapply(nams, function(i) {
+      rownames(coefs[[i]]) <- paste(rep(c("estimate", "SE"), each = nrow(coefs[[i]]) / 2), cats[[i]], sep = "_")
+      coefs[[i]]
+    }, USE.NAMES = TRUE)
+  } else {
+    coefs <- pars
+  }
 
-    coefs <- lapply(nams, function(i) rbind(coefs[[i]], se[[i]])[order(c(rownames(coefs[[i]]), rownames(se[[i]]))), ])
-    rownams <- lapply(coefs, function(x) paste(rownames(x), c("estimate", "SE")))
-    coefs <- lapply(coefs, function(x) {
-      i <- which(coefs %in% list(x))
-      rownames(x) <- rownams[[i]]
-      return(x)
+  if (CI > 0) {
+    alpha <- (1 - CI) / 2
+    CIlow <- lapply(nams, function(i) pars[[i]] - qnorm(1 - alpha) * se[[i]])
+    CIupp <- lapply(nams, function(i) pars[[i]] + qnorm(1 - alpha) * se[[i]])
+    names(CIlow) <- names(CIupp) <- nams
+    coefs <- sapply(nams, function(i) rbind(coefs[[i]], CIlow[[i]], CIupp[[i]]), USE.NAMES = TRUE)
+    if (SE) {
+      tmp <- c("estimate", "SE", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha)))
+    } else {
+      tmp <- c("estimate", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha)))
+    }
+    coefs <- lapply(nams, function(i) {
+      rownames(coefs[[i]]) <- paste(rep(tmp, each = nrow(coefs[[i]]) / length(tmp)), cats[[i]], sep = "_")
+      coefs[[i]]
     })
+    names(coefs) <- nams
   }
 
   if (simplify) {
-    catnams <- unlist(lapply(coefs, rownames))
-    resnams <- unlist(lapply(1:m, function(i) rep(nams[i], sapply(coefs, nrow)[i])))
-    resnams <- paste(resnams, catnams)
-    res <- as.data.frame(plyr::ldply(coefs, rbind))
-    rownames(res) <- resnams
+    res <- as.data.frame(plyr::ldply(coefs, rbind, .id = NULL))
+    id <- unlist(lapply(nams, function(i) paste(i, rownames(coefs[[i]]))))
+    rownames(res) <- id
     res[is.na(res)] <- 0
-    if (!SE) res <- res[, -1]
   } else {
     res <- coefs
   }
@@ -861,13 +937,15 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, ...) {
 #' @aliases AIC.ddfMLR BIC.ddfMLR
 #' @rdname logLik.ddfMLR
 #'
-#' @description S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
-#' Schwarz's Bayesian criterion (BIC) for an object of \code{"ddfMLR"} class.
+#' @description S3 methods for extracting log-likelihood, Akaike's
+#'   information criterion (AIC) and Schwarz's Bayesian criterion
+#'   (BIC) for an object of \code{"ddfMLR"} class.
 #'
 #' @param object an object of \code{"ddfMLR"} class.
-#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number).
+#' @param item numeric or character: either character \code{"all"} to
+#'   apply for all converged items (default), or a vector of item
+#'   names (column names of \code{Data}), or item identifiers
+#'   (integers specifying the column number).
 #' @param ... other generic parameters for S3 methods.
 #'
 #' @author

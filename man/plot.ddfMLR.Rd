@@ -9,8 +9,9 @@
 \arguments{
 \item{x}{an object of \code{"ddfMLR"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
+\item{item}{numeric or character: either character \code{"all"} to
+apply for all items (default), or a vector of item names (column
+names of \code{Data}), or item identifiers (integers specifying
 the column number).}
 
 \item{group.names}{character: names of reference and focal group.}
@@ -21,10 +22,11 @@ the column number).}
 Returns list of objects of class \code{"ggplot"}.
 }
 \description{
-Plot method for an object of \code{"ddfMLR"} class using \pkg{ggplot2}.
+Plot method for an object of \code{"ddfMLR"} class
+  using \pkg{ggplot2}.
 
-The characteristic curves for an item specified in \code{item} argument are plotted.
-Plotted curves represent the best model.
+  The characteristic curves for an item specified in \code{item}
+  argument are plotted. Plotted curves represent the best model.
 }
 \examples{
 \dontrun{
