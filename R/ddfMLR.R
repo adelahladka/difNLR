@@ -603,14 +603,15 @@ print.ddfMLR <- function(x, ...) {
 plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   m <- length(x$mlrPAR)
   nams <- colnames(x$Data)
+
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -653,15 +654,15 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   }
 
   if (x$match[1] == "zscore") {
-    score <- c(scale(unlist(.score(as.data.frame(x$Data[, anchor]), x$key))))
+    matching <- c(scale(.score(as.data.frame(x$Data[, anchor]), x$key)))
     xlab <- "Standardized total score"
   } else {
     if (x$match[1] == "score") {
-      score <- c(unlist(.score(as.data.frame(x$Data[, anchor]), x$key)))
+      matching <- c(.score(as.data.frame(x$Data[, anchor]), x$key))
       xlab <- "Total score"
     } else {
       if (length(x$match) == dim(x$Data)[1]) {
-        score <- x$match
+        matching <- x$match
         xlab <- "Matching criterion"
       } else {
         stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
@@ -670,13 +671,12 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
     }
   }
 
-  sq <- seq(min(score, na.rm = TRUE), max(score, na.rm = TRUE), length.out = 300)
-  sqR <- as.matrix(data.frame(1, sq, 0, 0))
-  sqF <- as.matrix(data.frame(1, sq, 1, sq))
+  match <- seq(min(matching, na.rm = TRUE), max(matching, na.rm = TRUE), length.out = 300)
+  I <- length(items)
+  plot_CC <- as.list(rep(NA, I))
 
-  plot_CC <- vector("list", length = length(items))
-  for (j in 1:length(items)) {
-    i <- items[[j]]
+  for (k in 1:I) {
+    i <- items[k]
 
     TITLE <- colnames(x$Data)[i]
 
@@ -990,7 +990,7 @@ logLik.ddfMLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
         call. = FALSE
       )
@@ -1013,7 +1013,7 @@ logLik.ddfMLR <- function(object, item = "all", ...) {
     )
   }
   if (class(item) == "character") {
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1045,7 +1045,7 @@ AIC.ddfMLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
         call. = FALSE
       )
@@ -1068,7 +1068,7 @@ AIC.ddfMLR <- function(object, item = "all", ...) {
     )
   }
   if (class(item) == "character") {
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1089,7 +1089,7 @@ BIC.ddfMLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
         call. = FALSE
       )
@@ -1112,7 +1112,7 @@ BIC.ddfMLR <- function(object, item = "all", ...) {
     )
   }
   if (class(item) == "character") {
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1123,4 +1123,155 @@ BIC.ddfMLR <- function(object, item = "all", ...) {
 
   BIC <- ifelse(items %in% object$DDFitems, object$BICM1[items], object$BICM0[items])
   return(BIC)
+}
+
+#' Predicted values for an object of \code{"ddfMLR"} class.
+#'
+#' @description S3 method for predictions from the model used in the
+#'   object of \code{"ddfMLR"} class.
+#'
+#' @param object an object of \code{"ddfMLR"} class.
+#' @param item numeric or character: either character \code{"all"} to
+#'   apply for all converged items (default), or a vector of item
+#'   names (column names of \code{Data}), or item identifiers
+#'   (integers specifying the column number).
+#' @param match numeric: matching criterion for new observations.
+#' @param group numeric: group membership for new observations.
+#' @param ... other generic parameters for \code{predict()} function.
+#'
+#' @author
+#' Adela Hladka (nee Drabinova) \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{hladka@@cs.cas.cz} \cr
+#'
+#' Patricia Martinkova \cr
+#' Institute of Computer Science of the Czech Academy of Sciences \cr
+#' \email{martinkova@@cs.cas.cz} \cr
+#'
+#' @references
+#' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
+#' The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+#'
+#' @seealso
+#' \code{\link[difNLR]{ddfMLR}} for DDF detection among nominal data using multinomial log-linear regression model. \cr
+#' \code{\link[stats]{predict}} for generic function for prediction.
+#'
+#' @examples
+#' \dontrun{
+#' \dontrun{
+#' # loading data
+#' data(GMATtest, GMATkey)
+#' Data <- GMATtest[, 1:20] # items
+#' group <- GMATtest[, "group"] # group membership variable
+#' key <- GMATkey # correct answers
+#'
+#' # testing both DDF effects
+#' (x <- ddfMLR(Data, group, focal.name = 1, key))
+#'
+#' # fitted values
+#' predict(x, item = 1)
+#'
+#' # predicted values
+#' predict(x, item = 1, match = 0, group = c(0, 1))
+#' predict(x, item = x$DDFitems, match = 0, group = c(0, 1))
+#' }
+#'
+#' @export
+predict.ddfMLR <- function(object, item = "all", match, group, ...) {
+  m <- dim(object$Data)[2]
+  nams <- colnames(object$Data)
+
+  if (class(item) == "character") {
+    if (any(item != "all") & !all(item %in% nams)) {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
+      )
+    }
+    if (any(item == "all")) {
+      items <- 1:m
+    } else {
+      items <- which(nams %in% item)
+    }
+  } else {
+    if (class(item) != "integer" & class(item) != "numeric") {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+           call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+             call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
+  }
+
+  if (object$purification) {
+    anchor <- c(1:m)[!c(1:m) %in% object$DIFitems]
+  } else {
+    anchor <- 1:m
+  }
+
+  if (missing(match)) {
+    if (length(object$match) > 1) {
+      match <- object$match
+    } else {
+      if (object$match == "score") {
+        match <- c(.score(as.data.frame(object$Data[, anchor]), object$key))
+      } else {
+        match <- c(scale(.score(as.data.frame(object$Data[, anchor]), object$key)))
+      }
+    }
+  }
+
+  if (missing(group)) {
+    group <- object$group
+  }
+  if (length(match) != length(group)) {
+    if (length(match) == 1) {
+      match <- rep(match, length(group))
+    } else if (length(group) == 1) {
+      group <- rep(group, length(match))
+    } else {
+      stop("Arguments 'match' and 'group' must be of the same length.",
+           call. = FALSE
+      )
+    }
+  }
+
+  mat <- cbind("(Intercept)" = 1, "x" = match, "group" = group, "x:group" = match * group)
+  coefs_all <- coef(object, IRTpars = FALSE, CI = 0)
+  res <- list()
+
+  for (i in items) {
+    coefs <- coefs_all[[i]]
+
+    if (is.null(dim(coefs))) coefs <- matrix(coefs, ncol = length(coefs))
+    if (dim(coefs)[2] == 2) {
+      coefs <- as.matrix(data.frame(coefs, 0, 0))
+    }
+    if (dim(coefs)[2] == 3) {
+      coefs <- as.matrix(data.frame(coefs, 0))
+    }
+
+    cats <- c(object$key[i], rownames(coefs))
+
+    df.probs <- as.data.frame(t(exp(coefs %*% t(mat))))
+    df.probs <- sapply(df.probs, function(x) x / (rowSums(df.probs) + 1))
+    df.probs <- data.frame(1 - rowSums(df.probs), df.probs)
+    colnames(df.probs) <- cats
+    res[[i]] <- df.probs
+  }
+
+  res <- Filter(Negate(function(i) is.null(unlist(i))), res)
+  if (length(res) == 1) {
+    res <- res[[1]]
+  } else {
+    names(res) <- nams[items]
+  }
+  return(res)
 }
