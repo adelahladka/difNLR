@@ -1089,13 +1089,13 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     nams <- colnames(x$Data)
 
     if (class(item) == "character") {
-      if (item != "all" & !item %in% nams) {
+      if (any(item != "all") & !all(item %in% nams)) {
         stop("Invalid value for 'item'. Item must be either character 'all', or
              numeric vector corresponding to column identifiers, or name of the item.",
           call. = FALSE
         )
       }
-      if (item[1] == "all") {
+      if (any(item == "all")) {
         items <- 1:m
       } else {
         items <- which(nams %in% item)
@@ -1275,13 +1275,13 @@ fitted.difNLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1443,13 +1443,13 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1854,13 +1854,13 @@ logLik.difNLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1928,13 +1928,13 @@ AIC.difNLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1994,13 +1994,13 @@ BIC.difNLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
              numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -2122,13 +2122,13 @@ residuals.difNLR <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
