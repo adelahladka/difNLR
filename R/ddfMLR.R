@@ -191,9 +191,6 @@
 #'
 #' # testing both DDF effects with total score as matching criterion
 #' ddfMLR(Data, group, focal.name = 1, key, match = "score")
-#'
-#' # testing both DDF effects using classic parametrization
-#' ddfMLR(Data, group, focal.name = 1, key, parametrization = "classic")
 #' }
 #'
 #' @keywords DDF
@@ -264,7 +261,10 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         call. = FALSE
       )
     }
-    if (length(key) != dim(DATA)[2]) {
+    if (is.vector(key)) {
+      KEY <- matrix(key)
+    }
+    if (dim(KEY)[1] != dim(DATA)[2]) {
       stop("Number of items in 'Data' is not equal to the length of 'key'.",
         call. = FALSE
       )
@@ -312,7 +312,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(MLR(DATA, GROUP,
-        key = key, match = match, anchor = ANCHOR,
+        key = KEY, match = match, anchor = ANCHOR,
         type = type, p.adjust.method = p.adjust.method,
         alpha = alpha
       ))
@@ -360,14 +360,14 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         purification = purify,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
         alpha = alpha,
-        Data = DATA, group = GROUP, group.names = group.names, key = key, match = match
+        Data = DATA, group = GROUP, group.names = group.names, key = c(KEY), match = match
       )
     } else {
       nrPur <- 0
       ddfPur <- NULL
       noLoop <- FALSE
       prov1 <- suppressWarnings(MLR(DATA, GROUP,
-        key = key, type = type,
+        key = KEY, type = type,
         p.adjust.method = p.adjust.method,
         alpha = alpha
       ))
@@ -403,7 +403,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
               }
             }
             prov2 <- suppressWarnings(MLR(DATA, GROUP,
-              key = key, anchor = nodif, type = type,
+              key = KEY, anchor = nodif, type = type,
               p.adjust.method = p.adjust.method,
               alpha = alpha
             ))
@@ -466,7 +466,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
         alpha = alpha,
-        Data = DATA, group = GROUP, group.names = group.names, key = key, match = match
+        Data = DATA, group = GROUP, group.names = group.names, key = c(KEY), match = match
       )
     }
     class(RES) <- "ddfMLR"

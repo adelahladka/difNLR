@@ -178,9 +178,6 @@ ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 
 # testing both DDF effects with total score as matching criterion
 ddfMLR(Data, group, focal.name = 1, key, match = "score")
-
-# testing both DDF effects using classic parametrization
-ddfMLR(Data, group, focal.name = 1, key, parametrization = "classic")
 }
 
 }
