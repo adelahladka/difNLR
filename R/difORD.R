@@ -754,13 +754,13 @@ logLik.difORD <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -805,13 +805,13 @@ AIC.difORD <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -845,13 +845,13 @@ BIC.difORD <- function(object, item = "all", ...) {
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -940,13 +940,13 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
   nams <- colnames(x$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -971,7 +971,6 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
   if (missing(plot.type)) {
     plot.type <- "category"
   }
-
   if (x$model == "adjacent" & plot.type != "category") {
     warning("Argument 'plot.type' is ignored for adjacent category logit model. ")
   }
@@ -1029,6 +1028,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
   for (k in 1:I) {
     i <- items[k]
     TITLE <- colnames(x$Data)[i]
+
     df.fitted <- data.frame(rbind(
       cbind(Group = "0", Match = match, predict(x, item = i, match = match, group = 0, type = plot.type)),
       cbind(Group = "1", Match = match, predict(x, item = i, match = match, group = 1, type = plot.type))
@@ -1196,13 +1196,23 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
 #' # testing both DIF effects with cumulative logit model
 #' (x <- difORD(Data, group, match = match, focal.name = 1, model = "cumulative"))
 #'
+#' # fitted values
+#' predict(x, item = "X2003")
+#'
+#' # predicted values
 #' predict(x, item = "X2003", match = 350, group = c(0, 1))
 #' predict(x, item = "X2003", match = 350, group = c(0, 1), type = "cumulative")
+#' predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
 #'
 #' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, match = match, focal.name = 1, model = "adjacent"))
 #'
-#' predict(x, item = "X2003", match = 300, group = c(0, 1))
+#' # fitted values
+#' predict(x, item = "X2003")
+#'
+#' # predicted values
+#' predict(x, item = "X2003", match = 350, group = c(0, 1))
+#' predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
 #' }
 #'
 #' @export
@@ -1211,13 +1221,13 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
   nams <- colnames(object$Data)
 
   if (class(item) == "character") {
-    if (item != "all" & !item %in% nams) {
+    if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-    if (item[1] == "all") {
+    if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
@@ -1280,8 +1290,8 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
   }
 
   mat <- cbind("intercept" = 1, "match" = match, "group" = group, "x:match" = match * group)
-
   coefs_all <- coef(object, IRTpars = FALSE, CI = 0)
+  res <- list()
 
   for (i in items) {
     cat <- sort(unique(object$Data[, i]))
@@ -1332,13 +1342,20 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
       colnames(df.probs.cat) <- paste0("P(Y = ", cat, ")")
       df.probs.cat <- as.data.frame(df.probs.cat)
     }
+
+    if (type == "category") {
+      prob <- df.probs.cat
+    } else {
+      prob <- df.probs.cum
+    }
+    res[[i]] <- prob
   }
 
-  if (type == "category") {
-    prob <- df.probs.cat
+  res <- Filter(Negate(function(i) is.null(unlist(i))), res)
+  if (length(res) == 1) {
+    res <- res[[1]]
   } else {
-    prob <- df.probs.cum
+    names(res) <- nams[items]
   }
-
-  return(prob)
+  return(res)
 }

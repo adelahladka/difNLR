@@ -40,13 +40,23 @@ match <- rowSums(dataMedicalgraded[, 1:100]) # matching criterion
 # testing both DIF effects with cumulative logit model
 (x <- difORD(Data, group, match = match, focal.name = 1, model = "cumulative"))
 
+# fitted values
+predict(x, item = "X2003")
+
+# predicted values
 predict(x, item = "X2003", match = 350, group = c(0, 1))
 predict(x, item = "X2003", match = 350, group = c(0, 1), type = "cumulative")
+predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
 
 # testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, match = match, focal.name = 1, model = "adjacent"))
 
-predict(x, item = "X2003", match = 300, group = c(0, 1))
+# fitted values
+predict(x, item = "X2003")
+
+# predicted values
+predict(x, item = "X2003", match = 350, group = c(0, 1))
+predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
 }
 
 }
