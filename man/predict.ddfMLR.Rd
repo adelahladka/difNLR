@@ -24,6 +24,26 @@ names (column names of \code{Data}), or item identifiers
 S3 method for predictions from the model used in the
   object of \code{"ddfMLR"} class.
 }
+\examples{
+\dontrun{
+# loading data
+data(GMATtest, GMATkey)
+Data <- GMATtest[, 1:20] # items
+group <- GMATtest[, "group"] # group membership variable
+key <- GMATkey # correct answers
+
+# testing both DDF effects
+(x <- ddfMLR(Data, group, focal.name = 1, key))
+
+# fitted values
+predict(x, item = 1)
+
+# predicted values
+predict(x, item = 1, match = 0, group = c(0, 1))
+predict(x, item = x$DDFitems, match = 0, group = c(0, 1))
+}
+
+}
 \references{
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
 The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.

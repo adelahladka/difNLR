@@ -672,97 +672,56 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   }
 
   match <- seq(min(matching, na.rm = TRUE), max(matching, na.rm = TRUE), length.out = 300)
-  I <- length(items)
-  plot_CC <- as.list(rep(NA, I))
+  plot_CC <- list()
 
-  for (k in 1:I) {
-    i <- items[k]
-
+  for (i in items) {
     TITLE <- colnames(x$Data)[i]
 
-    coefs <- x$mlrPAR[[i]]
-    if (x$parametrization == "irt") {
-      a <- coefs[, "a"]
-      b <- coefs[, "b"]
-      aDIF <- coefs[, "aDIF"]
-      bDIF <- coefs[, "bDIF"]
-      coefs <- cbind(-a * b, a, -a * bDIF - aDIF * b - aDIF * bDIF, aDIF)
-    }
+    df.fitted <- data.frame(rbind(
+      cbind(Group = "0", Match = match, predict(x, item = i, match = match, group = 0)),
+      cbind(Group = "1", Match = match, predict(x, item = i, match = match, group = 1))
+    ))
+    df.fitted <- reshape2::melt(df.fitted, id.vars = c("Group", "Match"), variable.name = "Category", value.name = "Probability")
+    df.fitted$Category <- relevel(df.fitted$Category, ref = paste(x$key[i]))
+    levels(df.fitted$Category) <- paste0("P(Y = ", levels(df.fitted$Category), ")")
+    n_cats <- length(levels(df.fitted$Category))
 
-    if (is.null(dim(coefs))) coefs <- matrix(coefs, ncol = length(coefs))
-    if (dim(coefs)[2] == 2) {
-      coefs <- as.matrix(data.frame(coefs, 0, 0))
-    }
-    if (dim(coefs)[2] == 3) {
-      coefs <- as.matrix(data.frame(coefs, 0))
-    }
-
-    prR <- as.data.frame(t(exp(coefs %*% t(sqR))))
-    prF <- as.data.frame(t(exp(coefs %*% t(sqF))))
-    colnames(prR) <- colnames(prF) <- rownames(coefs)
-
-    prR <- sapply(prR, function(x) x / (rowSums(prR) + 1))
-    prF <- sapply(prF, function(x) x / (rowSums(prF) + 1))
-
-    hvR <- data.frame(1 - rowSums(prR), prR, "R", sq)
-    hvF <- data.frame(1 - rowSums(prF), prF, "F", sq)
-
-    if (is.null(rownames(coefs)) | nrow(coefs) == 1) {
-      if (is.null(levels(x$Data[, i]))) {
-        lvls <- sort(unique(x$Data[, i]))
-      } else {
-        lvls <- levels(x$Data[, i])
-      }
-      nams <- lvls[lvls != x$key[i]]
-    } else {
-      nams <- rownames(coefs)
-    }
-
-    colnames(hvR) <- colnames(hvF) <- c(paste(x$key[i]), nams, "group", "score")
-    hv <- rbind(hvR, hvF)
-
-    df <- reshape2::melt(hv, id = c("score", "group"))
-    df$group <- as.factor(df$group)
-
-    df2 <- rbind(
-      data.frame(prop.table(table(x$Data[x$group == 1, i], score[x$group == 1]), 2),
-        table(x$Data[x$group == 1, i], score[x$group == 1]),
+    df.empirical <- rbind(
+      data.frame(prop.table(table(x$Data[x$group == 1, i], matching[x$group == 1]), 2),
+        table(x$Data[x$group == 1, i], matching[x$group == 1]),
         group = "1"
       ),
-      data.frame(prop.table(table(x$Data[x$group == 0, i], score[x$group == 0]), 2),
-        table(x$Data[x$group == 0, i], score[x$group == 0]),
+      data.frame(prop.table(table(x$Data[x$group == 0, i], matching[x$group == 0]), 2),
+        table(x$Data[x$group == 0, i], matching[x$group == 0]),
         group = "0"
       )
     )
-
-    df2$score <- as.numeric(levels(df2$Var2))[df2$Var2]
-    df2$answ <- relevel(df2$Var1, ref = paste(x$key[i]))
-    df2$group <- as.factor(df2$group)
-
-    df$variable <- relevel(df$variable, ref = paste(x$key[i]))
-
-    levels(df$variable) <- paste0("P(Y = ", levels(df$variable), ")")
-    levels(df2$answ) <- paste0("P(Y = ", levels(df2$answ), ")")
+    df.empirical <- data.frame(Group = as.factor(df.empirical$group),
+                               Match = as.numeric(paste(df.empirical$Var2)),
+                               Category = relevel(df.empirical$Var1, ref = paste(x$key[i])),
+                               Count = as.numeric(paste(df.empirical$Freq.1)),
+                               Probability = as.numeric(paste(df.empirical$Freq)))
+    levels(df.empirical$Category) <- paste0("P(Y = ", levels(df.empirical$Category), ")")
 
     cbPalette <- c("#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
-    num.col <- ceiling(length(levels(df$variable)) / 8)
-    cols <- rep(cbPalette, num.col)[1:length(levels(df$variable))]
+    n_col <- ceiling(n_cats / 8)
+    cols <- rep(cbPalette, n_col)[1:n_cats]
 
-    plot_CC[[j]] <- ggplot2::ggplot() +
+    plot_CC[[i]] <- ggplot2::ggplot() +
       ggplot2::geom_line(
-        data = df,
+        data = df.fitted,
         ggplot2::aes_string(
-          x = "score", y = "value",
-          colour = "variable", linetype = "group"
+          x = "Match", y = "Probability",
+          colour = "Category", linetype = "Group"
         ),
         size = 0.8
       ) +
       ggplot2::geom_point(
-        data = df2,
+        data = df.empirical,
         ggplot2::aes_string(
-          x = "score", y = "Freq",
-          colour = "answ", fill = "answ",
-          size = "Freq.1"
+          x = "Match", y = "Probability",
+          colour = "Category", fill = "Category",
+          size = "Count"
         ),
         alpha = 0.5, shape = 21
       ) +
@@ -773,7 +732,7 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
         y = "Probability of answer"
       ) +
       ggplot2::scale_linetype_manual(
-        breaks = c("R", "F"), labels = group.names,
+        breaks = c(0, 1), labels = group.names,
         values = c("solid", "dashed")
       ) +
       ggplot2::scale_color_manual(values = cols) +
@@ -1157,7 +1116,6 @@ BIC.ddfMLR <- function(object, item = "all", ...) {
 #' \code{\link[stats]{predict}} for generic function for prediction.
 #'
 #' @examples
-#' \dontrun{
 #' \dontrun{
 #' # loading data
 #' data(GMATtest, GMATkey)
