@@ -17,23 +17,26 @@
 \arguments{
 \item{object}{an object of \code{"difNLR"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
+\item{item}{numeric or character: either character \code{"all"} to
+apply for all converged items (default), or a vector of item
+names (column names of \code{Data}), or item identifiers
+(integers specifying the column number).}
 
 \item{match}{numeric: matching criterion for new observations.}
 
 \item{group}{numeric: group membership for new observations.}
 
-\item{interval}{character: type of interval calculation, either \code{"none"} (default) or \code{"confidence"}
-for confidence interval.}
+\item{interval}{character: type of interval calculation, either
+\code{"none"} (default) or \code{"confidence"} for confidence
+interval.}
 
 \item{level}{numeric: confidence level.}
 
 \item{...}{other generic parameters for \code{predict()} function.}
 }
 \description{
-S3 method for predictions from the model used in the object of \code{"difNLR"} class.
+S3 method for predictions from the model used in the
+  object of \code{"difNLR"} class.
 }
 \examples{
 \dontrun{

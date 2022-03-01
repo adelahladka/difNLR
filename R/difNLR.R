@@ -1362,16 +1362,19 @@ fitted.difNLR <- function(object, item = "all", ...) {
 
 #' Predicted values for an object of \code{"difNLR"} class.
 #'
-#' @description S3 method for predictions from the model used in the object of \code{"difNLR"} class.
+#' @description S3 method for predictions from the model used in the
+#'   object of \code{"difNLR"} class.
 #'
 #' @param object an object of \code{"difNLR"} class.
-#' @param item numeric or character: either character \code{"all"} to apply for all converged items (default),
-#' or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-#' the column number).
+#' @param item numeric or character: either character \code{"all"} to
+#'   apply for all converged items (default), or a vector of item
+#'   names (column names of \code{Data}), or item identifiers
+#'   (integers specifying the column number).
 #' @param match numeric: matching criterion for new observations.
 #' @param group numeric: group membership for new observations.
-#' @param interval character: type of interval calculation, either \code{"none"} (default) or \code{"confidence"}
-#' for confidence interval.
+#' @param interval character: type of interval calculation, either
+#'   \code{"none"} (default) or \code{"confidence"} for confidence
+#'   interval.
 #' @param level numeric: confidence level.
 #' @param ... other generic parameters for \code{predict()} function.
 #'
