@@ -1021,12 +1021,10 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
   }
 
   match <- seq(min(matching, na.rm = TRUE), max(matching, na.rm = TRUE), length.out = 300)
-  I <- length(items)
-  plot_CC <- as.list(rep(NA, I))
+  plot_CC <- list()
   ylab <- ifelse(plot.type == "category", "Category probability", "Cumulative probability")
 
-  for (k in 1:I) {
-    i <- items[k]
+  for (i in items) {
     TITLE <- colnames(x$Data)[i]
 
     df.fitted <- data.frame(rbind(
@@ -1107,7 +1105,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
     num.col <- ceiling(length(levels(df.fitted$Category)) / 8)
     cols <- rep(cbPalette, num.col)[1:length(levels(df.fitted$Category))]
 
-    plot_CC[[k]] <- ggplot2::ggplot() +
+    plot_CC[[i]] <- ggplot2::ggplot() +
       ggplot2::geom_point(
         data = df.empirical,
         ggplot2::aes_string(
@@ -1145,7 +1143,6 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
         linetype = ggplot2::guide_legend(title = "Group", order = 3)
       )
   }
-
   plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
   return(plot_CC)
 }
