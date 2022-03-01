@@ -539,9 +539,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
   return(results)
 }
 
-#' @noRd
-#' only for 2PL model
 .deltamethod.NLR.log2irt <- function(par, cov, conv, cov_fail) {
+  # only for 2PL model
   if (conv) {
     par_names <- which(c("(Intercept)", "x", "g", "x:g") %in% names(par))
     par_tmp <- setNames(
