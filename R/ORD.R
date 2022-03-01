@@ -234,7 +234,14 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
 
 #' @noRd
 .deltamethod.ORD.log2irt <- function(par, cov) {
-  cats <- as.numeric(paste(gsub("\\(Intercept\\)\\:", "", names(par)[(grepl("Intercept", names(par)))])))
+  if (sum((grepl("Intercept", names(par)))) == 1) {
+    cats <- 1
+    num_cats <- 1
+  } else {
+    cats <- as.numeric(paste(gsub("\\(Intercept\\)\\:", "", names(par)[(grepl("Intercept", names(par)))])))
+    num_cats <- length(cats)
+  }
+
   par_new <- setNames(
     c(
       -par[grepl("Intercept", names(par))] / par["x"],
@@ -244,8 +251,6 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     ),
     c(paste0("b", as.numeric(paste(cats))), "a", paste0("bDIF", as.numeric(paste(cats))), "aDIF")
   )
-
-  num_cats <- length(cats)
 
   betas0 <- paste0("x", cats)
   beta1 <- paste0("x", num_cats + 1)
