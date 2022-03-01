@@ -9,10 +9,10 @@
 #### MAJOR UPDATES
   * First version of iteratively reweighted least squares algorithm 
     was implemented in `difNLR()`, `NLR()`, and `estimNLR()` functions.
-  * `coef.difNLR()`, `coef.difORD()` methods now include delta method 
-    for IRT and logistic parameterizations. 
-  * `coef.difNLR()`, `coef.difORD()` methods now include calculation 
-    of confidence intervals. 
+  * `coef.difNLR()`, `coef.difORD()`, and `coef.ddfMLR()` methods now 
+    include delta method for IRT and logistic parameterizations. 
+  * `coef.difNLR()`, `coef.difORD()`, and `coef.ddfMLR()` methods now 
+    include calculation of confidence intervals. 
 
 #### MINOR UPDATES
   * Some typos fixed.
