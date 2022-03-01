@@ -262,7 +262,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
       )
     }
     if (is.matrix(key) | is.data.frame(key)) {
-      KEY <- c(unlist(key))
+      KEY <- paste(unlist(key))
     } else {
       KEY <- key
     }
@@ -656,11 +656,11 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   }
 
   if (x$match[1] == "zscore") {
-    matching <- c(scale(.score(as.data.frame(x$Data[, anchor]), x$key)))
+    matching <- c(scale(.score(as.data.frame(x$Data[, anchor]), x$key[anchor])))
     xlab <- "Standardized total score"
   } else {
     if (x$match[1] == "score") {
-      matching <- c(.score(as.data.frame(x$Data[, anchor]), x$key))
+      matching <- c(.score(as.data.frame(x$Data[, anchor]), x$key[anchor]))
       xlab <- "Total score"
     } else {
       if (length(x$match) == dim(x$Data)[1]) {

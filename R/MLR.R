@@ -128,10 +128,10 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   }
 
   if (match[1] == "zscore") {
-    x <- c(scale(unlist(.score(as.data.frame(Data[, anchor]), key[anchor]))))
+    x <- c(scale(.score(as.data.frame(Data[, anchor]), key[anchor])))
   } else {
     if (match[1] == "score") {
-      x <- c(unlist(.score(as.data.frame(Data[, anchor]), key[anchor])))
+      x <- c(.score(as.data.frame(Data[, anchor]), key[anchor]))
     } else {
       if (length(match) == dim(Data)[1]) {
         x <- match
