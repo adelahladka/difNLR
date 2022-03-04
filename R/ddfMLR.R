@@ -834,7 +834,6 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
 
   if (!IRTpars) {
     pars <- object$mlrPAR
-    se <- object$mlrSE
   } else {
     mlrPAR <- object$mlrPAR
     mlrCOV <- ifelse(1:m %in% object$DDFitems, object$covM1, object$covM0)
@@ -861,6 +860,7 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
   }
 
   if (CI > 0) {
+    se <- object$mlrSE
     alpha <- (1 - CI) / 2
     CIlow <- lapply(1:m, function(i) pars[[i]] - qnorm(1 - alpha) * se[[i]])
     CIupp <- lapply(1:m, function(i) pars[[i]] + qnorm(1 - alpha) * se[[i]])
