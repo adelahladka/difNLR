@@ -852,7 +852,7 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
     pars <- lapply(1:m, function(i) {
       matrix(mlrDM[[i]]$par,
         nrow = nrow(mlrPAR[[i]]), ncol = ncol(mlrPAR[[i]]),
-        dimnames = list(rownames(mlrPAR[[i]]), colnames(mlrPAR[[i]]))
+        dimnames = list(rownames(mlrPAR[[i]]), names(mlrDM[[i]]$par))
       )
     })
   }
