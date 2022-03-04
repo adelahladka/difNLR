@@ -191,7 +191,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
 
   par.m1 <- lapply(m1, function(x) {
     if (is.null(dim(coef(x)))) {
-      tmp <- matrix(coef(x), nrow = 1, dimnames = list(1, names(coef(x))))
+      tmp <- matrix(coef(x), nrow = 1, dimnames = list(x$lev[2], names(coef(x))))
     } else {
       tmp <- coef(x)
     }
@@ -199,7 +199,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   })
   par.m0 <- lapply(m0, function(x) {
     if (is.null(dim(coef(x)))) {
-      tmp <- matrix(coef(x), nrow = 1, dimnames = list(1, names(coef(x))))
+      tmp <- matrix(coef(x), nrow = 1, dimnames = list(x$lev[2], names(coef(x))))
     } else {
       tmp <- coef(x)
     }
