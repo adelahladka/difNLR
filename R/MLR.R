@@ -239,7 +239,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   n_cats <- length(cats)
   num_cats <- 1:n_cats
 
-  par_tmp <- matrix(NA,
+  par_tmp <- matrix(0,
     nrow = nrow(par), ncol = 4,
     dimnames = list(cats, c("(Intercept)", "x", "group", "x:group"))
   )
@@ -283,18 +283,18 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   ), as.list(akDIF))
   formulas <- lapply(formulas, function(x) paste0("~", x))
   formulas <- lapply(formulas, as.formula)
-  formulas <- formulas[!is.na(par_new)]
   cov_new <- msm::deltamethod(
     formulas,
-    par,
-    cov,
+    par_tmp,
+    cov_tmp,
     ses = FALSE
   )
 
+  nams <- paste0(rep(colnames(par_new), each = n_cats), cats)[par_new != 0]
+  cov_new <- cov_new[par_new != 0, par_new != 0]
   se_new <- sqrt(diag(cov_new))
-  nams <- paste0(rep(colnames(par_new), each = n_cats), cats)[!is.na(par_new)]
-  par_new <- par_new[, !colSums(!is.finite(par_new))]
   rownames(cov_new) <- colnames(cov_new) <- names(se_new) <- nams
+  par_new <- par_new[, par_new != 0]
 
   return(list(par = par_new, cov = cov_new, se = se_new))
 }
