@@ -192,7 +192,6 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   par.m1 <- lapply(m1, function(x) {
     if (is.null(dim(coef(x)))) {
       tmp <- matrix(coef(x), nrow = 1, dimnames = list(1, names(coef(x))))
-      # rownames(tmp)[is.null(rownames(tmp))] <- 1
     } else {
       tmp <- coef(x)
     }
@@ -254,7 +253,11 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   dimnames = list(cats, c("b", "a", "bDIF", "aDIF"))
   )
 
-  nams <- paste(rep(cats, each = 4), c("(Intercept)", "x", "group", "x:group"), sep = ":")
+  if (n_cats == 1) {
+    nams <- c("(Intercept)", "x", "group", "x:group")
+  } else {
+    nams <- paste(rep(cats, each = 4), c("(Intercept)", "x", "group", "x:group"), sep = ":")
+  }
 
   cov_tmp <- matrix(0, nrow = 4 * n_cats, ncol = 4 * n_cats,
                     dimnames = list(nams, nams))
