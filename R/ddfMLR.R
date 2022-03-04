@@ -843,38 +843,35 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
         par = mlrPAR[[i]], cov = mlrCOV[[i]]
       )
     })
-    pars <- lapply(mlrDM, function(x) x$par)
-    se <- lapply(mlrDM, function(x) x$se)
+    pars <- lapply(1:m, function(i) matrix(mlrDM[[i]]$par, nrow = nrow(mlrPAR[[i]]), ncol = ncol(mlrPAR[[i]]),
+                   dimnames = list(rownames(mlrPAR[[i]]), colnames(mlrPAR[[i]]))))
   }
-  names(pars) <-  nams
-  cats <- lapply(nams, function(i) rownames(pars[[i]]))
-  names(se) <- names(cats) <- nams
+  cats <- lapply(1:m, function(i) rownames(pars[[i]]))
+  names(pars) <- names(cats) <- nams
 
   if (SE) {
-    se_matrix <- sapply(nams, function(i) matrix(se[[i]], nrow = nrow(pars[[i]]), ncol = ncol(pars[[i]]),
-                                                 dimnames = list(rownames(pars[[i]]), colnames(pars[[i]]))),
-                        USE.NAMES = TRUE)
-    coefs <- sapply(nams, function(i) rbind(pars[[i]], se_matrix[[i]]), USE.NAMES = TRUE)
-    coefs <- sapply(nams, function(i) {
+    se_matrix <- lapply(1:m, function(i) matrix(mlrDM[[i]]$se, nrow = nrow(pars[[i]]), ncol = ncol(pars[[i]]),
+                                                 dimnames = list(rownames(pars[[i]]), colnames(pars[[i]]))))
+    coefs <- lapply(1:m, function(i) rbind(pars[[i]], se_matrix[[i]]))
+    coefs <- lapply(1:m, function(i) {
       rownames(coefs[[i]]) <- paste(rep(c("estimate", "SE"), each = nrow(coefs[[i]]) / 2), cats[[i]], sep = "_")
-      coefs[[i]]
-    }, USE.NAMES = TRUE)
+      coefs[[i]]})
   } else {
     coefs <- pars
   }
 
   if (CI > 0) {
     alpha <- (1 - CI) / 2
-    CIlow <- lapply(nams, function(i) pars[[i]] - qnorm(1 - alpha) * se[[i]])
-    CIupp <- lapply(nams, function(i) pars[[i]] + qnorm(1 - alpha) * se[[i]])
-    names(CIlow) <- names(CIupp) <- nams
-    coefs <- sapply(nams, function(i) rbind(coefs[[i]], CIlow[[i]], CIupp[[i]]), USE.NAMES = TRUE)
+    CIlow <- lapply(1:m, function(i) pars[[i]] - qnorm(1 - alpha) * se[[i]])
+    CIupp <- lapply(1:m, function(i) pars[[i]] + qnorm(1 - alpha) * se[[i]])
+    coefs <- lapply(1:m, function(i) rbind(coefs[[i]], CIlow[[i]], CIupp[[i]]))
+    names(coefs) <- nams
     if (SE) {
       tmp <- c("estimate", "SE", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha)))
     } else {
       tmp <- c("estimate", paste0("CI", 100 * alpha), paste0("CI", 100 * (1 - alpha)))
     }
-    coefs <- lapply(nams, function(i) {
+    coefs <- lapply(1:m, function(i) {
       rownames(coefs[[i]]) <- paste(rep(tmp, each = nrow(coefs[[i]]) / length(tmp)), cats[[i]], sep = "_")
       coefs[[i]]
     })
