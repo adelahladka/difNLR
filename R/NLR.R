@@ -588,15 +588,16 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
 .deltamethod.NLR.irt2log <- function(par, cov, conv, cov_fail) {
   if (conv) {
     par_names <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif") %in% names(par)
-    par_names_new <- as.logical(c(-par_names[1] * par_names[2],
-                       par_names[1],
-                       par_names[3],
-                       par_names[4],
-                       -par_names[1] * par_names[6] - par_names[5] * par_names[2] - par_names[5] * par_names[6],
-                       par_names[5],
-                       par_names[7],
-                       par_names[8])
-    )
+    par_names_new <- as.logical(c(
+      -par_names[1] * par_names[2],
+      par_names[1],
+      par_names[3],
+      par_names[4],
+      -par_names[1] * par_names[6] - par_names[5] * par_names[2] - par_names[5] * par_names[6],
+      par_names[5],
+      par_names[7],
+      par_names[8]
+    ))
     par_names <- which(par_names)
     par_names_new <- which(par_names_new)
     par_tmp <- setNames(
@@ -605,7 +606,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     )
     par_tmp[par_names] <- par
     par_new <- setNames(
-      c(-par_tmp[1] * par_tmp[2],
+      c(
+        -par_tmp[1] * par_tmp[2],
         par_tmp[1],
         par_tmp[3],
         par_tmp[4],

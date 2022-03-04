@@ -744,7 +744,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     }
     if (purify) {
       if (!noLoop) {
-        warning(paste0("Item purification process not converged after ",
+        warning(paste0(
+          "Item purification process not converged after ",
           nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
           "Results are based on the last iteration of the item purification.\n"
         ),
@@ -762,7 +763,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
 
 #' @export
 print.difNLR <- function(x, ...) {
-  cat(paste0("Detection of ",
+  cat(paste0(
+    "Detection of ",
     ifelse(length(unique(x$type)) == 1,
       switch(unique(x$type),
         both = "both types of ",
@@ -777,7 +779,8 @@ print.difNLR <- function(x, ...) {
     "using generalized logistic regression model"
   ))
   cat(
-    paste0("\n\nGeneralized logistic regression ",
+    paste0(
+      "\n\nGeneralized logistic regression ",
       switch(x$test,
         "F" = "F-test",
         "LR" = "likelihood ratio chi-square",
@@ -823,9 +826,11 @@ print.difNLR <- function(x, ...) {
       "irls" = "maximum likelihood method \nwith iteratively reweighted least squares algorithm\n"
     )
   ))
-  cat(paste0("\nItem purification was",
+  cat(paste0(
+    "\nItem purification was",
     ifelse(x$purification, " ", " not "), "applied",
-    ifelse(x$purification, paste0(" with ", x$nrPur,
+    ifelse(x$purification, paste0(
+      " with ", x$nrPur,
       ifelse(x$nrPur <= 1, " iteration.", " iterations.")
     ), ""), "\n"
   ))
@@ -1706,12 +1711,12 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
   }
   if (class(IRTpars) != "logical") {
     stop("Invalid value for 'IRTpars'. 'IRTpars' need to be logical. ",
-         call. = FALSE
+      call. = FALSE
     )
   }
   if (CI > 1 | CI < 0 | !is.numeric(CI)) {
     stop("Invalid value for 'CI'. 'CI' must be numeric value between 0 and 1. ",
-         call. = FALSE
+      call. = FALSE
     )
   }
 
@@ -1724,13 +1729,13 @@ coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
   } else {
     nlrPAR <- ifelse(1:m %in% object$DIFitems, object$parM1, object$parM0)
     nlrCOV <- ifelse(1:m %in% object$DIFitems, object$covM1, object$covM0)
-    nlrDM <- lapply(1:m, function(i)
+    nlrDM <- lapply(1:m, function(i) {
       .deltamethod.NLR.irt2log(
         par = nlrPAR[[i]], cov = nlrCOV[[i]],
         conv = !(i %in% object$conv.fail.which),
         cov_fail = is.null(nlrCOV[[i]])
       )
-    )
+    })
     pars <- lapply(nlrDM, function(x) x$par)
     se <- lapply(nlrDM, function(x) x$se)
   }

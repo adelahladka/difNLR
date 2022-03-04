@@ -123,7 +123,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   # deprecated args handling
   if (!missing(parametrization)) {
     warning("Argument 'parametrization' is deprecated; please use 'coef.difORD()' method for different parameterizations. ",
-            call. = FALSE
+      call. = FALSE
     )
   }
 
@@ -239,8 +239,10 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   n_cats <- length(cats)
   num_cats <- 1:n_cats
 
-  par_tmp <- matrix(NA, nrow = nrow(par), ncol = 4,
-                    dimnames = list(cats, c("(Intercept)", "x", "group", "x:group")))
+  par_tmp <- matrix(NA,
+    nrow = nrow(par), ncol = 4,
+    dimnames = list(cats, c("(Intercept)", "x", "group", "x:group"))
+  )
   par_tmp[rownames(par), colnames(par)] <- par
 
   par_new <- matrix(cbind(
@@ -259,8 +261,10 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     nams <- paste(rep(cats, each = 4), c("(Intercept)", "x", "group", "x:group"), sep = ":")
   }
 
-  cov_tmp <- matrix(0, nrow = 4 * n_cats, ncol = 4 * n_cats,
-                    dimnames = list(nams, nams))
+  cov_tmp <- matrix(0,
+    nrow = 4 * n_cats, ncol = 4 * n_cats,
+    dimnames = list(nams, nams)
+  )
   cov_tmp[rownames(cov), colnames(cov)] <- cov
 
   betas0 <- paste0("x", num_cats)

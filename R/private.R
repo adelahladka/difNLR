@@ -23,8 +23,8 @@
 }
 
 .delta.gNLR <- deriv(y ~ (c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))),
-                     namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
-                     function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {}
+  namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
+  function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {}
 )
 
 .plot.theme <- function() {
@@ -53,6 +53,6 @@
 
 .checkInterval <- function(x, vec) {
   ifelse(x >= vec[1] & x <= vec[2], x,
-         ifelse(x > vec[2], vec[2], vec[1])
+    ifelse(x > vec[2], vec[2], vec[1])
   )
 }

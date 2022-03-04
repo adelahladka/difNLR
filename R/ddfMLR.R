@@ -313,7 +313,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
       ANCHOR <- 1:dim(DATA)[2]
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
-      PROV <- suppressWarnings(MLR(Data = DATA, group = GROUP,
+      PROV <- suppressWarnings(MLR(
+        Data = DATA, group = GROUP,
         key = KEY, match = match, anchor = ANCHOR,
         type = type, p.adjust.method = p.adjust.method,
         alpha = alpha
@@ -368,7 +369,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
       nrPur <- 0
       ddfPur <- NULL
       noLoop <- FALSE
-      prov1 <- suppressWarnings(MLR(Data = DATA, group = GROUP,
+      prov1 <- suppressWarnings(MLR(
+        Data = DATA, group = GROUP,
         key = KEY, type = type,
         p.adjust.method = p.adjust.method,
         alpha = alpha
@@ -404,7 +406,8 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
                 }
               }
             }
-            prov2 <- suppressWarnings(MLR(Data = DATA, group = GROUP,
+            prov2 <- suppressWarnings(MLR(
+              Data = DATA, group = GROUP,
               key = KEY, anchor = nodif, type = type,
               p.adjust.method = p.adjust.method,
               alpha = alpha
@@ -698,11 +701,13 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
         group = "0"
       )
     )
-    df.empirical <- data.frame(Group = as.factor(df.empirical$group),
-                               Match = as.numeric(paste(df.empirical$Var2)),
-                               Category = relevel(df.empirical$Var1, ref = paste(x$key[i])),
-                               Count = as.numeric(paste(df.empirical$Freq.1)),
-                               Probability = as.numeric(paste(df.empirical$Freq)))
+    df.empirical <- data.frame(
+      Group = as.factor(df.empirical$group),
+      Match = as.numeric(paste(df.empirical$Var2)),
+      Category = relevel(df.empirical$Var1, ref = paste(x$key[i])),
+      Count = as.numeric(paste(df.empirical$Freq.1)),
+      Probability = as.numeric(paste(df.empirical$Freq))
+    )
     levels(df.empirical$Category) <- paste0("P(Y = ", levels(df.empirical$Category), ")")
 
     cbPalette <- c("#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
@@ -834,6 +839,7 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
 
   if (!IRTpars) {
     pars <- object$mlrPAR
+    se <- object$mlrSE
   } else {
     mlrPAR <- object$mlrPAR
     mlrCOV <- ifelse(1:m %in% object$DDFitems, object$covM1, object$covM0)
@@ -842,25 +848,35 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
         par = mlrPAR[[i]], cov = mlrCOV[[i]]
       )
     })
-    pars <- lapply(1:m, function(i) matrix(mlrDM[[i]]$par, nrow = nrow(mlrPAR[[i]]), ncol = ncol(mlrPAR[[i]]),
-                   dimnames = list(rownames(mlrPAR[[i]]), colnames(mlrPAR[[i]]))))
+    se <- lapply(mlrDM, function(x) x$se)
+    pars <- lapply(1:m, function(i) {
+      matrix(mlrDM[[i]]$par,
+        nrow = nrow(mlrPAR[[i]]), ncol = ncol(mlrPAR[[i]]),
+        dimnames = list(rownames(mlrPAR[[i]]), colnames(mlrPAR[[i]]))
+      )
+    })
   }
   cats <- lapply(1:m, function(i) rownames(pars[[i]]))
-  names(pars) <- names(cats) <- nams
+  names(pars) <- names(cats) <- names(se) <- nams
 
   if (SE) {
-    se_matrix <- lapply(1:m, function(i) matrix(mlrDM[[i]]$se, nrow = nrow(pars[[i]]), ncol = ncol(pars[[i]]),
-                                                 dimnames = list(rownames(pars[[i]]), colnames(pars[[i]]))))
+    se_matrix <- lapply(1:m, function(i) {
+      matrix(se[[i]],
+        nrow = nrow(pars[[i]]), ncol = ncol(pars[[i]]),
+        dimnames = list(rownames(pars[[i]]), colnames(pars[[i]]))
+      )
+    })
     coefs <- lapply(1:m, function(i) rbind(pars[[i]], se_matrix[[i]]))
     coefs <- lapply(1:m, function(i) {
       rownames(coefs[[i]]) <- paste(rep(c("estimate", "SE"), each = nrow(coefs[[i]]) / 2), cats[[i]], sep = "_")
-      coefs[[i]]})
+      coefs[[i]]
+    })
   } else {
     coefs <- pars
   }
+  names(coefs) <- nams
 
   if (CI > 0) {
-    se <- object$mlrSE
     alpha <- (1 - CI) / 2
     CIlow <- lapply(1:m, function(i) pars[[i]] - qnorm(1 - alpha) * se[[i]])
     CIupp <- lapply(1:m, function(i) pars[[i]] + qnorm(1 - alpha) * se[[i]])
@@ -1142,7 +1158,7 @@ predict.ddfMLR <- function(object, item = "all", match, group, ...) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     }
     if (any(item == "all")) {
@@ -1154,12 +1170,12 @@ predict.ddfMLR <- function(object, item = "all", match, group, ...) {
     if (class(item) != "integer" & class(item) != "numeric") {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
-           call. = FALSE
+        call. = FALSE
       )
     } else {
       if (!all(item %in% 1:m)) {
         stop("Invalid number for 'item'.",
-             call. = FALSE
+          call. = FALSE
         )
       } else {
         items <- item
@@ -1195,7 +1211,7 @@ predict.ddfMLR <- function(object, item = "all", match, group, ...) {
       group <- rep(group, length(match))
     } else {
       stop("Arguments 'match' and 'group' must be of the same length.",
-           call. = FALSE
+        call. = FALSE
       )
     }
   }

@@ -206,19 +206,21 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
   mod1 <- mod
 
   if (parameterization == "logistic") {
-    mod0 <- c(as.logical(mod0[["b"]]),
-              as.logical(mod0[["a"]]),
-              as.logical(-mod0[["a"]] * mod0[["bDif"]] -
-                          mod0[["aDif"]] * mod0[["b"]] -
-                          mod0[["aDif"]] * mod0[["bDif"]]),
-              as.logical(mod0[["aDif"]])
-              )
-    mod1 <- c(as.logical(mod1[["b"]]),
-              as.logical(mod1[["a"]]),
-              as.logical(-mod1[["a"]] * mod1[["bDif"]] -
-                           mod1[["aDif"]] * mod1[["b"]] -
-                           mod1[["aDif"]] * mod1[["bDif"]]),
-              as.logical(mod1[["aDif"]])
+    mod0 <- c(
+      as.logical(mod0[["b"]]),
+      as.logical(mod0[["a"]]),
+      as.logical(-mod0[["a"]] * mod0[["bDif"]] -
+        mod0[["aDif"]] * mod0[["b"]] -
+        mod0[["aDif"]] * mod0[["bDif"]]),
+      as.logical(mod0[["aDif"]])
+    )
+    mod1 <- c(
+      as.logical(mod1[["b"]]),
+      as.logical(mod1[["a"]]),
+      as.logical(-mod1[["a"]] * mod1[["bDif"]] -
+        mod1[["aDif"]] * mod1[["b"]] -
+        mod1[["aDif"]] * mod1[["bDif"]]),
+      as.logical(mod1[["aDif"]])
     )
     names(mod0) <- names(mod1) <- c("(Intercept)", "x", "g", "x:g")
     part_regr0 <- names(mod0[-1])[mod0[-1]]
