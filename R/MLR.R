@@ -294,7 +294,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   cov_new <- cov_new[par_new != 0, par_new != 0]
   se_new <- sqrt(diag(cov_new))
   rownames(cov_new) <- colnames(cov_new) <- names(se_new) <- nams
-  par_new <- par_new[, par_new != 0]
+  par_new <- par_new[, colSums(par_new) != 0]
 
   return(list(par = par_new, cov = cov_new, se = se_new))
 }
