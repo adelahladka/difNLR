@@ -42,7 +42,7 @@ key <- GMATkey # correct answers
 # graphical devices
 plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 plot(x, item = x$DDFitems)
-plot(x, item = 1)
+plot(x, item = c(3, 1, 5))
 }
 }
 \seealso{

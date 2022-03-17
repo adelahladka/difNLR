@@ -1254,7 +1254,8 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         )
       plot_CC[[i]] <- g
     }
-    plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
+    plot_CC <- plot_CC[items]
+    names(plot_CC) <- nams[items]
     return(plot_CC)
   }
   # checking input

@@ -1143,7 +1143,8 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
         linetype = ggplot2::guide_legend(title = "Group", order = 3)
       )
   }
-  plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
+  plot_CC <- plot_CC[items]
+  names(plot_CC) <- nams[items]
   return(plot_CC)
 }
 
@@ -1348,7 +1349,8 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
     res[[i]] <- prob
   }
 
-  res <- Filter(Negate(function(i) is.null(unlist(i))), res)
+  res <- res[items]
+  names(res) <- nams[items]
   if (length(res) == 1) {
     res <- res[[1]]
   } else {

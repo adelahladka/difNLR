@@ -602,7 +602,7 @@ print.ddfMLR <- function(x, ...) {
 #' # graphical devices
 #' plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 #' plot(x, item = x$DDFitems)
-#' plot(x, item = 1)
+#' plot(x, item = c(3, 1, 5))
 #' }
 #' @export
 plot.ddfMLR <- function(x, item = "all", group.names, ...) {
@@ -755,7 +755,8 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
         linetype = ggplot2::guide_legend(title = "Group", order = 3)
       )
   }
-  plot_CC <- Filter(Negate(function(i) is.null(unlist(i))), plot_CC)
+  plot_CC <- plot_CC[items]
+  names(plot_CC) <- nams[items]
   return(plot_CC)
 }
 
@@ -1246,7 +1247,8 @@ predict.ddfMLR <- function(object, item = "all", match, group, ...) {
     res[[i]] <- df.probs
   }
 
-  res <- Filter(Negate(function(i) is.null(unlist(i))), res)
+  res <- res[items]
+  names(res) <- nams[items]
   if (length(res) == 1) {
     res <- res[[1]]
   } else {
