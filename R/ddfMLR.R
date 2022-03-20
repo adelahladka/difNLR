@@ -686,8 +686,13 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
       cbind(Group = "0", Match = match, predict(x, item = i, match = match, group = 0)),
       cbind(Group = "1", Match = match, predict(x, item = i, match = match, group = 1))
     ))
-    df.fitted <- reshape2::melt(df.fitted, id.vars = c("Group", "Match"), variable.name = "Category", value.name = "Probability")
-    levels(df.fitted$Category) <- gsub("X", "", levels(df.fitted$Category))
+    df.fitted <- reshape(
+      data = df.fitted, direction = "long",
+      varying = list(colnames(df.fitted)[-c(1:2)]), v.names = "Probability",
+      idvar = c("Group", "Match"),
+      timevar = "Category", times = colnames(df.fitted)[-c(1:2)]
+    )
+    df.fitted$Category <- factor(df.fitted$Category)
     df.fitted$Category <- relevel(df.fitted$Category, ref = paste(x$key[i]))
     levels(df.fitted$Category) <- paste0("P(Y = ", levels(df.fitted$Category), ")")
     n_cats <- length(levels(df.fitted$Category))
