@@ -1075,22 +1075,22 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
 
       df.empirical.cum.count <- reshape(
         data = df.empirical.cum[, c(1:2, 4:(2 + num.cat))], direction = "long",
-        varying = list(colnames(df.empirical.cum[, 4:(2 + num.cat)])), v.names = "Count",
+        varying = list(colnames(df.empirical.cum)[4:(2 + num.cat)]), v.names = "Count",
         idvar = c("Group", "Match"),
         timevar = "Category"
       )
       df.empirical.cum.count$Category <- factor(df.empirical.cum.count$Category)
-      levels(df.empirical.cum.count$Category) <- colnames(df.empirical.cum[, 4:(2 + num.cat)])
+      levels(df.empirical.cum.count$Category) <- colnames(df.empirical.cum)[4:(2 + num.cat)]
       levels(df.empirical.cum.count$Category) <- paste0("P(Y >= ", gsub("X", "", levels(df.empirical.cum.count$Category)), ")")
 
       df.empirical.cum.prob <- reshape(
         data = df.empirical.cum[, c(1:2, (4 + num.cat):dim(df.empirical.cum)[2])], direction = "long",
-        varying = list(colnames(df.empirical.cum[, (4 + num.cat):dim(df.empirical.cum)[2]])), v.names = "Probability",
+        varying = list(colnames(df.empirical.cum)[(4 + num.cat):dim(df.empirical.cum)[2]]), v.names = "Probability",
         idvar = c("Group", "Match"),
         timevar = "Category"
       )
       df.empirical.cum.prob$Category <- factor(df.empirical.cum.prob$Category)
-      levels(df.empirical.cum.prob$Category) <- colnames(df.empirical.cum[, (4 + num.cat):dim(df.empirical.cum)[2]])
+      levels(df.empirical.cum.prob$Category) <- colnames(df.empirical.cum)[(4 + num.cat):dim(df.empirical.cum)[2]]
       levels(df.empirical.cum.prob$Category) <- paste0(
         "P(Y >= ",
         gsub(
