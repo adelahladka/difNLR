@@ -26,7 +26,7 @@ Drabinova, A. & Martinkova, P. (2017). Detection of differential item functionin
 A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
-Vlckova, K. (2014). Test and Item Fairness (Unpublished master's thesis).
+Vlckova, K. (2014). Test and item fairness. Master's thesis. Faculty of Mathematics and Physics, Charles University.
 }
 \seealso{
 \code{\link{MSATB}}, \code{\link{MSATBkey}}

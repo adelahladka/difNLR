@@ -20,10 +20,10 @@ The difNLR package contains method for detection of differential
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.3.7-3\cr
-Date: 2022-02-11\cr
+Version: 1.4.0\cr
+Date: 2022-04-16\cr
 Depends: R (>= 3.1)\cr
-Imports: ggplot2 (>= 2.2.1), msm, nnet, plyr, reshape2, stats, VGAM\cr
+Imports: calculus, ggplot2 (>= 2.2.1), msm, nnet, plyr, stats, VGAM\cr
 Suggests: ShinyItemAnalysis\cr
 License: GPL-3\cr
 BugReports: \url{https://github.com/adelahladka/difNLR/issues}\cr
@@ -79,7 +79,7 @@ assessments. CBE--Life Sciences Education, 16(2), rm2, \doi{10.1187/cbe.16-10-03
 Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
 Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
 
-Vlckova, K. (2014). Test and item fairness (Unpublished master's thesis).
+Vlckova, K. (2014). Test and item fairness. Master's thesis. Faculty of Mathematics and Physics, Charles University.
 }
 \seealso{
 Useful links:
