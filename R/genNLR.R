@@ -8,9 +8,9 @@
 #' \code{\link[difNLR]{ddfMLR}} for detail), and \code{"ordinal"} for ordinal data based on adjacent
 #' category logit model (for details see \code{\link[difNLR]{difORD}}).
 #' @param a numeric: matrix representing discriminations with m rows
-#' (where m is number of items). Need to be provided. See \strong{Details}.
+#' (where m is number of items). Needs to be provided. See \strong{Details}.
 #' @param b numeric: numeric: matrix representing difficulties with m rows
-#' (where m is number of items). Need to be provided. See \strong{Details}.
+#' (where m is number of items). Needs to be provided. See \strong{Details}.
 #' @param c numeric: matrix representing guessings (lower asymptotes) with m rows
 #' (where m is number of items). Default is \code{NULL}. See \strong{Details}.
 #' @param d numeric: matrix representing inattentions (upper asymptotes) with m rows
@@ -141,14 +141,14 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
 
   if (itemtype == "dich") {
     if (missing(a)) {
-      stop("Missing 'a'. Discrimination parameter need to be provided.", call. = FALSE)
+      stop("Missing 'a'. Discrimination parameter needs to be provided.", call. = FALSE)
     }
     if (is.null(dim(a))) {
       a <- cbind(a, a)
     }
     m <- nrow(a)
     if (missing(b)) {
-      stop("Missing 'b'. Discrimination parameter need to be provided.", call. = FALSE)
+      stop("Missing 'b'. Difficulty parameter needs to be provided.", call. = FALSE)
     }
     if (is.null(dim(b))) {
       b <- cbind(b, b)
@@ -189,14 +189,14 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     }
   } else {
     if (missing(a)) {
-      stop("Missing 'a'. Discrimination parameter need to be provided.", call. = FALSE)
+      stop("Missing 'a'. Discrimination parameter needs to be provided.", call. = FALSE)
     }
     if (!((ncol(a) %% 2) == 0)) {
       stop("Invalid dimension for 'a'.", call. = FALSE)
     }
 
     if (missing(b)) {
-      stop("Missing 'b'. Discrimination parameter need to be provided.", call. = FALSE)
+      stop("Missing 'b'. Difficulty parameter needs to be provided.", call. = FALSE)
     }
     if (!((ncol(b) %% 2) == 0)) {
       stop("Invalid dimension for 'b'.", call. = FALSE)

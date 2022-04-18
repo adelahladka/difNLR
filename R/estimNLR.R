@@ -233,7 +233,7 @@ print.estNLR <- function(x, ...) {
 #' @rdname estNLR
 #' @export
 vcov.estNLR <- function(object, sandwich = FALSE, ...) {
-  if (class(object)[2] == "nls") {
+  if (inherits(object, "nls")) {
     if (sandwich) {
       e <- object$m$getEnv()
       y <- e$y
@@ -253,7 +253,7 @@ vcov.estNLR <- function(object, sandwich = FALSE, ...) {
     if (sandwich) {
       message("Sandwich estimator of covariance not available for method = 'likelihood'. ")
     }
-    if (class(object)[2] == "lkl") {
+    if (inherits(object, "lkl")) {
       cov.object <- tryCatch(
         {
           solve(object$hessian)

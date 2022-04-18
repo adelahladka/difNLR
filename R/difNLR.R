@@ -471,7 +471,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       type <- rep(type, dim(DATA)[2])
     } else {
       if (length(type) != dim(DATA)[2]) {
-        stop("Invalid length of 'type'. Type of DIF need to be specified for each item or
+        stop("Invalid length of 'type'. Type of DIF needs to be specified for each item or
              by single string. ", call. = FALSE)
       }
     }
@@ -544,7 +544,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
              as number of items in Data.", call. = FALSE)
       }
       if (!all(unique(unlist(lapply(start, names))) %in% c(letters[1:4], paste0(letters[1:4], "Dif")))) {
-        stop("Invalid names in 'start'. Each element of 'start' need to be a numeric vector
+        stop("Invalid names in 'start'. Each element of 'start' needs to be a numeric vector
              with names 'a', 'b', 'c', 'd', 'aDif', 'bDif', 'cDif' and 'dDif'.", call. = FALSE)
       }
     }
@@ -1093,10 +1093,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     m <- length(x$nlrPAR)
     nams <- colnames(x$Data)
 
-    if (class(item) == "character") {
+    if (inherits(item, "character")) {
       if (any(item != "all") & !all(item %in% nams)) {
         stop("Invalid value for 'item'. Item must be either character 'all', or
-             numeric vector corresponding to column identifiers, or name of the item.",
+           numeric vector corresponding to column identifiers, or name of the item.",
           call. = FALSE
         )
       }
@@ -1106,9 +1106,9 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         items <- which(nams %in% item)
       }
     } else {
-      if (class(item) != "integer" & class(item) != "numeric") {
+      if (!inherits(item, "integer") & !inherits(item, "numeric")) {
         stop("Invalid value for 'item'. Item must be either character 'all', or
-             numeric vector corresponding to column identifiers, or name of the item.",
+           numeric vector corresponding to column identifiers, or name of the item.",
           call. = FALSE
         )
       } else {
@@ -1280,7 +1280,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -1293,7 +1293,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -1448,7 +1448,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -1461,7 +1461,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -1700,18 +1700,18 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 #' }
 #' @export
 coef.difNLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
-  if (class(SE) != "logical") {
-    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+  if (!inherits(SE, "logical")) {
+    stop("Invalid value for 'SE'. 'SE' needs to be logical. ",
       call. = FALSE
     )
   }
-  if (class(simplify) != "logical") {
-    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+  if (!inherits(simplify, "logical")) {
+    stop("Invalid value for 'simplify'. 'simplify' needs to be logical. ",
       call. = FALSE
     )
   }
-  if (class(IRTpars) != "logical") {
-    stop("Invalid value for 'IRTpars'. 'IRTpars' need to be logical. ",
+  if (!inherits(IRTpars, "logical")) {
+    stop("Invalid value for 'IRTpars'. 'IRTpars' needs to be logical. ",
       call. = FALSE
     )
   }
@@ -1859,7 +1859,7 @@ logLik.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -1872,7 +1872,7 @@ logLik.difNLR <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -1933,7 +1933,7 @@ AIC.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -1946,7 +1946,7 @@ AIC.difNLR <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -1999,10 +1999,10 @@ BIC.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
-             numeric vector corresponding to column identifiers, or name of the item.",
+           numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
@@ -2012,9 +2012,9 @@ BIC.difNLR <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
-             numeric vector corresponding to column identifiers, or name of the item.",
+           numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     } else {
@@ -2127,7 +2127,7 @@ residuals.difNLR <- function(object, item = "all", ...) {
   m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -2140,7 +2140,7 @@ residuals.difNLR <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE

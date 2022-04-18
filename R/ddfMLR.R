@@ -609,7 +609,7 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   m <- length(x$mlrPAR)
   nams <- colnames(x$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -622,7 +622,7 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -820,18 +820,18 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
 #' }
 #' @export
 coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
-  if (class(SE) != "logical") {
-    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+  if (!inherits(SE, "logical")) {
+    stop("Invalid value for 'SE'. 'SE' needs to be logical. ",
       call. = FALSE
     )
   }
-  if (class(simplify) != "logical") {
-    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+  if (!inherits(simplify, "logical")) {
+    stop("Invalid value for 'simplify'. 'simplify' needs to be logical. ",
       call. = FALSE
     )
   }
-  if (class(IRTpars) != "logical") {
-    stop("Invalid value for 'IRTpars'. 'IRTpars' need to be logical. ",
+  if (!inherits(IRTpars, "logical")) {
+    stop("Invalid value for 'IRTpars'. 'IRTpars' needs to be logical. ",
       call. = FALSE
     )
   }
@@ -975,37 +975,33 @@ logLik.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+        call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+          call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   val <- ifelse(items %in% object$DDFitems,
@@ -1030,37 +1026,33 @@ AIC.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+        call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+          call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   AIC <- ifelse(items %in% object$DDFitems, object$AICM1[items], object$AICM0[items])
@@ -1074,37 +1066,33 @@ BIC.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
       )
     }
-  } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
-      stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all' or name of item. ",
-        call. = FALSE
-      )
-    }
-  }
-  if (class(item) == "numeric" & !all(item %in% 1:m)) {
-    stop("Invalid number for 'item'.",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "integer" & !all(item %in% 1:m)) {
-    stop("Invalid value for 'item'. Item must be either numeric vector or character string 'all'. ",
-      call. = FALSE
-    )
-  }
-  if (class(item) == "character") {
     if (any(item == "all")) {
       items <- 1:m
     } else {
       items <- which(nams %in% item)
     }
   } else {
-    items <- item
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
+      stop("Invalid value for 'item'. Item must be either character 'all', or
+           numeric vector corresponding to column identifiers, or name of the item.",
+        call. = FALSE
+      )
+    } else {
+      if (!all(item %in% 1:m)) {
+        stop("Invalid number for 'item'.",
+          call. = FALSE
+        )
+      } else {
+        items <- item
+      }
+    }
   }
 
   BIC <- ifelse(items %in% object$DDFitems, object$BICM1[items], object$BICM0[items])
@@ -1166,7 +1154,7 @@ predict.ddfMLR <- function(object, item = "all", match, group, ...) {
   m <- dim(object$Data)[2]
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -1179,7 +1167,7 @@ predict.ddfMLR <- function(object, item = "all", match, group, ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE

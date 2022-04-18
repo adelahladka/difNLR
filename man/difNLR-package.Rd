@@ -20,8 +20,8 @@ The difNLR package contains method for detection of differential
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.4.0\cr
-Date: 2022-04-16\cr
+Version: 1.4.1\cr
+Date: 2022-04-18\cr
 Depends: R (>= 3.1)\cr
 Imports: calculus, ggplot2 (>= 2.2.1), msm, nnet, plyr, stats, VGAM\cr
 Suggests: ShinyItemAnalysis\cr

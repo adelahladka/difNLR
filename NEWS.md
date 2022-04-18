@@ -1,8 +1,14 @@
 ## Changes and developments in the difNLR package
 
-### Changes in version 1.4.0 (2022-04-16)
+### Changes in version 1.4.1 (2022-04-18)
 
-**_THIS IS A CRAN VERSION_**
+#### MINOR UPDATES
+  * Some typos fixed.
+  * `class` handling was updated. 
+
+------
+
+### Changes in version 1.4.0 (2022-04-16)
 
 *It includes versions 1.3.7-1 - 1.3.7-3*
 

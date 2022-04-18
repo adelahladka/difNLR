@@ -608,18 +608,18 @@ print.difORD <- function(x, ...) {
 #' }
 #' @export
 coef.difORD <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
-  if (class(SE) != "logical") {
-    stop("Invalid value for 'SE'. 'SE' need to be logical. ",
+  if (!inherits(SE, "logical")) {
+    stop("Invalid value for 'SE'. 'SE' needs to be logical. ",
       call. = FALSE
     )
   }
-  if (class(simplify) != "logical") {
-    stop("Invalid value for 'simplify'. 'simplify' need to be logical. ",
+  if (!inherits(simplify, "logical")) {
+    stop("Invalid value for 'simplify'. 'simplify' needs to be logical. ",
       call. = FALSE
     )
   }
-  if (class(IRTpars) != "logical") {
-    stop("Invalid value for 'IRTpars'. 'IRTpars' need to be logical. ",
+  if (!inherits(IRTpars, "logical")) {
+    stop("Invalid value for 'IRTpars'. 'IRTpars' needs to be logical. ",
       call. = FALSE
     )
   }
@@ -753,7 +753,7 @@ logLik.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -766,7 +766,7 @@ logLik.difORD <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -804,7 +804,7 @@ AIC.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -817,7 +817,7 @@ AIC.difORD <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -844,7 +844,7 @@ BIC.difORD <- function(object, item = "all", ...) {
   m <- length(object$ordPAR)
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -857,7 +857,7 @@ BIC.difORD <- function(object, item = "all", ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -939,7 +939,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
   m <- length(x$ordPAR)
   nams <- colnames(x$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -952,7 +952,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE
@@ -1232,7 +1232,7 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
   m <- dim(object$Data)[2]
   nams <- colnames(object$Data)
 
-  if (class(item) == "character") {
+  if (inherits(item, "character")) {
     if (any(item != "all") & !all(item %in% nams)) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
@@ -1245,7 +1245,7 @@ predict.difORD <- function(object, item = "all", match, group, type = "category"
       items <- which(nams %in% item)
     }
   } else {
-    if (class(item) != "integer" & class(item) != "numeric") {
+    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
       stop("Invalid value for 'item'. Item must be either character 'all', or
            numeric vector corresponding to column identifiers, or name of the item.",
         call. = FALSE

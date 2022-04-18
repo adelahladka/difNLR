@@ -18,10 +18,10 @@ for details), \code{"nominal"} for nominal items based on multinomial model for 
 category logit model (for details see \code{\link[difNLR]{difORD}}).}
 
 \item{a}{numeric: matrix representing discriminations with m rows
-(where m is number of items). Need to be provided. See \strong{Details}.}
+(where m is number of items). Needs to be provided. See \strong{Details}.}
 
 \item{b}{numeric: numeric: matrix representing difficulties with m rows
-(where m is number of items). Need to be provided. See \strong{Details}.}
+(where m is number of items). Needs to be provided. See \strong{Details}.}
 
 \item{c}{numeric: matrix representing guessings (lower asymptotes) with m rows
 (where m is number of items). Default is \code{NULL}. See \strong{Details}.}
