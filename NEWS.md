@@ -171,6 +171,7 @@
 ------
 
 ### Changes in version 1.3.0-6 (2020-01-22)
+
 #### BUGFIXING
   * Mismatch in null and alternative models was fixed for all functions.
   * `MLR()` function now returns correct value of log-likelihood for
@@ -184,6 +185,7 @@
 ------
 
 ### Changes in version 1.3.0-5 (2020-01-20)
+
 #### BUGFIXING
   * Function `MLR()` was fixed for binary data and IRT parametrization.
   * Typo fixed in `print.difORD()` method.
@@ -192,6 +194,7 @@
 ------
 
 ### Changes in version 1.3.0-4 (2020-01-17)
+
 #### MAJOR UPDATES
   * Function `ddfORD()` was renamed to `difORD()`.
 
@@ -206,6 +209,7 @@
 ------
 
 ### Changes in version 1.3.0-3 (2020-01-07)
+
 #### DOCUMENTATION
   * Documentation was updated.
   * Authors' details were updated.
@@ -223,6 +227,7 @@
 ------
 
 ### Changes in version 1.3.0-2 (2020-01-03)
+
 #### MAJOR UPDATES
   * Default option of argument type in `difNLR()` function was set
     to `"all"` instead of `"both"`.
@@ -239,6 +244,7 @@
 ------
 
 ### Changes in version 1.3.0-1 (2019-12-16)
+
 #### BUGFIXING
   * Legend in `plot.ddfORD()` is now correctly displayed.
 
@@ -258,6 +264,7 @@
 ------
 
 ### Changes in version 1.2.8-4 (2019-08-09)
+
 #### MINOR UPDATES
   * Typos fixed in `print.ddfORD()` and print.ddfMLR().
   * Matching criterion for `plot.ddfORD()` uses anchor items.
@@ -265,6 +272,7 @@
 ------
 
 ### Changes in version 1.2.8-3 (2019-08-08)
+
 #### BUGFIXING
   * `plot.ddfORD()` now works when Data is factor.
 
@@ -275,6 +283,7 @@
 ------
 
 ### Changes in version 1.2.8-2 (2019-08-07)
+
 #### BUGFIXING
   * `plot.ddfORD()` now works when items have different scales.
   * Argument `anchor` is now used for calculation of matching
@@ -295,13 +304,17 @@
 ------
 
 ### Changes in version 1.2.8-1 (2019-08-06)
+
 #### MINOR UPDATES
   * IRT parametrization now available in `ddfMLR()` function with
     argument `parametrization`. SE calculated with delta method.
   * Names of reference and focal group in `plot.ddfMLR()` can be
     changed with `group.name` argument.
 
+------
+
 ### Changes in version 1.2.8 (2019-08-05)
+
 #### MAJOR UPDATES
   * `ddfORD()` function was renamed. Now `ddfORD()`.
   * IRT parametrization now available in `ddfORD()` function with
@@ -316,6 +329,7 @@
 ------
 
 ### Changes in version 1.2.7 (2019-07-04)
+
 #### BUGFIXING
   * Check for input `item` in S3 methods for `difNLR()`, `ddfMLR()`, and `ddfORD()`
     was fixed.
@@ -331,12 +345,14 @@
 ------
 
 ### Changes in version 1.2.6 (2019-07-03)
+
 #### MAJOR UDPATES
   * S3 method `plot()` for `ddfORD()` was implemented.
 
 ------
 
 ### Changes in version 1.2.5 (2019-07-02)
+
 #### MAJOR UPDATES
   * S3 methods `AIC()`, `BIC()`, `logLik()`, `coef()` for `ddfORD()` were implemented.
   * S3 methods `AIC()`, `BIC()`, `logLik()`, `residuals()` for `difNLR()` and `ddfMLR()`
@@ -352,6 +368,7 @@
 ------
 
 ### Changes in version 1.2.4 (2019-07-02)
+
 #### MAJOR UPDATES
   * New functions `ddfORD()` and `ORD()` for DDF detection for ordinal data
     with adjacent and cumulative logistic regression models were added.
@@ -365,6 +382,7 @@
 ------
 
 ### Changes in version 1.2.3 (2019-06-20)
+
 #### BUGFIXING
   * `plot.ddfMLR()` now handles also binary data.
   * `ddfMLR()` returns consistently `"No DDF item detected"` when no DDF
@@ -388,12 +406,14 @@
 ------
 
 ### Changes in version 1.2.1-3 (2018-04-26)
+
 #### MINOR UPDATES
   * S3 methods `AIC()`, `BIC()`, `logLik()` of `ddfMLR()` are now item specific.
 
 ------
 
 ### Changes in version 1.2.1-2 (2018-03-19)
+
 #### BUGFIXING
   * `difNLR()`
     - Check for constraints was fixed.
@@ -403,6 +423,7 @@
 ------
 
 ### Changes in version 1.2.1-1 (2018-03-16)
+
 #### BUGFIXING
   * `difNLR()`:
     - P-value adjustment is now performed in the last iteration of purification
@@ -427,6 +448,7 @@
 ------
 
 ### Changes in version 1.2.0-7 (2018-02-27)
+
 #### MAJOR UPDATES
   * Argument `start` in `difNLR()` function is now item-specific. The input is
     correctly checked.
@@ -437,8 +459,7 @@
   * Argument `constraints` in `difNLR()` function is now item-specific.
 
 #### MINOR UPDATES
-  * Minor #### BUGFIXING:
-    - Typos were fixed in `print()` method for `difNLR` class.
+  * Minor typos were fixed in `print()` method for `difNLR` class.
   * Title was shorten.
   * Description of package was updated.
   * Description file was updated, reference was added.
@@ -448,12 +469,13 @@
 ------
 
 ### Changes in version 1.2.0-6 (2018-02-26)
+
 #### MAJOR UPDATES
-  * S3 methods for `difNLR` class are now properly describedm, especially,
+  * S3 methods for `difNLR` class are now properly described, especially,
     `plot.difNLR()` and `predict.difNLR()`.
   * `difNLR()` documentation was improved.
 
-#### BUGFIXING:
+#### BUGFIXING
   * S3 methods for class `difNLR` can now properly handle items with convergence 
     issues.
   * `NLR()` now detects DIF correctly with F test.
@@ -464,6 +486,7 @@
 ------
 
 ### Changes in version 1.2.0-5 (2018-02-20)
+
 #### MAJOR UPDATES
   * `print()`, `plot()`,`fitted()`, `predict()`, `logLik()`, `AIC()`, `BIC()`
     and `residuals()` for `difNLR` class now handles item specific arguments
@@ -484,6 +507,7 @@
 ------
 
 ### Changes in version 1.2.0-4 (2018-02-19)
+
 #### MAJOR UPDATES
   * Function `startNLR()` now handles item-specific arguments (`model` and
     `parameterization`). Its output is now in the form of list. It can be
@@ -500,6 +524,7 @@
 ------
 
 ### Changes in version 1.2.0-3 (2018-02-19)
+
 #### BUGFIXING
   * Starting values in input of `estimNLR()` in `NLR()` are now properly named.
   * Bug in alternative parameterization for testing differences in parameters c and d in function `formulaNLR()` was fixed.
@@ -510,6 +535,7 @@
 ------
 
 ### Changes in version 1.2.0-2 (2018-02-15)
+
 #### MAJOR UPDATES
   * Function `genNLR()` can now also generate nominal data based on
     model specified in `ddfMLR()`.
@@ -525,6 +551,7 @@
 ------
 
 ### Changes in version 1.2.0-1 (2018-02-14)
+
 #### MAJOR UPDATES
   * New function `estimNLR()` to estimate parameters of NLR models
     was added. This function uses non-linear least squares or maximum
@@ -550,6 +577,7 @@
 ------
 
 ### Changes in version 1.1.3 (2018-02-06)
+
 #### BUGFIXING
   * Bug in delta method in `NLR()` function was fixed.
   * Bug in `match` argument in `difNLR()` function was fixed.
@@ -571,6 +599,7 @@
 ------
 
 ### Changes in version 1.1.2 (2017-12-12)
+
 #### MAJOR UPDATES
   * CITATION file was added with reference to relevant paper.
   * Bug when loading group by group identificator was fixed.
@@ -579,7 +608,7 @@
   * S3 functions `AIC()` and `BIC()` for `difNLR` class were
     updated.
   * S3 functions `plot()`, `fitted()` and `predict()` for `difNLR` class
-    can now handle also other matching criterions than `zscore`.
+    can now handle also other matching criteria than `zscore`.
 
 #### MINOR UPDATES
   * Reference lists were updated.
@@ -616,6 +645,7 @@
 ------
 
 ### Changes in version 1.0.8 (2017-08-14)
+
 #### BUGFIXING
   * Several bugs were fixed:
     - `difNLR()` function can handle `Data` with one column.
@@ -629,6 +659,7 @@
 ------
 
 ### Changes in version 1.0.7 (2017-08-10)
+
 #### MAJOR UPDATES
   * Item purification was implemented into `ddfMLR()` function.
   * Anchor items were implemented into `ddfMLR()` function.
@@ -641,6 +672,7 @@
 ------
 
 ### Changes in version 1.0.6 (2017-08-09)
+
 #### MAJOR UPDATES
   * Item purification was implemented into `difNLR()` function.
   * Anchor items were implemented into `difNLR()` function.
@@ -652,6 +684,7 @@
 ------
 
 ### Changes in version 1.0.5 (2017-08-09)
+
 #### MAJOR UPDATES
   * Datasets `difMedical`, `difMedicaltest`, and `difMedicalkey`
     were renamed. Now they are `MSATB`, `MSATBtest`, and `MSATBkey`.
@@ -665,6 +698,7 @@
 ------
 
 ### Changes in version 1.0.4 (2017-08-08)
+
 #### MAJOR UPDATES
   * New function `formulaNLR()` was implemented. Function
     returns formula for NLR model for 11 predefined models and 4
@@ -723,15 +757,15 @@
 **_THIS IS A CRAN VERSION_**
 
 #### MAJOR UPDATES
-  * New function ddfMLR() to detect Differential Distractor Functioning (DDF) with Multinomial Log-linear Regression (MLR) model. S3 methods for class `ddfMLR` also added - `print` and `plot`.
-  * New function MLR() to calculate likelihood ratio statistic
+  * New function `ddfMLR()` to detect Differential Distractor Functioning (DDF) with Multinomial Log-linear Regression (MLR) model. S3 methods for class `ddfMLR` also added - `print` and `plot`.
+  * New function `MLR()` to calculate likelihood ratio statistic
      for detecting DDF with MLR model.
   * The `difNLR()` function can handle 6 generalized logistic
      regression models with option `model`.
   * Functions `startNLR()`, `genNLR()` ans S3 methods for class
      `difNLR` were changed according `difNLR()` function. S3 method
      `coef` was created.
-  * New functions NLR() and constrNLR() can now calculates DIF
+  * New functions `NLR()` and `constrNLR()` can now calculates DIF
      detection statistics and specify constraints for generalized
      logistic regression model.
   * Function `difNLR()` was edited to response to `difR` package
