@@ -1,5 +1,13 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.4.1-1 (2023-03-07)
+
+#### MINOR UPDATES
+  * `startNLR` now handles missing values. Returns error when not enough complete 
+    observations are provided. 
+
+------
+
 ### Changes in version 1.4.1 (2022-04-18)
 
 #### MINOR UPDATES

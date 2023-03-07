@@ -2,8 +2,9 @@
 #'
 #' @aliases estimNLR
 #'
-#' @description Estimates parameters of non-linear regression models for DIF detection using either
-#' non-linear least squares or maximum likelihood method.
+#' @description Estimates parameters of non-linear regression models
+#'   for DIF detection using either non-linear least squares or
+#'   maximum likelihood method.
 #'
 #' @param y numeric: binary vector of responses.
 #' @param match numeric: vector of matching criterion.
@@ -19,10 +20,11 @@
 #' @usage estimNLR(y, match, group, formula, method, lower, upper, start)
 #'
 #' @details
-#' Function offers either non-linear least squares estimation via \code{\link[stats]{nls}} function,
-#' maximum likelihood method with \code{"L-BFGS-B"} method via \code{\link[stats]{optim}} function,
-#' or maximum likelihood method with iteratively reweighted least squares via \code{\link[stats]{glm}}
-#' function.
+#' Function offers either non-linear least squares estimation via
+#' \code{\link[stats]{nls}} function, maximum likelihood method with
+#' \code{"L-BFGS-B"} method via \code{\link[stats]{optim}} function,
+#' or maximum likelihood method with iteratively reweighted least
+#' squares via \code{\link[stats]{glm}} function.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
@@ -35,8 +37,9 @@
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' @references
-#' Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
-#' Faculty of Mathematics and Physics, Charles University.
+#' Hladka, A. (2021). Statistical models for detection of differential
+#' item functioning. Dissertation thesis. Faculty of Mathematics and
+#' Physics, Charles University.
 #'
 #' @examples
 #' # loading data

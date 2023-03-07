@@ -26,14 +26,16 @@ estimation with iteratively reweighted least squares. See \strong{Details}.}
 \item{start}{numeric: initial parameters. Can be obtained by \code{startNLR()} function.}
 }
 \description{
-Estimates parameters of non-linear regression models for DIF detection using either
-non-linear least squares or maximum likelihood method.
+Estimates parameters of non-linear regression models
+  for DIF detection using either non-linear least squares or
+  maximum likelihood method.
 }
 \details{
-Function offers either non-linear least squares estimation via \code{\link[stats]{nls}} function,
-maximum likelihood method with \code{"L-BFGS-B"} method via \code{\link[stats]{optim}} function,
-or maximum likelihood method with iteratively reweighted least squares via \code{\link[stats]{glm}}
-function.
+Function offers either non-linear least squares estimation via
+\code{\link[stats]{nls}} function, maximum likelihood method with
+\code{"L-BFGS-B"} method via \code{\link[stats]{optim}} function,
+or maximum likelihood method with iteratively reweighted least
+squares via \code{\link[stats]{glm}} function.
 }
 \examples{
 # loading data
@@ -93,8 +95,9 @@ fitted(fitIRLSM1)
 residuals(fitIRLSM1)
 }
 \references{
-Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
-Faculty of Mathematics and Physics, Charles University.
+Hladka, A. (2021). Statistical models for detection of differential
+item functioning. Dissertation thesis. Faculty of Mathematics and
+Physics, Charles University.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
