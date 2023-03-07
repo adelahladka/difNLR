@@ -150,6 +150,11 @@ startNLR <- function(Data, group, model, match = "zscore", parameterization = "a
 
     breaks <- unique(quantile(covar, (0:3) / 3, na.rm = TRUE))
     lb <- length(breaks) - 1
+    if (lb < 2) {
+      stop("Not enough complete observations to compute starting values.",
+           call. = FALSE
+      )
+    }
     Q3 <- cut(covar, breaks, include.lowest = TRUE)
     levels(Q3) <- LETTERS[1:lb]
 
