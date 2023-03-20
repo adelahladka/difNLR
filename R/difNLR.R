@@ -1209,7 +1209,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
             x = "match", y = "prob",
             col = "group", linetype = "group"
           ),
-          size = .8
+          linewidth = 0.8
         )
       if (draw.empirical) {
         g <- g +

@@ -727,7 +727,7 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
           x = "Match", y = "Probability",
           colour = "Category", linetype = "Group"
         ),
-        size = 0.8
+        linewidth = 0.8
       ) +
       ggplot2::geom_point(
         data = df.empirical,

@@ -1,10 +1,14 @@
 ## Changes and developments in the difNLR package
 
-### Changes in version 1.4.1-1 (2023-03-07)
+### Changes in version 1.4.2 (2023-03-20)
 
 #### MINOR UPDATES
   * `startNLR` now handles missing values. Returns error when not enough complete 
     observations are provided. 
+  * Arguments in `ggplot2` plotting methods were updated to follow changes in 
+    the `ggplot2` package.
+  * Linetype and its legend appearance in `ggplot2` plotting methods were
+    updated. 
 
 ------
 

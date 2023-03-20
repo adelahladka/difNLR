@@ -1134,7 +1134,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
           x = "Match", y = "Probability",
           col = "Category", linetype = "Group"
         ),
-        size = 0.8
+        linewidth = 0.8
       ) +
       ggplot2::xlab(xlab) +
       ggplot2::ylab(ylab) +

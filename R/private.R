@@ -33,10 +33,7 @@
       axis.line = ggplot2::element_line(colour = "black"),
       panel.grid.major = ggplot2::element_blank(),
       panel.grid.minor = ggplot2::element_blank(),
-      plot.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.key = ggplot2::element_rect(fill = "white", colour = NA),
-      legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA)
+      plot.background = ggplot2::element_rect(fill = "transparent", colour = NA)
     )
 }
 
@@ -47,7 +44,10 @@
     legend.position = c(0.02, 0.98),
     legend.box = "horizontal",
     legend.box.margin = ggplot2::margin(3, 3, 3, 3),
-    legend.key = ggplot2::element_rect(fill = "white", colour = NA)
+    legend.key = ggplot2::element_rect(fill = "white", colour = NA),
+    legend.key.width = ggplot2::unit(0.9, "cm"),
+    legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+    legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA)
   )
 }
 
