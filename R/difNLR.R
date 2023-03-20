@@ -1238,7 +1238,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         # adjusting colours
         ggplot2::scale_fill_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
         ggplot2::scale_colour_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
-        ggplot2::scale_linetype_manual(values = c("solid", "dashed"), labels = group.names) +
+        ggplot2::scale_linetype_manual(values = c("solid", 33), labels = group.names) +
         ggplot2::ggtitle(TITLE) +
         ggplot2::labs(x = xlab, y = "Probability of correct answer") +
         ggplot2::scale_y_continuous(limits = c(0, 1)) +

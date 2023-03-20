@@ -746,7 +746,7 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
       ) +
       ggplot2::scale_linetype_manual(
         breaks = c(0, 1), labels = group.names,
-        values = c("solid", "dashed")
+        values = c("solid", 33)
       ) +
       ggplot2::scale_color_manual(values = cols) +
       ggplot2::scale_fill_manual(values = cols) +
