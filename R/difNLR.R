@@ -1047,10 +1047,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     hv <- na.omit(as.data.frame(cbind(1:length(x$Sval), x$Sval, g)))
     hv$g <- as.factor(hv$g)
     hv$V1 <- as.factor(hv$V1)
-    plot_stat <- ggplot2::ggplot(hv, ggplot2::aes_string(
-      x = "V1", y = "V2",
-      label = "V1",
-      col = "g"
+    plot_stat <- ggplot2::ggplot(data = hv, ggplot2::aes(
+      x = .data$V1, y = .data$V2,
+      label = .data$V1,
+      col = .data$g
     )) +
       # points
       ggplot2::geom_text() +
@@ -1205,19 +1205,19 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
       g <- ggplot2::ggplot() +
         ggplot2::geom_line(
-          data = df_line, ggplot2::aes_string(
-            x = "match", y = "prob",
-            col = "group", linetype = "group"
+          data = df_line, ggplot2::aes(
+            x = .data$match, y = .data$prob,
+            col = .data$group, linetype = .data$group
           ),
           linewidth = 0.8
         )
       if (draw.empirical) {
         g <- g +
           ggplot2::geom_point(
-            data = df_point, ggplot2::aes_string(
-              x = "match", y = "prob",
-              col = "group", fill = "group",
-              size = "size"
+            data = df_point, ggplot2::aes(
+              x = .data$match, y = .data$prob,
+              col = .data$group, fill = .data$group,
+              size = .data$size
             ),
             shape = 21, alpha = 0.5
           )
@@ -1225,10 +1225,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       if (draw.CI) {
         g <- g +
           ggplot2::geom_ribbon(
-            data = df_line, ggplot2::aes_string(
-              x = "match", y = "prob",
-              ymin = "lwr.conf", ymax = "upr.conf",
-              col = "group", fill = "group"
+            data = df_line, ggplot2::aes(
+              x = .data$match, y = .data$prob,
+              ymin = .data$lwr.conf, ymax = .data$upr.conf,
+              col = .data$group, fill = .data$group
             ),
             alpha = 0.25
           )
@@ -1238,7 +1238,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         # adjusting colours
         ggplot2::scale_fill_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
         ggplot2::scale_colour_manual(values = c("dodgerblue2", "goldenrod2"), labels = group.names) +
-        ggplot2::scale_linetype_manual(values = c("solid", 33), labels = group.names) +
+        ggplot2::scale_linetype_manual(values = c("solid", "dashed"), labels = group.names) +
         ggplot2::ggtitle(TITLE) +
         ggplot2::labs(x = xlab, y = "Probability of correct answer") +
         ggplot2::scale_y_continuous(limits = c(0, 1)) +

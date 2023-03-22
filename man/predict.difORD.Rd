@@ -32,31 +32,30 @@ S3 method for predictions from the model used in the
 \examples{
 \dontrun{
 # loading data
-data(dataMedicalgraded, package = "ShinyItemAnalysis")
-Data <- dataMedicalgraded[, 1:5] # items
-group <- dataMedicalgraded[, 101] # group membership variable
-match <- rowSums(dataMedicalgraded[, 1:100]) # matching criterion
+data(Anxiety, package = "ShinyItemAnalysis")
+Data <- Anxiety[, paste0("R", 1:29)] # items
+group <- Anxiety[, "gender"] # group membership variable
 
 # testing both DIF effects with cumulative logit model
-(x <- difORD(Data, group, match = match, focal.name = 1, model = "cumulative"))
+(x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
 
 # fitted values
-predict(x, item = "X2003")
+predict(x, item = "R6")
 
 # predicted values
-predict(x, item = "X2003", match = 350, group = c(0, 1))
-predict(x, item = "X2003", match = 350, group = c(0, 1), type = "cumulative")
-predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
+predict(x, item = "R6", match = 0, group = c(0, 1))
+predict(x, item = "R6", match = 0, group = c(0, 1), type = "cumulative")
+predict(x, item = c("R6", "R7"), match = 0, group = c(0, 1))
 
 # testing both DIF effects with adjacent category logit model
-(x <- difORD(Data, group, match = match, focal.name = 1, model = "adjacent"))
+(x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 
 # fitted values
-predict(x, item = "X2003")
+predict(x, item = "R6")
 
 # predicted values
-predict(x, item = "X2003", match = 350, group = c(0, 1))
-predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
+predict(x, item = "R6", match = 0, group = c(0, 1))
+predict(x, item = c("R6", "R7"), match = 0, group = c(0, 1))
 }
 
 }

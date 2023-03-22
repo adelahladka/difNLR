@@ -151,17 +151,17 @@
 #'
 #' @examples
 #' # loading data
-#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5] # items
-#' group <- dataMedicalgraded[, 101] # group membership variable
+#' data(Anxiety, package = "ShinyItemAnalysis")
+#' Data <- Anxiety[, paste0("R", 1:29)] # items
+#' group <- Anxiety[, "gender"] # group membership variable
 #'
 #' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #' \dontrun{
 #' # graphical devices
-#' plot(x, item = 3)
-#' plot(x, item = "X2003")
-#' plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
+#' plot(x, item = 6)
+#' plot(x, item = "R6")
+#' plot(x, item = "R6", group.names = c("Males", "Females"))
 #'
 #' # estimated parameters
 #' coef(x)
@@ -192,9 +192,11 @@
 #' # testing both DIF effects with total score as matching criterion
 #' difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 #'
+#' testing both DIF effects with cumulative logit model
+#' (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
 #' # graphical devices
-#' plot(x, item = 3, plot.type = "cumulative")
-#' plot(x, item = 3, plot.type = "category")
+#' plot(x, item = 7, plot.type = "cumulative")
+#' plot(x, item = 7, plot.type = "category")
 #'
 #' # estimated parameters
 #' coef(x, simplify = TRUE)
@@ -588,9 +590,9 @@ print.difORD <- function(x, ...) {
 #' @examples
 #' \dontrun{
 #' # loading data
-#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5] # items
-#' group <- dataMedicalgraded[, 101] # group membership variable
+#' data(Anxiety, package = "ShinyItemAnalysis")
+#' Data <- Anxiety[, paste0("R", 1:29)] # items
+#' group <- Anxiety[, "gender"] # group membership variable
 #'
 #' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
@@ -731,9 +733,9 @@ coef.difORD <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
 #' @examples
 #' \dontrun{
 #' # loading data
-#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5] # items
-#' group <- dataMedicalgraded[, 101] # group membership variable
+#' data(Anxiety, package = "ShinyItemAnalysis")
+#' Data <- Anxiety[, paste0("R", 1:29)] # items
+#' group <- Anxiety[, "gender"] # group membership variable
 #'
 #' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
@@ -918,21 +920,21 @@ BIC.difORD <- function(object, item = "all", ...) {
 #' @examples
 #' \dontrun{
 #' # loading data
-#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5] # items
-#' group <- dataMedicalgraded[, 101] # group membership variable
+#' data(Anxiety, package = "ShinyItemAnalysis")
+#' Data <- Anxiety[, paste0("R", 1:29)] # items
+#' group <- Anxiety[, "gender"] # group membership variable
 #'
 #' # testing both DIF effects with adjacent category logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
 #' # graphical devices
-#' plot(x, item = 3)
-#' plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
+#' plot(x, item = 6)
+#' plot(x, item = "R6", group.names = c("Males", "Females"))
 #'
 #' # testing both DIF effects with cumulative logit model
 #' (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
-#' plot(x, item = 3, plot.type = "cumulative")
-#' plot(x, item = 3, plot.type = "category")
+#' plot(x, item = 7, plot.type = "cumulative")
+#' plot(x, item = 7, plot.type = "category")
 #' }
 #' @export
 plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
@@ -1122,17 +1124,17 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
     plot_CC[[i]] <- ggplot2::ggplot() +
       ggplot2::geom_point(
         data = df.empirical,
-        ggplot2::aes_string(
-          x = "Match", y = "Probability", group = "Category",
-          size = "Count", col = "Category", fill = "Category"
+        ggplot2::aes(
+          x = .data$Match, y = .data$Probability, group = .data$Category,
+          size = .data$Count, col = .data$Category, fill = .data$Category
         ),
         shape = 21, alpha = 0.5
       ) +
       ggplot2::geom_line(
         data = df.fitted,
-        ggplot2::aes_string(
-          x = "Match", y = "Probability",
-          col = "Category", linetype = "Group"
+        ggplot2::aes(
+          x = .data$Match, y = .data$Probability,
+          col = .data$Category, linetype = .data$Group
         ),
         linewidth = 0.8
       ) +
@@ -1143,7 +1145,7 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
       ggplot2::scale_linetype_manual(
         breaks = c(0, 1),
         labels = group.names,
-        values = c("solid", 33)
+        values = c("solid", "dashed")
       ) +
       ggplot2::scale_fill_manual(values = cols) +
       ggplot2::scale_color_manual(values = cols) +
@@ -1200,31 +1202,30 @@ plot.difORD <- function(x, item = "all", plot.type, group.names, ...) {
 #' @examples
 #' \dontrun{
 #' # loading data
-#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' Data <- dataMedicalgraded[, 1:5] # items
-#' group <- dataMedicalgraded[, 101] # group membership variable
-#' match <- rowSums(dataMedicalgraded[, 1:100]) # matching criterion
+#' data(Anxiety, package = "ShinyItemAnalysis")
+#' Data <- Anxiety[, paste0("R", 1:29)] # items
+#' group <- Anxiety[, "gender"] # group membership variable
 #'
 #' # testing both DIF effects with cumulative logit model
-#' (x <- difORD(Data, group, match = match, focal.name = 1, model = "cumulative"))
+#' (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
 #'
 #' # fitted values
-#' predict(x, item = "X2003")
+#' predict(x, item = "R6")
 #'
 #' # predicted values
-#' predict(x, item = "X2003", match = 350, group = c(0, 1))
-#' predict(x, item = "X2003", match = 350, group = c(0, 1), type = "cumulative")
-#' predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
+#' predict(x, item = "R6", match = 0, group = c(0, 1))
+#' predict(x, item = "R6", match = 0, group = c(0, 1), type = "cumulative")
+#' predict(x, item = c("R6", "R7"), match = 0, group = c(0, 1))
 #'
 #' # testing both DIF effects with adjacent category logit model
-#' (x <- difORD(Data, group, match = match, focal.name = 1, model = "adjacent"))
+#' (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 #'
 #' # fitted values
-#' predict(x, item = "X2003")
+#' predict(x, item = "R6")
 #'
 #' # predicted values
-#' predict(x, item = "X2003", match = 350, group = c(0, 1))
-#' predict(x, item = c("X2001", "X2003"), match = 350, group = c(0, 1))
+#' predict(x, item = "R6", match = 0, group = c(0, 1))
+#' predict(x, item = c("R6", "R7"), match = 0, group = c(0, 1))
 #' }
 #'
 #' @export

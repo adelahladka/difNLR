@@ -1,7 +1,10 @@
 ## Changes and developments in the difNLR package
 
-### Changes in version 1.4.2 (2023-03-20)
+### Changes in version 1.4.2 (2023-03-22)
 
+#### BUGFIXING
+  * `plot.ddfMLR()` now correctly plots ordinal data.  
+    
 #### MINOR UPDATES
   * `startNLR` now handles missing values. Returns error when not enough complete 
     observations are provided. 
@@ -10,6 +13,8 @@
   * Linetype and its legend appearance in `ggplot2` plotting methods were
     updated. 
   * `ggplot2` v.3.4.0 is now imported. 
+  * Examples for the `difORD()` and `ORD()` functions were updated. Now using 
+    the `Anxiety` dataset from the `ShinyItemAnalysis` package.
 
 ------
 

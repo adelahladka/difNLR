@@ -136,17 +136,17 @@ parameters.
 }
 \examples{
 # loading data
-data(dataMedicalgraded, package = "ShinyItemAnalysis")
-Data <- dataMedicalgraded[, 1:5] # items
-group <- dataMedicalgraded[, 101] # group membership variable
+data(Anxiety, package = "ShinyItemAnalysis")
+Data <- Anxiety[, paste0("R", 1:29)] # items
+group <- Anxiety[, "gender"] # group membership variable
 
 # testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
 \dontrun{
 # graphical devices
-plot(x, item = 3)
-plot(x, item = "X2003")
-plot(x, item = "X2003", group.names = c("Group 1", "Group 2"))
+plot(x, item = 6)
+plot(x, item = "R6")
+plot(x, item = "R6", group.names = c("Males", "Females"))
 
 # estimated parameters
 coef(x)
@@ -177,9 +177,11 @@ difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 # testing both DIF effects with total score as matching criterion
 difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 
+testing both DIF effects with cumulative logit model
+(x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
 # graphical devices
-plot(x, item = 3, plot.type = "cumulative")
-plot(x, item = 3, plot.type = "category")
+plot(x, item = 7, plot.type = "cumulative")
+plot(x, item = 7, plot.type = "category")
 
 # estimated parameters
 coef(x, simplify = TRUE)

@@ -110,11 +110,9 @@
 #' @examples
 #' \dontrun{
 #' # loading data
-#' data(dataMedicalgraded, package = "ShinyItemAnalysis")
-#' df <- dataMedicalgraded[, c(1:5, 101)]
-#' df <- df[complete.cases(df), ] # omitting missing values
-#' Data <- df[, 1:5] # items
-#' group <- df[, 6] # group membership variable
+#' data(Anxiety, package = "ShinyItemAnalysis")
+#' Data <- Anxiety[, paste0("R", 1:29)] # items
+#' group <- Anxiety[, "gender"] # group membership variable
 #'
 #' # testing both DIF effects
 #' ORD(Data, group, type = "both")

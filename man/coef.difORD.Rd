@@ -31,9 +31,9 @@ S3 method for extracting estimated model coefficients
 \examples{
 \dontrun{
 # loading data
-data(dataMedicalgraded, package = "ShinyItemAnalysis")
-Data <- dataMedicalgraded[, 1:5] # items
-group <- dataMedicalgraded[, 101] # group membership variable
+data(Anxiety, package = "ShinyItemAnalysis")
+Data <- Anxiety[, paste0("R", 1:29)] # items
+group <- Anxiety[, "gender"] # group membership variable
 
 # testing both DIF effects with adjacent category logit model
 (x <- difORD(Data, group, focal.name = 1, model = "adjacent"))
