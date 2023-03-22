@@ -9,6 +9,7 @@
     the `ggplot2` package.
   * Linetype and its legend appearance in `ggplot2` plotting methods were
     updated. 
+  * `ggplot2` v.3.4.0 is now imported. 
 
 ------
 

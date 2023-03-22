@@ -10,7 +10,7 @@ Depends:
     R (>= 3.1)
 Imports:
     calculus,
-    ggplot2 (>= 2.2.1),
+    ggplot2 (>= 3.4.0),
     msm,
     nnet,
     plyr,
