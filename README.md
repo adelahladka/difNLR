@@ -1,6 +1,7 @@
 # difNLR
 DIF and DDF Detection by Non-Linear Regression Models.
 
+[![R-CMD-check](https://github.com/adelahladka/difNLR/workflows/R-CMD-check/badge.svg)](https://github.com/adelahladka/difNLR/actions)
 ![GHversion](https://img.shields.io/github/release/adelahladka/difNLR.svg)
 [![version](https://www.r-pkg.org/badges/version/difNLR)](https://CRAN.R-project.org/package=difNLR)
 ![cranlogs](https://cranlogs.r-pkg.org/badges/difNLR)
