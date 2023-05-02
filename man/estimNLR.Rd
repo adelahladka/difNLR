@@ -2,9 +2,15 @@
 % Please edit documentation in R/estimNLR.R
 \name{estimNLR}
 \alias{estimNLR}
+\alias{print.estimNLR}
+\alias{vcov.estimNLR}
 \title{Non-Linear Regression DIF models estimation.}
 \usage{
 estimNLR(y, match, group, formula, method, lower, upper, start)
+
+\method{print}{estimNLR}(x, ...)
+
+\method{vcov}{estimNLR}(object, sandwich = FALSE, ...)
 }
 \arguments{
 \item{y}{numeric: binary vector of responses.}
@@ -24,6 +30,16 @@ estimation with iteratively reweighted least squares. See \strong{Details}.}
 \item{upper}{numeric: upper bounds for parameters of model specified in \code{formula}.}
 
 \item{start}{numeric: initial parameters. Can be obtained by \code{startNLR()} function.}
+
+\item{x}{an object of \code{"estimNLR"} class.}
+
+\item{...}{other generic parameters for S3 methods.}
+
+\item{object}{an object of \code{"estimNLR"} class.}
+
+\item{sandwich}{logical: should be sandwich estimator used for covariance
+matrix of parameters when using \code{method = "nls"}? Default is
+\code{FALSE}.}
 }
 \description{
 Estimates parameters of non-linear regression models

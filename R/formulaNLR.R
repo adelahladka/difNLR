@@ -114,7 +114,7 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
   names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
 
   if (!is.null(constraints)) {
-    if (!is.na(constraints)) {
+    if (any(!is.na(constraints))) {
       constr <- unlist(strsplit(constraints, split = ""))
       if (!all(constr %in% letters[1:4])) {
         warning("Constraints can be only 'a', 'b', 'c' or 'd'!", call. = FALSE)
@@ -163,7 +163,7 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
   }
 
   if (type == "other") {
-    if (!is.na(constraints)) {
+    if (any(!is.na(constraints))) {
       if (length(intersect(types, constr)) > 0) {
         stop("The difference in constrained parameters cannot be tested.", call. = FALSE)
       }

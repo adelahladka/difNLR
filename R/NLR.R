@@ -508,7 +508,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all",
     Wval[which(!(cfM1 | cfM0))] <- sapply(
       which(!(cfM1 | cfM0)),
       function(l) {
-        nams <- which(M[[l]]$M1$parameters == setdiff(M[[l]]$M1$parameters, M[[l]]$M0$parameters))
+        nams <- which(M[[l]]$M1$parameters %in% setdiff(M[[l]]$M1$parameters, M[[l]]$M0$parameters))
         V <- cov.m1[[l]][nams, nams]
         par <- par.m1[[l]][nams]
         par %*% solve(V) %*% par

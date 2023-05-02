@@ -56,5 +56,5 @@ You can try some functionalities of the `difNLR` package
 application and package and its DIF/Fairness section.
   
 ## Getting help
-In case you find any bug or just need help with `difNLR` package, you can leave
+In case you find any bug or just need help with the `difNLR` package, you can leave
 your message as an issue here or directly contact us at hladka@cs.cas.cz

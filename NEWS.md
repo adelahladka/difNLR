@@ -1,9 +1,11 @@
 ## Changes and developments in the difNLR package
 
-### Changes in version 1.4.2 (2023-03-22)
+### Changes in version 1.4.2 (2023-05-02)
 
 #### BUGFIXING
   * `plot.ddfMLR()` now correctly plots ordinal data.  
+  * Option `test = "W"` was fixed for the `difNLR()` and `NLR()` functions.
+  * Constraints handling was fixed for the `difNLR()` and `NLR()` functions.
     
 #### MINOR UPDATES
   * `startNLR` now handles missing values. Returns error when not enough complete 

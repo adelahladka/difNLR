@@ -373,7 +373,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
   if (missing(start)) {
     start <- NULL
   }
-  # starting values with bootstraped samples
+  # starting values with bootstrapped samples
   if (initboot) {
     if (nrBo < 1) {
       stop("The maximal number of iterations for calculation of starting values using bootstraped
