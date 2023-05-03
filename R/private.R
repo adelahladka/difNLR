@@ -1,3 +1,4 @@
+# calculates total test score from unscored data and key of correct answers
 .score <- function(Data, key) {
   if (!is.matrix(key)) {
     key <- matrix(key)
@@ -14,19 +15,23 @@
   rowSums(X)
 }
 
+# generalized logistic regression function
 .gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
   return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
 }
 
+# generalized logistic regression function without group variable
 .gNLR_group <- function(x, a, b, c, d) {
   return(c + (d - c) / (1 + exp(-(a * (x - b)))))
 }
 
+# delta method for generalized logistic regression function
 .delta.gNLR <- deriv(y ~ (c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))),
   namevec = c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
   function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {}
 )
 
+# ggplot2 theme for plot
 .plot.theme <- function() {
   ggplot2::theme_bw() +
     ggplot2::theme(
@@ -37,6 +42,7 @@
     )
 }
 
+# ggplot2 theme for plot with legend
 .plot.theme.legend <- function() {
   ggplot2::theme(
     legend.box.just = "top",
