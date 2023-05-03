@@ -1,12 +1,11 @@
 year <- sub("-.*", "", meta$Date)
 note <- sprintf("R package version %s", meta$Version)
 
-citHeader("To cite package 'difNLR' in publications use:")
+citHeader("To cite the 'difNLR' package in publications use:")
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
          title = "{difNLR}: Generalized logistic regression models for {DIF} and {DDF} detection",
-         author = personList(as.person("Adela Hladka"),
-                             as.person("Patricia Martinkova")),
+         author = c(as.person("Adela Hladka"), as.person("Patricia Martinkova")),
          year = "2020",
          doi = "10.32614/RJ-2020-014",
          pages = "300--323",
@@ -15,10 +14,9 @@ citEntry(entry = "Article",
          journal = "The R Journal",
          textVersion = "Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection. The R Journal, 12(1), 300--323, doi: 10.32614/RJ-2020-014.")
 
-citEntry(entry = "Manual",
-         title = "{difNLR}: {DIF} and {DDF} Detection by Non-Linear Regression Models.",
-         author = personList(as.person("Adela Hladka"),
-                             as.person("Patricia Martinkova")),
+bibentry(bibtype = "Manual",
+         title = "{difNLR}: {DIF} and {DDF} Detection by Non-Linear Regression Models",
+         author = c(as.person("Adela Hladka"), as.person("Patricia Martinkova")),
          year = year,
          note = note,
          url = "https://CRAN.R-project.org/package=difNLR",
@@ -27,10 +25,9 @@ citEntry(entry = "Manual",
                year, "). difNLR: DIF and DDF detection by non-linear regression models. ", note,
                "."))
 
-citEntry(entry = "Article",
-         title = "{D}etection of Differential Item Functioning with Nonlinear Regression: {A} Non-{IRT} Approach Accounting for Guessing",
-         author = personList(as.person("Adela Drabinova"),
-                             as.person("Patricia Martinkova")),
+bibentry(bibtype = "Article",
+         title = "{D}etection of differential item functioning with nonlinear regression: {A} non-{IRT} approach accounting for guessing",
+         author = c(as.person("Adela Drabinova"), as.person("Patricia Martinkova")),
          year = "2017",
          journal = "Journal of Educational Measurement",
          volume = "54",

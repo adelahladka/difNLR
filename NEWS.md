@@ -1,5 +1,14 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.4.2-1 (2023-05-03)
+
+**_THIS IS A CRAN VERSION_**
+
+#### MINOR UPDATES
+  * CITATION file was updated.
+
+------
+
 ### Changes in version 1.4.2 (2023-05-02)
 
 #### BUGFIXING
