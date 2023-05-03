@@ -2,11 +2,23 @@
 % Please edit documentation in R/estimNLR.R
 \name{estimNLR}
 \alias{estimNLR}
+\alias{logLik.estimNLR}
+\alias{coef.estimNLR}
+\alias{fitted.estimNLR}
+\alias{residuals.estimNLR}
 \alias{print.estimNLR}
 \alias{vcov.estimNLR}
-\title{Non-Linear Regression DIF models estimation.}
+\title{Nonlinear regression DIF models estimation.}
 \usage{
 estimNLR(y, match, group, formula, method, lower, upper, start)
+
+\method{logLik}{estimNLR}(object, ...)
+
+\method{coef}{estimNLR}(object, ...)
+
+\method{fitted}{estimNLR}(object, ...)
+
+\method{residuals}{estimNLR}(object, ...)
 
 \method{print}{estimNLR}(x, ...)
 
@@ -17,34 +29,38 @@ estimNLR(y, match, group, formula, method, lower, upper, start)
 
 \item{match}{numeric: vector of matching criterion.}
 
-\item{group}{numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.}
+\item{group}{numeric: binary vector of group membership. \code{"0"} for
+reference group, \code{"1"} for focal group.}
 
-\item{formula}{formula: specification of the model. Can be obtained by \code{formulaNLR()} function.}
+\item{formula}{formula: specification of the model. Can be obtained by the
+\code{formulaNLR()} function.}
 
-\item{method}{character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
-squares (default), \code{"likelihood"} for maximum likelihood method, and \code{"irls"} for maximum likelihood
-estimation with iteratively reweighted least squares. See \strong{Details}.}
+\item{method}{character: method used to estimate parameters. The options are
+\code{"nls"} for nonlinear least squares (default), \code{"mle"} for
+maximum likelihood method, and \code{"irls"} for maximum likelihood estimation
+with iteratively reweighted least squares. See \strong{Details}.}
 
 \item{lower}{numeric: lower bounds for parameters of model specified in \code{formula}.}
 
 \item{upper}{numeric: upper bounds for parameters of model specified in \code{formula}.}
 
-\item{start}{numeric: initial parameters. Can be obtained by \code{startNLR()} function.}
+\item{start}{numeric: initial parameters. Can be obtained by the
+\code{startNLR()} function.}
 
-\item{x}{an object of \code{"estimNLR"} class.}
+\item{object}{an object of \code{"estimNLR"} class.}
 
 \item{...}{other generic parameters for S3 methods.}
 
-\item{object}{an object of \code{"estimNLR"} class.}
+\item{x}{an object of \code{"estimNLR"} class.}
 
 \item{sandwich}{logical: should be sandwich estimator used for covariance
 matrix of parameters when using \code{method = "nls"}? Default is
 \code{FALSE}.}
 }
 \description{
-Estimates parameters of non-linear regression models
-  for DIF detection using either non-linear least squares or
-  maximum likelihood method.
+Estimates parameters of nonlinear regression models for DIF
+  detection using either nonlinear least squares or maximum likelihood method
+  with various algorithms.
 }
 \details{
 Function offers either non-linear least squares estimation via
@@ -54,66 +70,62 @@ or maximum likelihood method with iteratively reweighted least
 squares via \code{\link[stats]{glm}} function.
 }
 \examples{
-# loading data
-data(GMAT)
+# loading datadata(GMAT)
 y <- GMAT[, 1] # item 1
 match <- scale(rowSums(GMAT[, 1:20])) # standardized total score
 group <- GMAT[, "group"] # group membership variable
 
-# formula for 3PL model with the same guessing
+# formula for 3PL model with the same guessing for both groups
 M <- formulaNLR(model = "3PLcg", type = "both")
 
 # starting values for 3PL model with the same guessing for item 1
 start <- startNLR(GMAT[, 1:20], group, model = "3PLcg", parameterization = "classic")
-start <- start[[1]][M$M0$parameters]
+start <- start[[1]][M$M1$parameters]
 
-# non-linear least squares
-fitNLSM0 <- estimNLR(
+# nonlinear least squares
+(fit_nls <- estimNLR(
   y = y, match = match, group = group,
-  formula = M$M0$formula, method = "nls",
-  lower = M$M0$lower, upper = M$M0$upper, start = start
-)
-fitNLSM0
+  formula = M$M1$formula, method = "nls",
+  lower = M$M1$lower, upper = M$M1$upper, start = start
+))
 
-coef(fitNLSM0)
-logLik(fitNLSM0)
-vcov(fitNLSM0)
-vcov(fitNLSM0, sandwich = TRUE)
-fitted(fitNLSM0)
-residuals(fitNLSM0)
+coef(fit_nls)
+logLik(fit_nls)
+vcov(fit_nls)
+vcov(fit_nls, sandwich = TRUE)
+fitted(fit_nls)
+residuals(fit_nls)
 
 # maximum likelihood method
-fitLKLM0 <- estimNLR(
+(fit_mle <- estimNLR(
   y = y, match = match, group = group,
-  formula = M$M0$formula, method = "likelihood",
-  lower = M$M0$lower, upper = M$M0$upper, start = start
-)
-fitLKLM0
+  formula = M$M1$formula, method = "mle",
+  lower = M$M1$lower, upper = M$M1$upper, start = start
+))
 
-coef(fitLKLM0)
-logLik(fitLKLM0)
-vcov(fitLKLM0)
-fitted(fitLKLM0)
-residuals(fitLKLM0)
+coef(fit_mle)
+logLik(fit_mle)
+vcov(fit_mle)
+fitted(fit_mle)
+residuals(fit_mle)
 
 # iteratively reweighted least squares for 2PL model
 M <- formulaNLR(model = "2PL", parameterization = "logistic")
-fitIRLSM1 <- estimNLR(
+(fit_irls <- estimNLR(
   y = y, match = match, group = group,
   formula = M$M1$formula, method = "irls"
-)
-fitIRLSM1
+))
 
-coef(fitIRLSM1)
-logLik(fitIRLSM1)
-vcov(fitIRLSM1)
-fitted(fitIRLSM1)
-residuals(fitIRLSM1)
+coef(fit_irls)
+logLik(fit_irls)
+vcov(fit_irls)
+fitted(fit_irls)
+residuals(fit_irls)
 }
 \references{
-Hladka, A. (2021). Statistical models for detection of differential
-item functioning. Dissertation thesis. Faculty of Mathematics and
-Physics, Charles University.
+Hladka, A. (2021). Statistical models for detection of differential item
+functioning. Dissertation thesis.
+Faculty of Mathematics and Physics, Charles University.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

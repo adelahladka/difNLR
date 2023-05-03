@@ -14,7 +14,7 @@
 #' are any combinations of parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}. Default value
 #' is \code{NULL}. See \strong{Details}.
 #' @param method character: method used to estimate parameters. The options are \code{"nls"} for
-#' non-linear least squares (default), \code{"likelihood"} for maximum likelihood method with
+#' non-linear least squares (default), \code{"mle"} for maximum likelihood method with
 #' \code{"L-BFGS-B"} algorithm, or \code{"irls"} for maximum likelihood method with iteratively
 #' reweighted least squares (available only for \code{model = "2PL"}).
 #' @param match character or numeric: matching criterion to be used as estimate of trait. Can be
@@ -178,7 +178,7 @@
 #' NLR(Data, group, model = "4PL", constraints = "ac", type = "b")
 #'
 #' # using maximum likelihood estimation method with L-BFGS-B algorithm
-#' NLR(Data, group, model = "3PLcg", method = "likelihood")
+#' NLR(Data, group, model = "3PLcg", method = "mle")
 #'
 #' # using maximum likelihood estimation method with iteratively reweighted least squares algorithm
 #' NLR(Data, group, model = "2PL", method = "irls")

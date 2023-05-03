@@ -1,21 +1,25 @@
-#' Non-Linear Regression DIF models estimation.
+#' Nonlinear regression DIF models estimation.
 #'
 #' @aliases estimNLR
 #'
-#' @description Estimates parameters of non-linear regression models
-#'   for DIF detection using either non-linear least squares or
-#'   maximum likelihood method.
+#' @description Estimates parameters of nonlinear regression models for DIF
+#'   detection using either nonlinear least squares or maximum likelihood method
+#'   with various algorithms.
 #'
 #' @param y numeric: binary vector of responses.
 #' @param match numeric: vector of matching criterion.
-#' @param group numeric: binary vector of group membership. \code{"0"} for reference group, \code{"1"} for focal group.
-#' @param formula formula: specification of the model. Can be obtained by \code{formulaNLR()} function.
-#' @param method character: method used to estimate parameters. The options are \code{"nls"} for non-linear least
-#' squares (default), \code{"likelihood"} for maximum likelihood method, and \code{"irls"} for maximum likelihood
-#' estimation with iteratively reweighted least squares. See \strong{Details}.
+#' @param group numeric: binary vector of group membership. \code{"0"} for
+#'  reference group, \code{"1"} for focal group.
+#' @param formula formula: specification of the model. Can be obtained by the
+#'  \code{formulaNLR()} function.
+#' @param method character: method used to estimate parameters. The options are
+#'  \code{"nls"} for nonlinear least squares (default), \code{"mle"} for
+#'  maximum likelihood method, and \code{"irls"} for maximum likelihood estimation
+#'  with iteratively reweighted least squares. See \strong{Details}.
 #' @param lower numeric: lower bounds for parameters of model specified in \code{formula}.
 #' @param upper numeric: upper bounds for parameters of model specified in \code{formula}.
-#' @param start numeric: initial parameters. Can be obtained by \code{startNLR()} function.
+#' @param start numeric: initial parameters. Can be obtained by the
+#'  \code{startNLR()} function.
 #'
 #' @usage estimNLR(y, match, group, formula, method, lower, upper, start)
 #'
@@ -37,98 +41,97 @@
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' @references
-#' Hladka, A. (2021). Statistical models for detection of differential
-#' item functioning. Dissertation thesis. Faculty of Mathematics and
-#' Physics, Charles University.
+#' Hladka, A. (2021). Statistical models for detection of differential item
+#' functioning. Dissertation thesis.
+#' Faculty of Mathematics and Physics, Charles University.
 #'
 #' @examples
-#' # loading data
-#' data(GMAT)
+#' # loading datadata(GMAT)
 #' y <- GMAT[, 1] # item 1
 #' match <- scale(rowSums(GMAT[, 1:20])) # standardized total score
 #' group <- GMAT[, "group"] # group membership variable
 #'
-#' # formula for 3PL model with the same guessing
+#' # formula for 3PL model with the same guessing for both groups
 #' M <- formulaNLR(model = "3PLcg", type = "both")
 #'
 #' # starting values for 3PL model with the same guessing for item 1
 #' start <- startNLR(GMAT[, 1:20], group, model = "3PLcg", parameterization = "classic")
-#' start <- start[[1]][M$M0$parameters]
+#' start <- start[[1]][M$M1$parameters]
 #'
-#' # non-linear least squares
-#' fitNLSM0 <- estimNLR(
+#' # nonlinear least squares
+#' (fit_nls <- estimNLR(
 #'   y = y, match = match, group = group,
-#'   formula = M$M0$formula, method = "nls",
-#'   lower = M$M0$lower, upper = M$M0$upper, start = start
-#' )
-#' fitNLSM0
+#'   formula = M$M1$formula, method = "nls",
+#'   lower = M$M1$lower, upper = M$M1$upper, start = start
+#' ))
 #'
-#' coef(fitNLSM0)
-#' logLik(fitNLSM0)
-#' vcov(fitNLSM0)
-#' vcov(fitNLSM0, sandwich = TRUE)
-#' fitted(fitNLSM0)
-#' residuals(fitNLSM0)
+#' coef(fit_nls)
+#' logLik(fit_nls)
+#' vcov(fit_nls)
+#' vcov(fit_nls, sandwich = TRUE)
+#' fitted(fit_nls)
+#' residuals(fit_nls)
 #'
 #' # maximum likelihood method
-#' fitLKLM0 <- estimNLR(
+#' (fit_mle <- estimNLR(
 #'   y = y, match = match, group = group,
-#'   formula = M$M0$formula, method = "likelihood",
-#'   lower = M$M0$lower, upper = M$M0$upper, start = start
-#' )
-#' fitLKLM0
+#'   formula = M$M1$formula, method = "mle",
+#'   lower = M$M1$lower, upper = M$M1$upper, start = start
+#' ))
 #'
-#' coef(fitLKLM0)
-#' logLik(fitLKLM0)
-#' vcov(fitLKLM0)
-#' fitted(fitLKLM0)
-#' residuals(fitLKLM0)
+#' coef(fit_mle)
+#' logLik(fit_mle)
+#' vcov(fit_mle)
+#' fitted(fit_mle)
+#' residuals(fit_mle)
 #'
 #' # iteratively reweighted least squares for 2PL model
 #' M <- formulaNLR(model = "2PL", parameterization = "logistic")
-#' fitIRLSM1 <- estimNLR(
+#' (fit_irls <- estimNLR(
 #'   y = y, match = match, group = group,
 #'   formula = M$M1$formula, method = "irls"
-#' )
-#' fitIRLSM1
+#' ))
 #'
-#' coef(fitIRLSM1)
-#' logLik(fitIRLSM1)
-#' vcov(fitIRLSM1)
-#' fitted(fitIRLSM1)
-#' residuals(fitIRLSM1)
+#' coef(fit_irls)
+#' logLik(fit_irls)
+#' vcov(fit_irls)
+#' fitted(fit_irls)
+#' residuals(fit_irls)
 #' @keywords DIF
 #' @export
 estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
   M <- switch(method,
-    nls = tryCatch(nls(
-      formula = formula,
-      data = data.frame(y = y, x = match, g = group),
-      algorithm = "port",
-      start = start,
-      lower = lower,
-      upper = upper
+    nls = tryCatch(
+      nls(
+        formula = formula,
+        data = data.frame(y = y, x = match, g = group),
+        algorithm = "port",
+        start = start,
+        lower = lower,
+        upper = upper
+      ),
+      error = function(e) {},
+      finally = ""
     ),
-    error = function(e) {},
-    finally = ""
+    mle = tryCatch(
+      .MLE_estimation(
+        formula = formula,
+        data = data.frame(y = y, x = match, g = group),
+        par = start,
+        lower = lower,
+        upper = upper
+      ),
+      error = function(e) {},
+      finally = ""
     ),
-    likelihood = tryCatch(lkl(
-      formula = formula,
-      data = data.frame(y = y, x = match, g = group),
-      par = start,
-      lower = lower,
-      upper = upper
-    ),
-    error = function(e) {},
-    finally = ""
-    ),
-    irls = tryCatch(glm(
-      formula = formula,
-      family = binomial(),
-      data = data.frame(y = y, x = match, g = group)
-    ),
-    error = function(e) {},
-    finally = ""
+    irls = tryCatch(
+      glm(
+        formula = formula,
+        family = binomial(),
+        data = data.frame(y = y, x = match, g = group)
+      ),
+      error = function(e) {},
+      finally = ""
     )
   )
   if (!is.null(M)) {
@@ -137,73 +140,60 @@ estimNLR <- function(y, match, group, formula, method, lower, upper, start) {
   return(M)
 }
 
-# private function
-.param.likel <- function(data, formula, par) {
-  param <- as.list(par)
-  param[[length(param) + 1]] <- data$x
-  names(param)[length(param)] <- "x"
-  param[[length(param) + 1]] <- data$g
-  names(param)[length(param)] <- "g"
-
-  y <- data$y
-
-  h. <- parse(text = as.character(formula)[3])
-  h <- eval(h., envir = param)
-
-  l <- -sum((y * log(h)) + ((1 - y) * log(1 - h)), na.rm = TRUE)
-  return(l)
-}
-
-#' @noRd
-lkl <- function(formula, data, par, lower, upper) {
-  m <- optim(
-    par = par,
-    fn = .param.likel,
-    data = data,
-    formula = formula,
-    method = "L-BFGS-B",
-    lower = lower,
-    upper = upper,
-    hessian = TRUE
+#' @rdname estimNLR
+#' @export
+logLik.estimNLR <- function(object, ...) {
+  val <- switch(class(object)[2],
+         "nls" = {
+           res <- object$m$resid()
+           N <- length(res)
+           w <- rep(1, N)
+           zw <- w == 0
+           N <- sum(!zw)
+           - N * (log(2 * pi) + 1 - log(N) - sum(log(w + zw))/N + log(sum(res^2)))/2
+         },
+         "mle" = -object$value,
+         "glm" = object$rank - object$aic/2
   )
-
-  h. <- parse(text = as.character(formula)[3])
-  param <- as.list(par)
-  param[[length(param) + 1]] <- data$x
-  names(param)[length(param)] <- "x"
-  param[[length(param) + 1]] <- data$g
-  names(param)[length(param)] <- "g"
-
-  m$fitted <- eval(h., param)
-  m$data <- data
-  m$formula <- formula
-
-  class(m) <- "lkl"
-  return(m)
+  attr(val, "df") <- length(coef(object))
+  class(val) <- "logLik"
+  val
 }
 
-#' @rdname lkl
+#' @rdname estimNLR
 #' @export
-logLik.lkl <- function(object, ...) {
-  -object$value
+coef.estimNLR <- function(object, ...) {
+  switch(class(object)[2],
+         "nls" = object$m$getPars(),
+         "mle" = object$par,
+         "glm" = object$coefficients
+  )
 }
 
-#' @rdname lkl
+#' @rdname estimNLR
 #' @export
-coef.lkl <- function(object, ...) {
-  object$par
+fitted.estimNLR <- function(object, ...) {
+  val <- switch(class(object)[2],
+         "nls" = as.vector(object$m$fitted()),
+         "mle" = object$fitted,
+         "glm" = object$fitted.values
+  )
+  lab <- "Fitted values"
+  attr(val, "label") <- lab
+  val
 }
 
-#' @rdname lkl
+#' @rdname estimNLR
 #' @export
-fitted.lkl <- function(object, ...) {
-  object$fitted
-}
-
-#' @rdname lkl
-#' @export
-residuals.lkl <- function(object, ...) {
-  object$data$y - object$fitted
+residuals.estimNLR <- function(object, ...) {
+  val <- switch(class(object)[2],
+         "nls" = as.vector(object$m$resid()),
+         "mle" = object$data$y - object$fitted,
+         "glm" = object$residuals
+  )
+  lab <- "Residuals"
+  attr(val, "label") <- lab
+  val
 }
 
 #' @rdname estimNLR
@@ -211,23 +201,23 @@ residuals.lkl <- function(object, ...) {
 #' @export
 print.estimNLR <- function(x, ...) {
   formula <- switch(class(x)[2],
-    "nls" = paste(x$m$formula()[2], x$m$formula()[1], x$m$formula()[3]),
-    "lkl" = paste(x$formula[2], x$formula[1], x$formula[3]),
-    "glm" = paste0(x$formula[2], " ", x$formula[1], " exp(", x$formula[3], ") / (1 + exp(", x$formula[3], "))")
+                    "nls" = paste(x$m$formula()[2], x$m$formula()[1], x$m$formula()[3]),
+                    "mle" = paste(x$formula[2], x$formula[1], x$formula[3]),
+                    "glm" = paste0(x$formula[2], " ", x$formula[1], " exp(", x$formula[3], ") / (1 + exp(", x$formula[3], "))")
   )
   cat(
     "Nonlinear regression model \n\n",
     "Model: ", formula, "\n"
   )
   pars <- switch(class(x)[2],
-    "nls" = x$m$getPars(),
-    "lkl" = x$par,
-    "glm" = x$coefficients
+                 "nls" = x$m$getPars(),
+                 "mle" = x$par,
+                 "glm" = x$coefficients
   )
   alg <- switch(class(x)[2],
-    "nls" = "Nonlinear least squares estimation",
-    "lkl" = "Maximum likelihood estimation using L-BFGS-B algorithm",
-    "glm" = "Maximum likelihood estimation using iteratively reweighted least squares algorithm"
+                "nls" = "Nonlinear least squares estimation",
+                "mle" = "Maximum likelihood estimation using L-BFGS-B algorithm",
+                "glm" = "Maximum likelihood estimation using iteratively reweighted least squares algorithm"
   )
   cat("\nCoefficients:\n")
   print(round(pars, 4))
@@ -260,9 +250,9 @@ vcov.estimNLR <- function(object, sandwich = FALSE, ...) {
     }
   } else {
     if (sandwich) {
-      message("Sandwich estimator of covariance not available for method = 'likelihood'. ")
+      message("Sandwich estimator of covariance is available only for method = 'nls'. ")
     }
-    if (inherits(object, "lkl")) {
+    if (inherits(object, "mle")) {
       cov.object <- tryCatch(
         {
           solve(object$hessian)
@@ -315,7 +305,6 @@ vcov.estimNLR <- function(object, sandwich = FALSE, ...) {
     ))
   )
 
-
   psi.val <- do.call(
     cbind,
     do.call(
@@ -341,4 +330,53 @@ vcov.estimNLR <- function(object, sandwich = FALSE, ...) {
   cov.sandwich <- solve(mat.gamma) %*% mat.sigma %*% solve(mat.gamma) / n
   rownames(cov.sandwich) <- colnames(cov.sandwich) <- names(par)
   return(cov.sandwich)
+}
+
+# ---------------------------------------------------------------------------------
+# Maximum likelihood estimation
+# ---------------------------------------------------------------------------------
+
+# log-likelihood function to be maximized in MLE estimation
+.likelihood <- function(data, formula, par) {
+  param <- as.list(par)
+  param[[length(param) + 1]] <- data$x
+  names(param)[length(param)] <- "x"
+  param[[length(param) + 1]] <- data$g
+  names(param)[length(param)] <- "g"
+
+  y <- data$y
+
+  h. <- parse(text = as.character(formula)[3])
+  h <- eval(h., envir = param)
+
+  l <- -sum((y * log(h)) + ((1 - y) * log(1 - h)), na.rm = TRUE)
+  return(l)
+}
+
+# Maximum likelihood estimation
+.MLE_estimation <- function(formula, data, par, lower, upper) {
+  m <- optim(
+    par = par,
+    fn = .likelihood,
+    data = data,
+    formula = formula,
+    method = "L-BFGS-B",
+    lower = lower,
+    upper = upper,
+    hessian = TRUE
+  )
+
+  h. <- parse(text = as.character(formula)[3])
+  param <- as.list(par)
+  param[[length(param) + 1]] <- data$x
+  names(param)[length(param)] <- "x"
+  param[[length(param) + 1]] <- data$g
+  names(param)[length(param)] <- "g"
+
+  m$fitted <- eval(h., param)
+  m$data <- data
+  m$formula <- formula
+
+  class(m) <- "mle"
+  return(m)
 }

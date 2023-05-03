@@ -42,7 +42,7 @@ items) or as an item-specific vector.}
 
 \item{method}{character: method used to estimate parameters. The options
 are \code{"nls"} for non-linear least squares (default),
-\code{"likelihood"} for maximum likelihood method with \code{"L-BFGS-B"}
+\code{"mle"} for maximum likelihood method with \code{"L-BFGS-B"}
 algorithm, or \code{"irls"} for maximum likelihood method with iteratively
 reweighted least squares (available only for \code{model = "2PL"}).}
 
@@ -293,7 +293,7 @@ difNLR(Data, group, focal.name = 1, model = "4PL", constraints = "ac", type = "b
 # testing both DIF effects using LR test,
 # 3PL model with fixed guessing for groups
 # using maximum likelihood estimation method with L-BFGS-B algorithm
-difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
+difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "mle")
 
 # testing both DIF effects using LR test and 2PL model
 # using maximum likelihood estimation method with iteratively reweighted least squares algorithm

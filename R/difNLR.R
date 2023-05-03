@@ -31,7 +31,7 @@
 #'   items) or as an item-specific vector.
 #' @param method character: method used to estimate parameters. The options
 #'   are \code{"nls"} for non-linear least squares (default),
-#'   \code{"likelihood"} for maximum likelihood method with \code{"L-BFGS-B"}
+#'   \code{"mle"} for maximum likelihood method with \code{"L-BFGS-B"}
 #'   algorithm, or \code{"irls"} for maximum likelihood method with iteratively
 #'   reweighted least squares (available only for \code{model = "2PL"}).
 #' @param match numeric or character: matching criterion to be used as an
@@ -317,7 +317,7 @@
 #' # testing both DIF effects using LR test,
 #' # 3PL model with fixed guessing for groups
 #' # using maximum likelihood estimation method with L-BFGS-B algorithm
-#' difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "likelihood")
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "mle")
 #'
 #' # testing both DIF effects using LR test and 2PL model
 #' # using maximum likelihood estimation method with iteratively reweighted least squares algorithm
@@ -381,8 +381,11 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     }
   }
   # estimation method
-  if (!(method %in% c("nls", "likelihood", "irls"))) {
-    stop("Invalid value for 'method'. Estimation method must be either 'nls', 'likelihood', or 'irls'. ", call. = FALSE)
+  if (!(method %in% c("nls", "likelihood", "mle", "irls"))) {
+    stop("Invalid value for 'method'. Estimation method must be either 'nls', 'mle', or 'irls'. ", call. = FALSE)
+  }
+  if (method == "likelihood") {
+    method <- "mle"
   }
   # internal NLR function
   internalNLR <- function() {
@@ -822,7 +825,7 @@ print.difNLR <- function(x, ...) {
     "\nParameters were estimated using",
     switch(x$method,
       "nls" = "non-linear least squares\n",
-      "likelihood" = "maximum likelihood method \nwith L-BFGS-B algorithm\n",
+      "mle" = "maximum likelihood method \nwith L-BFGS-B algorithm\n",
       "irls" = "maximum likelihood method \nwith iteratively reweighted least squares algorithm\n"
     )
   ))

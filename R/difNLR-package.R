@@ -44,7 +44,7 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.4.2-1\cr
+#' Version: 1.4.3\cr
 #' Date: 2023-05-03\cr
 #' Depends: R (>= 3.1)\cr
 #' Imports: calculus, ggplot2 (>= 3.4.0), msm, nnet, plyr, stats, VGAM\cr

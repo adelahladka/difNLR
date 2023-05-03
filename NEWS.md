@@ -1,5 +1,14 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.4.3 (2023-05-03)
+
+#### MAJOR UPDATES
+  * `"likelihood"` option for maximum likelihood estimation in the `estimNLR()`
+    function was renamed to `"mle"`.
+  * S3 methods for the `estimNLR()` function were extended and improved. 
+
+------
+
 ### Changes in version 1.4.2-1 (2023-05-03)
 
 **_THIS IS A CRAN VERSION_**
