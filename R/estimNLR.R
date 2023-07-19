@@ -380,3 +380,186 @@ vcov.estimNLR <- function(object, sandwich = FALSE, ...) {
   class(m) <- "mle"
   return(m)
 }
+
+# ---------------------------------------------------------------------------------
+# EM algorithm
+# ---------------------------------------------------------------------------------
+
+# E-step in EM algorithm
+.expectation <- function(data, par) {
+  expit <- function(x) {
+    return(exp(x) / (1 + exp(x)))
+  }
+  par_asymp <- c("c" = 0, "cDif" = 0, "d" = 1, "dDif" = 0)
+  par_expit <- c("b0" = 0, "b1" = 0, "b2" = 0, "b3" = 0)
+
+  par_asymp[!is.na(par[c("c", "cDif", "d", "dDif")])] <- c(par[c("c", "cDif", "d", "dDif")])[!is.na(par[c("c", "cDif", "d", "dDif")])]
+  par_expit[!is.na(par[c("b0", "b1", "b2", "b3")])] <- c(par[c("b0", "b1", "b2", "b3")])[!is.na(par[c("b0", "b1", "b2", "b3")])]
+
+  phi <- as.vector(expit(par_expit %*% t(cbind(1, data$x, data$g, data$x * data$g))))
+
+  z1 <- data$y * (par_asymp["c"] + par_asymp["cDif"] * data$g) /
+    (par_asymp["c"] + par_asymp["cDif"] * data$g + (par_asymp["d"] + par_asymp["dDif"] * data$g - par_asymp["c"] - par_asymp["cDif"] * data$g) * phi)
+  z2 <- data$y - z1
+  z4 <- (1 - data$y) * (1 - par_asymp["d"] - par_asymp["dDif"] * data$g) /
+    (1 - par_asymp["c"] - par_asymp["cDif"] * data$g - (par_asymp["d"] + par_asymp["dDif"] * data$g - par_asymp["c"] - par_asymp["cDif"] * data$g) * phi)
+  z3 <- 1 - data$y - z4
+
+  return(list(z1 = z1, z2 = z2, z3 = z3, z4 = z4))
+}
+
+# EM algorithm
+.EM_algorithm <- function(formula, data, start,
+                          lower, upper) {
+  # toto je potreba jeste osetrit
+  par_estimated <- sapply(c("x", "g", "x:g", "c", "cDif", "d", "dDif"), function(x) grepl(x, formula[3]))
+  par_estimated <- c("b0", c("b1", "b2", "b3", "c", "cDif", "d", "dDif")[par_estimated])
+
+  # which parameters are estimated and related parts of formula
+  par_estim_M1 <- c("b0", "b1", "b2", "b3")
+  par_estim_M2 <- c("c")
+  form_M1 <- "x + g + x:g"
+  form_M2 <- "c + (1 - c)"
+
+  # initial values
+  fit1_par_new <- start[paste0("b", 0:3)]
+  fit2_par_new <- start[c("c", "cDif", "d", "dDif")]
+
+  par <- list()
+  k <- 1
+  dev_new <- 0
+  conv <- "DO NOT FINISH"
+
+  # EM algorithm
+  repeat ({
+    par[[k]] <- c(
+      fit1_par_new,
+      fit2_par_new
+    )
+
+    # checking maximal number of iterations
+    # actual number of iterations is k - 1,
+    # the first is for the initial run
+    if (k == 2001) {
+      break
+    }
+
+    # --------------------
+    # E-step
+    # --------------------
+    Z <- .expectation(data = data, par = setNames(unlist(c(
+      fit1_par_new,
+      fit2_par_new
+    )), c(paste0("b", 0:3), "c", "cDif", "d", "dDif")))
+
+    # --------------------
+    # M-step
+    # --------------------
+
+    Z_M1 <- cbind(Z$z2, Z$z3)
+    fit1 <- tryCatch(glm(as.formula(paste("Z_M1", "~", form_M1)),
+                         family = binomial(),
+                         data = data,
+                         start = unlist(c(b0_new, b1_new, b2_new, b3_new))
+    ), error = function(e) e)
+
+    if (any(class(fit1) %in% c("simpleError", "error", "condition"))) {
+      conv <- "CRASHED"
+      break
+    }
+    fit1_par_new <- setNames(rep(0, 4), paste0("b", 0:3))
+    fit1_par_new[par_estim_M1] <- coef(fit1)
+
+    Z_M2 <- cbind(Z$z2 + Z$z3, Z$z1, Z$z4)[, c(TRUE, sapply(c("c", "d"), function(x) grepl(x, par_estim_M2)))]
+    if (ncol(Z_M2) > 1) {
+      group_present_M2 <- grepl("Dif", par_estim_M2)
+      form_M2 <- ifelse(group_present_M2, "g", "1")
+
+      fit2 <- tryCatch(
+        nnet::multinom(as.formula(paste("Z_M2", "~", form_M2)),
+                       trace = FALSE,
+                       data = data
+        ),
+        error = function(e) e
+      )
+      if (any(class(fit2) %in% c("simpleError", "error", "condition"))) {
+        conv <- "CRASHED"
+        break
+      }
+      fit2_par_new <- setNames(c(0, 0, 1, 0), c("c", "cDif", "d", "dDif"))
+      # V2 = d - c, V3 = c, V4 = 1 - d
+      if (group_present_M2) {
+        fit2_par_new[par_estim_M2] <- as.data.frame(cbind(g = unique(data$g), unique(fitted(fit2))))[, c("g", "V3", "V4")]
+      } else {
+        fit2_par_new[par_estim_M2] <- as.data.frame(unique(fitted(fit2)))[, c("V2")]
+      }
+
+      # deviance
+      dev_old <- dev_new
+      dev_new <- deviance(fit1) + deviance(fit2)
+    } else {
+      # deviance
+      dev_old <- dev_new
+      dev_new <- deviance(fit1)
+    }
+
+    # checking stopping criterion
+    if (abs(dev_old - dev_new) / (0.1 + dev_new) < 1e-6) {
+      k <- k + 1
+      par[[k]] <- c(
+        fit1_par_new,
+        fit2_par_new
+      )
+      conv <- "CONVERGED"
+      break
+    }
+    k <- k + 1
+  })
+
+  if (conv == "CRASHED") {
+    se <- rep(NA, 8)
+    par <- rep(NA, 8)
+    num_iter <- NA
+  } else {
+    par <- as.data.frame(do.call(rbind, par))
+    colnames(par) <- c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif")
+
+    # number of iterations
+    num_iter <- nrow(par) - 1
+    # final parameter estimates
+    par <- par[nrow(par), ]
+    # standard errors of the estimates
+    se <- tryCatch(sqrt(diag(.covariance_matrix(unlist(par), data = data))),
+                   error = function(e) e
+    )
+    if (any(class(se) %in% c("simpleError", "error", "condition"))) {
+      se <- rep(NA, 8)
+    }
+  }
+}
+
+# Covariance matrix
+# Calculates estimate of covariance matrix
+# Arguments:
+#    par = vector of parameters of the nonlinear model:
+#          b0, b1, b2, b3, c, d, dDif, dDif
+#    data = data.frame with three variable:
+#          y = outcome (binary vector)
+#          x = observed ability (numeric vector)
+#          g = grouping variable (binary vector)
+.covariance_matrix <- function(par, data) {
+  # log-likelihood function
+  ll <- function(par, data) {
+    -sum(data$y * log(par[5] + par[6] * data$g + # c + cDif * g +
+                        (par[7] + par[8] * data$g - par[5] - par[6] * data$g) / # (d + dDif * g - c - cDif * g)
+                        (1 + exp(-(par[1] + par[2] * data$x + par[3] * data$g + par[4] * data$x * data$g)))) + # b0 + b1 * x + b2 * g + b3 * x * g
+           (1 - data$y) * log(1 - par[5] - par[6] * data$g - # 1 - c - cDif * g -
+                                (par[7] + par[8] * data$g - par[5] - par[6] * data$g) / # (d + dDif * g - c - cDif * g)
+                                (1 + exp(-(par[1] + par[2] * data$x + par[3] * data$g + par[4] * data$x * data$g)))), na.rm = TRUE) # b0 + b1 * x + b2 * g + b3 * x * g
+  }
+
+  # evaluating Hessian function and computing its inverse
+  hessian <- calculus::hessian(f = ll, var = as.vector(par), params = list(data = data))
+  return(solve(hessian))
+}
+
