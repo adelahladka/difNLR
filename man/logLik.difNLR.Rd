@@ -4,7 +4,7 @@
 \alias{logLik.difNLR}
 \alias{AIC.difNLR}
 \alias{BIC.difNLR}
-\title{Log-likelihood and information criteria for an object of \code{"difNLR"} class.}
+\title{Log-likelihood and information criteria for an object of the \code{"difNLR"} class.}
 \usage{
 \method{logLik}{difNLR}(object, item = "all", ...)
 
@@ -13,17 +13,18 @@
 \method{BIC}{difNLR}(object, item = "all", ...)
 }
 \arguments{
-\item{object}{an object of \code{"difNLR"} class.}
+\item{object}{an object of the \code{"difNLR"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
+\item{item}{numeric or character: either character \code{"all"} to apply for all
+converged items (default), or a vector of item names (column names of the
+\code{Data}), or item identifiers (integers specifying the column number).}
 
 \item{...}{other generic parameters for S3 methods.}
 }
 \description{
-S3 methods for extracting log-likelihood, Akaike's information criterion (AIC) and
-Schwarz's Bayesian criterion (BIC) for an object of \code{"difNLR"} class.
+S3 methods for extracting log-likelihood, Akaike's information criterion (AIC)
+and Schwarz's Bayesian criterion (BIC) for an object of the \code{"difNLR"}
+class.
 }
 \examples{
 \dontrun{
@@ -48,25 +49,23 @@ logLik(x, item = 1)
 }
 }
 \references{
-Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
-A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+functioning with nonlinear regression: A non-IRT approach accounting for
+guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
-Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
-
-Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
-Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+models for DIF and DDF detection. The R Journal, 12(1), 300--323,
+\doi{10.32614/RJ-2020-014}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
-\code{\link[stats]{logLik}} for generic function extracting log-likelihood. \cr
-\code{\link[stats]{AIC}} for generic function calculating AIC and BIC.
+\code{\link[difNLR]{difNLR}} for DIF detection among binary data using the generalized logistic regression model. \cr
+\code{\link[stats]{logLik}} for a generic function extracting log-likelihood. \cr
+\code{\link[stats]{AIC}} for a generic function calculating AIC and BIC.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

@@ -2,41 +2,33 @@
 % Please edit documentation in R/difNLR.R
 \name{predict.difNLR}
 \alias{predict.difNLR}
-\title{Predicted values for an object of \code{"difNLR"} class.}
+\title{Predicted values for an object of the \code{"difNLR"} class.}
 \usage{
-\method{predict}{difNLR}(
-  object,
-  item = "all",
-  match,
-  group,
-  interval = "none",
-  level = 0.95,
-  ...
-)
+\method{predict}{difNLR}(object, item = "all", match, group, interval = "none", CI = 0.95, ...)
 }
 \arguments{
-\item{object}{an object of \code{"difNLR"} class.}
+\item{object}{an object of the \code{"difNLR"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to
-apply for all converged items (default), or a vector of item
-names (column names of \code{Data}), or item identifiers
-(integers specifying the column number).}
+\item{item}{numeric or character: either character \code{"all"} to apply for all
+converged items (default), or a vector of item names (column names of the
+\code{Data}), or item identifiers (integers specifying the column number).}
 
-\item{match}{numeric: matching criterion for new observations.}
+\item{match}{numeric: a matching criterion for new observations.}
 
-\item{group}{numeric: group membership for new observations.}
+\item{group}{numeric: a group membership variable for new observations.}
 
-\item{interval}{character: type of interval calculation, either
+\item{interval}{character: a type of interval calculation, either
 \code{"none"} (default) or \code{"confidence"} for confidence
 interval.}
 
-\item{level}{numeric: confidence level.}
+\item{CI}{numeric: a significance level for confidence interval (the default is
+\code{0.95} for 95\% confidence interval).}
 
-\item{...}{other generic parameters for \code{predict()} function.}
+\item{...}{other generic parameters for the \code{predict()} method.}
 }
 \description{
-S3 method for predictions from the model used in the
-  object of \code{"difNLR"} class.
+S3 method for predictions from the fitted model used in the object of the
+\code{"difNLR"} class.
 }
 \examples{
 \dontrun{
@@ -57,10 +49,11 @@ predict(x, item = "Item1")
 # predicted values for new observations - average score
 predict(x, item = 1, match = 0, group = 0) # reference group
 predict(x, item = 1, match = 0, group = 1) # focal group
+predict(x, item = 1, match = 0, group = c(0, 1)) # both groups
 
-# predicted values for new observations - various z-scores and groups
-new.match <- rep(c(-1, 0, 1), 2)
-new.group <- rep(c(0, 1), each = 3)
+# predicted values for new observations - various Z-scores and groups
+new.match <- rep(c(-1, 0, 1), each = 2)
+new.group <- rep(c(0, 1), 3)
 predict(x, item = 1, match = new.match, group = new.group)
 
 # predicted values for new observations with confidence intervals
@@ -70,24 +63,22 @@ predict(x, item = c(2, 4), match = new.match, group = new.group, interval = "con
 
 }
 \references{
-Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
-A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+functioning with nonlinear regression: A non-IRT approach accounting for
+guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
-Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
-
-Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
-Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+models for DIF and DDF detection. The R Journal, 12(1), 300--323,
+\doi{10.32614/RJ-2020-014}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
-\code{\link[stats]{predict}} for generic function for prediction.
+\code{\link[difNLR]{difNLR}} for DIF detection among binary data using the generalized logistic regression model. \cr
+\code{\link[stats]{predict}} for a generic function for prediction.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

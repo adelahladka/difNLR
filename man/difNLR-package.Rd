@@ -3,7 +3,6 @@
 \docType{package}
 \name{difNLR-package}
 \alias{difNLR-package}
-\alias{_PACKAGE}
 \title{DIF and DDF Detection by Non-Linear Regression Models.}
 \description{
 The difNLR package contains method for detection of differential
@@ -20,9 +19,9 @@ The difNLR package contains method for detection of differential
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.4.3\cr
-Date: 2023-05-03\cr
-Depends: R (>= 3.1)\cr
+Version: 1.5.0\cr
+Date: 2024-12-14\cr
+Depends: R (>= 4.0.0)\cr
 Imports: calculus, ggplot2 (>= 3.4.0), msm, nnet, plyr, stats, VGAM\cr
 Suggests: ShinyItemAnalysis\cr
 License: GPL-3\cr
@@ -69,6 +68,9 @@ Faculty of Mathematics and Physics, Charles University.
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
 The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 
+Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms for estimation of item functioning.
+Journal of Educational and Behavioral Statistics. Accepted.
+
 Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
 methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2): 1--64.
 
@@ -91,7 +93,6 @@ Useful links:
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

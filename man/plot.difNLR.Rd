@@ -2,7 +2,7 @@
 % Please edit documentation in R/difNLR.R
 \name{plot.difNLR}
 \alias{plot.difNLR}
-\title{ICC and test statistics plots for an object of \code{"difNLR"} class.}
+\title{ICC and test statistics plots for an object of the \code{"difNLR"} class.}
 \usage{
 \method{plot}{difNLR}(
   x,
@@ -15,44 +15,53 @@
 )
 }
 \arguments{
-\item{x}{an object of \code{"difNLR"} class.}
+\item{x}{an object of the \code{"difNLR"} class.}
 
-\item{plot.type}{character: type of plot to be plotted (either \code{"cc"} for characteristic curve
-(default), or \code{"stat"} for test statistics).}
+\item{plot.type}{character: a type of a plot to be plotted (either \code{"cc"}
+for characteristic curves (default), or \code{"stat"} for test statistics).}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
+\item{item}{numeric or character: either character \code{"all"} to apply for all
+converged items (default), or a vector of item names (column names of the
+\code{Data}), or item identifiers (integers specifying the column number).}
 
-\item{group.names}{character: names of reference and focal group.}
+\item{group.names}{character: names of the reference and focal groups.}
 
-\item{draw.empirical}{logical: should empirical probabilities be plotted as points? Default value is \code{TRUE}.}
+\item{draw.empirical}{logical: should empirical probabilities be plotted as
+points? (the default value is \code{TRUE}).}
 
-\item{draw.CI}{logical: should confidence intervals for predicted values be plotted? Default value is \code{FALSE}.}
+\item{draw.CI}{logical: should confidence intervals for predicted values be
+plotted? (the default value is \code{FALSE}).}
 
-\item{...}{other generic parameters for \code{plot()} function.}
+\item{...}{other generic parameters for the \code{plot()} method.}
 }
 \value{
-For an option \code{plot.type = "stat"}, returns object of class \code{"ggplot"}. In case of
-\code{plot.type = "cc"}, returns list of objects of class \code{"ggplot"}.
+For an option \code{plot.type = "stat"}, returns object of the \code{"ggplot"}
+class. In the case of \code{plot.type = "cc"}, returns a list of objects of the
+\code{"ggplot"} class.
 
-Outputs can be edited and modified as standard \code{"ggplot"} object including colours, titles, shapes or linetypes.
+Outputs can be edited and modified as a standard \code{"ggplot"} object
+including colours, titles, shapes, or linetypes.
 
-Note that option \code{draw.CI = TRUE} returns confidence intervals for predicted values as calculated by
-\code{\link[difNLR]{predict.difNLR}}. Confidence intervals may overlap even in case that item functions differently.
+Note that the option \code{draw.CI = TRUE} returns confidence intervals for
+predicted values as calculated by the \code{\link[difNLR]{predict.difNLR}}.
+Confidence intervals may overlap even in the case that item functions
+differently.
 }
 \description{
-Plot method for an object of \code{"difNLR"} class using \pkg{ggplot2}.
+A plotting method for an object of the \code{"difNLR"} class using the
+\pkg{ggplot2} package.
 
-Two types of plots are available. The first one is obtained by setting \code{plot.type = "cc"}
-(default). The characteristic curves for an item specified in \code{item} argument are plotted.
-Plotted curves represent the best model.
+Two types of plots are available. The first one is obtained by setting
+\code{plot.type = "cc"} (default). The characteristic curves for items specified
+in the \code{item} argument are plotted. Plotted curves represent the best
+fitted model.
 
-The second plot is obtained by setting \code{plot.type = "stat"}. The  test statistics
-(either LR-test, or F-test, depends on argument \code{test}) are displayed on the Y axis,
-for each converged item. The detection threshold is displayed by a horizontal line and items
-detected as DIF are printed with the red color. Only parameters \code{size} and \code{title}
-are used.
+The second plot is obtained by setting \code{plot.type = "stat"}. The test
+statistics (either LR-test, F-test, or Wald test; depending on argument
+\code{test}) are displayed on the Y axis, for each converged item. The detection
+threshold is displayed by a horizontal line and items detected as DIF are
+printed with the red color. Only parameters \code{size} and \code{title} are
+used.
 }
 \examples{
 \dontrun{
@@ -69,7 +78,7 @@ group <- GMAT[, "group"] # group membership variable
 plot(x)
 plot(x, item = x$DIFitems)
 plot(x, item = 1)
-plot(x, item = "Item1")
+plot(x, item = "Item2", group.names = c("Group 1", "Group 2"))
 
 # item characteristic curves without empirical probabilities
 plot(x, item = 1, draw.empirical = FALSE)
@@ -82,25 +91,23 @@ plot(x, plot.type = "stat")
 }
 }
 \references{
-Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
-A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+functioning with nonlinear regression: A non-IRT approach accounting for
+guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
-Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
-
-Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
-Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+models for DIF and DDF detection. The R Journal, 12(1), 300--323,
+\doi{10.32614/RJ-2020-014}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
+\code{\link[difNLR]{difNLR}} for DIF detection among binary data using the generalized logistic regression model. \cr
 \code{\link[difNLR]{predict.difNLR}} for prediction.
-\code{\link[ggplot2]{ggplot}} for general function to plot a \code{"ggplot"} object.
+\code{\link[ggplot2]{ggplot}} for a general function to plot with the \pkg{"ggplot2"} package.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

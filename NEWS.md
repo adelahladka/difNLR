@@ -1,5 +1,25 @@
 ## Changes and developments in the difNLR package
 
+### Changes in version 1.5.0 (2024-12-14)
+
+#### BUGFIXING
+  * Bug caused by mixing two parametrization in `predict.difNLR()` was fixed. 
+  * Bug in calculation of starting values with `startNLR()` was fixed. 
+  
+#### MAJOR UPDATES
+  * Options `"em"` and `"plf"` were added for the `method` argument in the 
+    `estimNLR()` function to estimate item parameters with either the EM 
+    algorithm or algorithm based on parametric link function (PLF). "plf" is now
+    default option. This is also the default option for the `NLR()` function.
+  * Options  for the `parameterization` argument of the `formulaNLR()` and 
+    `startNLR()` function were updated (renamed). 
+  * Argument `constraints` were added into the `startNLR()` function. 
+  
+#### MINOR UPDATES
+  * References were updated.
+
+------
+
 ### Changes in version 1.4.3 (2023-05-03)
 
 #### MAJOR UPDATES
@@ -491,7 +511,7 @@
   * Argument `start` in `difNLR()` function is now item-specific. The input is
     correctly checked.
   * In case that some items do not converge, starting values are recalculated
-    from bootstraped sample and problematic models are fitted again. This is done
+    from bootstrapped sample and problematic models are fitted again. This is done
     20 times at most.
     The options were added into `difNLR()` and `NLR()` functions.
   * Argument `constraints` in `difNLR()` function is now item-specific.

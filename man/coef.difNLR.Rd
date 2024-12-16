@@ -3,30 +3,41 @@
 \name{coef.difNLR}
 \alias{coef.difNLR}
 \alias{coefficients.difNLR}
-\title{Extract model coefficients from an object of \code{"difNLR"} class.}
+\title{Extract item parameter estimates from an object of the \code{"difNLR"} class.}
 \usage{
-\method{coef}{difNLR}(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...)
+\method{coef}{difNLR}(
+  object,
+  item = "all",
+  SE = FALSE,
+  simplify = FALSE,
+  IRTpars = TRUE,
+  CI = 0.95,
+  ...
+)
 }
 \arguments{
-\item{object}{an object of \code{"difNLR"} class.}
+\item{object}{an object of the \code{"difNLR"} class.}
 
-\item{SE}{logical: should the standard errors of estimated
-parameters be also returned? (default is \code{FALSE}).}
+\item{item}{numeric or character: either character \code{"all"} to apply for all
+converged items (default), or a vector of item names (column names of the
+\code{Data}), or item identifiers (integers specifying the column number).}
 
-\item{simplify}{logical: should the estimated parameters be
-simplified to a matrix? (default is \code{FALSE}).}
+\item{SE}{logical: should the standard errors of the estimated item parameters
+be also returned? (the default is \code{FALSE}).}
 
-\item{IRTpars}{logical: should the estimated parameters be returned
-in IRT parameterization? (default is \code{TRUE}).}
+\item{simplify}{logical: should the estimated item parameters be simplified to a
+matrix? (the default is \code{FALSE}).}
 
-\item{CI}{numeric: level of confidence interval for parameters,
-default is \code{0.95} for 95\% confidence interval.}
+\item{IRTpars}{logical: should the estimated item parameters be returned in he
+IRT parameterization? (the default is \code{TRUE}).}
 
-\item{...}{other generic parameters for \code{coef()} function.}
+\item{CI}{numeric: a significance level for confidence intervals of item
+parameter estimates (the default is \code{0.95} for 95\% confidence interval).}
+
+\item{...}{other generic parameters for the \code{coef()} method.}
 }
 \description{
-S3 method for extracting model coefficients from an
-  object of \code{"difNLR"} class.
+S3 method for extracting the item parameter estimates from an object of the \code{"difNLR"} class.
 }
 \examples{
 \dontrun{
@@ -49,27 +60,27 @@ coef(x, SE = TRUE, simplify = TRUE)
 coef(x, IRTpars = FALSE)
 # intercept-slope parameterization, simplifies to matrix, turn off confidence intervals
 coef(x, IRTpars = FALSE, simplify = TRUE, CI = 0)
+# for DIF items only
+coef(x, item = x$DIFitems, IRTpars = FALSE, simplify = TRUE, CI = 0)
 }
 }
 \references{
-Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
-A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+functioning with nonlinear regression: A non-IRT approach accounting for
+guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
-Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
-
-Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
-Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+models for DIF and DDF detection. The R Journal, 12(1), 300--323,
+\doi{10.32614/RJ-2020-014}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
-\code{\link[stats]{coef}} for generic function extracting model coefficients.
+\code{\link[difNLR]{difNLR}} for DIF detection among binary data using the generalized logistic regression model. \cr
+\code{\link[stats]{coef}} for a generic function for extracting parameter estimates.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

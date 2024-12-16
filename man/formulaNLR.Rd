@@ -2,52 +2,80 @@
 % Please edit documentation in R/formulaNLR.R
 \name{formulaNLR}
 \alias{formulaNLR}
-\title{Formula for non-linear regression DIF model.}
+\title{Creates a formula for non-linear regression DIF models.}
 \usage{
-formulaNLR(model, constraints = NULL, type = "all", parameterization = "classic", outcome)
+formulaNLR(model, constraints = NULL, type = "all", parameterization = "irt",
+           outcome)
 }
 \arguments{
-\item{model}{character: generalized logistic regression model for which starting values should be
-estimated. See \strong{Details}.}
+\item{model}{character: generalized logistic regression model for which
+starting values should be estimated. See \strong{Details}.}
 
-\item{constraints}{character: which parameters should be the same for both groups. Possible values
-are any combinations of parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}. Default value
-is \code{NULL}. See \strong{Details}.}
+\item{constraints}{character: which parameters should be the same for both
+groups. Possible values are any combinations of parameters \code{"a"},
+\code{"b"}, \code{"c"}, and \code{"d"}. Default value is \code{NULL}.}
 
-\item{type}{character: type of DIF to be tested. Possible values are \code{"all"} for detecting
-difference in any parameter (default), \code{"udif"} for uniform DIF only (i.e., difference in
-difficulty parameter \code{"b"}), \code{"nudif"} for non-uniform DIF only (i.e., difference in
-discrimination parameter \code{"a"}), \code{"both"} for uniform and non-uniform DIF (i.e.,
-difference in parameters \code{"a"} and \code{"b"}), or combination of parameters \code{"a"},
-\code{"b"}, \code{"c"}, and \code{"d"}. Can be specified as a single value (for all items) or as
-an item-specific vector.}
+\item{type}{character: type of DIF to be tested. Possible values are
+\code{"all"} for detecting difference in any parameter (default),
+\code{"udif"} for uniform DIF only (i.e., difference in difficulty
+parameter \code{"b"}),
+\code{"nudif"} for non-uniform DIF only (i.e., difference in discrimination
+parameter \code{"a"}),
+\code{"both"} for uniform and non-uniform DIF (i.e., difference in
+parameters \code{"a"} and \code{"b"}),
+or any combination of parameters \code{"a"}, \code{"b"}, \code{"c"}, and
+\code{"d"}. Can be specified as a single value (for all items) or as an
+item-specific vector.}
 
 \item{parameterization}{character: parameterization of regression
-coefficients. Possible options are \code{"classic"} (IRT parameterization),
-\code{"alternative"} (default) and \code{"logistic"} (logistic regression).
-See \strong{Details}.}
+coefficients. Possible options are \code{"irt"} (IRT parameterization,
+default), \code{"is"} (intercept-slope), and \code{"logistic"} (logistic
+regression as in the \code{\link[stats]{glm}} function, available for
+the \code{"2PL"} model only). See \strong{Details}.}
 
-\item{outcome}{character: name of outcome to be printed in formula. If not specified \code{"y"} is used.}
+\item{outcome}{character: name of outcome to be printed in formula. If not
+specified \code{"y"} is used.}
 }
 \value{
-A list of two models. Both includes formula, parameters to be estimated and their lower and upper constraints.
+A list of two models. Each includes a formula, parameters to be estimated,
+and their lower and upper constraints.
 }
 \description{
-Function returns the formula of the non-linear regression DIF model
-based on model specification and DIF type to be tested.
+The function returns the formula of the non-linear regression DIF model based
+on model specification and DIF type to be tested.
 }
 \details{
-The unconstrained form of 4PL generalized logistic regression model for probability of correct
-answer (i.e., \eqn{y = 1}) is
-\deqn{P(y = 1) = (c + cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b - bDif * g))), }
-where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
-Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
-Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
-(reference and focal) in relevant parameters.
+The unconstrained form of the 4PL generalized logistic regression model for
+probability of correct answer (i.e., \eqn{Y_{pi} = 1}) using IRT parameterization
+is
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+(1 - G_p)) / (1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
+(X_p - b_p - b_{i\text{DIF}} \cdot G_p))), }
+where \eqn{X_p} is the matching criterion (e.g., standardized total score) and
+\eqn{G_p} is a group membership variable for respondent \eqn{p}.
+Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_{iR}}, and \eqn{d_{iR}}
+are discrimination, difficulty, guessing, and inattention for the reference
+group for item \eqn{i}. Terms \eqn{a_{i\text{DIF}}} and \eqn{b_{i\text{DIF}}}
+then represent differences between the focal and reference groups in
+discrimination and difficulty for item \eqn{i}. Terms \eqn{c_{iF}}, and
+\eqn{d_{iF}} are guessing and inattention parameters for the focal group for
+item \eqn{i}. In the case that there is no assumed difference between the
+reference and focal group in the guessing or inattention parameters, the terms
+\eqn{c_i} and \eqn{d_i} are used.
+
+Alternatively, intercept-slope parameterization may be applied:
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+(1 - G_p)) / (1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
+\beta_{i2} \cdot G_p + \beta_{i3} \cdot X_p \cdot G_p))), }
+where parameters \eqn{\beta_{i0}, \beta_{i1}, \beta_{i2}, \beta_{i3}} are
+intercept, effect of the matching criterion, effect of the group membership,
+and their mutual interaction, respectively.
 
 The \code{model} argument offers several predefined models. The options are as follows:
 \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
-\code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+\code{1PL} for 1PL model with discrimination parameter set the same for both groups,
 \code{2PL} for logistic regression model,
 \code{3PLcg} for 3PL model with fixed guessing for both groups,
 \code{3PLdg} for 3PL model with fixed inattention for both groups,
@@ -58,34 +86,40 @@ The \code{model} argument offers several predefined models. The options are as f
 \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
 or \code{4PL} for 4PL model.
 
-Three possible parameterization can be specified in \code{"parameterization"} argument: \code{"classic"}
-returns IRT parameters of reference group and differences in these parameters between reference and focal group.
-\code{"alternative"} returns IRT parameters of reference group, the differences in parameters \code{"a"} and
-\code{"b"} between two groups and parameters \code{"c"} and \code{"d"} for focal group.
-\code{"logistic"} returns parameters in logistic regression parameterization and it is available only for 2PL model.
+Three possible parameterizations can be specified in the
+\code{"parameterization"} argument: \code{"irt"} returns the IRT parameters
+of the reference group and differences in these parameters between the
+reference and focal group. Parameters of asymptotes are printed separately
+for the reference and focal groups. \code{"is"} returns intercept-slope
+parameterization. Parameters of asymptotes are again printed separately for
+the reference and focal groups. \code{"logistic"} returns parameters in
+logistic regression parameterization as in the \code{\link[stats]{glm}}
+function, and it is available only for the 2PL model.
 }
 \examples{
-# 3PL model with the same guessing for both groups
+# 3PL model with the same guessing parameter for both groups
 # to test both types of DIF
 formulaNLR(model = "3PLcg", type = "both")
+formulaNLR(model = "3PLcg", type = "both", parameterization = "is")
 
-# 4PL model with the same guessing and inattention
+# 4PL model with the same guessing and inattention parameters
 # to test uniform DIF
 formulaNLR(model = "4PLcgdg", type = "udif")
+formulaNLR(model = "4PLcgdg", type = "udif", parameterization = "is")
 
 # 2PL model to test non-uniform DIF
 formulaNLR(model = "2PL", type = "nudif")
+formulaNLR(model = "2PL", type = "nudif", parameterization = "is")
+formulaNLR(model = "2PL", type = "nudif", parameterization = "logistic")
 
 # 4PL model to test all possible DIF
-# with alternative parameterization
-formulaNLR(model = "4PL", type = "all", parameterization = "alternative")
+formulaNLR(model = "4PL", type = "all", parameterization = "irt")
+formulaNLR(model = "4PL", type = "all", parameterization = "is")
 
-# 4PL model with fixed a and c parameter
-# to test difference in b with alternative parameterization
-formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "alternative")
-
-# 2PL model with logistic parameterization
-formulaNLR(model = "2PL", parameterization = "logistic")
+# 4PL model with fixed a and c parameters
+# to test difference in b
+formulaNLR(model = "4PL", constraints = "ac", type = "b")
+formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "is")
 }
 \seealso{
 \code{\link[difNLR]{difNLR}}
@@ -93,7 +127,6 @@ formulaNLR(model = "2PL", parameterization = "logistic")
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

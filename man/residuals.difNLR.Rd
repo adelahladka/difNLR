@@ -4,23 +4,24 @@
 \alias{fitted.difNLR}
 \alias{residuals.difNLR}
 \alias{resid.difNLR}
-\title{Fitted values and residuals for an object of \code{"difNLR"} class.}
+\title{Fitted values and residuals for an object of the \code{"difNLR"} class.}
 \usage{
 \method{fitted}{difNLR}(object, item = "all", ...)
 
 \method{residuals}{difNLR}(object, item = "all", ...)
 }
 \arguments{
-\item{object}{an object of \code{"difNLR"} class.}
+\item{object}{an object of the \code{"difNLR"} class.}
 
-\item{item}{numeric or character: either character \code{"all"} to apply for all converged items (default),
-or a vector of item names (column names of \code{Data}), or item identifiers (integers specifying
-the column number).}
+\item{item}{numeric or character: either character \code{"all"} to apply for all
+converged items (default), or a vector of item names (column names of the
+\code{Data}), or item identifiers (integers specifying the column number).}
 
 \item{...}{other generic parameters for S3 methods.}
 }
 \description{
-S3 methods for extracting fitted values and residuals for an object of \code{"difNLR"} class.
+S3 methods for extracting fitted values and residuals for an object of the
+\code{"difNLR"} class.
 }
 \examples{
 \dontrun{
@@ -36,32 +37,33 @@ group <- GMAT[, "group"] # group membership variable
 # fitted values
 fitted(x)
 fitted(x, item = 1)
+fitted(x, item = x$DIFitems)
 
 # residuals
 residuals(x)
 residuals(x, item = 1)
+residuals(x, item = x$DIFitems)
 }
+
 }
 \references{
-Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
-A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
+Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+functioning with nonlinear regression: A non-IRT approach accounting for
+guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
-Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
-
-Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
-Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+models for DIF and DDF detection. The R Journal, 12(1), 300--323,
+\doi{10.32614/RJ-2020-014}.
 }
 \seealso{
-\code{\link[difNLR]{difNLR}} for DIF detection among binary data using generalized logistic regression model. \cr
-\code{\link[stats]{fitted}} for generic function extracting fitted values. \cr
-\code{\link[stats]{residuals}} for generic function extracting residuals.
+\code{\link[difNLR]{difNLR}} for DIF detection among binary data using the generalized logistic regression model. \cr
+\code{\link[stats]{fitted}} for a generic function extracting fitted values. \cr
+\code{\link[stats]{residuals}} for a generic function extracting residuals.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

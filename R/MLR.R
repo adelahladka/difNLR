@@ -146,39 +146,45 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
 
   m1 <- lapply(1:m, function(i) {
     switch(type,
-      "both" = nnet::multinom(relevel(as.factor(Data[, i]),
-        ref = paste(key[i])
-      ) ~ x * group,
-      trace = FALSE
+      "both" = nnet::multinom(
+        relevel(as.factor(Data[, i]),
+          ref = paste(key[i])
+        ) ~ x * group,
+        trace = FALSE
       ),
-      "nudif" = nnet::multinom(relevel(as.factor(Data[, i]),
-        ref = paste(key[i])
-      ) ~ x * group,
-      trace = FALSE
+      "nudif" = nnet::multinom(
+        relevel(as.factor(Data[, i]),
+          ref = paste(key[i])
+        ) ~ x * group,
+        trace = FALSE
       ),
-      "udif" = nnet::multinom(relevel(as.factor(Data[, i]),
-        ref = paste(key[i])
-      ) ~ x + group,
-      trace = FALSE
+      "udif" = nnet::multinom(
+        relevel(as.factor(Data[, i]),
+          ref = paste(key[i])
+        ) ~ x + group,
+        trace = FALSE
       )
     )
   })
   m0 <- lapply(1:m, function(i) {
     switch(type,
-      "both" = nnet::multinom(relevel(as.factor(Data[, i]),
-        ref = paste(key[i])
-      ) ~ x,
-      trace = FALSE
+      "both" = nnet::multinom(
+        relevel(as.factor(Data[, i]),
+          ref = paste(key[i])
+        ) ~ x,
+        trace = FALSE
       ),
-      "nudif" = nnet::multinom(relevel(as.factor(Data[, i]),
-        ref = paste(key[i])
-      ) ~ x + group,
-      trace = FALSE
+      "nudif" = nnet::multinom(
+        relevel(as.factor(Data[, i]),
+          ref = paste(key[i])
+        ) ~ x + group,
+        trace = FALSE
       ),
-      "udif" = nnet::multinom(relevel(as.factor(Data[, i]),
-        ref = paste(key[i])
-      ) ~ x,
-      trace = FALSE
+      "udif" = nnet::multinom(
+        relevel(as.factor(Data[, i]),
+          ref = paste(key[i])
+        ) ~ x,
+        trace = FALSE
       )
     )
   })
@@ -245,14 +251,15 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
   )
   par_tmp[rownames(par), colnames(par)] <- par
 
-  par_new <- matrix(cbind(
-    -par_tmp[, "(Intercept)"] / par_tmp[, "x"],
-    par_tmp[, "x"],
-    (par_tmp[, "(Intercept)"] * par_tmp[, "x:group"] - par_tmp[, "x"] * par_tmp[, "group"]) / (par_tmp[, "x"]^2 + par_tmp[, "x"] * par_tmp[, "x:group"]),
-    par_tmp[, "x:group"]
-  ),
-  ncol = 4,
-  dimnames = list(cats, c("b", "a", "bDIF", "aDIF"))
+  par_new <- matrix(
+    cbind(
+      -par_tmp[, "(Intercept)"] / par_tmp[, "x"],
+      par_tmp[, "x"],
+      (par_tmp[, "(Intercept)"] * par_tmp[, "x:group"] - par_tmp[, "x"] * par_tmp[, "group"]) / (par_tmp[, "x"]^2 + par_tmp[, "x"] * par_tmp[, "x:group"]),
+      par_tmp[, "x:group"]
+    ),
+    ncol = 4,
+    dimnames = list(cats, c("b", "a", "bDIF", "aDIF"))
   )
 
   if (n_cats == 1) {

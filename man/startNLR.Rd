@@ -4,58 +4,81 @@
 \alias{startNLR}
 \title{Calculates starting values for non-linear regression DIF models.}
 \usage{
-startNLR(Data, group, model, match = "zscore", parameterization = "alternative",
-         simplify = FALSE)
+startNLR(Data, group, model, constraints = NULL, match = "zscore",
+         parameterization = "irt", simplify = FALSE)
 }
 \arguments{
-\item{Data}{Data data.frame or matrix: dataset which rows represent
+\item{Data}{data.frame or matrix: dataset in which rows represent
 scored examinee answers (\code{"1"} correct, \code{"0"}
 incorrect) and columns correspond to the items.}
 
-\item{group}{numeric: binary vector of group membership. \code{"0"}
-for reference group, \code{"1"} for focal group.}
+\item{group}{numeric: a binary vector of a group membership (\code{"0"}
+for the reference group, \code{"1"} for the focal group).}
 
 \item{model}{character: generalized logistic regression model for
 which starting values should be estimated. See \strong{Details}.}
 
+\item{constraints}{character: which parameters should be the same for both
+groups. Possible values are any combinations of parameters \code{"a"},
+\code{"b"}, \code{"c"}, and \code{"d"}. Default value is \code{NULL}.}
+
 \item{match}{character or numeric: matching criterion to be used as
-estimate of trait. Can be either \code{"zscore"} (default,
+an estimate of the trait. It can be either \code{"zscore"} (default,
 standardized total score), \code{"score"} (total test score), or
-numeric vector of the same length as number of observations in
-\code{Data}.}
+a numeric vector of the same length as a number of observations in
+the \code{Data}.}
 
 \item{parameterization}{character: parameterization of regression
-coefficients. Possible options are \code{"classic"} (IRT
-parameterization), \code{"alternative"} (default) and
-\code{"logistic"} (logistic regression). See \strong{Details}.}
+coefficients. Possible options are \code{"irt"} (IRT parameterization,
+default), \code{"is"} (intercept-slope), and \code{"logistic"} (logistic
+regression as in the \code{\link[stats]{glm}} function, available for
+the \code{"2PL"} model only). See \strong{Details}.}
 
 \item{simplify}{logical: should initial values be simplified into
-the matrix? This is only applicable when parameterization is the
+the matrix? It is only applicable when parameterization is the
 same for all items.}
 }
 \value{
-A list containing elements representing items. Each element is a
-named numeric vector of length 8 with initial values for
-generalized logistic regression model.
+A list containing elements representing items. Each element is a named
+numeric vector with initial values for the chosen generalized logistic
+regression model.
 }
 \description{
-Calculates starting values for \code{difNLR()} function based
-on linear approximation.
+Calculates starting values for the \code{difNLR()} function based on linear
+approximation.
 }
 \details{
-The unconstrained form of 4PL generalized logistic regression model
-for probability of correct answer (i.e., \eqn{y = 1}) is
-\deqn{P(y = 1) = (c + cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b - bDif * g))), }
-where \eqn{x} is by default standardized total score (also called
-Z-score) and \eqn{g} is a group membership. Parameters \eqn{a},
-\eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty,
-guessing, and inattention. Terms \eqn{aDif}, \eqn{bDif},
-\eqn{cDif}, and \eqn{dDif} then represent differences between two
-groups (reference and focal) in relevant parameters.
+The unconstrained form of the 4PL generalized logistic regression model for
+probability of correct answer (i.e., \eqn{Y_{pi} = 1}) using IRT parameterization
+is
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+(1 - G_p)) / (1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
+(X_p - b_p - b_{i\text{DIF}} \cdot G_p))), }
+where \eqn{X_p} is the matching criterion (e.g., standardized total score) and
+\eqn{G_p} is a group membership variable for respondent \eqn{p}.
+Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_{iR}}, and \eqn{d_{iR}}
+are discrimination, difficulty, guessing, and inattention for the reference
+group for item \eqn{i}. Terms \eqn{a_{i\text{DIF}}} and \eqn{b_{i\text{DIF}}}
+then represent differences between the focal and reference groups in
+discrimination and difficulty for item \eqn{i}. Terms \eqn{c_{iF}}, and
+\eqn{d_{iF}} are guessing and inattention parameters for the focal group for
+item \eqn{i}. In the case that there is no assumed difference between the
+reference and focal group in the guessing or inattention parameters, the terms
+\eqn{c_i} and \eqn{d_i} are used.
+
+Alternatively, intercept-slope parameterization may be applied:
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+(1 - G_p)) / (1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
+\beta_{i2} \cdot G_p + \beta_{i3} \cdot X_p \cdot G_p))), }
+where parameters \eqn{\beta_{i0}, \beta_{i1}, \beta_{i2}, \beta_{i3}} are
+intercept, effect of the matching criterion, effect of the group membership,
+and their mutual interaction, respectively.
 
 The \code{model} argument offers several predefined models. The options are as follows:
 \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
-\code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+\code{1PL} for 1PL model with discrimination parameter set the same for both groups,
 \code{2PL} for logistic regression model,
 \code{3PLcg} for 3PL model with fixed guessing for both groups,
 \code{3PLdg} for 3PL model with fixed inattention for both groups,
@@ -66,14 +89,15 @@ The \code{model} argument offers several predefined models. The options are as f
 \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
 or \code{4PL} for 4PL model.
 
-Three possible parameterization can be specified in
-\code{"parameterization"} argument: \code{"classic"} returns IRT
-parameters of reference group and differences in these parameters
-between reference and focal group. \code{"alternative"} returns IRT
-parameters of reference group, the differences in parameters
-\code{"a"} and \code{"b"} between two groups and parameters
-\code{"c"} and \code{"d"} for focal group. \code{"logistic"}
-returns parameters in logistic regression parameterization.
+Three possible parameterizations can be specified in the
+\code{"parameterization"} argument: \code{"irt"} returns the IRT parameters
+of the reference group and differences in these parameters between the
+reference and focal group. Parameters of asymptotes are printed separately
+for the reference and focal groups. \code{"is"} returns intercept-slope
+parameterization. Parameters of asymptotes are again printed separately for
+the reference and focal groups. \code{"logistic"} returns parameters in
+logistic regression parameterization as in the \code{\link[stats]{glm}}
+function, and it is available only for the 2PL model.
 }
 \examples{
 # loading data
@@ -81,16 +105,21 @@ data(GMAT)
 Data <- GMAT[, 1:20] # items
 group <- GMAT[, "group"] # group membership variable
 
-# starting values for 3PL model
-startNLR(Data, group, model = "3PL")
+# 3PL model with the same guessing for both groups
+startNLR(Data, group, model = "3PLcg")
+startNLR(Data, group, model = "3PLcg", parameterization = "is")
+# simplified into a single table
+startNLR(Data, group, model = "3PLcg", simplify = TRUE)
+startNLR(Data, group, model = "3PLcg", parameterization = "is", simplify = TRUE)
 
-# starting values for 3PL model
-# simplified into single table
-startNLR(Data, group, model = "3PL", simplify = TRUE)
+# 2PL model
+startNLR(Data, group, model = "2PL")
+startNLR(Data, group, model = "2PL", parameterization = "is")
+startNLR(Data, group, model = "2PL", parameterization = "logistic")
 
-# starting values for 3PL model
-# with score as matching criterion
-startNLR(Data, group, model = "3PL", match = "score")
+# 4PL model with a total score as the matching criterion
+startNLR(Data, group, model = "4PL", match = "score")
+startNLR(Data, group, model = "4PL", match = "score", parameterization = "is")
 
 # starting values for model specified for each item
 startNLR(Data, group,
@@ -99,11 +128,19 @@ startNLR(Data, group,
     rep("3PL", 5), rep("4PL", 5)
   )
 )
+
+# 4PL model with fixed a and c parameters
+startNLR(Data, group, model = "4PL", constraints = "ac", simplify = TRUE)
+
 }
 \references{
 Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
 A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
+
+Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+models for DIF and DDF detection. The R Journal, 12(1), 300--323,
+\doi{10.32614/RJ-2020-014}.
 
 Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
 Faculty of Mathematics and Physics, Charles University.
@@ -114,7 +151,6 @@ Faculty of Mathematics and Physics, Charles University.
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

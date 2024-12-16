@@ -4,24 +4,22 @@
 \alias{difNLR}
 \title{DIF detection using non-linear regression method.}
 \usage{
-difNLR(
-  Data, group, focal.name, model, constraints, type = "all", method = "nls",
-  match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10, test = "LR",
-  alpha = 0.05, p.adjust.method = "none", start, initboot = TRUE, nrBo = 20,
-  sandwich = FALSE
-)
+difNLR(Data, group, focal.name, model, constraints, type = "all",
+       method = "nls", match = "zscore", anchor = NULL, purify = FALSE,
+       nrIter = 10, test = "LR", alpha = 0.05, p.adjust.method = "none", start,
+       initboot = TRUE, nrBo = 20, sandwich = FALSE)
 }
 \arguments{
-\item{Data}{data.frame or matrix: dataset which rows represent scored
+\item{Data}{data.frame or matrix: dataset in which rows represent scored
 examinee answers (\code{"1"} correct, \code{"0"} incorrect) and columns
-correspond to the items. In addition, \code{Data} can hold the vector of
-group membership.}
+correspond to the items. In addition, \code{Data} can hold the vector of group
+membership.}
 
-\item{group}{numeric or character: a dichotomous vector of the same length as
-\code{nrow(Data)} or a column identifier of \code{Data}.}
+\item{group}{numeric or character: a binary vector of the same length as
+\code{nrow(Data)} or a column identifier in the \code{Data}.}
 
-\item{focal.name}{numeric or character: indicates the level of \code{group}
-which corresponds to focal group.}
+\item{focal.name}{numeric or character: indicates the level of the \code{group}
+corresponding to the focal group.}
 
 \item{model}{character: generalized logistic regression model to be fitted.
 See \strong{Details}.}
@@ -31,112 +29,112 @@ groups. Possible values are any combinations of parameters \code{"a"},
 \code{"b"}, \code{"c"}, and \code{"d"}. See \strong{Details}.}
 
 \item{type}{character: type of DIF to be tested. Possible values are
-\code{"all"} for detecting difference in any parameter (default),
+\code{"all"} for detecting differences in any parameters (default),
 \code{"udif"} for uniform DIF only (i.e., difference in difficulty
 parameter \code{"b"}), \code{"nudif"} for non-uniform DIF only (i.e.,
 difference in discrimination parameter \code{"a"}), \code{"both"} for
 uniform and non-uniform DIF (i.e., difference in parameters \code{"a"} and
-\code{"b"}), or combination of parameters \code{"a"}, \code{"b"},
+\code{"b"}), or a combination of parameters \code{"a"}, \code{"b"},
 \code{"c"}, and \code{"d"}. Can be specified as a single value (for all
 items) or as an item-specific vector.}
 
-\item{method}{character: method used to estimate parameters. The options
-are \code{"nls"} for non-linear least squares (default),
-\code{"mle"} for maximum likelihood method with \code{"L-BFGS-B"}
-algorithm, or \code{"irls"} for maximum likelihood method with iteratively
-reweighted least squares (available only for \code{model = "2PL"}).}
+\item{method}{character: an estimation method to be applied. The options are
+\code{"nls"} for non-linear least squares (default), \code{"mle"} for the
+maximum likelihood method using the \code{"L-BFGS-B"} algorithm with
+constraints, \code{"em"} for the maximum likelihood estimation with the EM
+algorithm, \code{"plf"} for the maximum likelihood estimation with the
+algorithm based on parametric link function, and \code{"irls"} for the maximum
+likelihood estimation with the iteratively reweighted least squares algorithm
+(available for the \code{"2PL"} model only). See \strong{Details}.}
 
-\item{match}{numeric or character: matching criterion to be used as an
-estimate of trait. Can be either \code{"zscore"} (default, standardized
-total score), \code{"score"} (total test score), or vector of the same
-length as number of observations in \code{Data}.}
+\item{match}{character or numeric: matching criterion to be used as
+an estimate of the trait. It can be either \code{"zscore"} (default,
+standardized total score), \code{"score"} (total test score), or
+a numeric vector of the same length as a number of observations in
+the \code{Data}.}
 
-\item{anchor}{numeric or character: specification of DIF free items. Either
-\code{NULL} (default), or a vector of item names (column names of
-\code{Data}), or item identifiers (integers specifying the column number)
-determining which items are currently considered as anchor (DIF free)
-items. Argument is ignored if \code{match} is not \code{"zscore"} or
-\code{"score"}.}
+\item{anchor}{character or numeric: specification of DIF free items. Either
+\code{NULL} (default), or a vector of item identifiers (integers specifying
+the column number) specifying which items are currently considered as anchor
+(DIF free) items. Argument is ignored if the \code{match} is not
+\code{"zscore"} or \code{"score"}.}
 
-\item{purify}{logical: should the item purification be applied? (default is
+\item{purify}{logical: should the item purification be applied? (the default is
 \code{FALSE}).}
 
 \item{nrIter}{numeric: the maximal number of iterations in the item
-purification (default is 10).}
+purification (the default is 10).}
 
-\item{test}{character: test to be performed for DIF detection. Can be either
-\code{"LR"} for likelihood ratio test of a submodel (default), \code{"W"}
-for Wald test, or \code{"F"} for F-test of a submodel.}
+\item{test}{character: a statistical test to be performed for DIF detection.
+Can be either \code{"LR"} for the likelihood ratio test of a submodel
+(default), \code{"W"} for the Wald's test, or \code{"F"} for the F-test of
+a submodel.}
 
-\item{alpha}{numeric: significance level (default is 0.05).}
+\item{alpha}{numeric: a significance level (the default is 0.05).}
 
-\item{p.adjust.method}{character: method for multiple comparison correction.
-Possible values are \code{"holm"}, \code{"hochberg"}, \code{"hommel"},
-\code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, and
-\code{"none"} (default). For more details see
+\item{p.adjust.method}{character: a method for a multiple comparison
+correction. Possible values are \code{"holm"}, \code{"hochberg"},
+\code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"},
+\code{"fdr"}, and \code{"none"} (default). For more details see
 \code{\link[stats]{p.adjust}}.}
 
-\item{start}{numeric: initial values for estimation of parameters. If not
-specified, starting values are calculated with
-\code{\link[difNLR]{startNLR}} function. Otherwise, list with as many
-elements as a number of items. Each element is a named numeric vector of
-length 8 representing initial values for parameter estimation.
-Specifically, parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}
-are initial values for discrimination, difficulty, guessing, and
-inattention for reference group. Parameters \code{"aDif"}, \code{"bDif"},
-\code{"cDif"}, and \code{"dDif"} are then differences in these parameters
-between reference and focal group.}
+\item{start}{numeric: initial values for the estimation of item parameters. If
+not specified, starting values are calculated with the
+\code{\link[difNLR]{startNLR}} function. Otherwise, a list with as many
+elements as a number of items. Each element is a named numeric vector
+representing initial values for estimation of item parameters. Specifically,
+parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"} are initial
+values for discrimination, difficulty, guessing, and inattention for the
+reference group. Parameters \code{"aDif"}, \code{"bDif"}, \code{"cDif"}, and
+\code{"dDif"} are then differences in these parameters between the reference
+and focal groups. For the \code{method = "irls"}, default initial values from
+the \code{\link[stats]{glm}} function are used.}
 
-\item{initboot}{logical: in case of convergence issues, should be starting
-values re-calculated based on bootstrapped samples? (default is
+\item{initboot}{logical: in the case of convergence issues, should starting
+values be re-calculated based on bootstrapped samples? (the default is
 \code{TRUE}; newly calculated initial values are applied only to
 items/models with convergence issues).}
 
-\item{nrBo}{numeric: the maximal number of iterations for calculation of
-starting values using bootstrapped samples (default is 20).}
+\item{nrBo}{numeric: the maximal number of iterations for the calculation of
+starting values using bootstrapped samples (the default is 20).}
 
-\item{sandwich}{logical: should be sandwich estimator used for covariance
-matrix of parameters when using \code{method = "nls"}? Default is
-\code{FALSE}.}
+\item{sandwich}{logical: should the sandwich estimator be applied for
+computation of the covariance matrix of item parameters when using
+\code{method = "nls"}? (the default is \code{FALSE}).}
 }
 \value{
 The \code{difNLR()} function returns an object of class \code{"difNLR"}. The
-output including values of the test statistics, p-values, and items detected
-as function differently is displayed by the \code{print()} method.
+output, including values of the test statistics, p-values, and items detected
+as function differently, is displayed by the \code{print()} method.
 
 Object of class \code{"difNLR"} is a list with the following components:
 \describe{
-  \item{\code{Sval}}{the values of the test statistics.}
-  \item{\code{nlrPAR}}{the estimates of final model.}
-  \item{\code{nlrSE}}{the standard errors of estimates of final model.}
-  \item{\code{parM0}}{the estimates of null model.}
-  \item{\code{seM0}}{the standard errors of estimates of null model.}
-  \item{\code{covM0}}{the covariance matrices of estimates of null model.}
-  \item{\code{llM0}}{log-likelihood of null model.}
-  \item{\code{parM1}}{the estimates of alternative model.}
-  \item{\code{seM1}}{the standard errors of estimates of alternative model.}
-  \item{\code{covM1}}{the covariance matrices of estimates of alternative model.}
-  \item{\code{llM1}}{log-likelihood of alternative model.}
-  \item{\code{DIFitems}}{either the column identifiers of the items which were detected as DIF, or
-  \code{"No DIF item detected"} in case no item was detected as function differently.}
+  \item{\code{Sval}}{the values of the \code{test} statistics.}
+  \item{\code{nlrPAR}}{the item parameter estimates of the final model.}
+  \item{\code{nlrSE}}{the standard errors of the item parameter estimates of the final model.}
+  \item{\code{parM0}}{the item parameter estimates of the null (smaller) model.}
+  \item{\code{seM0}}{the standard errors of item parameter estimates of the null (smaller) model.}
+  \item{\code{covM0}}{the covariance matrices of the item parameter estimates of the null (smaller) model.}
+  \item{\code{llM0}}{the log-likelihood values of the null (smaller) model.}
+  \item{\code{parM1}}{the item parameter estimates of the alternative (larger) model.}
+  \item{\code{seM1}}{the standard errors of the item parameter estimates of the alternative (larger) model.}
+  \item{\code{covM1}}{the covariance matrices of the item parameter estimates of alternative (larger) model.}
+  \item{\code{llM1}}{the log-likelihood values of the alternative (larger) model.}
+  \item{\code{DIFitems}}{either the column identifiers of the items which were detected as DIF, or \code{"No DIF item detected"} in the case no item was detected as function differently.}
   \item{\code{model}}{fitted model.}
   \item{\code{constraints}}{constraints for the \code{model}.}
-  \item{\code{type}}{character: type of DIF that was tested. If parameters were specified, the value is \code{"other"}.}
-  \item{\code{types}}{character: the parameters (specified by user, \code{type} has value \code{"other"}) which were
-  tested for difference.}
-  \item{\code{p.adjust.method}}{character: method for multiple comparison correction which was applied.}
-  \item{\code{pval}}{the p-values of the test.}
-  \item{\code{adj.pval}}{the adjusted p-values of the test using \code{p.adjust.method}.}
-  \item{\code{df}}{the degress of freedom of the test.}
+  \item{\code{type}}{character: type of DIF that was tested. If a combination of the item parameters was specified, the value is \code{"other"}.}
+  \item{\code{types}}{character: the parameters (specified by user, \code{type} has value \code{"other"}) which were tested for difference.}
+  \item{\code{p.adjust.method}}{character: a method for the multiple comparison correction which was applied.}
+  \item{\code{pval}}{the p-values by the \code{test}.}
+  \item{\code{adjusted.pval}}{adjusted p-values by the \code{p.adjust.method}.}
+  \item{\code{df}}{the degrees of freedom of the \code{test}.}
   \item{\code{test}}{used test.}
   \item{\code{purification}}{\code{purify} value.}
-  \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
-  is \code{TRUE}.}
+  \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
-  \code{"1"} in i-th row and j-th column means that j-th item was identified as DIF in i-th iteration. Returned only
-  if \code{purify} is \code{TRUE}.}
-  \item{\code{conv.puri}}{logical: indicating whether item purification process converged before the maximal number
-  \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
+  \code{"1"} in i-th row and j-th column means that j-th item was identified as DIF in i-th iteration. Returned only if \code{purify} is \code{TRUE}.}
+  \item{\code{conv.puri}}{logical: indicating whether item purification process converged before the maximal number \code{nrIter} of iterations. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{method}}{used estimation method.}
   \item{\code{conv.fail}}{numeric: number of convergence issues.}
   \item{\code{conv.fail.which}}{the identifiers of the items which did not converge.}
@@ -147,11 +145,11 @@ Object of class \code{"difNLR"} is a list with the following components:
   \item{\code{match}}{matching criterion.}
 }
 
-For an object of class \code{"difNLR"} several methods are available (e.g.,
+Several methods are available for an object of the \code{"difNLR"} class (e.g.,
 \code{methods(class = "difNLR")}).
 }
 \description{
-Performs DIF detection procedure for dichotomous data based on non-linear
+Performs DIF detection procedure in dichotomous data based on non-linear
 regression model (generalized logistic regression) and either
 likelihood-ratio test, F-test, or Wald's test of a submodel.
 }
@@ -161,25 +159,42 @@ the logistic regression procedure (Swaminathan & Rogers, 1990) accounting for
 possible guessing and/or inattention when responding (Drabinova & Martinkova,
 2017; Hladka & Martinkova, 2020).
 
-The unconstrained form of 4PL generalized logistic regression model for
-probability of correct answer (i.e., \eqn{y = 1}) is \deqn{P(y = 1) = (c +
-cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b
-- bDif * g))), } where \eqn{x} is by default standardized total score (also
-called Z-score) and \eqn{g} is a group membership. Parameters \eqn{a},
-\eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and
-inattention. Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then
-represent differences between two groups (reference and focal) in relevant
-parameters.
+The unconstrained form of the 4PL generalized logistic regression model for
+probability of correct answer (i.e., \eqn{Y_{pi} = 1}) using IRT
+parameterization is
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+(1 - G_p)) / (1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
+(X_p - b_p - b_{i\text{DIF}} \cdot G_p))), }
+where \eqn{X_p} is the matching criterion (e.g., standardized total score)
+and \eqn{G_p} is a group membership variable for respondent \eqn{p}.
+Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_{iR}}, and \eqn{d_{iR}} are
+discrimination, difficulty, guessing, and inattention for the reference group
+for item \eqn{i}. Terms \eqn{a_{i\text{DIF}}} and \eqn{b_{i\text{DIF}}} then
+represent differences between the focal and reference groups in
+discrimination and difficulty for item \eqn{i}. Terms \eqn{c_{iF}}, and
+\eqn{d_{iF}} are guessing and inattention parameters for the focal group for
+item \eqn{i}. In the case that there is no assumed difference between the
+reference and focal group in the guessing or inattention parameters, the
+terms \eqn{c_i} and \eqn{d_i} are used.
 
-This 4PL model can be further constrained by \code{model} and
-\code{constraints} arguments. The arguments \code{model} and
-\code{constraints} can be also combined. Both arguments can be specified as a
-single value (for all items) or as an item-specific vector (where each
-element correspond to one item).
+Alternatively, intercept-slope parameterization may be applied:
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+(1 - G_p)) / (1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
+\beta_{i2} \cdot G_p + \beta_{i3} \cdot X_p \cdot G_p))), }
+where parameters \eqn{\beta_{i0}, \beta_{i1}, \beta_{i2}, \beta_{i3}} are
+intercept, effect of the matching criterion, effect of the group membership,
+and their mutual interaction, respectively.
+
+The \code{model} and \code{constraints} arguments can further constrain the
+4PL model. The arguments \code{model} and \code{constraints} can also be
+combined. Both arguments can be specified as a single value (for all items)
+or as an item-specific vector (where each element corresponds to one item).
 
 The \code{model} argument offers several predefined models. The options are as follows:
 \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
-\code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+\code{1PL} for 1PL model with discrimination parameter set the same for both groups,
 \code{2PL} for logistic regression model,
 \code{3PLcg} for 3PL model with fixed guessing for both groups,
 \code{3PLdg} for 3PL model with fixed inattention for both groups,
@@ -190,20 +205,30 @@ The \code{model} argument offers several predefined models. The options are as f
 \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
 or \code{4PL} for 4PL model.
 
-The \code{model} can be specified in more detail with \code{constraints}
-argument which specifies what parameters should be fixed for both groups. For
-example, choice \code{"ad"} means that discrimination (parameter \code{"a"})
-and inattention (parameter \code{"d"}) are fixed for both groups and other
-parameters (\code{"b"} and \code{"c"}) are not. The \code{NA} value for
-\code{constraints} means no constraints.
+The underlying generalized logistic regression model can be further specified in
+more detail with the \code{constraints} argument which specifies what parameters
+should be fixed for both groups. For example, a choice \code{"ad"} means that
+discrimination (parameter \code{"a"}) and inattention (parameter \code{"d"}) are
+fixed (and estimated for) both groups and other parameters (\code{"b"} and
+\code{"c"}) are not. The \code{NA} value for \code{constraints} means no
+constraints.
 
-Missing values are allowed but discarded for item estimation. They must be
-coded as \code{NA} for both, \code{Data} and \code{group} arguments.
+Missing values are allowed but discarded for an item estimation. They must be
+coded as \code{NA} for both, the \code{Data} and \code{group} arguments.
 
-In case that model considers difference in guessing or inattention parameter,
-the different parameterization is used and parameters with standard errors
-are re-calculated by delta method. However, covariance matrices stick with
-alternative parameterization.
+The function uses intercept-slope parameterization for the estimation via the
+\code{\link[difNLR]{estimNLR}} function. Item parameters are then
+re-calculated into the IRT parameterization using the delta method.
+
+The function offers either the non-linear least squares estimation via the
+\code{\link[stats]{nls}} function (Drabinova & Martinkova, 2017; Hladka &
+Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
+algorithm with constraints via the \code{\link[stats]{optim}} function (Hladka &
+Martinkova, 2020), the maximum likelihood method with the EM algorithm (Hladka,
+Martinkova, & Brabec, 2024), the maximum likelihood method with the algorithm
+based on parametric link function (PLF, the default option; Hladka, Martinkova,
+& Brabec, 2024), or the maximum likelihood method with the iteratively
+reweighted least squares algorithm via the \code{\link[stats]{glm}} function.
 }
 \examples{
 # loading data
@@ -225,6 +250,7 @@ plot(x, plot.type = "stat")
 coef(x)
 coef(x, SE = TRUE)
 coef(x, SE = TRUE, simplify = TRUE)
+coef(x, item = 1, CI = 0)
 
 # fitted values
 fitted(x)
@@ -239,8 +265,7 @@ predict(x)
 predict(x, item = 1)
 
 # predicted values for new subjects
-predict(x, item = 1, match = 0, group = 0)
-predict(x, item = 1, match = 0, group = 1)
+predict(x, item = 1, match = 0, group = c(0, 1))
 
 # AIC, BIC, log-likelihood
 AIC(x)
@@ -292,11 +317,14 @@ difNLR(Data, group, focal.name = 1, model = "4PL", constraints = "ac", type = "b
 
 # testing both DIF effects using LR test,
 # 3PL model with fixed guessing for groups
-# using maximum likelihood estimation method with L-BFGS-B algorithm
+# using maximum likelihood estimation with
+# the L-BFGS-B algorithm, the EM algorithm, and the PLF algorithm
 difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "mle")
+difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "em")
+difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "plf")
 
 # testing both DIF effects using LR test and 2PL model
-# using maximum likelihood estimation method with iteratively reweighted least squares algorithm
+# using maximum likelihood estimation with iteratively reweighted least squares algorithm
 difNLR(Data, group, focal.name = 1, model = "2PL", method = "irls")
 }
 
@@ -307,34 +335,38 @@ functioning with nonlinear regression: A non-IRT approach accounting for
 guessing. Journal of Educational Measurement, 54(4), 498--517,
 \doi{10.1111/jedm.12158}.
 
-Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
-Faculty of Mathematics and Physics, Charles University.
+Hladka, A. (2021). Statistical models for detection of differential item
+functioning. Dissertation thesis. Faculty of Mathematics and Physics, Charles
+University.
 
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
 models for DIF and DDF detection. The R Journal, 12(1), 300--323,
 \doi{10.32614/RJ-2020-014}.
+
+Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
+for estimation of item functioning. Journal of Educational and Behavioral
+Statistics. Accepted.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item
 functioning using logistic regression procedures. Journal of Educational
 Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
 }
 \seealso{
-\code{\link[difNLR]{plot.difNLR}} for graphical representation of item characteristic curves and DIF statistics. \cr
-\code{\link[difNLR]{coef.difNLR}} for extraction of item parameters with their standard errors. \cr
+\code{\link[difNLR]{plot.difNLR}} for a graphical representation of item characteristic curves and DIF statistics. \cr
+\code{\link[difNLR]{coef.difNLR}} for an extraction of item parameters with their standard errors in various parameterizations. \cr
 \code{\link[difNLR]{predict.difNLR}} for prediction. \cr
-\code{\link[difNLR]{fitted.difNLR}} and \code{\link[difNLR]{residuals.difNLR}} for extraction of fitted
+\code{\link[difNLR]{fitted.difNLR}} and \code{\link[difNLR]{residuals.difNLR}} for an extraction of fitted
 values and residuals. \cr
 \code{\link[difNLR]{logLik.difNLR}}, \code{\link[difNLR]{AIC.difNLR}}, \code{\link[difNLR]{BIC.difNLR}}
-for extraction of log-likelihood and information criteria. \cr
+for an extraction of log-likelihood values and information criteria. \cr
 
 \code{\link[stats]{p.adjust}} for multiple comparison corrections. \cr
-\code{\link[stats]{nls}} for nonlinear least squares estimation. \cr
-\code{\link[difNLR]{startNLR}} for calculation of initial values of fitting algorithms in \code{difNLR()}.
+\code{\link[stats]{nls}} for a nonlinear least squares estimation. \cr
+\code{\link[difNLR]{startNLR}} for a calculation of initial values of fitting algorithms in \code{difNLR()}.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr
 Institute of Computer Science of the Czech Academy of Sciences \cr
-Faculty of Mathematics and Physics, Charles University \cr
 \email{hladka@cs.cas.cz} \cr
 
 Patricia Martinkova \cr

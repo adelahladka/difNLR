@@ -1,43 +1,69 @@
-#' Formula for non-linear regression DIF model.
+#' Creates a formula for non-linear regression DIF models.
 #'
-#' @aliases formulaNLR
-#'
-#' @description Function returns the formula of the non-linear regression DIF model
-#' based on model specification and DIF type to be tested.
-#'
-#' @param model character: generalized logistic regression model for which starting values should be
-#' estimated. See \strong{Details}.
-#' @param type character: type of DIF to be tested. Possible values are \code{"all"} for detecting
-#' difference in any parameter (default), \code{"udif"} for uniform DIF only (i.e., difference in
-#' difficulty parameter \code{"b"}), \code{"nudif"} for non-uniform DIF only (i.e., difference in
-#' discrimination parameter \code{"a"}), \code{"both"} for uniform and non-uniform DIF (i.e.,
-#' difference in parameters \code{"a"} and \code{"b"}), or combination of parameters \code{"a"},
-#' \code{"b"}, \code{"c"}, and \code{"d"}. Can be specified as a single value (for all items) or as
-#' an item-specific vector.
-#' @param constraints character: which parameters should be the same for both groups. Possible values
-#' are any combinations of parameters \code{"a"}, \code{"b"}, \code{"c"}, and \code{"d"}. Default value
-#' is \code{NULL}. See \strong{Details}.
-#' @param parameterization character: parameterization of regression
-#' coefficients. Possible options are \code{"classic"} (IRT parameterization),
-#' \code{"alternative"} (default) and \code{"logistic"} (logistic regression).
-#' See \strong{Details}.
-#' @param outcome character: name of outcome to be printed in formula. If not specified \code{"y"} is used.
+#' @description
+#' The function returns the formula of the non-linear regression DIF model based
+#' on model specification and DIF type to be tested.
 #'
 #' @usage
-#' formulaNLR(model, constraints = NULL, type = "all", parameterization = "classic", outcome)
+#' formulaNLR(model, constraints = NULL, type = "all", parameterization = "irt",
+#'            outcome)
+#'
+#' @param model character: generalized logistic regression model for which
+#'   starting values should be estimated. See \strong{Details}.
+#' @param constraints character: which parameters should be the same for both
+#'   groups. Possible values are any combinations of parameters \code{"a"},
+#'   \code{"b"}, \code{"c"}, and \code{"d"}. Default value is \code{NULL}.
+#' @param type character: type of DIF to be tested. Possible values are
+#'   \code{"all"} for detecting difference in any parameter (default),
+#'   \code{"udif"} for uniform DIF only (i.e., difference in difficulty
+#'   parameter \code{"b"}),
+#'   \code{"nudif"} for non-uniform DIF only (i.e., difference in discrimination
+#'   parameter \code{"a"}),
+#'   \code{"both"} for uniform and non-uniform DIF (i.e., difference in
+#'   parameters \code{"a"} and \code{"b"}),
+#'   or any combination of parameters \code{"a"}, \code{"b"}, \code{"c"}, and
+#'   \code{"d"}. Can be specified as a single value (for all items) or as an
+#'   item-specific vector.
+#' @param parameterization character: parameterization of regression
+#'   coefficients. Possible options are \code{"irt"} (IRT parameterization,
+#'   default), \code{"is"} (intercept-slope), and \code{"logistic"} (logistic
+#'   regression as in the \code{\link[stats]{glm}} function, available for
+#'   the \code{"2PL"} model only). See \strong{Details}.
+#' @param outcome character: name of outcome to be printed in formula. If not
+#'   specified \code{"y"} is used.
 #'
 #' @details
-#' The unconstrained form of 4PL generalized logistic regression model for probability of correct
-#' answer (i.e., \eqn{y = 1}) is
-#' \deqn{P(y = 1) = (c + cDif * g) + (d + dDif * g - c - cDif * g) / (1 + exp(-(a + aDif * g) * (x - b - bDif * g))), }
-#' where \eqn{x} is by default standardized total score (also called Z-score) and \eqn{g} is a group membership.
-#' Parameters \eqn{a}, \eqn{b}, \eqn{c}, and \eqn{d} are discrimination, difficulty, guessing, and inattention.
-#' Terms \eqn{aDif}, \eqn{bDif}, \eqn{cDif}, and \eqn{dDif} then represent differences between two groups
-#' (reference and focal) in relevant parameters.
+#' The unconstrained form of the 4PL generalized logistic regression model for
+#' probability of correct answer (i.e., \eqn{Y_{pi} = 1}) using IRT parameterization
+#' is
+#' \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+#' (d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+#' (1 - G_p)) / (1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
+#' (X_p - b_p - b_{i\text{DIF}} \cdot G_p))), }
+#' where \eqn{X_p} is the matching criterion (e.g., standardized total score) and
+#' \eqn{G_p} is a group membership variable for respondent \eqn{p}.
+#' Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_{iR}}, and \eqn{d_{iR}}
+#' are discrimination, difficulty, guessing, and inattention for the reference
+#' group for item \eqn{i}. Terms \eqn{a_{i\text{DIF}}} and \eqn{b_{i\text{DIF}}}
+#' then represent differences between the focal and reference groups in
+#' discrimination and difficulty for item \eqn{i}. Terms \eqn{c_{iF}}, and
+#' \eqn{d_{iF}} are guessing and inattention parameters for the focal group for
+#' item \eqn{i}. In the case that there is no assumed difference between the
+#' reference and focal group in the guessing or inattention parameters, the terms
+#' \eqn{c_i} and \eqn{d_i} are used.
+#'
+#' Alternatively, intercept-slope parameterization may be applied:
+#' \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
+#' (d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
+#' (1 - G_p)) / (1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
+#' \beta_{i2} \cdot G_p + \beta_{i3} \cdot X_p \cdot G_p))), }
+#' where parameters \eqn{\beta_{i0}, \beta_{i1}, \beta_{i2}, \beta_{i3}} are
+#' intercept, effect of the matching criterion, effect of the group membership,
+#' and their mutual interaction, respectively.
 #'
 #' The \code{model} argument offers several predefined models. The options are as follows:
 #' \code{Rasch} for 1PL model with discrimination parameter fixed on value 1 for both groups,
-#' \code{1PL} for 1PL model with discrimination parameter fixed for both groups,
+#' \code{1PL} for 1PL model with discrimination parameter set the same for both groups,
 #' \code{2PL} for logistic regression model,
 #' \code{3PLcg} for 3PL model with fixed guessing for both groups,
 #' \code{3PLdg} for 3PL model with fixed inattention for both groups,
@@ -48,18 +74,23 @@
 #' \code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed inattention for both groups,
 #' or \code{4PL} for 4PL model.
 #'
-#' Three possible parameterization can be specified in \code{"parameterization"} argument: \code{"classic"}
-#' returns IRT parameters of reference group and differences in these parameters between reference and focal group.
-#' \code{"alternative"} returns IRT parameters of reference group, the differences in parameters \code{"a"} and
-#' \code{"b"} between two groups and parameters \code{"c"} and \code{"d"} for focal group.
-#' \code{"logistic"} returns parameters in logistic regression parameterization and it is available only for 2PL model.
+#' Three possible parameterizations can be specified in the
+#' \code{"parameterization"} argument: \code{"irt"} returns the IRT parameters
+#' of the reference group and differences in these parameters between the
+#' reference and focal group. Parameters of asymptotes are printed separately
+#' for the reference and focal groups. \code{"is"} returns intercept-slope
+#' parameterization. Parameters of asymptotes are again printed separately for
+#' the reference and focal groups. \code{"logistic"} returns parameters in
+#' logistic regression parameterization as in the \code{\link[stats]{glm}}
+#' function, and it is available only for the 2PL model.
 #'
-#' @return A list of two models. Both includes formula, parameters to be estimated and their lower and upper constraints.
+#' @return
+#' A list of two models. Each includes a formula, parameters to be estimated,
+#' and their lower and upper constraints.
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr
 #' Institute of Computer Science of the Czech Academy of Sciences \cr
-#' Faculty of Mathematics and Physics, Charles University \cr
 #' \email{hladka@@cs.cas.cz} \cr
 #'
 #' Patricia Martinkova \cr
@@ -69,30 +100,32 @@
 #' @seealso \code{\link[difNLR]{difNLR}}
 #'
 #' @examples
-#' # 3PL model with the same guessing for both groups
+#' # 3PL model with the same guessing parameter for both groups
 #' # to test both types of DIF
 #' formulaNLR(model = "3PLcg", type = "both")
+#' formulaNLR(model = "3PLcg", type = "both", parameterization = "is")
 #'
-#' # 4PL model with the same guessing and inattention
+#' # 4PL model with the same guessing and inattention parameters
 #' # to test uniform DIF
 #' formulaNLR(model = "4PLcgdg", type = "udif")
+#' formulaNLR(model = "4PLcgdg", type = "udif", parameterization = "is")
 #'
 #' # 2PL model to test non-uniform DIF
 #' formulaNLR(model = "2PL", type = "nudif")
+#' formulaNLR(model = "2PL", type = "nudif", parameterization = "is")
+#' formulaNLR(model = "2PL", type = "nudif", parameterization = "logistic")
 #'
 #' # 4PL model to test all possible DIF
-#' # with alternative parameterization
-#' formulaNLR(model = "4PL", type = "all", parameterization = "alternative")
+#' formulaNLR(model = "4PL", type = "all", parameterization = "irt")
+#' formulaNLR(model = "4PL", type = "all", parameterization = "is")
 #'
-#' # 4PL model with fixed a and c parameter
-#' # to test difference in b with alternative parameterization
-#' formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "alternative")
-#'
-#' # 2PL model with logistic parameterization
-#' formulaNLR(model = "2PL", parameterization = "logistic")
+#' # 4PL model with fixed a and c parameters
+#' # to test difference in b
+#' formulaNLR(model = "4PL", constraints = "ac", type = "b")
+#' formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "is")
 #' @export
 #' @importFrom stats as.formula
-formulaNLR <- function(model, constraints = NULL, type = "all", parameterization = "classic", outcome) {
+formulaNLR <- function(model, constraints = NULL, type = "all", parameterization = "irt", outcome) {
   if (missing(model)) {
     stop("Argument 'model' is missing.", call. = FALSE)
   } else {
@@ -101,37 +134,38 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
       "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
       "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"
     ))) {
-      stop("Invalid value for 'model'.", call. = FALSE)
+      stop("Invalid value for the 'model' argument.", call. = FALSE)
     }
   }
 
   if (parameterization == "logistic" & model != "2PL") {
-    stop("Logistic parameterization is available only for 2PL model", call. = FALSE)
+    stop("Logistic parameterization is available only for the 2PL model", call. = FALSE)
   }
 
   # constraints for model
   cons <- rep(TRUE, 8)
-  names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+  names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")
 
   if (!is.null(constraints)) {
     if (any(!is.na(constraints))) {
       constr <- unlist(strsplit(constraints, split = ""))
       if (!all(constr %in% letters[1:4])) {
-        warning("Constraints can be only 'a', 'b', 'c' or 'd'!", call. = FALSE)
+        warning("Constraints can be only 'a', 'b', 'c', or 'd'!", call. = FALSE)
       }
-      cons[paste0(constr, "Dif")] <- FALSE
+      cons[paste0(constr[!(constr %in% c("c", "d"))], "Dif")] <- FALSE
+      cons[paste0(constr[(constr %in% c("c", "d"))], "F")] <- FALSE
     }
   }
 
   # model
   mod <- logical(8)
   mod <- switch(model,
-    # 1 PL models
+    # 1PL models
     "Rasch"   = c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
     "1PL"     = c(TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
-    # 2 PL models
+    # 2PL models
     "2PL"     = c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE),
-    # 3 PL models
+    # 3PL models
     "3PLcg"   = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE),
     "3PLdg"   = c(TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE),
     "3PLc"    = c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE),
@@ -145,8 +179,7 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     "4PLc"    = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE),
     "4PL"     = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
   )
-
-  names(mod) <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
+  names(mod) <- c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")
   mod <- apply(cbind(mod, cons), 1, all)
 
   # type of DIF to be tested
@@ -156,9 +189,14 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     types <- unlist(strsplit(type, split = ""))
     if (!all(types %in% letters[1:4])) {
       stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c', or 'd' can be tested
-           or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'", call. = FALSE)
+           or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.", call. = FALSE)
     }
-    typcons[paste0(types, "Dif")] <- FALSE
+    if (any(types %in% c("c", "d"))) {
+      typcons[.MYpaste(types[(types %in% c("c", "d"))], "F")] <- FALSE
+    }
+    if (length(types[!(types %in% c("c", "d"))]) > 0) {
+      typcons[paste0(types[!(types %in% c("c", "d"))], "Dif")] <- FALSE
+    }
     type <- "other"
   }
 
@@ -184,7 +222,7 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
       typ["aDif"] <- FALSE
     },
     "all" = {
-      typ[c("aDif", "bDif", "cDif", "dDif")] <- FALSE
+      typ[c("aDif", "bDif", "cF", "dF")] <- FALSE
     },
     "other" = {
       typ <- typcons
@@ -207,127 +245,193 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
 
   if (parameterization == "logistic") {
     mod0 <- c(
-      as.logical(mod0[["b"]]),
-      as.logical(mod0[["a"]]),
-      as.logical(-mod0[["a"]] * mod0[["bDif"]] -
+      "(Intercept)" = as.logical(mod0[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "x" = as.logical(mod0[["a"]]),
+      "g" = as.logical(-mod0[["a"]] * mod0[["bDif"]] -
         mod0[["aDif"]] * mod0[["b"]] -
         mod0[["aDif"]] * mod0[["bDif"]]),
-      as.logical(mod0[["aDif"]])
+      "x:g" = as.logical(mod0[["aDif"]])
     )
     mod1 <- c(
-      as.logical(mod1[["b"]]),
-      as.logical(mod1[["a"]]),
-      as.logical(-mod1[["a"]] * mod1[["bDif"]] -
+      "(Intercept)" = as.logical(mod1[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "x" = as.logical(mod1[["a"]]),
+      "g" = as.logical(-mod1[["a"]] * mod1[["bDif"]] -
         mod1[["aDif"]] * mod1[["b"]] -
         mod1[["aDif"]] * mod1[["bDif"]]),
-      as.logical(mod1[["aDif"]])
+      "x:g" = as.logical(mod1[["aDif"]])
     )
-    names(mod0) <- names(mod1) <- c("(Intercept)", "x", "g", "x:g")
-    part_regr0 <- names(mod0[-1])[mod0[-1]]
-    part_regr0 <- paste(part_regr0[part_regr0 != ""], collapse = " + ")
-    part_regr1 <- names(mod1[-1])[mod1[-1]]
-    part_regr1 <- paste(part_regr1[part_regr1 != ""], collapse = " + ")
+    part_expit0 <- names(mod0[-1])[mod0[-1]]
+    part_expit0 <- .MYpaste(part_expit0, collapse = " + ")
+    part_asym0 <- ""
+
+    part_expit1 <- names(mod1[-1])[mod1[-1]]
+    part_expit1 <- .MYpaste(part_expit1, collapse = " + ")
+    part_asym1 <- ""
+  } else if (parameterization == "is") {
+    mod0 <- c(
+      "b0" = as.logical(mod0[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "b1" = as.logical(mod0[["a"]]),
+      "b2" = any(mod0[["bDif"]], as.logical(-mod0[["a"]] * mod0[["bDif"]] - # note, intercept always estimated, even if discrimination is not
+        mod0[["aDif"]] * mod0[["b"]] -
+        mod0[["aDif"]] * mod0[["bDif"]])),
+      "b3" = as.logical(mod0[["aDif"]]),
+      "c" = as.logical(mod0[["c"]]),
+      "cF" = as.logical(mod0[["cF"]]),
+      "d" = as.logical(mod0[["d"]]),
+      "dF" = as.logical(mod0[["dF"]])
+    )
+    mod1 <- c(
+      "b0" = as.logical(mod1[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "b1" = as.logical(mod1[["a"]]),
+      "b2" = any(mod1[["bDif"]], as.logical(-mod1[["a"]] * mod1[["bDif"]] - # note, intercept always estimated, even if discrimination is not
+        mod1[["aDif"]] * mod1[["b"]] -
+        mod1[["aDif"]] * mod1[["bDif"]])),
+      "b3" = as.logical(mod1[["aDif"]]),
+      "c" = as.logical(mod1[["c"]]),
+      "cF" = as.logical(mod1[["cF"]]),
+      "d" = as.logical(mod1[["d"]]),
+      "dF" = as.logical(mod1[["dF"]])
+    )
+    # expit part
+    mod0_expit <- mod0[c("b0", "b1", "b2", "b3")]
+    part_expit0 <- paste0(paste0(names(mod0_expit), c("", " * x", " * g", " * x * g"))[mod0_expit], collapse = " + ")
+    part_expit0 <- ifelse(model == "Rasch", paste(part_expit0, "+ x"), part_expit0)
+    part_expit0 <- paste0(" / (1 + exp(-(", part_expit0, ")))")
+
+    # expit part
+    mod1_expit <- mod1[c("b0", "b1", "b2", "b3")]
+    part_expit1 <- paste0(paste0(names(mod1_expit), c("", " * x", " * g", " * x * g"))[mod1_expit], collapse = " + ")
+    part_expit1 <- ifelse(model == "Rasch", paste(part_expit1, "+ x"), part_expit1)
+    part_expit1 <- paste0(" / (1 + exp(-(", part_expit1, ")))")
   } else {
-    # parameters in model 0 and model 1
-    param0 <- param1 <- list()
+    # expit part - a
+    mod0_expit_a0 <- mod0[c("a", "aDif")]
+    part_a0 <- paste0(paste0(names(mod0_expit_a0), c("", " * g"))[mod0_expit_a0], collapse = " + ")
+    part_a0 <- ifelse(nchar(part_a0) <= 1, part_a0, paste0("(", part_a0, ")"))
+    # expit part - b
+    mod0_expit_b0 <- mod0[c("b", "bDif")]
+    part_b0 <- paste0(paste0(names(mod0_expit_b0), c("", " * g"))[mod0_expit_b0], collapse = " + ")
+    part_b0 <- ifelse(nchar(part_b0) <= 1, part_b0, paste0("(", part_b0, ")"))
+    # expit part
+    part_expit0 <- paste0("/ (1 + exp(-", .MYpaste(c(part_a0, paste0("(x - ", part_b0, ")")), collapse = " * "), "))")
 
-    for (i in 1:4) {
-      param0[[i]] <- paste(names(which(mod0[c(i, i + 4)])), collapse = " + g * ")
-      param1[[i]] <- paste(names(which(mod1[c(i, i + 4)])), collapse = " + g * ")
-    }
-
-    if (parameterization == "alternative") {
-      names(mod0)[3:4] <- names(mod1)[3:4] <- c("cR", "dR")
-      names(mod0)[7:8] <- names(mod1)[7:8] <- c("cF", "dF")
-      for (i in 3:4) {
-        param0[[i]] <- ifelse(length(which(mod0[c(i, i + 4)])) == 1,
-          names(which(mod0[c(i, i + 4)])),
-          paste(names(which(mod0[c(i, i + 4)])), c("* (1 - g)", "* g")[mod0[c(i, i + 4)]], collapse = " + ")
-        )
-        param1[[i]] <- ifelse(length(which(mod1[c(i, i + 4)])) == 1,
-          names(which(mod1[c(i, i + 4)])),
-          paste(names(which(mod1[c(i, i + 4)])), c("* (1 - g)", "* g")[mod1[c(i, i + 4)]], collapse = " + ")
-        )
-      }
-    }
-
-    if (param0[[3]] == "") param0[[3]] <- "0"
-    if (param0[[4]] == "") param0[[4]] <- "1"
-
-    if (param1[[3]] == "") param1[[3]] <- "0"
-    if (param1[[4]] == "") param1[[4]] <- "1"
-
-    if (param0[[1]] == "") param0[[1]] <- "1"
-    if (param1[[1]] == "") param1[[1]] <- "1"
-
-    # formulas for model 0 and model 1
-    param0[grepl(" ", param0)] <- paste0("(", param0[grepl(" ", param0)], ")")
-    param1[grepl(" ", param1)] <- paste0("(", param1[grepl(" ", param1)], ")")
-
-    # (d - c)
-    part_dc0 <- paste(c(param0[4], param0[3]), collapse = " - ")
-    part_dc0[grepl(" ", part_dc0)] <- paste0("(", part_dc0[grepl(" ", part_dc0)], ")")
-    part_dc1 <- paste(c(param1[4], param1[3]), collapse = " - ")
-    part_dc1[grepl(" ", part_dc1)] <- paste0("(", part_dc1[grepl(" ", part_dc1)], ")")
-
-    # c + (d - c)
-    part_cdc0 <- paste(c(param0[3], part_dc0), collapse = " + ")
-    part_cdc1 <- paste(c(param1[3], part_dc1), collapse = " + ")
-
-    # x - b
-    part_xb0 <- paste0("(x - ", param0[2], ")")
-    part_xb1 <- paste0("(x - ", param1[2], ")")
-
-    # a * (x - b)
-    part_axb0 <- paste(param0[1], " * ", part_xb0)
-    part_axb1 <- paste(param1[1], " * ", part_xb1)
-
-    # 1 + exp(- a * (x - b))
-    if (parameterization == "logistic") {
-      part_exp0 <- part_axb0
-      part_exp1 <- part_axb1
-    } else {
-      part_exp0 <- paste0("1 + exp(-", part_axb0, ")")
-      part_exp0 <- paste0("(", part_exp0, ")")
-      part_exp1 <- paste0("1 + exp(-", part_axb1, ")")
-      part_exp1 <- paste0("(", part_exp1, ")")
-    }
-
-    # model
-    part_regr0 <- paste(part_cdc0, "/", part_exp0)
-    part_regr1 <- paste(part_cdc1, "/", part_exp1)
+    # expit part - a
+    mod1_expit_a1 <- mod1[c("a", "aDif")]
+    part_a1 <- paste0(paste0(names(mod1_expit_a1), c("", " * g"))[mod1_expit_a1], collapse = " + ")
+    part_a1 <- ifelse(nchar(part_a1) <= 1, part_a1, paste0("(", part_a1, ")"))
+    # expit part - b
+    mod1_expit_b1 <- mod1[c("b", "bDif")]
+    part_b1 <- paste0(paste0(names(mod1_expit_b1), c("", " * g"))[mod1_expit_b1], collapse = " + ")
+    part_b1 <- ifelse(nchar(part_b1) <= 1, part_b1, paste0("(", part_b1, ")"))
+    # expit part
+    part_expit1 <- paste0("/ (1 + exp(-", .MYpaste(c(part_a1, paste0("(x - ", part_b1, ")")), collapse = " * "), "))")
   }
+
+  if (parameterization != "logistic") {
+    # c asymptote
+    if (mod0["cF"]) {
+      names(mod0)[names(mod0) %in% c("c", "cF")] <- c("cR", "cF")
+      mod0_c0 <- mod0[c("cR", "cF")]
+      part_c0 <- paste0(paste(names(mod0_c0), c("* (1 - g)", "* g"))[mod0_c0], collapse = " + ")
+    } else {
+      mod0_c0 <- mod0[c("c", "cF")]
+      part_c0 <- paste0(paste0(names(mod0_c0), c("", " * g"))[mod0_c0], collapse = " + ")
+    }
+    part_c0 <- ifelse(nchar(part_c0) > 1, paste0("(", part_c0, ")"), part_c0)
+
+    # d asymptote
+    if (mod0["dF"]) {
+      names(mod0)[names(mod0) %in% c("d", "dF")] <- c("dR", "dF")
+      mod0_d0 <- mod0[c("dR", "dF")]
+      part_d0 <- paste0(paste(names(mod0_d0), c("* (1 - g)", "* g"))[mod0_d0], collapse = " + ")
+    } else {
+      mod0_d0 <- mod0[c("d", "dF")]
+      part_d0 <- paste0(paste0(names(mod0_d0), c("", " * g"))[mod0_d0], collapse = " + ")
+    }
+    part_d0 <- ifelse(part_d0 == "" & (grepl(3, model) | grepl(4, model)), 1, part_d0)
+
+    # d - c
+    part_dc0 <- .MYpaste(c(part_d0, part_c0), collapse = " - ")
+    part_dc0 <- ifelse(part_dc0 == "" & (grepl(3, model) | grepl(4, model)), 1, part_dc0)
+    part_dc0 <- ifelse(nchar(part_dc0) > 1, paste0("(", part_dc0, ")"), part_dc0)
+    # c + (d - c) asymptotes
+    part_asym0 <- ifelse(grepl(3, model) | grepl(4, model), .MYpaste(c(part_c0, part_dc0), collapse = " + "), 1)
+
+    # c asymptote
+    if (mod1["cF"]) {
+      names(mod1)[names(mod1) %in% c("c", "cF")] <- c("cR", "cF")
+      mod1_c1 <- mod1[c("cR", "cF")]
+      part_c1 <- paste0(paste(names(mod1_c1), c("* (1 - g)", "* g"))[mod1_c1], collapse = " + ")
+    } else {
+      mod1_c1 <- mod1[c("c", "cF")]
+      part_c1 <- paste0(paste0(names(mod1_c1), c("", " * g"))[mod1_c1], collapse = " + ")
+    }
+    part_c1 <- ifelse(nchar(part_c1) > 1, paste0("(", part_c1, ")"), part_c1)
+
+    # d asymptote
+    if (mod1["dF"]) {
+      names(mod1)[names(mod1) %in% c("d", "dF")] <- c("dR", "dF")
+      mod1_d1 <- mod1[c("dR", "dF")]
+      part_d1 <- paste0(paste(names(mod1_d1), c("* (1 - g)", "* g"))[mod1_d1], collapse = " + ")
+    } else {
+      mod1_d1 <- mod1[c("d", "dF")]
+      part_d1 <- paste0(paste0(names(mod1_d1), c("", " * g"))[mod1_d1], collapse = " + ")
+    }
+    part_d1 <- ifelse(part_d1 == "" & (grepl(3, model) | grepl(4, model)), 1, part_d1)
+
+    # d - c
+    part_dc1 <- .MYpaste(c(part_d1, part_c1), collapse = " - ")
+    part_dc1 <- ifelse(part_dc1 == "" & (grepl(3, model) | grepl(4, model)), 1, part_dc1)
+    part_dc1 <- ifelse(nchar(part_dc1) > 1, paste0("(", part_dc1, ")"), part_dc1)
+    # c + (d - c) asymptotes
+    part_asym1 <- ifelse(grepl(3, model) | grepl(4, model), .MYpaste(c(part_c1, part_dc1), collapse = " + "), 1)
+  } else {
+    part_asym0 <- part_asym1 <- ""
+  }
+
+  # formula
+  form0 <- paste0(part_asym0, part_expit0)
+  form1 <- paste0(part_asym1, part_expit1)
 
   # formula - adding outcome
   if (missing(outcome)) {
     outcome <- "y"
   }
-  form0 <- paste(outcome, "~", part_regr0)
-  form1 <- paste(outcome, "~", part_regr1)
+  form0 <- paste(outcome, "~", form0)
+  form1 <- paste(outcome, "~", form1)
 
   lower <- switch(parameterization,
-    "classic" = c(-Inf, -Inf, 0, 0, -Inf, -Inf, -1, -1),
-    "alternative" = c(-Inf, -Inf, 0, 0, -Inf, -Inf, 0, 0),
+    "irt" = c(-Inf, -Inf, 0, 0, -Inf, -Inf, 0, 0),
+    "is" = c(-Inf, -Inf, -Inf, -Inf, 0, 0, 0, 0),
     "logistic" = NULL
   )
   upper <- switch(parameterization,
-    "classic" = c(Inf, Inf, 1, 1, Inf, Inf, 1, 1),
-    "alternative" = c(Inf, Inf, 1, 1, Inf, Inf, 1, 1),
+    "irt" = c(Inf, Inf, 1, 1, Inf, Inf, 1, 1),
+    "is" = c(Inf, Inf, Inf, Inf, 1, 1, 1, 1),
     "logistic" = NULL
   )
+
+  if (parameterization != "logistic") {
+    lower0 <- setNames(lower[mod0], names(mod0[mod0]))
+    upper0 <- setNames(upper[mod0], names(mod0[mod0]))
+    lower1 <- setNames(lower[mod1], names(mod1[mod1]))
+    upper1 <- setNames(upper[mod1], names(mod1[mod1]))
+  } else {
+    lower0 <- upper0 <- lower1 <- upper1 <- NULL
+  }
 
   return(list(
     M0 = list(
       formula = as.formula(form0),
       parameters = names(mod0[mod0]),
-      lower = lower[mod0],
-      upper = upper[mod0]
+      lower = lower0,
+      upper = upper0
     ),
     M1 = list(
       formula = as.formula(form1),
       parameters = names(mod1[mod1]),
-      lower = lower[mod1],
-      upper = upper[mod1]
+      lower = lower1,
+      upper = upper1
     )
   ))
 }
