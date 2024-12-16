@@ -659,10 +659,10 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       c(
         par_tmp[2],
         -par_tmp[1] / par_tmp[2],
-        par_tmp[4],
-        (par_tmp[1] * par_tmp[4] - par_tmp[2] * par_tmp[3]) / (par_tmp[2] * (par_tmp[2] + par_tmp[4]))
+        (par_tmp[1] * par_tmp[4] - par_tmp[2] * par_tmp[3]) / (par_tmp[2] * (par_tmp[2] + par_tmp[4])),
+        par_tmp[4]
       ),
-      c("a", "b", "aDif", "bDif")
+      c("a", "b", "bDif", "aDif")
     )[par_names]
 
     if (cov_fail) {
@@ -678,12 +678,12 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       )
       cov_tmp[par_names, par_names] <- cov
       cov_new <- msm::deltamethod(
-        list(~x2, ~ -x1 / x2, ~x4, ~ (x1 * x4 - x2 * x3) / (x2 * (x2 + x4))),
+        list(~x2, ~ -x1 / x2, ~ (x1 * x4 - x2 * x3) / (x2 * (x2 + x4)), ~x4),
         par_tmp,
         cov_tmp,
         ses = FALSE
       )[par_names, par_names]
-      colnames(cov_new) <- rownames(cov_new) <- c("a", "b", "aDif", "bDif")[par_names]
+      colnames(cov_new) <- rownames(cov_new) <- c("a", "b", "bDif", "aDif")[par_names]
       se_new <- sqrt(diag(cov_new))
     }
 
