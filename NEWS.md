@@ -392,7 +392,7 @@
   * Check for input `item` in S3 methods for `difNLR()`, `ddfMLR()`, and `ddfORD()`
     was fixed.
 
-#### MAJOR UDPATES
+#### MAJOR UPDATES
   * S3 methods `plot()` outputs for `difNLR()`, `ddfMLR()`, and `ddfORD()` functions 
   were unified.
 
@@ -404,7 +404,7 @@
 
 ### Changes in version 1.2.6 (2019-07-03)
 
-#### MAJOR UDPATES
+#### MAJOR UPDATES
   * S3 method `plot()` for `ddfORD()` was implemented.
 
 ------

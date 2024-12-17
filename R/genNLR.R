@@ -37,7 +37,7 @@
 #' First 3 columns correspond to distractors parameters for reference group and last three columns
 #' for focal group. The number of choices can differ for items. Matrices \code{a} and \code{b}
 #' need to consist of as many columns as is the maximum number of distractors. Items with less
-#' choices can containt NAs.
+#' choices can contain NAs.
 #'
 #' @usage genNLR(N = 1000, ratio = 1, itemtype = "dich", a, b, c, d, mu = 0, sigma = 1)
 #'
