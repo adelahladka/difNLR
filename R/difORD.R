@@ -7,7 +7,7 @@
 #'   logit model and likelihood ratio test of a submodel.
 #'
 #' @param Data data.frame or matrix: dataset which rows represent
-#'   ordinaly scored examinee answers and columns correspond to the
+#'   ordinally scored examinee answers and columns correspond to the
 #'   items. In addition, \code{Data} can hold the vector of group
 #'   membership.
 #' @param group numeric or character: a dichotomous vector of the same

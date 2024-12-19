@@ -7,7 +7,7 @@
 #'   on cumulative logit regression model.
 #'
 #' @param Data data.frame or matrix: dataset which rows represent
-#'   ordinaly scored examinee answers and columns correspond to the
+#'   ordinally scored examinee answers and columns correspond to the
 #'   items.
 #' @param group numeric: binary vector of group membership. \code{"0"}
 #'   for reference group, \code{"1"} for focal group.

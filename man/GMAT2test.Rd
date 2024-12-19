@@ -19,7 +19,7 @@ data(GMAT2test)
 The \code{GMAT2test} is a generated dataset based on parameters from Graduate Management
 Admission Test (GMAT, Kingston et al., 1985). First two items were considered to function differently
 in uniform and non-uniform way respectively. The data set represents responses of 1,000 subjects to
-multiple-choice test of 20 items. Aditionally, 4 possible answers on all items were generated,
+multiple-choice test of 20 items. Additionally, 4 possible answers on all items were generated,
 coded A, B, C, and D. The column \code{group} represents group membership, where 0 indicates reference group
 and 1 indicates focal group. Groups are the same size (i.e. 500 per group).
 }

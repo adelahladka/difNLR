@@ -10,7 +10,7 @@ ORD(Data, group, model = "adjacent", type = "both", match = "zscore",
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent
-ordinaly scored examinee answers and columns correspond to the
+ordinally scored examinee answers and columns correspond to the
 items.}
 
 \item{group}{numeric: binary vector of group membership. \code{"0"}
