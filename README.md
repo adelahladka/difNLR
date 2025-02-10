@@ -50,11 +50,10 @@ To cite `difNLR` package in publications, please, use:
   Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. Journal of
   Educational Measurement, 54(4), 498--517, [doi: 10.1111/jedm.12158](https://doi.org/10.1111/jedm.12158).
   
-To cite new estimation approaches provided in the `difNLR()` function, please, use:
-
+To cite new estimation approaches provided in the `difNLR()` function, please, use
   Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms for 
   estimation of item functioning. Journal of Educational and Behavioral Statistics. 
-  Accepted, [arXiv: 2302.12648](https://doi.org/10.48550/arXiv.2302.12648)
+  Accepted.
   
 ## Try online
 You can try some functionalities of the `difNLR` package
