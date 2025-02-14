@@ -10,7 +10,7 @@ difORD(Data, group, focal.name, model = "adjacent", type = "both", match = "zsco
 }
 \arguments{
 \item{Data}{data.frame or matrix: dataset which rows represent
-ordinaly scored examinee answers and columns correspond to the
+ordinally scored examinee answers and columns correspond to the
 items. In addition, \code{Data} can hold the vector of group
 membership.}
 

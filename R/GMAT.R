@@ -38,6 +38,6 @@
 #' \describe{
 #' \item{Item1-Item20}{dichotomously scored items of the test}
 #' \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
-#' \item{criterion}{continuous critetion intended to be predicted by test}
+#' \item{criterion}{continuous criterion intended to be predicted by test}
 #' }
 "GMAT"

@@ -4,7 +4,7 @@
 #' Graduate Management Admission Test (GMAT, Kingston et al., 1985). First two items
 #' were considered to function differently in uniform and non-uniform way respectively.
 #' The dataset represents responses of 2,000 subjects to multiple-choice test of 20 items.
-#' Aditionally, 4 possible answers on all items were generated, coded A, B, C, and D. The column
+#' Additionally, 4 possible answers on all items were generated, coded A, B, C, and D. The column
 #' \code{group} represents group membership, where 0 indicates reference group and 1 indicates
 #' focal group. Groups are the same size (i.e. 1,000 per group). The distributions of total scores
 #' (sum of correct answers) are the same for both reference and focal group (Martinkova et al., 2017).
@@ -39,7 +39,7 @@
 #' \describe{
 #' \item{Item1-Item20}{nominal items of the test coded A, B, C, and D}
 #' \item{group}{group membership vector, \code{"0"} reference group, \code{"1"} focal group}
-#' \item{criterion}{continuous critetion intended to be predicted by test}
+#' \item{criterion}{continuous criterion intended to be predicted by test}
 #' }
 #' Correct answers are presented in \code{\link{GMATkey}} data set.
 "GMATtest"

@@ -58,7 +58,7 @@ item with 4 different choices is supposed to be generated, user provide matrices
 First 3 columns correspond to distractors parameters for reference group and last three columns
 for focal group. The number of choices can differ for items. Matrices \code{a} and \code{b}
 need to consist of as many columns as is the maximum number of distractors. Items with less
-choices can containt NAs.
+choices can contain NAs.
 }
 \examples{
 # seed

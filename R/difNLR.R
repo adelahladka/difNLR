@@ -836,7 +836,7 @@ print.difNLR <- function(x, ...) {
       " statistics",
       ifelse(length(unique(x$model)) == 1,
         paste0(
-          "\nbased on",
+          "\nbased on ",
           switch(unique(x$model),
             "Rasch" = "Rasch model",
             "1PL" = "1PL model",
