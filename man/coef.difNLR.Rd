@@ -31,8 +31,9 @@ matrix? (the default is \code{FALSE}).}
 \item{IRTpars}{logical: should the estimated item parameters be returned in he
 IRT parameterization? (the default is \code{TRUE}).}
 
-\item{CI}{numeric: a significance level for confidence intervals of item
-parameter estimates (the default is \code{0.95} for 95\% confidence interval).}
+\item{CI}{numeric: a significance level for confidence intervals (CIs) of item
+parameter estimates (the default is \code{0.95} for 95\% CI).
+With 0 value, no CIs are displayed.}
 
 \item{...}{other generic parameters for the \code{coef()} method.}
 }

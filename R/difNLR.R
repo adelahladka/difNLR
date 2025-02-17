@@ -577,29 +577,33 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       }
       start_names <- unique(unlist(lapply(start, names)))
       if (!all(start_names %in% c(paste0("b", 0:3), letters[3:4], paste0(letters[3:4], "Dif"))) &
-          !all(start_names %in% c(letters[1:4], paste0(letters[1:4], "Dif")))) {
+        !all(start_names %in% c(letters[1:4], paste0(letters[1:4], "Dif")))) {
         stop("Invalid names in 'start'. Each element of 'start' needs to be a numeric vector
              with names 'b0', 'b1', 'b2', 'b3', 'c', 'd', 'cDif', and 'dDif' or
              'a', 'b', 'c', 'd', 'aDif', 'bDif', 'cDif', and 'dDif'. ", call. = FALSE)
       } else {
         if (all(start_names %in% c(letters[1:4], paste0(letters[1:4], "Dif")))) {
-            start_old <- start
-            lapply(start_old, function(x) c(
+          start_old <- start
+          start <- lapply(start_old, function(x) {
+            tmp <- unlist(c(
               b0 = -x["a"] * x["b"], b1 = x["a"],
-              b2 = -x["a"]*x["bDif"] - x["aDif"]*x["b"] - x["aDif"]*x["bDif"],
+              b2 = -x["a"] * x["bDif"] - x["aDif"] * x["b"] - x["aDif"] * x["bDif"],
               b3 = x["aDif"],
-              c = x["c"], d = x["d"],
-              cDif = x["cDif"], dDif = x["dDif"]
+              cR = x["c"], dR = x["d"],
+              cF = x["c"] + x["cDif"], dF = x["d"] + x["dDif"]
             ))
+            names(tmp) <- c("b0", "b1", "b2", "b3", "cR", "dR", "cF", "dF")
+            return(tmp)
+          })
         }
       }
     }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
-      PROV <- suppressWarnings(NLR(DATA, GROUP,
+      PROV <- NLR(DATA, GROUP,
         model = model, constraints = constraints, type = type, method = method,
         match = match, anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method,
         test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
-      ))
+      )
       STATS <- PROV$Sval
       ADJ.PVAL <- PROV$adjusted.pval
       significant <- which(ADJ.PVAL < alpha)
@@ -650,7 +654,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         df = PROV$df, test = test,
         purification = purify,
         method = method,
-        conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
+        conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
         alpha = alpha,
         Data = DATA, group = GROUP, group.names = group.names, match = match
       )
@@ -658,11 +662,11 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       nrPur <- 0
       difPur <- NULL
       noLoop <- FALSE
-      prov1 <- suppressWarnings(NLR(DATA, GROUP,
+      prov1 <- NLR(DATA, GROUP,
         model = model, constraints = constraints, type = type, method = method,
         match = match, start = start, p.adjust.method = p.adjust.method, test = test,
         alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
-      ))
+      )
       stats1 <- prov1$Sval
       pval1 <- prov1$pval
       significant1 <- which(pval1 < alpha)
@@ -696,11 +700,11 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
                 }
               }
             }
-            prov2 <- suppressWarnings(NLR(DATA, GROUP,
+            prov2 <- NLR(DATA, GROUP,
               model = model, constraints = constraints, type = type, method = method,
               match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
               test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
-            ))
+            )
             stats2 <- prov2$Sval
             pval2 <- prov2$pval
             significant2 <- which(pval2 < alpha)
@@ -780,13 +784,10 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         df = PROV$df, test = test,
         purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
         method = method,
-        conv.fail = PROV$conv.fail, conv.fail.which = PROV$conv.fail.which,
+        conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
         alpha = alpha,
         Data = DATA, group = GROUP, group.names = group.names, match = match
       )
-    }
-    if (PROV$conv.fail > 0) {
-      warning(paste("Convergence failure in item", PROV$conv.fail.which, "\n"), call. = FALSE)
     }
     if (purify) {
       if (!noLoop) {
@@ -858,7 +859,7 @@ print.difNLR <- function(x, ...) {
     ),
     ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
       paste(
-        "with constraints on",
+        " with constraints on",
         ifelse(length(unique(unlist(x$constraints))) == 1, "parameter", "parameters"),
         paste(unique(unlist(x$constraints)), collapse = ", "), "\n"
       ),
@@ -1634,7 +1635,6 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 
   # confidence interval
   if (interval == "confidence") {
-
     DELTA_new <- as.list(rep(NA, m))
     DELTA_new <- lapply(1:m, function(i) {
       attr(.delta.gNLR.is(
@@ -1644,15 +1644,16 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
       ), "gradient")
     })
 
-    VCOV_par <- lapply(1:m, function(i)
+    VCOV_par <- lapply(1:m, function(i) {
       matrix(
-      0,
-      ncol = 8, nrow = 8,
-      dimnames = list(
-        c("b0", "b1", "b2", "b3", "c", "d", "cDif", "dDif"),
-        c("b0", "b1", "b2", "b3", "c", "d", "cDif", "dDif")
+        0,
+        ncol = 8, nrow = 8,
+        dimnames = list(
+          c("b0", "b1", "b2", "b3", "c", "d", "cDif", "dDif"),
+          c("b0", "b1", "b2", "b3", "c", "d", "cDif", "dDif")
+        )
       )
-    ))
+    })
     VCOV_par <- lapply(1:m, function(i) {
       if (ITEMS[i] %in% object$DIFitems) {
         tmp <- colnames(object$covM1[[ITEMS[i]]])
@@ -1725,8 +1726,9 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 #'   matrix? (the default is \code{FALSE}).
 #' @param IRTpars logical: should the estimated item parameters be returned in he
 #'   IRT parameterization? (the default is \code{TRUE}).
-#' @param CI numeric: a significance level for confidence intervals of item
-#'   parameter estimates (the default is \code{0.95} for 95\% confidence interval).
+#' @param CI numeric: a significance level for confidence intervals (CIs) of item
+#'   parameter estimates (the default is \code{0.95} for 95\% CI).
+#'   With 0 value, no CIs are displayed.
 #' @param ... other generic parameters for the \code{coef()} method.
 #'
 #' @author
@@ -1854,7 +1856,14 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
 
   if (!IRTpars) {
     pars <- nlrPAR
-    se <- lapply(nlrCOV, function(x) sqrt(diag(x)))
+    se <- lapply(1:m, function(i) {
+      if (items[i] %in% object$conv.fail.which) {
+        setNames(rep(NA, length(pars[[i]])), names(pars[[i]]))
+      } else {
+        sqrt(diag(nlrCOV[[i]]))
+      }
+
+    })
   } else {
     nlrDM <- lapply(1:m, function(i) {
       .deltamethod.NLR.is2irt(
@@ -1909,6 +1918,7 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
     res <- res[, -1]
     rownames(res) <- resnams
     res[is.na(res)] <- 0
+    res[grepl(nams[object$conv.fail.which], rownames(res)), ] <- NA
   } else {
     res <- coefs
   }

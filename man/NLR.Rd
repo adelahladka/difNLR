@@ -107,8 +107,8 @@ A list with the following arguments:
   \item{\code{par.m1}}{the matrix of estimated item parameters for the alternative model.}
   \item{\code{se.m1}}{the matrix of standard errors of item parameters for the alternative model.}
   \item{\code{cov.m1}}{list of covariance matrices of item parameters for the alternative model.}
-  \item{\code{conv.fail}}{numeric: a number of convergence issues.}
-  \item{\code{conv.fail.which}}{the indicators of the items that did not converge.}
+  \item{\code{cf}}{numeric: a number of convergence issues.}
+  \item{\code{cf.which}}{the indicators of the items that did not converge.}
   \item{\code{ll.m0}}{log-likelihood of null model.}
   \item{\code{ll.m1}}{log-likelihood of alternative model.}
   \item{\code{startBo0}}{the binary matrix. Columns represent iterations of initial values

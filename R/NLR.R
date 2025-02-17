@@ -158,8 +158,8 @@
 #'   \item{\code{par.m1}}{the matrix of estimated item parameters for the alternative model.}
 #'   \item{\code{se.m1}}{the matrix of standard errors of item parameters for the alternative model.}
 #'   \item{\code{cov.m1}}{list of covariance matrices of item parameters for the alternative model.}
-#'   \item{\code{conv.fail}}{numeric: a number of convergence issues.}
-#'   \item{\code{conv.fail.which}}{the indicators of the items that did not converge.}
+#'   \item{\code{cf}}{numeric: a number of convergence issues.}
+#'   \item{\code{cf.which}}{the indicators of the items that did not converge.}
 #'   \item{\code{ll.m0}}{log-likelihood of null model.}
 #'   \item{\code{ll.m1}}{log-likelihood of alternative model.}
 #'   \item{\code{startBo0}}{the binary matrix. Columns represent iterations of initial values
@@ -288,7 +288,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
   } else {
     parameterization <- rep("is", m)
   }
-
+  # formulas for models
   M <- lapply(
     1:m,
     function(i) {
@@ -300,7 +300,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       )
     }
   )
-
+  # starting values
   if (method == "irls") {
     start <- NULL
   } else if (missing(start) || is.null(start)) {
@@ -312,7 +312,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
     }
   }
-
+  # model fitting
   m0 <- lapply(1:m, function(i) {
     start_tmp <- start[[i]]
     names_start_tmp <- names(start_tmp)
@@ -355,160 +355,235 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       upper = M[[i]]$M1$upper
     )
   })
+
   # convergence failures
-  cfM0 <- unlist(lapply(m0, is.null))
-  cfM1 <- unlist(lapply(m1, is.null))
-  conv.fail <- sum(cfM0, cfM1)
-  conv.fail.which <- which(cfM0 | cfM1)
+  cf0 <- sapply(m0, is.null)
+  cf1 <- sapply(m1, is.null)
+  cf <- sum(cf0, cf1)
+
+  items.cf0 <- which(cf0)
+  items.cf1 <- which(cf1)
+  items.cf <- sort(which(cf0 | cf1))
+  # converged items
+  items.conv0 <- setdiff(1:m, items.cf0)
+  items.conv1 <- setdiff(1:m, items.cf1)
 
   # covariance structure
   cov.m0 <- cov.m1 <- as.list(rep(NA, m))
   if (method == "irls") {
-    cov.m0[which(!cfM0)] <- suppressWarnings(lapply(lapply(m0[which(!cfM0)], summary), vcov))
-    cov.m1[which(!cfM1)] <- suppressWarnings(lapply(lapply(m1[which(!cfM1)], summary), vcov))
+    cov.m0[items.conv0] <- suppressWarnings(lapply(lapply(m0[items.conv0], summary), vcov))
+    cov.m1[items.conv1] <- suppressWarnings(lapply(lapply(m1[items.conv1], summary), vcov))
   } else {
-    cov.m0[which(!cfM0)] <- suppressWarnings(lapply(m0[which(!cfM0)], vcov, sandwich))
-    cov.m1[which(!cfM1)] <- suppressWarnings(lapply(m1[which(!cfM1)], vcov, sandwich))
+    cov.m0[items.conv0] <- suppressWarnings(lapply(m0[items.conv0], vcov, sandwich))
+    cov.m1[items.conv1] <- suppressWarnings(lapply(m1[items.conv1], vcov, sandwich))
   }
-  cov.fail0 <- which(sapply(cov.m0, is.null))
-  cov.fail1 <- which(sapply(cov.m1, is.null))
-  cov.fail <- sort(union(cov.fail0, cov.fail1))
-
-  if (length(cov.fail) > 0) {
-    warning(paste0(
-      "Covariance matrix cannot be computed for ",
-      ifelse(length(cov.fail) > 1, "items ", "item "),
-      paste(cov.fail, collapse = ", "), "."
-    ), call. = FALSE)
-  }
-  conv.m0 <- setdiff(1:m, unique(c(which(cfM0), which(sapply(cov.m0[which(!cfM0)], function(x) is.null(x))))))
-  conv.m1 <- setdiff(1:m, unique(c(which(cfM1), which(sapply(cov.m1[which(!cfM1)], function(x) is.null(x))))))
+  items.cov.fail0 <- which(sapply(cov.m0, is.null))
+  items.cov.fail1 <- which(sapply(cov.m1, is.null))
+  items.cov.fail <- sort(union(items.cov.fail0, items.cov.fail1))
+  # converged items with covariances
+  items.conv0 <- setdiff(items.conv0, items.cov.fail0)
+  items.conv1 <- setdiff(items.conv1, items.cov.fail1)
 
   # standard errors
   se.m0 <- se.m1 <- as.list(rep(NA, m))
-  se.m0[conv.m0] <- suppressWarnings(lapply(cov.m0[conv.m0], function(x) sqrt(diag(x))))
-  se.m1[conv.m1] <- suppressWarnings(lapply(cov.m1[conv.m1], function(x) sqrt(diag(x))))
+  se.m0[items.conv0] <- suppressWarnings(lapply(cov.m0[items.conv0], function(x) sqrt(diag(x))))
+  se.m1[items.conv1] <- suppressWarnings(lapply(cov.m1[items.conv1], function(x) sqrt(diag(x))))
 
-  se.fail0 <- which(sapply(se.m0, function(x) any(is.na(x))))
-  se.fail1 <- which(sapply(se.m1, function(x) any(is.na(x))))
-  se.fail <- sort(union(se.fail0, se.fail1))
-  if (length(se.fail) > 0) {
-    warning(paste0(
-      "Standard errors of item parameter estimates cannot be computed for ",
-      ifelse(length(se.fail) > 1, "items ", "item "),
-      paste(se.fail, collapse = ", "), ". \n",
-      "Computed covariance", ifelse(length(se.fail) > 1, " matrices are", " matrix is"), " probably not positive semi-definite."
-    ), call. = FALSE)
-  }
+  items.se.fail0 <- which(sapply(se.m0[items.conv0], function(x) any(is.na(x))))
+  items.se.fail1 <- which(sapply(se.m1[items.conv1], function(x) any(is.na(x))))
+  items.se.fail <- sort(union(items.se.fail0, items.se.fail1))
+  # converged items with covariances and SEs
+  items.conv0 <- setdiff(items.conv0, items.se.fail0)
+  items.conv1 <- setdiff(items.conv1, items.se.fail1)
 
   # using starting values for bootstrapped samples
-  if (initboot & (conv.fail > 0 || length(cov.fail) > 0 || length(se.fail) > 0)) {
-    item.failed0 <- sort(union(which(cfM0), union(cov.fail0, se.fail0)))
-    item.failed1 <- sort(union(which(cfM1), union(cov.fail1, se.fail1)))
+  if (initboot & (cf > 0 || length(items.cov.fail) > 0 || length(items.se.fail) > 0)) {
+    items.failed0 <- setdiff(1:m, items.conv0)
+    items.failed1 <- setdiff(1:m, items.conv1)
 
-    startM0 <- startM1 <- start
-    startBo0 <- rep(0, m)
-    startBo1 <- rep(0, m)
-    startBo0[item.failed0] <- 1
-    startBo1[item.failed1] <- 1
+    start0 <- start1 <- start
+    startBo0 <- startBo1 <- rep(0, m)
+    startBo0[items.cf0] <- 1
+    startBo1[items.cf1] <- 1
 
-    for (i in 1:nrBo) {
-      if (length(item.failed0) > 0 || length(item.failed1) > 0) {
-        # re-calculating initial values
-        set.seed(i)
-        samp <- sample(1:dim(Data)[1], size = dim(Data)[1], replace = TRUE)
-        startalt <- startNLR(Data[samp, ], group[samp], model,
-          match = x,
+    i <- k <- 1 # i is current iteration, k is successful
+    message("Trying to recalculate starting values based on bootstrapped samples... ")
+
+    while (length(items.failed0) > 0 || length(items.failed1) > 0) {
+      # re-calculating initial values
+      set.seed(k)
+      samp <- sample(1:n, size = n, replace = TRUE)
+      startalt <- tryCatch(
+        startNLR(Data[samp, ], group[samp], model,
+          match = x[samp],
           parameterization = parameterization
-        )
-        if (length(item.failed0) > 0) {
-          startM0[item.failed0] <- startalt[item.failed0]
-          m0[item.failed0] <- lapply(item.failed0, function(i) {
-            estimNLR(
-              y = Data[, i], match = x, group = group,
-              formula = M[[i]]$M0$formula,
-              method = method,
-              start = structure(startM0[[i]][M[[i]]$M0$parameters],
-                names = M[[i]]$M0$parameters
-              ),
-              lower = M[[i]]$M0$lower,
-              upper = M[[i]]$M0$upper
-            )
-          })
-          cfM0 <- unlist(lapply(m0, is.null))
-          if (method == "irls") {
-            cov.m0[which(which(!cfM0) %in% item.failed0)] <- suppressWarnings(lapply(lapply(m0[which(!cfM0)], summary), vcov))
-          } else {
-            cov.m0[which(!cfM0)] <- suppressWarnings(lapply(m0[which(!cfM0)], vcov, sandwich))
+        ),
+        error = function(e) {},
+        finally = ""
+      )
+      if (is.null(startalt)) {
+        k <- k + 1
+        next
+      }
+
+      if (length(items.failed0) > 0) {
+        start0[items.cf0] <- startalt[items.cf0]
+        m0[items.cf0] <- lapply(items.cf0, function(j) {
+          start_tmp <- start0[[j]]
+          names_start_tmp <- names(start_tmp)
+          if (!("cR" %in% M[[j]]$M0$parameters) & "cR" %in% names_start_tmp) {
+            names(start_tmp)[names_start_tmp == "cR"] <- "c"
           }
-          cov.fail0 <- which(sapply(cov.m0, is.null))
-          se.m0[conv.m0] <- suppressWarnings(lapply(cov.m0[conv.m0], function(x) sqrt(diag(x))))
-          se.fail0 <- which(sapply(se.m0, function(x) any(is.na(x))))
-
-          startBo0 <- cbind(startBo0, rep(0, m))
-          startBo0[which(cfM0), i + 1] <- 1
-          item.failed0 <- sort(union(which(cfM0), union(cov.fail0, se.fail0)))
-        }
-        if (length(item.failed1) > 0) {
-          startM1[item.failed1] <- startalt[item.failed1]
-          m1[item.failed1] <- lapply(item.failed1, function(i) {
-            estimNLR(
-              y = Data[, i], match = x, group = group,
-              formula = M[[i]]$M1$formula,
-              method = method,
-              start = structure(startM1[[i]][M[[i]]$M1$parameters],
-                names = M[[i]]$M1$parameters
-              ),
-              lower = M[[i]]$M1$lower,
-              upper = M[[i]]$M1$upper
-            )
-          })
-          cfM1 <- unlist(lapply(m1, is.null))
-          if (method == "irls") {
-            cov.m1[which(!cfM1)] <- suppressWarnings(lapply(lapply(m1[which(!cfM1)], summary), vcov))
-          } else {
-            cov.m1[which(!cfM1)] <- suppressWarnings(lapply(m1[which(!cfM1)], vcov, sandwich))
+          if (!("dR" %in% M[[j]]$M0$parameters) & "dR" %in% names_start_tmp) {
+            names(start_tmp)[names_start_tmp == "dR"] <- "d"
           }
-          cov.fail1 <- which(sapply(cov.m1, is.null))
-          se.m1[conv.m1] <- suppressWarnings(lapply(cov.m1[conv.m1], function(x) sqrt(diag(x))))
-          se.fail1 <- which(sapply(se.m1, function(x) any(is.na(x))))
 
-          startBo1 <- cbind(startBo1, rep(0, m))
-          startBo1[which(cfM1), i + 1] <- 1
-          item.failed1 <- sort(union(which(cfM1), union(cov.fail1, se.fail1)))
-        }
-        item.failed <- sort(union(item.failed0, item.failed1))
-
-        if (length(item.failed) > 0) {
-          warning(
-            paste0(
-              "Convergence issues in ", ifelse(length(item.failed) > 0, "items ", "item "),
-              paste0(item.failed, collapse = ", "), "\n",
-              "Trying re-calculate starting values based on bootstrapped samples. "
+          estimNLR(
+            y = Data[, j], match = x, group = group,
+            formula = M[[j]]$M0$formula,
+            method = method,
+            start = structure(start_tmp[M[[j]]$M0$parameters],
+              names = M[[j]]$M0$parameters
             ),
-            call. = FALSE
+            lower = M[[j]]$M0$lower,
+            upper = M[[j]]$M0$upper
           )
+        })
+        items.cf0 <- which(sapply(m0, is.null))
+        items.conv0.new <- setdiff(items.failed0, items.cf0)
+
+        # checking covariance for newly converged
+        if (method == "irls") {
+          cov.m0[items.conv0.new] <- suppressWarnings(lapply(lapply(m0[items.conv0.new], summary), vcov))
+        } else {
+          cov.m0[items.conv0.new] <- suppressWarnings(lapply(m0[items.conv0.new], vcov, sandwich))
         }
-      } else {
+        items.cov.fail0 <- which(sapply(cov.m0, is.null))
+        # newly converged items with covariances
+        items.conv0.new <- setdiff(items.conv0.new, items.cov.fail0)
+
+        # checking standard errors for newly converged
+        se.m0[items.conv0.new] <- suppressWarnings(lapply(cov.m0[items.conv0.new], function(x) sqrt(diag(x))))
+        se.fail0 <- which(sapply(se.m0, function(x) any(is.na(x))))
+        # newly converged items with covariances and SEs
+        items.conv0.new <- setdiff(items.conv0.new, se.fail0)
+
+        # not successfully converged items
+        items.cf0 <- sort(union(items.cf0, union(items.cov.fail0, items.se.fail0)))
+
+        startBo0 <- cbind(startBo0, rep(0, m))
+        startBo0[items.cf0, i + 1] <- 1
+      }
+      if (length(items.failed1) > 0) {
+        start1[items.cf1] <- startalt[items.cf1]
+        m1[items.cf1] <- lapply(items.cf1, function(j) {
+          start_tmp <- start1[[j]]
+          names_start_tmp <- names(start_tmp)
+          if (!("cR" %in% M[[j]]$M1$parameters) & "cR" %in% names_start_tmp) {
+            names(start_tmp)[names_start_tmp == "cR"] <- "c"
+          }
+          if (!("dR" %in% M[[j]]$M1$parameters) & "dR" %in% names_start_tmp) {
+            names(start_tmp)[names_start_tmp == "dR"] <- "d"
+          }
+
+          estimNLR(
+            y = Data[, j], match = x, group = group,
+            formula = M[[j]]$M1$formula,
+            method = method,
+            start = structure(start_tmp[M[[j]]$M1$parameters],
+              names = M[[j]]$M1$parameters
+            ),
+            lower = M[[j]]$M1$lower,
+            upper = M[[j]]$M1$upper
+          )
+        })
+        items.cf1 <- which(sapply(m1, is.null))
+        items.conv1.new <- setdiff(items.failed1, items.cf1)
+
+        # checking covariance for newly converged
+        if (method == "irls") {
+          cov.m1[items.conv1.new] <- suppressWarnings(lapply(lapply(m1[items.conv1.new], summary), vcov))
+        } else {
+          cov.m1[items.conv1.new] <- suppressWarnings(lapply(m1[items.conv1.new], vcov, sandwich))
+        }
+        items.cov.fail1 <- which(sapply(cov.m1, is.null))
+        # newly converged items with covariances
+        items.conv1.new <- setdiff(items.conv1.new, items.cov.fail1)
+
+        # checking standard errors for newly converged
+        se.m1[items.conv1.new] <- suppressWarnings(lapply(cov.m1[items.conv1.new], function(x) sqrt(diag(x))))
+        se.fail1 <- which(sapply(se.m1, function(x) any(is.na(x))))
+        # newly converged items with covariances and SEs
+        items.conv1.new <- setdiff(items.conv1.new, se.fail1)
+
+        # not successfully converged items
+        items.cf1 <- sort(union(items.cf1, union(items.cov.fail1, items.se.fail1)))
+
+        startBo1 <- cbind(startBo1, rep(0, m))
+        startBo1[items.cf1, i + 1] <- 1
+      }
+
+      items.cf <- sort(union(items.cf0, items.cf1))
+      items.cov.fail <- sort(union(items.cov.fail0, items.cov.fail1))
+      items.se.fail <- sort(union(items.se.fail0, items.se.fail1))
+
+      items.failed0 <- union(items.cf0, union(items.cov.fail0, items.se.fail0))
+      items.failed1 <- union(items.cf1, union(items.cov.fail1, items.se.fail1))
+      cf0 <- 1:m %in% items.cf0
+      cf1 <- 1:m %in% items.cf1
+
+      if (i == nrBo) {
         break
+      } else {
+        i <- i + 1
+        k <- k + 1
       }
     }
   } else {
     startBo0 <- startBo1 <- NULL
     i <- 1
   }
+
   if (i > 1) {
-    message("Starting values were calculated based on bootstrapped samples. ")
+    if (i < nrBo) {
+      message("The recalculation of starting values was successful. ")
+    }
   }
 
-  if (conv.fail > 0) {
-    warning(paste("Convergence failure in item", conv.fail.which, "\n"))
+  if (length(items.cf) > 0) {
+    msg <- ifelse(initboot, "", "\n You may try recalculating the starting values based on bootstrapped samples by using the argument `initboot = TRUE`. ")
+    warning(
+      paste0(
+        "Convergence issues in ", ifelse(length(items.cf) > 1, "items ", "item "),
+        paste0(items.cf, collapse = ", "), msg
+      ),
+      call. = FALSE
+    )
   }
+  if (length(items.cov.fail) > 0) {
+    warning(paste0(
+      "Covariance matrix cannot be computed for ",
+      ifelse(length(items.cov.fail) > 1, "items ", "item "),
+      paste(items.cov.fail, collapse = ", "), "."
+    ), call. = FALSE)
+  }
+  if (length(items.se.fail) > 0) {
+    warning(paste0(
+      "Standard errors of item parameter estimates cannot be computed for ",
+      ifelse(length(items.se.fail) > 1, "items ", "item "),
+      paste(items.se.fail, collapse = ", "), ". \n",
+      "Computed covariance", ifelse(length(items.se.fail) > 1, " matrices are", " matrix is"), " probably not positive semi-definite."
+    ), call. = FALSE)
+  }
+
+  conv0 <- which(!cf0)
+  conv1 <- which(!cf1)
+  conv <- which(!(cf1 | cf0))
 
   # log-likelihood
   ll.m0 <- ll.m1 <- rep(NA, m)
-  ll.m0[which(!cfM0)] <- sapply(m0[which(!cfM0)], logLik)
-  ll.m1[which(!cfM1)] <- sapply(m1[which(!cfM1)], logLik)
+  ll.m0[conv0] <- sapply(m0[conv0], logLik)
+  ll.m1[conv1] <- sapply(m1[conv1], logLik)
 
   # parameters
   par.m0 <- lapply(1:m, function(i) {
@@ -521,99 +596,48 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       names = M[[i]]$M1$parameters
     )
   })
-  par.m0[which(!cfM0)] <- lapply(m0[which(!cfM0)], coef)
-  par.m1[which(!cfM1)] <- lapply(m1[which(!cfM1)], coef)
-
-
-
-  # delta method
-  # dm.m0 <- lapply(1:m, function(i) {
-  #   switch(parameterization[[i]],
-  #     "logistic" = .deltamethod.NLR.log2irt(
-  #       par = par.m0[[i]], cov = cov.m0[[i]],
-  #       conv = (i %in% conv.m0),
-  #       cov_fail = cfM0[i]
-  #     ),
-  #     "alternative" = .deltamethod.NLR.alt2irt(
-  #       par = par.m0[[i]], cov = cov.m0[[i]],
-  #       conv = (i %in% conv.m0),
-  #       cov_fail = cfM0[i]
-  #     ),
-  #     "irt" = list(par = par.m0[[i]], cov = cov.m0[[i]], se = se.m0[[i]])
-  #   )
-  # })
-  # par.m0 <- lapply(dm.m0, function(x) x$par)
-  # cov.m0 <- lapply(dm.m0, function(x) x$cov)
-  # se.m0 <- lapply(dm.m0, function(x) x$se)
-
-  # dm.m1 <- lapply(1:m, function(i) {
-  #   switch(parameterization[[i]],
-  #     "logistic" = .deltamethod.NLR.log2irt(
-  #       par = par.m1[[i]], cov = cov.m1[[i]],
-  #       conv = (i %in% conv.m1),
-  #       cov_fail = cfM1[i]
-  #     ),
-  #     "alternative" = .deltamethod.NLR.alt2irt(
-  #       par = par.m1[[i]], cov = cov.m1[[i]],
-  #       conv = (i %in% conv.m1),
-  #       cov_fail = cfM1[i]
-  #     ),
-  #     "irt" = list(par = par.m1[[i]], cov = cov.m1[[i]], se = se.m1[[i]])
-  #   )
-  # })
-  # par.m1 <- lapply(dm.m1, function(x) x$par)
-  # cov.m1 <- lapply(dm.m1, function(x) x$cov)
-  # se.m1 <- lapply(dm.m1, function(x) x$se)
+  par.m0[conv0] <- lapply(m0[conv0], coef)
+  par.m1[conv1] <- lapply(m1[conv1], coef)
 
   names(par.m1) <- names(par.m0) <- names(se.m1) <- names(se.m0) <- names(cov.m0) <- names(cov.m1) <- colnames(Data)
 
   # test
+  n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
+  n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
+  df <- cbind(n1 - n0, n - n1)
+
   if (test == "F") {
     pval <- Fval <- rep(NA, m)
-    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
-    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
-
-    df <- cbind(n1 - n0, n - n1)
 
     RSS0 <- rep(NA, m)
     RSS1 <- rep(NA, m)
-    RSS0[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m0[[l]])^2))
-    RSS1[which(!(cfM1 | cfM0))] <- sapply(which(!(cfM1 | cfM0)), function(l) sum(residuals(m1[[l]])^2))
+    RSS0[conv] <- sapply(conv, function(l) sum(residuals(m0[[l]])^2))
+    RSS1[conv] <- sapply(conv, function(l) sum(residuals(m1[[l]])^2))
 
-    Fval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
+    Fval[conv] <- sapply(
+      conv,
       function(l) ((RSS0[l] - RSS1[l]) / df[l, 1]) / (RSS1[l] / df[l, 2])
     )
-    pval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
+    pval[conv] <- sapply(
+      conv,
       function(l) (1 - pf(Fval[l], df[l, 1], df[l, 2]))
     )
   } else if (test == "LR") {
     pval <- LRval <- rep(NA, m)
 
-    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
-    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
-
-    df <- n1 - n0
-
-    LRval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
+    LRval[conv] <- sapply(
+      conv,
       function(l) -2 * c(logLik(m0[[l]]) - logLik(m1[[l]]))
     )
-    pval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
+    pval[conv] <- sapply(
+      conv,
       function(l) (1 - pchisq(LRval[l], df[l]))
     )
   } else if (test == "W") {
     pval <- Wval <- rep(NA, m)
 
-    n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
-    n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
-
-    df <- n1 - n0
-
-    Wval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
+    Wval[conv] <- sapply(
+      conv,
       function(l) {
         nams <- which(M[[l]]$M1$parameters %in% setdiff(M[[l]]$M1$parameters, M[[l]]$M0$parameters))
         V <- cov.m1[[l]][nams, nams]
@@ -621,8 +645,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
         par %*% solve(V) %*% par
       }
     )
-    pval[which(!(cfM1 | cfM0))] <- sapply(
-      which(!(cfM1 | cfM0)),
+    pval[conv] <- sapply(
+      conv,
       function(l) (1 - pchisq(Wval[l], df[l]))
     )
   }
@@ -639,7 +663,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
     df = df, test = test,
     par.m0 = par.m0, se.m0 = se.m0, cov.m0 = cov.m0,
     par.m1 = par.m1, se.m1 = se.m1, cov.m1 = cov.m1,
-    conv.fail = conv.fail, conv.fail.which = conv.fail.which,
+    cf = sum(cf), cf.which = items.cf,
     ll.m0 = ll.m0, ll.m1 = ll.m1,
     startBo0 = startBo0, startBo1 = startBo1
   )
@@ -647,53 +671,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
 }
 
 #' @noRd
-.deltamethod.NLR.log2irt <- function(par, cov, conv, cov_fail) {
-  if (conv) {
-    par_names <- which(c("(Intercept)", "x", "g", "x:g") %in% names(par))
-    par_tmp <- setNames(
-      rep(0, 4),
-      c("(Intercept)", "x", "g", "x:g")
-    )
-    par_tmp[par_names] <- par
-    par_new <- setNames(
-      c(
-        par_tmp[2],
-        -par_tmp[1] / par_tmp[2],
-        (par_tmp[1] * par_tmp[4] - par_tmp[2] * par_tmp[3]) / (par_tmp[2] * (par_tmp[2] + par_tmp[4])),
-        par_tmp[4]
-      ),
-      c("a", "b", "bDif", "aDif")
-    )[par_names]
-
-    if (cov_fail) {
-      cov_new <- se_new <- NULL
-    } else {
-      cov_tmp <- matrix(
-        0,
-        ncol = 4, nrow = 4,
-        dimnames = list(
-          c("(Intercept)", "x", "g", "x:g"),
-          c("(Intercept)", "x", "g", "x:g")
-        )
-      )
-      cov_tmp[par_names, par_names] <- cov
-      cov_new <- msm::deltamethod(
-        list(~x2, ~ -x1 / x2, ~ (x1 * x4 - x2 * x3) / (x2 * (x2 + x4)), ~x4),
-        par_tmp,
-        cov_tmp,
-        ses = FALSE
-      )[par_names, par_names]
-      colnames(cov_new) <- rownames(cov_new) <- c("a", "b", "bDif", "aDif")[par_names]
-      se_new <- sqrt(diag(cov_new))
-    }
-
-    return(list(par = par_new, cov = cov_new, se = se_new))
-  }
-}
-
-#' @noRd
 .deltamethod.NLR.is2irt <- function(par, cov, conv, cov_fail) {
-  if (conv) {
+
     par_names <- which(c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF") %in% names(par))
 
     new_order <- sapply(c("a", "b", "aDif", "bDif", "c", "cR", "cF", "d", "dR", "dF"), function(x) {
@@ -722,8 +701,17 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")
     )[par_names]
 
-    if (cov_fail) {
-      cov_new <- se_new <- NULL
+    if (cov_fail | !conv) {
+      npar <- length(par_new)
+      se_new <- setNames(rep(NA, npar), names(par_new)[new_order])
+      cov_new <- matrix(
+        NA,
+        ncol = npar, nrow = npar,
+        dimnames = list(
+          names(par_new)[new_order],
+          names(par_new)[new_order]
+        )
+      )
     } else {
       cov_tmp <- matrix(
         0,
@@ -749,128 +737,4 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
     }
 
     return(list(par = par_new[new_order], cov = cov_new, se = se_new))
-  }
-}
-
-#' @noRd
-.deltamethod.NLR.irt2log <- function(par, cov, conv, cov_fail) {
-  if (conv) {
-    par_names <- c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif") %in% names(par)
-    par_names_new <- as.logical(c(
-      -par_names[1] * par_names[2],
-      par_names[1],
-      par_names[3],
-      par_names[4],
-      -par_names[1] * par_names[6] - par_names[5] * par_names[2] - par_names[5] * par_names[6],
-      par_names[5],
-      par_names[7],
-      par_names[8]
-    ))
-    par_names <- which(par_names)
-    par_names_new <- which(par_names_new)
-    par_tmp <- setNames(
-      rep(0, 8),
-      c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
-    )
-    par_tmp[par_names] <- par
-    par_new <- setNames(
-      c(
-        -par_tmp[1] * par_tmp[2],
-        par_tmp[1],
-        par_tmp[3],
-        par_tmp[4],
-        -par_tmp[1] * par_tmp[6] - par_tmp[5] * par_tmp[2] - par_tmp[5] * par_tmp[6],
-        par_tmp[5],
-        par_tmp[7],
-        par_tmp[8]
-      ),
-      c("(Intercept)", "x", "c", "d", "g", "x:g", "cDif", "dDif")
-    )[par_names_new]
-
-    if (cov_fail) {
-      cov_new <- se_new <- NULL
-    } else {
-      cov_tmp <- matrix(
-        0,
-        ncol = 8, nrow = 8,
-        dimnames = list(
-          c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif"),
-          c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
-        )
-      )
-      cov_tmp[par_names, par_names] <- cov
-      cov_new <- msm::deltamethod(
-        list(
-          ~ -x1 * x2, ~x1, ~x3, ~x4,
-          ~ -x1 * x6 - x5 * x2 - x5 * x6,
-          ~x5, ~x7, ~x8
-        ),
-        par_tmp,
-        cov_tmp,
-        ses = FALSE
-      )[par_names_new, par_names_new]
-      colnames(cov_new) <- rownames(cov_new) <- c("(Intercept)", "x", "c", "d", "g", "x:g", "cDif", "dDif")[par_names]
-      se_new <- sqrt(diag(cov_new))
-    }
-
-    return(list(par = par_new, cov = cov_new, se = se_new))
-  }
-}
-
-#' @noRd
-.deltamethod.NLR.alt2irt <- function(par, cov, conv, cov_fail) {
-  if (conv) {
-    # par_names <- names(par)
-    par_old <- par
-    names(par_old)[names(par_old) == "cR"] <- "c"
-    names(par_old)[names(par_old) == "dR"] <- "d"
-    par_new <- setNames(
-      c(
-        par_old["a"], par_old["b"], par_old["c"], par_old["d"],
-        par_old["aDif"], par_old["bDif"],
-        par_old["cF"] + par_old["c"], par_old["dF"] - par_old["d"]
-      ),
-      c("a", "b", "c", "d", "aDif", "bDif", "cDif", "dDif")
-    )
-
-    par_names <- names(par_old)[names(par_old) %in% c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")]
-    which_par_names <- which(names(par_old) %in% c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF"))
-
-    if (cov_fail) {
-      cov_new <- se_new <- NULL
-    } else {
-      cov_old <- cov
-      colnames(cov_old)[colnames(cov_old) == "cR"] <- "c"
-      colnames(cov_old)[colnames(cov_old) == "dR"] <- "d"
-      rownames(cov_old)[rownames(cov_old) == "cR"] <- "c"
-      rownames(cov_old)[rownames(cov_old) == "dR"] <- "d"
-
-      cov_tmp <- matrix(
-        0,
-        ncol = 8, nrow = 8,
-        dimnames = list(
-          c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF"),
-          c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")
-        )
-      )
-      cov_tmp[par_names, par_names] <- cov
-      cov_new <- msm::deltamethod(
-        list(~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~ x7 - x3, ~ x8 - x4)[which_par_names],
-        par_old,
-        cov_tmp[par_names, par_names],
-        ses = FALSE
-      )
-      colnames(cov_new) <- rownames(cov_new) <- par_names
-      se_new <- sqrt(diag(cov_new))
-    }
-  } else {
-    par_new <- par
-    se_new <- sqrt(diag(cov))
-    names(par_new) <- names(se_new) <- gsub("cF", "cDif", names(par))
-    names(par_new) <- names(se_new) <- gsub("dF", "dDif", names(par))
-    names(par_new) <- names(se_new) <- gsub("cR", "c", names(par))
-    names(par_new) <- names(se_new) <- gsub("dR", "d", names(par))
-  }
-
-  return(list(par = par_new, cov = cov_new, se = se_new))
 }

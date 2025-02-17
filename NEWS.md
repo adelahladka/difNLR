@@ -1,6 +1,26 @@
 ## Changes and developments in the difNLR package
 
+------
+
+### Changes in version 1.5.0-1 (2025-02-17)
+
+#### BUGFIXING
+  * Bug in re-calculation of starting values in the `NLR()` function was fixed.
+  * Bugs in `coef.difNLR()` when convergence issues are present were fixed. 
+    Thanks to Jan Netik.
+
+#### MINOR UPDATES
+  * Warnings and messages in the `NLR()` and `difNLR()` functions were updated.
+  * Documentation of the `coef.difNLR()` was updated.
+  * Some typos were fixed.
+  * README file was updated.
+  * Description of the package was updated. 
+
+------
+
 ### Changes in version 1.5.0 (2024-12-14)
+
+**_THIS IS A CRAN VERSION_**
 
 #### BUGFIXING
   * Bug caused by mixing two parametrization in `predict.difNLR()` was fixed. 
@@ -392,7 +412,7 @@
   * Check for input `item` in S3 methods for `difNLR()`, `ddfMLR()`, and `ddfORD()`
     was fixed.
 
-#### MAJOR UPDATES
+#### MAJOR UDPATES
   * S3 methods `plot()` outputs for `difNLR()`, `ddfMLR()`, and `ddfORD()` functions 
   were unified.
 
@@ -404,7 +424,7 @@
 
 ### Changes in version 1.2.6 (2019-07-03)
 
-#### MAJOR UPDATES
+#### MAJOR UDPATES
   * S3 method `plot()` for `ddfORD()` was implemented.
 
 ------
