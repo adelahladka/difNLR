@@ -66,7 +66,7 @@
 #'
 #' Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
 #' for estimation of item functioning. Journal of Educational and Behavioral
-#' Statistics. Accepted.
+#' Statistics. Online first, \doi{10.3102/10769986241312354}.
 #'
 #' @examples
 #' # loading data
@@ -813,7 +813,7 @@ vcov.estimNLR <- function(object, sandwich = FALSE, ...) {
   par_old <- c("b0", "b1", "b2", "b3")
   par_new <- c("", "x", "g", "x:g")
   form_M1 <- .MYpaste(diag(sapply(which(par_old %in% par_estim_M1), function(i) gsub(par_old[i], par_new[i], par_estim_M1))), collapse = " + ")
-  form_M2 <- form_split[1]
+  form_M2 <- gsub("g", "group", form_split[1])
 
   # initial values
   fit1_par_new <- unlist(start[par_estim_M1])

@@ -237,7 +237,7 @@
 #'
 #' Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
 #' for estimation of item functioning. Journal of Educational and Behavioral
-#' Statistics. Accepted.
+#' Statistics. Online first, \doi{10.3102/10769986241312354}.
 #'
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item
 #' functioning using logistic regression procedures. Journal of Educational
@@ -569,7 +569,6 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
 
     # parameterization
     parameterization <- rep("is", m)
-    # TODO: this needs to be updated - zkontrolovat
     if (!is.null(start)) {
       if (length(start) != m) {
         stop("Invalid value for 'start'. Initial values must be a list with as many elements
@@ -854,7 +853,7 @@ print.difNLR <- function(x, ...) {
             "4PLc" = "4PL model with fixed inattention parameter for groups",
             "4PL" = "4PL model"
           )
-        )
+        ), ""
       )
     ),
     ifelse((!all(is.na(x$constraints)) & length(unique(x$constraints)) == 1),
@@ -1918,7 +1917,9 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
     res <- res[, -1]
     rownames(res) <- resnams
     res[is.na(res)] <- 0
-    res[grepl(nams[object$conv.fail.which], rownames(res)), ] <- NA
+    if (object$conv.fail > 0) {
+      res[grepl(nams[object$conv.fail.which], rownames(res)), ] <- NA
+    }
   } else {
     res <- coefs
   }

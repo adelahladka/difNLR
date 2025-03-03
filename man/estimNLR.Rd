@@ -185,7 +185,7 @@ Faculty of Mathematics and Physics, Charles University.
 
 Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
 for estimation of item functioning. Journal of Educational and Behavioral
-Statistics. Accepted.
+Statistics. Online first, \doi{10.3102/10769986241312354}.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

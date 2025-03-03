@@ -198,7 +198,7 @@
 #'
 #' Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
 #' for estimation of item functioning. Journal of Educational and Behavioral
-#' Statistics. Accepted.
+#' Statistics. Online first, \doi{10.3102/10769986241312354}.
 #'
 #' Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item
 #' functioning using logistic regression procedures. Journal of Educational
@@ -389,8 +389,16 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
   se.m0[items.conv0] <- suppressWarnings(lapply(cov.m0[items.conv0], function(x) sqrt(diag(x))))
   se.m1[items.conv1] <- suppressWarnings(lapply(cov.m1[items.conv1], function(x) sqrt(diag(x))))
 
-  items.se.fail0 <- which(sapply(se.m0[items.conv0], function(x) any(is.na(x))))
-  items.se.fail1 <- which(sapply(se.m1[items.conv1], function(x) any(is.na(x))))
+  if (length(items.conv0) > 0) {
+    items.se.fail0 <- which(sapply(se.m0[items.conv0], function(x) any(is.na(x))))
+  } else {
+    items.se.fail0 <- 1:m
+  }
+  if (length(items.conv1) > 0) {
+    items.se.fail1 <- which(sapply(se.m1[items.conv1], function(x) any(is.na(x))))
+  } else {
+    items.se.fail1 <- 1:m
+  }
   items.se.fail <- sort(union(items.se.fail0, items.se.fail1))
   # converged items with covariances and SEs
   items.conv0 <- setdiff(items.conv0, items.se.fail0)
@@ -547,6 +555,10 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
   if (i > 1) {
     if (i < nrBo) {
       message("The recalculation of starting values was successful. ")
+    } else if (length(items.cf) > 0) {
+      message("Unfortunately, the recalculation of starting values was unsuccessful.
+There are still some convergence issues.
+You may try increasing the number of recalculations using the `nrBo` argument. ")
     }
   }
 

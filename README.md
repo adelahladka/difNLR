@@ -40,27 +40,27 @@ devtools::install_github("adelahladka/difNLR")
 ```
 ## Version
 Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is
-1.5.0. The newest development version available on
-[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.0-1.
+1.5.1. The newest development version available on
+[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.1.
 
 ## Reference
 To cite `difNLR` package in publications, please, use:
 
 <ul>Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection. 
   <i>The R Journal, 12</i>(1), 300--323, 
-  [doi: 10.32614/RJ-2020-014](https://doi.org/10.32614/RJ-2020-014)</ul>
+  https://doi.org/10.32614/RJ-2020-014</ul>
 
 <ul>Drabinova, A. & Martinkova, P. (2017). Detection of Differential Item Functioning with
   Nonlinear Regression: A Non-IRT Approach Accounting for Guessing. 
   <i>Journal of Educational Measurement, 54</i>(4), 498--517, 
-  [doi: 10.1111/jedm.12158](https://doi.org/10.1111/jedm.12158)</ul>
+  https://doi.org/10.1111/jedm.12158</ul>
   
 
 To cite new estimation approaches provided in the `difNLR()` function, please, use:
 
 <ul>Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms for estimation of item functioning. 
   <i>Journal of Educational and Behavioral Statistics. </i> 
-  Accepted.</ul>
+  Online first, https://doi.org/10.3102/10769986241312354</ul>
   
 ## Try online
 You can try some functionalities of the `difNLR` package

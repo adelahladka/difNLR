@@ -271,7 +271,10 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     mod0 <- c(
       "b0" = as.logical(mod0[["b"]]), # note, intercept always estimated, even if discrimination is not
       "b1" = as.logical(mod0[["a"]]),
-      "b2" = any(mod0[["bDif"]], as.logical(-mod0[["a"]] * mod0[["bDif"]] - # note, intercept always estimated, even if discrimination is not
+      # "b2" = any(mod0[["bDif"]], as.logical(-mod0[["a"]] * mod0[["bDif"]] - # note, intercept always estimated, even if discrimination is not
+      #   mod0[["aDif"]] * mod0[["b"]] -
+      #   mod0[["aDif"]] * mod0[["bDif"]])),
+      "b2" = as.logical(mod0[["bDif"]] * (-mod0[["a"]] * mod0[["bDif"]] - # note, intercept always estimated, even if discrimination is not
         mod0[["aDif"]] * mod0[["b"]] -
         mod0[["aDif"]] * mod0[["bDif"]])),
       "b3" = as.logical(mod0[["aDif"]]),
@@ -283,7 +286,10 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     mod1 <- c(
       "b0" = as.logical(mod1[["b"]]), # note, intercept always estimated, even if discrimination is not
       "b1" = as.logical(mod1[["a"]]),
-      "b2" = any(mod1[["bDif"]], as.logical(-mod1[["a"]] * mod1[["bDif"]] - # note, intercept always estimated, even if discrimination is not
+      # "b2" = any(mod1[["bDif"]], as.logical(-mod1[["a"]] * mod1[["bDif"]] - # note, intercept always estimated, even if discrimination is not
+      #   mod1[["aDif"]] * mod1[["b"]] -
+      #   mod1[["aDif"]] * mod1[["bDif"]])),
+      "b2" = as.logical(mod1[["bDif"]] * (-mod1[["a"]] * mod1[["bDif"]] - # note, intercept always estimated, even if discrimination is not
         mod1[["aDif"]] * mod1[["b"]] -
         mod1[["aDif"]] * mod1[["bDif"]])),
       "b3" = as.logical(mod1[["aDif"]]),

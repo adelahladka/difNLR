@@ -2,6 +2,29 @@
 
 ------
 
+### Changes in version 1.5.1 (2025-03-03)
+
+**_THIS IS A CRAN VERSION_**
+
+*It includes versions 1.5.0-1 - 1.5.0-2*
+
+------
+
+### Changes in version 1.5.0-2 (2025-02-27)
+
+#### BUGFIXING
+  * Bug in `formulaNLR()` when `type = "b"` fixed. 
+  * Bug in `estimNLR()` when `method = "plf"` fixed. 
+  * Bug in `NLR()` calculating SEs when no item is converged fixed. 
+  
+#### MAJOR UPDATES
+  * Testing with the `testthat` package has been started. 
+  
+#### MINOR UPDATES
+  * References updated.
+  
+------
+
 ### Changes in version 1.5.0-1 (2025-02-17)
 
 #### BUGFIXING

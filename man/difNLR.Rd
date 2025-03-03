@@ -345,7 +345,7 @@ models for DIF and DDF detection. The R Journal, 12(1), 300--323,
 
 Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
 for estimation of item functioning. Journal of Educational and Behavioral
-Statistics. Accepted.
+Statistics. Online first, \doi{10.3102/10769986241312354}.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item
 functioning using logistic regression procedures. Journal of Educational
