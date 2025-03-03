@@ -2,7 +2,7 @@
 
 ------
 
-### Changes in version 1.5.1 (2025-03-03)
+### Changes in version 1.5.1-1 (2025-03-03)
 
 **_THIS IS A CRAN VERSION_**
 

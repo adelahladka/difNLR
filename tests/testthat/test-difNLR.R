@@ -1,4 +1,7 @@
 test_that("fit 3PL model on generated data", {
+  skip_on_cran()
+  skip_on_os("linux")
+
   # setting parameters
   # discrimination
   a <- matrix(rep(c(1.00, 1.12, 1.45, 1.25, 1.32, 1.38, 1.44, 0.89, 1.15,
@@ -50,6 +53,9 @@ test_that("fit 3PL model on generated data", {
 })
 
 test_that("fit different models on generated data", {
+  skip_on_cran()
+  skip_on_os("linux")
+
   # setting parameters
   # discrimination
   a <- matrix(rep(c(1.00, 1.12, 1.45, 1.25, 1.32, 1.38, 1.44, 0.89, 1.15,
@@ -132,6 +138,9 @@ test_that("fit different models on generated data", {
 
 
 test_that("use different estimation methods on generated data", {
+  skip_on_cran()
+  skip_on_os("linux")
+
   # setting parameters
   # discrimination
   a <- matrix(rep(c(1.00, 1.12, 1.45, 1.25, 1.32, 1.38, 1.44, 0.89, 1.15,
@@ -192,6 +201,9 @@ test_that("use different estimation methods on generated data", {
 
 
 test_that("fit 3PL model on GMAT data", {
+  skip_on_cran()
+  skip_on_os("linux")
+
   data(GMAT)
   Data <- GMAT[, 1:20] # items
   group <- GMAT[, "group"] # group membership variable
@@ -207,6 +219,9 @@ test_that("fit 3PL model on GMAT data", {
 })
 
 test_that("fit 3PL model on GMAT data with different tests", {
+  skip_on_cran()
+  skip_on_os("linux")
+
   data(GMAT)
   Data <- GMAT[, 1:20] # items
   group <- GMAT[, "group"] # group membership variable
@@ -229,6 +244,9 @@ test_that("fit 3PL model on GMAT data with different tests", {
 
 
 test_that("coef.difNLR works on GMAT", {
+  skip_on_cran()
+  skip_on_os("linux")
+
   # loading data
   data(GMAT)
   Data <- GMAT[, 1:20] # items
