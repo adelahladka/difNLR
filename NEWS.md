@@ -2,6 +2,17 @@
 
 ------
 
+### Changes in version 1.5.1-2 (2025-03-05)
+
+#### BUGFIXING
+  * Bug in `NLR()` when `method = "irls"` fixed. Parameters are now labelled as
+    b0-b3 and estimates are correctly printed with the `coef.difNLR()` S3 method. 
+
+#### MINOR UPDATES
+  * Tests updated.
+
+------
+
 ### Changes in version 1.5.1-1 (2025-03-03)
 
 **_THIS IS A CRAN VERSION_**

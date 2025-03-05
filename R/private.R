@@ -73,6 +73,10 @@
 
 # paste function which removes empty strings
 .MYpaste <- function(..., sep = "", collapse = NULL, recycle0 = FALSE) {
-  x <- lapply(Filter(function(x) {any(nzchar(x))}, list(...)), function(x) {x[nzchar(x)]})
+  x <- lapply(Filter(function(x) {
+    any(nzchar(x))
+  }, list(...)), function(x) {
+    x[nzchar(x)]
+  })
   do.call(paste, c(x, sep = sep, collapse = collapse, recycle0 = recycle0))
 }

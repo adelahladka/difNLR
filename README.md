@@ -41,7 +41,7 @@ devtools::install_github("adelahladka/difNLR")
 ## Version
 Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is
 1.5.1-1. The newest development version available on
-[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.1-1.
+[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.1-2.
 
 ## Reference
 To cite `difNLR` package in publications, please, use:

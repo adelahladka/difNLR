@@ -613,6 +613,35 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
 
   names(par.m1) <- names(par.m0) <- names(se.m1) <- names(se.m0) <- names(cov.m0) <- names(cov.m1) <- colnames(Data)
 
+  if (method == "irls") {
+    par.m0 <- lapply(par.m0, function(x) {
+      names(x) <- gsub("g", "b2", gsub("x", "b1", gsub("x:g", "b3", gsub("\\(Intercept\\)", "b0", names(x)))))
+      x
+    })
+    par.m1 <- lapply(par.m1, function(x) {
+      names(x) <- gsub("g", "b2", gsub("x", "b1", gsub("x:g", "b3", gsub("\\(Intercept\\)", "b0", names(x)))))
+      x
+    })
+    se.m0 <- lapply(se.m0, function(x) {
+      names(x) <- gsub("g", "b2", gsub("x", "b1", gsub("x:g", "b3", gsub("\\(Intercept\\)", "b0", names(x)))))
+      x
+    })
+    se.m1 <- lapply(se.m1, function(x) {
+      names(x) <- gsub("g", "b2", gsub("x", "b1", gsub("x:g", "b3", gsub("\\(Intercept\\)", "b0", names(x)))))
+      x
+    })
+    cov.m0 <- lapply(cov.m0, function(x) {
+      tmp <- gsub("g", "b2", gsub("x", "b1", gsub("x:g", "b3", gsub("\\(Intercept\\)", "b0", rownames(x)))))
+      rownames(x) <- colnames(x) <- tmp
+      x
+    })
+    cov.m1 <- lapply(cov.m1, function(x) {
+      tmp <- gsub("g", "b2", gsub("x", "b1", gsub("x:g", "b3", gsub("\\(Intercept\\)", "b0", rownames(x)))))
+      rownames(x) <- colnames(x) <- tmp
+      x
+    })
+  }
+
   # test
   n0 <- sapply(1:m, function(i) length(M[[i]]$M0$parameters))
   n1 <- sapply(1:m, function(i) length(M[[i]]$M1$parameters))
@@ -684,69 +713,68 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
 
 #' @noRd
 .deltamethod.NLR.is2irt <- function(par, cov, conv, cov_fail) {
+  par_names <- which(c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF") %in% names(par))
 
-    par_names <- which(c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF") %in% names(par))
+  new_order <- sapply(c("a", "b", "aDif", "bDif", "c", "cR", "cF", "d", "dR", "dF"), function(x) {
+    which(x == c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names])
+  })
+  new_order <- unlist(new_order[sapply(new_order, function(x) length(x) > 0)])
 
-    new_order <- sapply(c("a", "b", "aDif", "bDif", "c", "cR", "cF", "d", "dR", "dF"), function(x) {
-      which(x == c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names])
-    })
-    new_order <- unlist(new_order[sapply(new_order, function(x) length(x) > 0)])
+  par_tmp <- setNames(
+    c(rep(0, 7), rep(1, 3)),
+    c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF")
+  )
+  par_tmp[par_names] <- par
+  par_new <- setNames(
+    c(
+      -par_tmp[1] / par_tmp[2],
+      par_tmp[2],
+      (par_tmp[1] * par_tmp[4] - par_tmp[2] * par_tmp[3]) / (par_tmp[2] * (par_tmp[2] + par_tmp[4])),
+      par_tmp[4],
+      par_tmp[5],
+      par_tmp[6],
+      par_tmp[7],
+      par_tmp[8],
+      par_tmp[9],
+      par_tmp[10]
+    ),
+    c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")
+  )[par_names]
 
-    par_tmp <- setNames(
-      c(rep(0, 7), rep(1, 3)),
-      c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF")
+  if (cov_fail | !conv) {
+    npar <- length(par_new)
+    se_new <- setNames(rep(NA, npar), names(par_new)[new_order])
+    cov_new <- matrix(
+      NA,
+      ncol = npar, nrow = npar,
+      dimnames = list(
+        names(par_new)[new_order],
+        names(par_new)[new_order]
+      )
     )
-    par_tmp[par_names] <- par
-    par_new <- setNames(
-      c(
-        -par_tmp[1] / par_tmp[2],
-        par_tmp[2],
-        (par_tmp[1] * par_tmp[4] - par_tmp[2] * par_tmp[3]) / (par_tmp[2] * (par_tmp[2] + par_tmp[4])),
-        par_tmp[4],
-        par_tmp[5],
-        par_tmp[6],
-        par_tmp[7],
-        par_tmp[8],
-        par_tmp[9],
-        par_tmp[10]
+  } else {
+    cov_tmp <- matrix(
+      0,
+      ncol = 10, nrow = 10,
+      dimnames = list(
+        c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF"),
+        c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF")
+      )
+    )
+    cov_tmp[par_names, par_names] <- cov
+    cov_new <- msm::deltamethod(
+      list(
+        ~ -x1 / x2, ~x2, ~ (x1 * x4 - x2 * x3) / (x2 * (x2 + x4)), ~x4,
+        ~x5, ~x6, ~x7, ~x8, ~x9, ~x10
       ),
-      c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")
-    )[par_names]
+      par_tmp,
+      cov_tmp,
+      ses = FALSE
+    )[par_names, par_names]
+    colnames(cov_new) <- rownames(cov_new) <- c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names]
+    cov_new <- cov_new[new_order, new_order]
+    se_new <- sqrt(diag(cov_new))
+  }
 
-    if (cov_fail | !conv) {
-      npar <- length(par_new)
-      se_new <- setNames(rep(NA, npar), names(par_new)[new_order])
-      cov_new <- matrix(
-        NA,
-        ncol = npar, nrow = npar,
-        dimnames = list(
-          names(par_new)[new_order],
-          names(par_new)[new_order]
-        )
-      )
-    } else {
-      cov_tmp <- matrix(
-        0,
-        ncol = 10, nrow = 10,
-        dimnames = list(
-          c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF"),
-          c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF")
-        )
-      )
-      cov_tmp[par_names, par_names] <- cov
-      cov_new <- msm::deltamethod(
-        list(
-          ~ -x1 / x2, ~x2, ~ (x1 * x4 - x2 * x3) / (x2 * (x2 + x4)), ~x4,
-          ~x5, ~x6, ~x7, ~x8, ~x9, ~x10
-        ),
-        par_tmp,
-        cov_tmp,
-        ses = FALSE
-      )[par_names, par_names]
-      colnames(cov_new) <- rownames(cov_new) <- c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names]
-      cov_new <- cov_new[new_order, new_order]
-      se_new <- sqrt(diag(cov_new))
-    }
-
-    return(list(par = par_new[new_order], cov = cov_new, se = se_new))
+  return(list(par = par_new[new_order], cov = cov_new, se = se_new))
 }

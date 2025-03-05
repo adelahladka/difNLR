@@ -1837,7 +1837,7 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
       call. = FALSE
     )
   }
-
+  # TODO: pro irls je potreba prejmenovat parametry aby to fungovalo!
   nlrPAR <- lapply(items, function(i) {
     if (i %in% object$DIFitems) {
       object$parM1[[i]]
@@ -1861,7 +1861,6 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
       } else {
         sqrt(diag(nlrCOV[[i]]))
       }
-
     })
   } else {
     nlrDM <- lapply(1:m, function(i) {
