@@ -182,11 +182,11 @@ re-calculated into the IRT parameterization using the delta method.
 The function offers either the non-linear least squares estimation via the
 \code{\link[stats]{nls}} function (Drabinova & Martinkova, 2017; Hladka &
 Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
-algorithm with constraints via the \code{\link[stats]{optim}} function (Hladka &
-Martinkova, 2020), the maximum likelihood method with the EM algorithm (Hladka,
-Martinkova, & Brabec, 2024), the maximum likelihood method with the algorithm
-based on parametric link function (PLF, the default option; Hladka, Martinkova,
-& Brabec, 2024), or the maximum likelihood method with the iteratively
+algorithm with constraints via the \code{\link[stats]{optim}} function
+(Hladka & Martinkova, 2020), the maximum likelihood method with the EM
+algorithm (Hladka, Martinkova, & Brabec, 2024), the maximum likelihood method
+with the algorithm based on parametric link function (Hladka, Martinkova, &
+Brabec, 2024), or the maximum likelihood method with the iteratively
 reweighted least squares algorithm via the \code{\link[stats]{glm}} function.
 }
 \examples{

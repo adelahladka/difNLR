@@ -138,11 +138,11 @@
 #' The function offers either the non-linear least squares estimation via the
 #' \code{\link[stats]{nls}} function (Drabinova & Martinkova, 2017; Hladka &
 #' Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
-#' algorithm with constraints via the \code{\link[stats]{optim}} function (Hladka &
-#' Martinkova, 2020), the maximum likelihood method with the EM algorithm (Hladka,
-#' Martinkova, & Brabec, 2024), the maximum likelihood method with the algorithm
-#' based on parametric link function (PLF, the default option; Hladka, Martinkova,
-#' & Brabec, 2024), or the maximum likelihood method with the iteratively
+#' algorithm with constraints via the \code{\link[stats]{optim}} function
+#' (Hladka & Martinkova, 2020), the maximum likelihood method with the EM
+#' algorithm (Hladka, Martinkova, & Brabec, 2024), the maximum likelihood method
+#' with the algorithm based on parametric link function (Hladka, Martinkova, &
+#' Brabec, 2024), or the maximum likelihood method with the iteratively
 #' reweighted least squares algorithm via the \code{\link[stats]{glm}} function.
 #'
 #' @return A list with the following arguments:
@@ -713,15 +713,23 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
 
 #' @noRd
 .deltamethod.NLR.is2irt <- function(par, cov, conv, cov_fail) {
+  # for Rasch model, IS and IRT is the same
+  if (length(par) == 1L && names(par) == "b0") {
+    names(par) <- "b"
+    cov <- as.matrix(cov) # to be able to set dimnames
+    dimnames(cov) <- list("b", "b")
+    return(list(par = par, cov = cov, se = sqrt(cov)))
+  }
+
   par_names <- which(c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF") %in% names(par))
 
   new_order <- sapply(c("a", "b", "aDif", "bDif", "c", "cR", "cF", "d", "dR", "dF"), function(x) {
     which(x == c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names])
   })
   new_order <- unlist(new_order[sapply(new_order, function(x) length(x) > 0)])
-
+  # TODO: zkontrolovat jestli funguje pro vsechny modely b1 = 1
   par_tmp <- setNames(
-    c(rep(0, 7), rep(1, 3)),
+    c(c(0, 1), rep(0, 5), rep(1, 3)),
     c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF")
   )
   par_tmp[par_names] <- par
@@ -771,8 +779,10 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
       cov_tmp,
       ses = FALSE
     )[par_names, par_names]
+    cov_new <- matrix(cov_new, nrow = length(par_names), ncol = length(par_names))
     colnames(cov_new) <- rownames(cov_new) <- c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names]
-    cov_new <- cov_new[new_order, new_order]
+    cov_new <- matrix(cov_new[new_order, new_order], nrow = length(par_names), ncol = length(par_names),
+                      dimnames = list(rownames(cov_new)[new_order], colnames(cov_new)[new_order]))
     se_new <- sqrt(diag(cov_new))
   }
 

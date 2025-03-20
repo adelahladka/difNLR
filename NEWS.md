@@ -7,6 +7,10 @@
 #### BUGFIXING
   * Bug in `NLR()` when `method = "irls"` fixed. Parameters are now labelled as
     b0-b3 and estimates are correctly printed with the `coef.difNLR()` S3 method. 
+  * Bug in `coef.difNLR()` S3 method fixed when only one parameter is
+    estimated. Thanks to Jan Netik.
+  * Bug in `coef.difNLR()` S3 method fixed when multiple items did not converged. 
+  * Bug in `difNLR()` handling items that failed to converge and their estimates.
 
 #### MINOR UPDATES
   * Tests updated.

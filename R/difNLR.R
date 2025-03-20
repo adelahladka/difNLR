@@ -156,11 +156,11 @@
 #' The function offers either the non-linear least squares estimation via the
 #' \code{\link[stats]{nls}} function (Drabinova & Martinkova, 2017; Hladka &
 #' Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
-#' algorithm with constraints via the \code{\link[stats]{optim}} function (Hladka &
-#' Martinkova, 2020), the maximum likelihood method with the EM algorithm (Hladka,
-#' Martinkova, & Brabec, 2024), the maximum likelihood method with the algorithm
-#' based on parametric link function (PLF, the default option; Hladka, Martinkova,
-#' & Brabec, 2024), or the maximum likelihood method with the iteratively
+#' algorithm with constraints via the \code{\link[stats]{optim}} function
+#' (Hladka & Martinkova, 2020), the maximum likelihood method with the EM
+#' algorithm (Hladka, Martinkova, & Brabec, 2024), the maximum likelihood method
+#' with the algorithm based on parametric link function (Hladka, Martinkova, &
+#' Brabec, 2024), or the maximum likelihood method with the iteratively
 #' reweighted least squares algorithm via the \code{\link[stats]{glm}} function.
 #'
 #' @return
@@ -610,7 +610,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       nlrPAR <- nlrSE <- lapply(
         1:length(PROV$par.m1),
         function(i) {
-          if (i %in% PROV$conv.fail.which) {
+          if (i %in% PROV$cf.which) {
             structure(rep(NA, length(PROV$par.m1[[i]])),
               names = names(PROV$par.m1[[i]])
             )
@@ -622,7 +622,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         }
       )
       for (i in 1:length(PROV$par.m1)) {
-        if (!(i %in% PROV$conv.fail.which)) {
+        if (!(i %in% PROV$cf.which)) {
           nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
           nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
         }
@@ -735,7 +735,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         nlrPAR <- nlrSE <- lapply(
           1:length(PROV$par.m1),
           function(i) {
-            if (i %in% PROV$conv.fail.which) {
+            if (i %in% PROV$cf.which) {
               structure(rep(NA, length(PROV$par.m1[[i]])),
                 names = names(PROV$par.m1[[i]])
               )
@@ -747,7 +747,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
           }
         )
         for (i in 1:length(PROV$par.m1)) {
-          if (!(i %in% PROV$conv.fail.which)) {
+          if (!(i %in% PROV$cf.which)) {
             nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
             nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
           }
@@ -1615,7 +1615,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
   PAR_NEW <- lapply(PAR, function(x) {
     par_names <- names(x)
     par_tmp <- data.frame(
-      b0 = 0, b1 = 0, b2 = 0, b3 = 0,
+      b0 = 0, b1 = 1, b2 = 0, b3 = 0, # b1 = 1 because of Rasch model where it is fixed, TODO: think about case when b1 = 0
       c = 0, d = 1, cDif = 0, dDif = 0
     )
     par_tmp[par_names] <- x[par_names]
@@ -1837,7 +1837,7 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
       call. = FALSE
     )
   }
-  # TODO: pro irls je potreba prejmenovat parametry aby to fungovalo!
+
   nlrPAR <- lapply(items, function(i) {
     if (i %in% object$DIFitems) {
       object$parM1[[i]]
@@ -1913,11 +1913,11 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
         resnams <- res[, 1]
       }
     }
-    res <- res[, -1]
+    res <- res[, -1, drop = FALSE]
     rownames(res) <- resnams
     res[is.na(res)] <- 0
     if (object$conv.fail > 0) {
-      res[grepl(nams[object$conv.fail.which], rownames(res)), ] <- NA
+      res[rownames(res) %in% nams[object$conv.fail.which], ] <- NA
     }
   } else {
     res <- coefs

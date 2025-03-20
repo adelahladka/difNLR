@@ -137,29 +137,21 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
       stop("Invalid value for the 'model' argument.", call. = FALSE)
     }
   }
-
+  if (model %in% c("Rasch", "1PL")) {
+    if (type == "both") {
+      warning("Only uniform DIF can be tested with the Rasch or 1PL model.", call. = FALSE)
+    }
+    if (type == "nudif") {
+      stop("It is not possible to test non-uniform DIF in the Rasch or 1PL model.", call. = FALSE)
+    }
+  }
   if (parameterization == "logistic" & model != "2PL") {
     stop("Logistic parameterization is available only for the 2PL model", call. = FALSE)
   }
 
-  # constraints for model
-  cons <- rep(TRUE, 8)
-  names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")
-
-  if (!is.null(constraints)) {
-    if (any(!is.na(constraints))) {
-      constr <- unlist(strsplit(constraints, split = ""))
-      if (!all(constr %in% letters[1:4])) {
-        warning("Constraints can be only 'a', 'b', 'c', or 'd'!", call. = FALSE)
-      }
-      cons[paste0(constr[!(constr %in% c("c", "d"))], "Dif")] <- FALSE
-      cons[paste0(constr[(constr %in% c("c", "d"))], "F")] <- FALSE
-    }
-  }
-
-  # model
-  mod <- logical(8)
-  mod <- switch(model,
+  # model - largest possible model
+  mod1 <- logical(8)
+  mod1 <- switch(model,
     # 1PL models
     "Rasch"   = c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
     "1PL"     = c(TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
@@ -179,85 +171,78 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     "4PLc"    = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE),
     "4PL"     = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
   )
-  names(mod) <- c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")
-  mod <- apply(cbind(mod, cons), 1, all)
+  names(mod1) <- c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")
 
-  # type of DIF to be tested
-  typ <- typcons <- mod
+  # constraints for larger model
+  cons <- rep(TRUE, 8)
+  names(cons) <- c("a", "b", "c", "d", "aDif", "bDif", "cF", "dF")
 
-  if (!(type %in% c("udif", "nudif", "both", "all"))) {
+  if (!is.null(constraints)) {
+    if (any(!is.na(constraints))) {
+      constr <- unlist(strsplit(constraints, split = ""))
+      if (!all(constr %in% letters[1:4])) {
+        warning("Constraints can be only 'a', 'b', 'c', or 'd'!", call. = FALSE)
+      }
+      cons <- apply(sapply(constr, function(x) {
+        if (x %in% c("c", "d")) {
+          cons[paste0(x, "F")] <- FALSE
+        } else {
+          cons[paste0(x, "Dif")] <- FALSE
+        }
+        cons
+      }), 1, all)
+    }
+  }
+  mod1 <- mod1 & cons
+
+  # submodel
+  mod0 <- mod1
+  # type of DIF to be tested within submodel
+  if (type == "udif") {
+    mod0["bDif"] <- FALSE
+    mod0["aDif"] <- FALSE
+    mod1["aDif"] <- FALSE
+  } else if (type == "nudif") {
+    mod0["aDif"] <- FALSE
+  } else if (type == "both") {
+    mod0["bDif"] <- FALSE
+    mod0["aDif"] <- FALSE
+  } else if (type == "all") {
+    mod0[c("aDif", "bDif", "cF", "dF")] <- FALSE
+  } else {
     types <- unlist(strsplit(type, split = ""))
     if (!all(types %in% letters[1:4])) {
       stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c', or 'd' can be tested
            or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.", call. = FALSE)
     }
-    if (any(types %in% c("c", "d"))) {
-      typcons[.MYpaste(types[(types %in% c("c", "d"))], "F")] <- FALSE
-    }
-    if (length(types[!(types %in% c("c", "d"))]) > 0) {
-      typcons[paste0(types[!(types %in% c("c", "d"))], "Dif")] <- FALSE
-    }
-    type <- "other"
-  }
-
-  if (type == "other") {
     if (any(!is.na(constraints))) {
       if (length(intersect(types, constr)) > 0) {
         stop("The difference in constrained parameters cannot be tested.", call. = FALSE)
       }
     }
+
+    mod0 <- apply(sapply(types, function(x) {
+      if (x %in% c("c", "d")) {
+        mod0[paste0(x, "F")] <- FALSE
+      } else {
+        mod0[paste0(x, "Dif")] <- FALSE
+      }
+      mod0
+    }), 1, all)
   }
 
-  switch(type,
-    "udif" = {
-      typ["bDif"] <- FALSE
-      typ["aDif"] <- FALSE
-      mod["aDif"] <- FALSE
-    },
-    "nudif" = {
-      typ["aDif"] <- FALSE
-    },
-    "both" = {
-      typ["bDif"] <- FALSE
-      typ["aDif"] <- FALSE
-    },
-    "all" = {
-      typ[c("aDif", "bDif", "cF", "dF")] <- FALSE
-    },
-    "other" = {
-      typ <- typcons
-    }
-  )
-
-  if (model %in% c("Rasch", "1PL")) {
-    typ["aDif"] <- FALSE
-    if (type == "both") {
-      warning("Only uniform DIF can be tested with specified model.", call. = FALSE)
-    }
-    if (type == "nudif") {
-      stop("It is not possible to test non-uniform DIF in specified model.", call. = FALSE)
-    }
-  }
-
-  # model 0 and model 1
-  mod0 <- typ
-  mod1 <- mod
-
+  # reparametrizations
   if (parameterization == "logistic") {
     mod0 <- c(
-      "(Intercept)" = as.logical(mod0[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "(Intercept)" = as.logical(mod0[["b"]]) | as.logical(mod0[["a"]]), # note, intercept always estimated, even if discrimination is not
       "x" = as.logical(mod0[["a"]]),
-      "g" = as.logical(-mod0[["a"]] * mod0[["bDif"]] -
-        mod0[["aDif"]] * mod0[["b"]] -
-        mod0[["aDif"]] * mod0[["bDif"]]),
+      "g" = as.logical(mod0[["bDif"]]), # | as.logical(mod0[["aDif"]]),
       "x:g" = as.logical(mod0[["aDif"]])
     )
     mod1 <- c(
-      "(Intercept)" = as.logical(mod1[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "(Intercept)" = as.logical(mod1[["b"]]) | as.logical(mod1[["a"]]), # note, intercept always estimated, even if discrimination is not
       "x" = as.logical(mod1[["a"]]),
-      "g" = as.logical(-mod1[["a"]] * mod1[["bDif"]] -
-        mod1[["aDif"]] * mod1[["b"]] -
-        mod1[["aDif"]] * mod1[["bDif"]]),
+      "g" = as.logical(mod1[["bDif"]]), # | as.logical(mod1[["aDif"]]),
       "x:g" = as.logical(mod1[["aDif"]])
     )
     part_expit0 <- names(mod0[-1])[mod0[-1]]
@@ -269,14 +254,9 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     part_asym1 <- ""
   } else if (parameterization == "is") {
     mod0 <- c(
-      "b0" = as.logical(mod0[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "b0" = as.logical(mod0[["b"]]) | as.logical(mod0[["a"]]), # note, intercept always estimated, even if discrimination is not
       "b1" = as.logical(mod0[["a"]]),
-      # "b2" = any(mod0[["bDif"]], as.logical(-mod0[["a"]] * mod0[["bDif"]] - # note, intercept always estimated, even if discrimination is not
-      #   mod0[["aDif"]] * mod0[["b"]] -
-      #   mod0[["aDif"]] * mod0[["bDif"]])),
-      "b2" = as.logical(mod0[["bDif"]] * (-mod0[["a"]] * mod0[["bDif"]] - # note, intercept always estimated, even if discrimination is not
-        mod0[["aDif"]] * mod0[["b"]] -
-        mod0[["aDif"]] * mod0[["bDif"]])),
+      "b2" = as.logical(mod0[["bDif"]]), # | as.logical(mod0[["aDif"]]),
       "b3" = as.logical(mod0[["aDif"]]),
       "c" = as.logical(mod0[["c"]]),
       "cF" = as.logical(mod0[["cF"]]),
@@ -284,14 +264,9 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
       "dF" = as.logical(mod0[["dF"]])
     )
     mod1 <- c(
-      "b0" = as.logical(mod1[["b"]]), # note, intercept always estimated, even if discrimination is not
+      "b0" = as.logical(mod1[["b"]]) | as.logical(mod1[["a"]]), # note, intercept always estimated, even if discrimination is not
       "b1" = as.logical(mod1[["a"]]),
-      # "b2" = any(mod1[["bDif"]], as.logical(-mod1[["a"]] * mod1[["bDif"]] - # note, intercept always estimated, even if discrimination is not
-      #   mod1[["aDif"]] * mod1[["b"]] -
-      #   mod1[["aDif"]] * mod1[["bDif"]])),
-      "b2" = as.logical(mod1[["bDif"]] * (-mod1[["a"]] * mod1[["bDif"]] - # note, intercept always estimated, even if discrimination is not
-        mod1[["aDif"]] * mod1[["b"]] -
-        mod1[["aDif"]] * mod1[["bDif"]])),
+      "b2" = as.logical(mod1[["bDif"]]), # | as.logical(mod1[["aDif"]]),
       "b3" = as.logical(mod1[["aDif"]]),
       "c" = as.logical(mod1[["c"]]),
       "cF" = as.logical(mod1[["cF"]]),

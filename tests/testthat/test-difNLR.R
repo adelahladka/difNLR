@@ -45,7 +45,7 @@ test_that("fit 3PL model on generated data", {
 
   set.seed(42)
   sam <- sample(1:1000, 400)
-  expect_message(fit8a <- difNLR(Data[sam, ], group[sam], focal.name = 1, model = "4PL", type = "all", initboot = TRUE))
+  expect_message(expect_message(fit8a <- difNLR(Data[sam, ], group[sam], focal.name = 1, model = "4PL", type = "all", initboot = TRUE)))
   # saveRDS(fit8a, file = "tests/testthat/fixtures/fit8a_gen.rds")
   fit8a_gen <- readRDS(test_path("fixtures", "fit8a_gen.rds"))
   expect_s3_class(fit8a, "difNLR")
@@ -99,10 +99,14 @@ test_that("fit different models on generated data", {
   Data <- df[, 1:15]
   group <- df[, 16]
 
+  # Rasch model
+  fit1 <- difNLR(Data, group, focal.name = 1, model = "Rasch")
+  expect_s3_class(fit1, "difNLR")
+  expect_equal(fit1$DIFitems, c(5, 8, 11, 12, 15))
+
   # item-specific model
   model <- c("1PL", rep("2PL", 2), rep("3PL", 2), rep("3PLd", 2), rep("4PL", 8))
   fit2 <- difNLR(Data, group, focal.name = 1, model = model, type = "all")
-
   expect_s3_class(fit2, "difNLR")
   expect_equal(fit2$DIFitems, c(5, 8, 11, 15))
 
@@ -376,4 +380,132 @@ test_that("coef.difNLR works on GMAT and 2PL model", {
   # saveRDS(coef_fit1_GMAT_DIF_is_simplify_noCI_2PL, file = "tests/testthat/fixtures/coef_fit1_GMAT_DIF_is_simplify_noCI_2PL.rds")
   coef_fit1_GMAT_DIF_is_simplify_noCI_2PL <- readRDS(test_path("fixtures", "coef_fit1_GMAT_DIF_is_simplify_noCI_2PL.rds"))
   expect_equal(coef(fit1, item = fit1$DIFitems, IRTpars = FALSE, simplify = TRUE, CI = 0), coef_fit1_GMAT_DIF_is_simplify_noCI_2PL)
+})
+
+test_that("formulaNLR equivalence of models for IRT parametrization", {
+  # 1PL vs 2PL model with constraints on a
+  frm1 <- formulaNLR(model = "1PL")
+  frm2 <- formulaNLR(model = "2PL", constraints = "a")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 3PLcg vs 3PL model with constraints on c
+  frm1 <- formulaNLR(model = "3PLcg")
+  frm2 <- formulaNLR(model = "3PL", constraints = "c")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 3PLdg vs 3PL model with constraints on d
+  frm1 <- formulaNLR(model = "3PLdg")
+  frm2 <- formulaNLR(model = "3PLd", constraints = "d")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 4PLcgdg vs 4PL model with constraints on c and d
+  frm1 <- formulaNLR(model = "4PLcgdg")
+  frm2 <- formulaNLR(model = "4PL", constraints = "cd")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 2PL all DIF vs 2PL both DIF
+  frm1 <- formulaNLR(model = "2PL", type = "all")
+  frm2 <- formulaNLR(model = "2PL", type = "both")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 2PL uniform DIF vs 1PL both DIF
+  frm1 <- formulaNLR(model = "2PL", type = "udif")
+  frm2 <- formulaNLR(model = "1PL", type = "all")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+})
+
+test_that("formulaNLR equivalence of models for IS parametrization", {
+  # 1PL vs 2PL model with constraints on a
+  frm1 <- formulaNLR(model = "1PL", parameterization = "is")
+  frm2 <- formulaNLR(model = "2PL", constraints = "a", parameterization = "is")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 3PLcg vs 3PL model with constraints on c
+  frm1 <- formulaNLR(model = "3PLcg", parameterization = "is")
+  frm2 <- formulaNLR(model = "3PL", constraints = "c", parameterization = "is")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 3PLdg vs 3PL model with constraints on d
+  frm1 <- formulaNLR(model = "3PLdg", parameterization = "is")
+  frm2 <- formulaNLR(model = "3PLd", constraints = "d", parameterization = "is")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 4PLcgdg vs 4PL model with constraints on c and d
+  frm1 <- formulaNLR(model = "4PLcgdg", parameterization = "is")
+  frm2 <- formulaNLR(model = "4PL", constraints = "cd", parameterization = "is")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 2PL all DIF vs 2PL both DIF
+  frm1 <- formulaNLR(model = "2PL", type = "all", parameterization = "is")
+  frm2 <- formulaNLR(model = "2PL", type = "both", parameterization = "is")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+
+  # 2PL uniform DIF vs 1PL both DIF
+  frm1 <- formulaNLR(model = "2PL", type = "udif", parameterization = "is")
+  frm2 <- formulaNLR(model = "1PL", type = "all", parameterization = "is")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+})
+
+test_that("formulaNLR equivalence of models for logistic parametrization", {
+  # 2PL with uniform DIF vs 2PL model with constraints on a
+  frm1 <- formulaNLR(model = "2PL", type = "udif", parameterization = "logistic")
+  frm2 <- formulaNLR(model = "2PL", constraints = "a", parameterization = "logistic")
+  expect_equal(frm1[[1]][-1], frm2[[1]][-1])
+  expect_equal(frm1[[2]][-1], frm2[[2]][-1])
+  expect_equal(paste(frm1[[1]][[1]]), paste(frm2[[1]][[1]]))
+  expect_equal(paste(frm1[[2]][[1]]), paste(frm2[[2]][[1]]))
+})
+
+test_that("fit different models on LtL data", {
+  skip_on_cran()
+  skip_on_os("linux")
+
+  data(LearningToLearn, package = "ShinyItemAnalysis")
+  Data <- LearningToLearn[60:100]
+  group <- LearningToLearn[, "track_01"]
+  match <- scale(LearningToLearn[, "score_6"])
+
+  expect_message(expect_message(expect_warning(expect_warning(fit1 <- difNLR(Data, group,
+    focal.name = 1, model = "Rasch", match = match,
+    type = "b"
+  )))))
+
+  df <- data.frame(do.call(rbind, fit1$nlrPAR), row.names = colnames(Data))
+  expect_identical(coef(fit1, simplify = TRUE, CI = 0, IRTpars = FALSE), df)
 })
