@@ -95,26 +95,23 @@
 #' The unconstrained form of the 4PL generalized logistic regression model for
 #' probability of correct answer (i.e., \eqn{Y_{pi} = 1}) using IRT
 #' parameterization is
-#' \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
-#' (d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
-#' (1 - G_p)) / (1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
+#' \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{i} + c_{i\text{DIF}} \cdot G_p) +
+#' (d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) /
+#' (1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
 #' (X_p - b_p - b_{i\text{DIF}} \cdot G_p))), }
 #' where \eqn{X_p} is the matching criterion (e.g., standardized total score)
 #' and \eqn{G_p} is a group membership variable for respondent \eqn{p}.
-#' Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_{iR}}, and \eqn{d_{iR}} are
-#' discrimination, difficulty, guessing, and inattention for the reference group
-#' for item \eqn{i}. Terms \eqn{a_{i\text{DIF}}} and \eqn{b_{i\text{DIF}}} then
-#' represent differences between the focal and reference groups in
-#' discrimination and difficulty for item \eqn{i}. Terms \eqn{c_{iF}}, and
-#' \eqn{d_{iF}} are guessing and inattention parameters for the focal group for
-#' item \eqn{i}. In the case that there is no assumed difference between the
-#' reference and focal group in the guessing or inattention parameters, the
-#' terms \eqn{c_i} and \eqn{d_i} are used.
+#' Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_i}, and \eqn{d_i} are discrimination,
+#' difficulty, guessing, and inattention for the reference group for item
+#' \eqn{i}. Terms \eqn{a_{i\text{DIF}}}, \eqn{b_{i\text{DIF}}},
+#' \eqn{c_{i\text{DIF}}}, and \eqn{d_{i\text{DIF}}} then represent differences
+#' between the focal and reference groups in discrimination, difficulty,
+#' guessing, and inattention for item \eqn{i}.
 #'
 #' Alternatively, intercept-slope parameterization may be applied:
-#' \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
-#' (d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
-#' (1 - G_p)) / (1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
+#' \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{i} + c_{i\text{DIF}} \cdot G_p) +
+#' (d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) /
+#' (1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
 #' \beta_{i2} \cdot G_p + \beta_{i3} \cdot X_p \cdot G_p))), }
 #' where parameters \eqn{\beta_{i0}, \beta_{i1}, \beta_{i2}, \beta_{i3}} are
 #' intercept, effect of the matching criterion, effect of the group membership,
@@ -158,9 +155,9 @@
 #' Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
 #' algorithm with constraints via the \code{\link[stats]{optim}} function
 #' (Hladka & Martinkova, 2020), the maximum likelihood method with the EM
-#' algorithm (Hladka, Martinkova, & Brabec, 2024), the maximum likelihood method
+#' algorithm (Hladka, Martinkova, & Brabec, 2025), the maximum likelihood method
 #' with the algorithm based on parametric link function (Hladka, Martinkova, &
-#' Brabec, 2024), or the maximum likelihood method with the iteratively
+#' Brabec, 2025), or the maximum likelihood method with the iteratively
 #' reweighted least squares algorithm via the \code{\link[stats]{glm}} function.
 #'
 #' @return
@@ -235,7 +232,7 @@
 #' models for DIF and DDF detection. The R Journal, 12(1), 300--323,
 #' \doi{10.32614/RJ-2020-014}.
 #'
-#' Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
+#' Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms
 #' for estimation of item functioning. Journal of Educational and Behavioral
 #' Statistics. Online first, \doi{10.3102/10769986241312354}.
 #'
@@ -575,23 +572,28 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
              as a number of items in 'Data'.", call. = FALSE)
       }
       start_names <- unique(unlist(lapply(start, names)))
-      if (!all(start_names %in% c(paste0("b", 0:3), letters[3:4], paste0(letters[3:4], "Dif"))) &
-        !all(start_names %in% c(letters[1:4], paste0(letters[1:4], "Dif")))) {
-        stop("Invalid names in 'start'. Each element of 'start' needs to be a numeric vector
-             with names 'b0', 'b1', 'b2', 'b3', 'c', 'd', 'cDif', and 'dDif' or
-             'a', 'b', 'c', 'd', 'aDif', 'bDif', 'cDif', and 'dDif'. ", call. = FALSE)
+
+
+      if (!all(start_names %in% c(letters[1:4], paste0(letters[1:4], "Dif"), paste0("b", 0:3), paste0(rep(letters[3:4], each = 2), c("R", "F"))))) {
+        stop("Invalid names in 'start'. Each element of 'start' needs to be a numeric vector with names
+        'b0', 'b1', 'b2', 'b3' for intercept-slope parametrization or
+        'a', 'b', 'aDif', 'bDif' for IRT parametrization.
+        For asymptote parameters, starting values need to be named
+        'cR', 'cF', 'dR', and 'dF'. ", call. = FALSE)
       } else {
-        if (all(start_names %in% c(letters[1:4], paste0(letters[1:4], "Dif")))) {
+        if (all(start_names %in% c("a", "b", "aDif", "bDif", "cR", "cF", "dR", "dF"))) {
           start_old <- start
           start <- lapply(start_old, function(x) {
+            pars <- c("b" = 0, "a" = 1, "bDif" = 0, "aDif" = 0, "cR" = 0, "cF" = 0, "dR" = 1, "dF" = 1)
+            pars[names(x)] <- x
+            x <- unlist(pars)
             tmp <- unlist(c(
-              b0 = -x["a"] * x["b"], b1 = x["a"],
-              b2 = -x["a"] * x["bDif"] - x["aDif"] * x["b"] - x["aDif"] * x["bDif"],
-              b3 = x["aDif"],
-              cR = x["c"], dR = x["d"],
-              cF = x["c"] + x["cDif"], dF = x["d"] + x["dDif"]
+                b0 = -x["a"] * x["b"], b1 = x["a"],
+                b2 = -x["a"] * x["bDif"] - x["aDif"] * x["b"] - x["aDif"] * x["bDif"],
+                b3 = x["aDif"],
+                cR = x["cR"], cF = x["cF"], dR = x["dR"], dF = x["dF"]
             ))
-            names(tmp) <- c("b0", "b1", "b2", "b3", "cR", "dR", "cF", "dF")
+            names(tmp) <- c("b0", "b1", "b2", "b3", "cR", "cF", "dR", "dF")
             return(tmp)
           })
         }
@@ -674,11 +676,27 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         PROV <- prov1
         STATS <- stats1
         DIFitems <- "No DIF item detected"
-        nlrPAR <- nlrSE <- structure(data.frame(matrix(0, ncol = dim(PROV$par.m1)[2], nrow = dim(PROV$par.m1)[1])),
-          .Names = colnames(PROV$par.m1)
+
+        nlrPAR <- nlrSE <- lapply(
+          1:length(PROV$par.m1),
+          function(i) {
+            if (i %in% PROV$cf.which) {
+              structure(rep(NA, length(PROV$par.m1[[i]])),
+                        names = names(PROV$par.m1[[i]])
+              )
+            } else {
+              structure(rep(0, length(PROV$par.m1[[i]])),
+                        names = names(PROV$par.m1[[i]])
+              )
+            }
+          }
         )
-        nlrPAR[, colnames(PROV$par.m0)] <- PROV$par.m0
-        nlrSE[, colnames(PROV$par.m0)] <- PROV$se.m0
+        for (i in 1:length(PROV$par.m1)) {
+          if (!(i %in% PROV$cf.which)) {
+            nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
+            nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
+          }
+        }
         noLoop <- TRUE
       } else {
         dif <- significant1
