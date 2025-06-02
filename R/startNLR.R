@@ -175,6 +175,12 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
            by single string.", call. = FALSE)
     }
   }
+  if (!is.null(constraints) & length(constraints) == 1) {
+    constraints <- rep(constraints, m)
+  } else if (!is.null(constraints) & length(constraints) != m) {
+      stop("Invalid length of 'constraints'. Constraints for initial values needs to be specified
+           for each item or by a single string.", call. = FALSE)
+  }
   if (length(parameterization) == 1) {
     parameterization <- rep(parameterization, m)
   } else {
@@ -182,10 +188,6 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
       stop("Invalid length of 'parameterization'. Parameterization for initial values needs to be specified
            for each item or by a single string.", call. = FALSE)
     }
-  }
-
-  if (!is.null(constraints) & length(constraints) == 1) {
-    constraints <- rep(constraints, m)
   }
 
   startNLR_line <- function(match, DATA) {
