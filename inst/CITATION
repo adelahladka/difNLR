@@ -3,7 +3,7 @@ note <- sprintf("R package version %s", meta$Version)
 
 citHeader("To cite the 'difNLR' package in publications use:")
 
-bibentry(bibtype = "Article",
+bibentry(bibtype = "article",
          title = "{difNLR}: Generalized logistic regression models for {DIF} and {DDF} detection",
          author = c(as.person("Adela Hladka"), as.person("Patricia Martinkova")),
          year = "2020",
@@ -14,7 +14,7 @@ bibentry(bibtype = "Article",
          journal = "The R Journal",
          textVersion = "Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection. The R Journal, 12(1), 300--323, doi: 10.32614/RJ-2020-014.")
 
-bibentry(bibtype = "Manual",
+bibentry(bibtype = "manual",
          title = "{difNLR}: {DIF} and {DDF} Detection by Non-Linear Regression Models",
          author = c(as.person("Adela Hladka"), as.person("Patricia Martinkova")),
          year = year,
@@ -25,7 +25,7 @@ bibentry(bibtype = "Manual",
                year, "). difNLR: DIF and DDF detection by non-linear regression models. ", note,
                "."))
 
-bibentry(bibtype = "Article",
+bibentry(bibtype = "article",
          title = "{D}etection of differential item functioning with nonlinear regression: {A} non-{IRT} approach accounting for guessing",
          author = c(as.person("Adela Drabinova"), as.person("Patricia Martinkova")),
          year = "2017",
