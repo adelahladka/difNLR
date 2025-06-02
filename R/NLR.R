@@ -140,9 +140,9 @@
 #' Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
 #' algorithm with constraints via the \code{\link[stats]{optim}} function
 #' (Hladka & Martinkova, 2020), the maximum likelihood method with the EM
-#' algorithm (Hladka, Martinkova, & Brabec, 2024), the maximum likelihood method
+#' algorithm (Hladka, Martinkova, & Brabec, 2025), the maximum likelihood method
 #' with the algorithm based on parametric link function (Hladka, Martinkova, &
-#' Brabec, 2024), or the maximum likelihood method with the iteratively
+#' Brabec, 2025), or the maximum likelihood method with the iteratively
 #' reweighted least squares algorithm via the \code{\link[stats]{glm}} function.
 #'
 #' @return A list with the following arguments:
@@ -196,7 +196,7 @@
 #' models for DIF and DDF detection. The R Journal, 12(1), 300--323,
 #' \doi{10.32614/RJ-2020-014}.
 #'
-#' Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
+#' Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms
 #' for estimation of item functioning. Journal of Educational and Behavioral
 #' Statistics. Online first, \doi{10.3102/10769986241312354}.
 #'
@@ -306,6 +306,9 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
   } else if (missing(start) || is.null(start)) {
     start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
   } else {
+    if (all(sapply(1:m, function(i) all(M[[i]]$M1$parameters %in% names(start[[i]]))))) {
+      start <- lapply(1:m, function(i) start[[i]][M[[i]]$M1$parameters])
+    }
     if (!all(sapply(1:m, function(i) length(start[[i]]) == length(M[[i]]$M1$parameters))) ||
       !all(sapply(1:m, function(i) all(sort(names(start[[i]])) == sort(M[[i]]$M1$parameters))))) {
       warning("Invalid names of item parameters in 'start'. Initial values are calculated with the 'startNLR' function.", call. = FALSE)
@@ -599,7 +602,7 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
 
   # parameters
   par.m0 <- lapply(1:m, function(i) {
-    structure(rep(NA, length(M[[i]]$M0$parameters)),
+    pars <- structure(rep(NA, length(M[[i]]$M0$parameters)),
       names = M[[i]]$M0$parameters
     )
   })
@@ -664,6 +667,7 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
       function(l) (1 - pf(Fval[l], df[l, 1], df[l, 2]))
     )
   } else if (test == "LR") {
+    df <- df[, 1]
     pval <- LRval <- rep(NA, m)
 
     LRval[conv] <- sapply(
@@ -675,6 +679,7 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
       function(l) (1 - pchisq(LRval[l], df[l]))
     )
   } else if (test == "W") {
+    df <- df[, 1]
     pval <- Wval <- rep(NA, m)
 
     Wval[conv] <- sapply(
@@ -693,6 +698,27 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
   }
   # adjusted p-values
   adjusted.pval <- p.adjust(pval, method = p.adjust.method)
+
+  # adjusting asymptote parameters
+  for (i in 1:m) {
+    if ("cF" %in% names(par.m0[[i]]) | "dF" %in% names(par.m0[[i]])) {
+      adj.par.m0 <- .deltamethod.NLR.asymptotes(par = par.m0[[i]], cov = cov.m0[[i]],
+                                                conv = (i %in% conv0),
+                                                cov_fail = (i %in% items.cov.fail0))
+      par.m0[[i]] <- adj.par.m0[["par"]]
+      cov.m0[[i]] <- adj.par.m0[["cov"]]
+      se.m0[[i]] <- adj.par.m0[["se"]]
+    }
+
+    if ("cF" %in% names(par.m1[[i]]) | "dF" %in% names(par.m1[[i]])) {
+      adj.par.m1 <- .deltamethod.NLR.asymptotes(par = par.m1[[i]], cov = cov.m1[[i]],
+                                                conv = (i %in% conv1),
+                                                cov_fail = (i %in% items.cov.fail1))
+      par.m1[[i]] <- adj.par.m1[["par"]]
+      cov.m1[[i]] <- adj.par.m1[["cov"]]
+      se.m1[[i]] <- adj.par.m1[["se"]]
+    }
+  }
 
   results <- list(
     Sval = switch(test,
@@ -721,16 +747,16 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
     return(list(par = par, cov = cov, se = sqrt(cov)))
   }
 
-  par_names <- which(c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF") %in% names(par))
+  par_names <- which(c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif") %in% names(par))
 
-  new_order <- sapply(c("a", "b", "aDif", "bDif", "c", "cR", "cF", "d", "dR", "dF"), function(x) {
-    which(x == c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names])
+  new_order <- sapply(c("a", "b", "aDif", "bDif", "c", "cDif", "d", "dDif"), function(x) {
+    which(x == c("b", "a", "bDif", "aDif", "c", "cDif", "d", "dDif")[par_names])
   })
   new_order <- unlist(new_order[sapply(new_order, function(x) length(x) > 0)])
   # TODO: zkontrolovat jestli funguje pro vsechny modely b1 = 1
   par_tmp <- setNames(
-    c(c(0, 1), rep(0, 5), rep(1, 3)),
-    c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF")
+    c(c(0, 1), rep(0, 4), rep(1, 2)),
+    c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif")
   )
   par_tmp[par_names] <- par
   par_new <- setNames(
@@ -742,11 +768,9 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
       par_tmp[5],
       par_tmp[6],
       par_tmp[7],
-      par_tmp[8],
-      par_tmp[9],
-      par_tmp[10]
+      par_tmp[8]
     ),
-    c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")
+    c("b", "a", "bDif", "aDif", "c", "cDif", "d", "dDif")
   )[par_names]
 
   if (cov_fail | !conv) {
@@ -763,24 +787,24 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
   } else {
     cov_tmp <- matrix(
       0,
-      ncol = 10, nrow = 10,
+      ncol = 8, nrow = 8,
       dimnames = list(
-        c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF"),
-        c("b0", "b1", "b2", "b3", "c", "cR", "cF", "d", "dR", "dF")
+        c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif"),
+        c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif")
       )
     )
     cov_tmp[par_names, par_names] <- cov
     cov_new <- msm::deltamethod(
       list(
         ~ -x1 / x2, ~x2, ~ (x1 * x4 - x2 * x3) / (x2 * (x2 + x4)), ~x4,
-        ~x5, ~x6, ~x7, ~x8, ~x9, ~x10
+        ~x5, ~x6, ~x7, ~x8
       ),
       par_tmp,
       cov_tmp,
       ses = FALSE
     )[par_names, par_names]
     cov_new <- matrix(cov_new, nrow = length(par_names), ncol = length(par_names))
-    colnames(cov_new) <- rownames(cov_new) <- c("b", "a", "bDif", "aDif", "c", "cR", "cF", "d", "dR", "dF")[par_names]
+    colnames(cov_new) <- rownames(cov_new) <- c("b", "a", "bDif", "aDif", "c", "cDif", "d", "dDif")[par_names]
     cov_new <- matrix(cov_new[new_order, new_order], nrow = length(par_names), ncol = length(par_names),
                       dimnames = list(rownames(cov_new)[new_order], colnames(cov_new)[new_order]))
     se_new <- sqrt(diag(cov_new))
@@ -788,3 +812,76 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
 
   return(list(par = par_new[new_order], cov = cov_new, se = se_new))
 }
+
+
+#' @noRd
+.deltamethod.NLR.asymptotes <- function(par, cov, conv, cov_fail) {
+
+  # this function is executed only when cF or dF is present in parameters
+  if ("c" %in% names(par)) {
+    names(par)[names(par) == "c"] <- "cR"
+    colnames(cov)[colnames(cov) == "c"] <- "cR"
+    rownames(cov)[rownames(cov) == "c"] <- "cR"
+  }
+  if ("d" %in% names(par)) {
+    names(par)[names(par) == "d"] <- "dR"
+    colnames(cov)[colnames(cov) == "d"] <- "dR"
+    rownames(cov)[rownames(cov) == "d"] <- "dR"
+  }
+  par_names <- which(c("b0", "b1", "b2", "b3", "cR", "cF", "dR", "dF") %in% names(par))
+  par_tmp <- setNames(
+    c(c(0, 1), rep(0, 4), rep(1, 2)),
+    c("b0", "b1", "b2", "b3", "cR", "cF", "dR", "dF")
+  )
+  par_tmp[par_names] <- par
+  par_new <- setNames(
+    c(par_tmp[1], # b0
+      par_tmp[2], # b1
+      par_tmp[3], # b2
+      par_tmp[4], # b3
+      par_tmp[5], # c = cR
+      par_tmp[6] - par_tmp[5], # cDif = cF - cR
+      par_tmp[7], # d = dR
+      par_tmp[8] - par_tmp[7]  # dDif = dF - dR
+    ),
+    c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif")
+  )[par_names]
+
+  if (cov_fail | !conv) {
+    npar <- length(par_new)
+    se_new <- setNames(rep(NA, npar), names(par_new))
+    cov_new <- matrix(
+      NA,
+      ncol = npar, nrow = npar,
+      dimnames = list(
+        names(par_new),
+        names(par_new)
+      )
+    )
+  } else {
+    cov_tmp <- matrix(
+      0,
+      ncol = 8, nrow = 8,
+      dimnames = list(
+        c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif"),
+        c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif")
+      )
+    )
+    cov_tmp[par_names, par_names] <- cov
+    cov_new <- msm::deltamethod(
+      list(
+        ~ x1, ~ x2, ~ x3, ~ x4,
+        ~ x5, ~ x6 - x5, ~ x7, ~ x8 - x7
+      ),
+      par_tmp,
+      cov_tmp,
+      ses = FALSE
+    )[par_names, par_names]
+    cov_new <- matrix(cov_new, nrow = length(par_names), ncol = length(par_names))
+    colnames(cov_new) <- rownames(cov_new) <- c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif")[par_names]
+    se_new <- sqrt(diag(cov_new))
+  }
+
+  return(list(par = par_new, cov = cov_new, se = se_new))
+}
+
