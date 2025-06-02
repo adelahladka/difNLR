@@ -1,0 +1,38 @@
+name: Test Coverage with RDS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - name: Install dependencies
+        run: |
+          install.packages("remotes")
+          remotes::install_deps(dependencies = TRUE)
+          install.packages("covr")
+
+      - name: Generate coverage.rds
+        run: |
+          library(covr)
+          cov <- package_coverage()
+          saveRDS(cov, "coverage.rds")
+        shell: Rscript {0}
+
+      - name: Upload to Codecov from RDS
+        run: |
+          library(covr)
+          cov <- readRDS("coverage.rds")
+          codecov(coverage = cov)
+        shell: Rscript {0}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
