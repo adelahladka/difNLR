@@ -2,6 +2,7 @@
 DIF and DDF Detection by Non-Linear Regression Models.
 
 [![R-CMD-check](https://github.com/adelahladka/difNLR/workflows/R-CMD-check/badge.svg)](https://github.com/adelahladka/difNLR/actions)
+[![codecov](https://codecov.io/gh/adelahladka/difNLR/branch/master/graph/badge.svg)](https://codecov.io/gh/adelahladka/difNLR)
 ![GHversion](https://img.shields.io/github/release/adelahladka/difNLR.svg)
 [![version](https://www.r-pkg.org/badges/version/difNLR)](https://CRAN.R-project.org/package=difNLR)
 ![cranlogs](https://cranlogs.r-pkg.org/badges/difNLR)
@@ -41,7 +42,7 @@ devtools::install_github("adelahladka/difNLR")
 ## Version
 Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is
 1.5.1-1. The newest development version available on
-[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.1-2.
+[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.1-3.
 
 ## Reference
 To cite `difNLR` package in publications, please, use:
@@ -58,7 +59,7 @@ To cite `difNLR` package in publications, please, use:
 
 To cite new estimation approaches provided in the `difNLR()` function, please, use:
 
-<ul>Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms for estimation of item functioning. 
+<ul>Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms for estimation of item functioning. 
   <i>Journal of Educational and Behavioral Statistics. </i> 
   Online first, https://doi.org/10.3102/10769986241312354</ul>
   
