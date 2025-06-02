@@ -54,7 +54,7 @@
   ggplot2::theme(
     legend.box.just = "top",
     legend.justification = c("left", "top"),
-    legend.position = c(0.02, 0.98),
+    legend.position.inside = c(0.02, 0.98),
     legend.box = "horizontal",
     legend.box.margin = ggplot2::margin(3, 3, 3, 3),
     legend.key = ggplot2::element_rect(fill = "white", colour = NA),
