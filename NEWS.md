@@ -2,6 +2,24 @@
 
 ------
 
+### Changes in version 1.5.1-3 (2025-05-20)
+
+#### BUGFIXING
+  * Typos in equations of generalized logistic model in the `difNLR` function 
+    were fixed.
+  * Parametrization for the parameters "c" and "d" in the `predict.difNLR` was 
+    fixed, fixing also issues in the `plot.difNLR`.
+  * Bug in degrees of freedom in the `df` output of the `difNLR()` function was
+    fixed. Degrees of freedom are now correctly returned for the LR and Wald 
+    tests. 
+
+#### MINOR UPDATES
+  * References were updated.
+  * Tests extended and updated.
+  * Check of the `start` input in the `difNLR()` function was updated.
+  
+------
+
 ### Changes in version 1.5.1-2 (2025-03-05)
 
 #### BUGFIXING
@@ -71,6 +89,8 @@
     default option. This is also the default option for the `NLR()` function.
   * Options  for the `parameterization` argument of the `formulaNLR()` and 
     `startNLR()` function were updated (renamed). 
+  * Intercept-slope parameterization is now used for model fitting, so slots of
+    fitted objects like `parM0` are returned with this parameterization.
   * Argument `constraints` were added into the `startNLR()` function. 
   
 #### MINOR UPDATES
