@@ -47,11 +47,11 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.5.1-2\cr
-#' Date: 2025-03-05\cr
+#' Version: 1.5.1-3\cr
+#' Date: 2025-05-20\cr
 #' Depends: R (>= 4.0.0)\cr
 #' Imports: calculus, ggplot2 (>= 3.4.0), msm, nnet, plyr, stats, VGAM\cr
-#' Suggests: ShinyItemAnalysis, testthat (>= 3.0.0)\cr
+#' Suggests: ShinyItemAnalysis, testthat (>= 3.0.0), vdiffr\cr
 #' License: GPL-3\cr
 #' BugReports: \url{https://github.com/adelahladka/difNLR/issues}\cr
 #' Encoding: UTF-8\cr
@@ -78,7 +78,7 @@
 #' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
 #' The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
 #'
-#' Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms for estimation of item functioning.
+#' Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms for estimation of item functioning.
 #' Journal of Educational and Behavioral Statistics. Online first, \doi{10.3102/10769986241312354}.
 #'
 #' Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
