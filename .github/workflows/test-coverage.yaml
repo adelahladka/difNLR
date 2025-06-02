@@ -1,10 +1,15 @@
-name: Test Coverage with RDS
+name: Run tests and upload coverage
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  push
+
+language: r
+
+r_packages:
+  - covr
+
+after_success:
+  - Rscript -e 'library(covr); codecov()'
 
 jobs:
   coverage:
