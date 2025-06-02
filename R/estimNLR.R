@@ -36,8 +36,8 @@
 #' Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
 #' algorithm with constraints via the \code{\link[stats]{optim}} function (Hladka &
 #' Martinkova, 2020), the maximum likelihood method with the EM algorithm (Hladka,
-#' Martinkova, & Brabec, 2024), the maximum likelihood method with the algorithm
-#' based on parametric link function (PLF; Hladka, Martinkova, & Brabec, 2024), or
+#' Martinkova, & Brabec, 2025), the maximum likelihood method with the algorithm
+#' based on parametric link function (PLF; Hladka, Martinkova, & Brabec, 2025), or
 #' the maximum likelihood method with the iteratively reweighted least squares
 #' algorithm via the \code{\link[stats]{glm}} function.
 #'
@@ -64,7 +64,7 @@
 #' functioning. Dissertation thesis.
 #' Faculty of Mathematics and Physics, Charles University.
 #'
-#' Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
+#' Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms
 #' for estimation of item functioning. Journal of Educational and Behavioral
 #' Statistics. Online first, \doi{10.3102/10769986241312354}.
 #'
