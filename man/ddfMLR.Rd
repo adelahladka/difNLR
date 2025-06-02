@@ -150,6 +150,11 @@ plot(x, item = "Item1", group.names = c("Group 1", "Group 2"))
 plot(x, item = x$DDFitems)
 plot(x, item = 1)
 
+# estimated parameters
+coef(x)
+coef(x, SE = TRUE)
+coef(x, SE = TRUE, simplify = TRUE)
+
 # AIC, BIC, log-likelihood
 AIC(x)
 BIC(x)
@@ -159,11 +164,6 @@ logLik(x)
 AIC(x, item = 1)
 BIC(x, item = 1)
 logLik(x, item = 1)
-
-# estimated parameters
-coef(x)
-coef(x, SE = TRUE)
-coef(x, SE = TRUE, simplify = TRUE)
 
 # testing both DDF effects with Benjamini-Hochberg adjustment method
 ddfMLR(Data, group, focal.name = 1, key, p.adjust.method = "BH")

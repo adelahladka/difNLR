@@ -162,26 +162,23 @@ possible guessing and/or inattention when responding (Drabinova & Martinkova,
 The unconstrained form of the 4PL generalized logistic regression model for
 probability of correct answer (i.e., \eqn{Y_{pi} = 1}) using IRT
 parameterization is
-\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
-(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
-(1 - G_p)) / (1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{i} + c_{i\text{DIF}} \cdot G_p) +
+(d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) /
+(1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot
 (X_p - b_p - b_{i\text{DIF}} \cdot G_p))), }
 where \eqn{X_p} is the matching criterion (e.g., standardized total score)
 and \eqn{G_p} is a group membership variable for respondent \eqn{p}.
-Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_{iR}}, and \eqn{d_{iR}} are
-discrimination, difficulty, guessing, and inattention for the reference group
-for item \eqn{i}. Terms \eqn{a_{i\text{DIF}}} and \eqn{b_{i\text{DIF}}} then
-represent differences between the focal and reference groups in
-discrimination and difficulty for item \eqn{i}. Terms \eqn{c_{iF}}, and
-\eqn{d_{iF}} are guessing and inattention parameters for the focal group for
-item \eqn{i}. In the case that there is no assumed difference between the
-reference and focal group in the guessing or inattention parameters, the
-terms \eqn{c_i} and \eqn{d_i} are used.
+Parameters \eqn{a_i}, \eqn{b_i}, \eqn{c_i}, and \eqn{d_i} are discrimination,
+difficulty, guessing, and inattention for the reference group for item
+\eqn{i}. Terms \eqn{a_{i\text{DIF}}}, \eqn{b_{i\text{DIF}}},
+\eqn{c_{i\text{DIF}}}, and \eqn{d_{i\text{DIF}}} then represent differences
+between the focal and reference groups in discrimination, difficulty,
+guessing, and inattention for item \eqn{i}.
 
 Alternatively, intercept-slope parameterization may be applied:
-\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{iR} \cdot G_p + c_{iF} \cdot (1 - G_p)) +
-(d_{iR} \cdot G_p + d_{iF} \cdot (1 - G_p) - c_{iR} \cdot G_p - c_{iF} \cdot
-(1 - G_p)) / (1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
+\deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{i} + c_{i\text{DIF}} \cdot G_p) +
+(d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) /
+(1 + \exp(-(\beta_{i0} + \beta_{i1} \cdot X_p +
 \beta_{i2} \cdot G_p + \beta_{i3} \cdot X_p \cdot G_p))), }
 where parameters \eqn{\beta_{i0}, \beta_{i1}, \beta_{i2}, \beta_{i3}} are
 intercept, effect of the matching criterion, effect of the group membership,
@@ -225,9 +222,9 @@ The function offers either the non-linear least squares estimation via the
 Martinkova, 2020), the maximum likelihood method with the \code{"L-BFGS-B"}
 algorithm with constraints via the \code{\link[stats]{optim}} function
 (Hladka & Martinkova, 2020), the maximum likelihood method with the EM
-algorithm (Hladka, Martinkova, & Brabec, 2024), the maximum likelihood method
+algorithm (Hladka, Martinkova, & Brabec, 2025), the maximum likelihood method
 with the algorithm based on parametric link function (Hladka, Martinkova, &
-Brabec, 2024), or the maximum likelihood method with the iteratively
+Brabec, 2025), or the maximum likelihood method with the iteratively
 reweighted least squares algorithm via the \code{\link[stats]{glm}} function.
 }
 \examples{
@@ -343,7 +340,7 @@ Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
 models for DIF and DDF detection. The R Journal, 12(1), 300--323,
 \doi{10.32614/RJ-2020-014}.
 
-Hladka, A., Martinkova, P., & Brabec, M. (2024). New iterative algorithms
+Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms
 for estimation of item functioning. Journal of Educational and Behavioral
 Statistics. Online first, \doi{10.3102/10769986241312354}.
 
