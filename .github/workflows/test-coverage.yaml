@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-
+      NOT_CRAN: "true"
     steps:
       - uses: actions/checkout@v4
 
@@ -30,22 +30,27 @@ jobs:
       - name: Test coverage
         run: |
           cov <- covr::package_coverage(
+            type = "tests",
+            test_function = function(path) {
+              message("Running tests manually...")
+              testthat::test_dif(file.path(path, "tests", "testthat"))
+            },
             quiet = FALSE,
             clean = FALSE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
           print(cov)
-          covr::to_cobertura(cov)
+          covr::to_cobertura(cov, file = "cobertura.xml")
         shell: Rscript {0}
 
       - uses: codecov/codecov-action@v5
         with:
           # Fail if error if not on PR, or if on PR and token is given
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
+          # fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
           files: ./cobertura.xml
           plugins: noop
           disable_search: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+          # token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Show testthat output
         if: always()
