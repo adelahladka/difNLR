@@ -1,4 +1,4 @@
-# difNLR
+# difNLR <img src="difNLR_hex_sticker.png" align="right" width=150/>
 DIF and DDF Detection by Non-Linear Regression Models.
 
 [![R-CMD-check](https://github.com/adelahladka/difNLR/workflows/R-CMD-check/badge.svg)](https://github.com/adelahladka/difNLR/actions)
