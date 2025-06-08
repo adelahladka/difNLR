@@ -178,7 +178,7 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
   if (!is.null(constraints) & length(constraints) == 1) {
     constraints <- rep(constraints, m)
   } else if (!is.null(constraints) & length(constraints) != m) {
-      stop("Invalid length of 'constraints'. Constraints for initial values needs to be specified
+    stop("Invalid length of 'constraints'. Constraints for initial values needs to be specified
            for each item or by a single string.", call. = FALSE)
   }
   if (length(parameterization) == 1) {

@@ -104,7 +104,7 @@ test_that("difORD - checking inputs", {
   expect_error(difORD(Data, group, match = group[-c(1:3)], focal.name = 1))
   expect_error(difORD(Data[1:765, 1:2], group, focal.name = 1))
   expect_error(difORD(Data[1:765, 1], group, focal.name = 1))
-  expect_error(difORD(Data[, 1], group, focal.name = 1)) # TODO: this should not be an error?
+  expect_error(difORD(Data, group, focal.name = 1, match = rnorm(765)))
   # too many NAs
   expect_error(difORD(Data = matrix(NA, ncol = 2, nrow = 766), group, focal.name = 1))
   expect_error(difORD(
@@ -121,6 +121,8 @@ test_that("difORD - checking inputs", {
   expect_error(difORD(Data, group, focal.name = 1, alpha = 30))
   # deprecated parametrization
   expect_warning(difORD(Data, group, focal.name = 1, parametrization = "is"))
+  # invalid combination of purification and matching
+  expect_error(difORD(Data, group, focal.name = 1, match = Anxiety$zscore, purify = TRUE))
 
   # different ways to input group
   fit1 <- difORD(Data, group, focal.name = 1)
@@ -135,4 +137,60 @@ test_that("difORD - checking inputs", {
   # invalid dimensions
   expect_error(difORD(Data[-c(1:4), 1:2], group, match = Anxiety$zscore, focal.name = 1))
   expect_error(difORD(Data[-c(1:4), ], group, focal.name = 1))
+})
+
+test_that("difORD S3 methods - checking inputs", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  # loading data
+  data(Anxiety, package = "ShinyItemAnalysis")
+  Data <- Anxiety[, paste0("R", 1:29)] # items
+  group <- Anxiety[, "gender"] # group membership variable
+
+  fit1 <- difORD(Data, group, focal.name = 1)
+
+  # plot - invalid item argument
+  expect_error(plot(fit1, item = "Item25")[[1]])
+  expect_error(plot(fit1, item = 33)[[1]])
+  expect_error(plot(fit1, item = list("Item2"))[[1]])
+  expect_error(plot(fit1, item = c(1, 42))[[1]])
+  # plot - invalid length of group.names
+  expect_warning(plot(fit1, item = 3, group.names = letters[1:3])[[1]])
+  expect_warning(plot(fit1, item = 3, group.names = letters[1])[[1]])
+
+  # coef - invalid SE
+  expect_error(coef(fit1, SE = "yes"))
+  # coef - invalid simplify
+  expect_error(coef(fit1, simplify = "no"))
+  # coef - invalid IRTpars
+  expect_error(coef(fit1, IRTpars = list()))
+  # coef - invalid CI
+  expect_error(coef(fit1, CI = 95))
+
+  # logLik - invalid item
+  expect_error(logLik(fit1, item = "Item25"))
+  expect_error(logLik(fit1, item = 33))
+  expect_error(logLik(fit1, item = list("Item2")))
+  expect_error(logLik(fit1, item = c(1, 42)))
+
+  # AIC - invalid item
+  expect_error(AIC(fit1, item = "Item25"))
+  expect_error(AIC(fit1, item = 33))
+  expect_error(AIC(fit1, item = list("Item2")))
+  expect_error(AIC(fit1, item = c(1, 42)))
+
+  # BIC - invalid item
+  expect_error(BIC(fit1, item = "Item25"))
+  expect_error(BIC(fit1, item = 33))
+  expect_error(BIC(fit1, item = list("Item2")))
+  expect_error(BIC(fit1, item = c(1, 42)))
+
+  # predict - invalid item
+  expect_error(predict(fit1, item = "Item25"))
+  expect_error(predict(fit1, item = 33))
+  expect_error(predict(fit1, item = list("Item2")))
+  expect_error(predict(fit1, item = c(1, 42)))
+  # predict - invalid dimensions
+  expect_error(predict(fit1, item = "Item2", group = c(0, 1), match = c(-1, 0, 1)))
 })

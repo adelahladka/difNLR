@@ -85,6 +85,7 @@ A list of class \code{"difORD"} with the following arguments:
   \code{"No DIF item detected"} in case no item was detected as DIF.}
   \item{\code{model}}{model used for DIF detection.}
   \item{\code{type}}{character: type of DIF that was tested.}
+  \item{\code{anchor}}{DIF free items specified by the \code{anchor} and \code{purify}.}
   \item{\code{purification}}{\code{purify} value.}
   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
   is \code{TRUE}.}
@@ -177,7 +178,7 @@ difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 # testing both DIF effects with total score as matching criterion
 difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 
-testing both DIF effects with cumulative logit model
+# testing both DIF effects with cumulative logit model
 (x <- difORD(Data, group, focal.name = 1, model = "cumulative"))
 # graphical devices
 plot(x, item = 7, plot.type = "cumulative")

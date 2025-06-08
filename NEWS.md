@@ -2,7 +2,7 @@
 
 ------
 
-### Changes in version 1.5.1-3 (2025-05-20)
+### Changes in version 1.5.1-3 (2025-06-08)
 
 #### BUGFIXING
   * Typos in equations of generalized logistic model in the `difNLR` function 
@@ -12,11 +12,23 @@
   * Bug in degrees of freedom in the `df` output of the `difNLR()` function was
     fixed. Degrees of freedom are now correctly returned for the LR and Wald 
     tests. 
+  * When `purify = TRUE` or `anchor` argument is used, matching criterion is now
+    correctly computed in the `plot()` and `predict()` S3 methods for the 
+    `difNLR()` function.
+  * Bug in the `fitted()` S3 method for the `difNLR` was fixed.
 
 #### MINOR UPDATES
   * References were updated.
   * Tests extended and updated.
   * Check of the `start` input in the `difNLR()` function was updated.
+  * Check of inputs was updated in the `genNLR()`, `difNLR()`, `difORD()`, and
+    `ddfMLR()` functions.
+  * Error messages were updated for the `difNLR()`, `difORD()`, `ddfMLR()`, 
+    `formulaNLR()`, and `genNLR()` functions. 
+  * Output `anchor` was added into the `difNLR()`, `difORD()`, and `ddfMLR()` 
+    functions, specifying anchoring items from the `anchor` argument. This also 
+    excludes DIF items when item purification is applied with the `purify = TRUE` 
+    argument.
   
 ------
 

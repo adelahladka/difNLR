@@ -80,3 +80,153 @@
   })
   do.call(paste, c(x, sep = sep, collapse = collapse, recycle0 = recycle0))
 }
+
+# checking inputs - anchor
+.resolve_anchor <- function(anchor, DATA) {
+  m <- ncol(DATA)
+
+  if (is.null(anchor)) {
+    ANCHOR <- seq_len(m)
+  } else if (is.numeric(anchor)) {
+    if (any(anchor < 1 | anchor > m)) {
+      stop("Numeric 'anchor' values must be valid column indices within 'Data'.", call. = FALSE)
+    }
+    ANCHOR <- anchor
+  } else if (is.character(anchor)) {
+    ANCHOR <- match(anchor, colnames(DATA))
+    if (any(is.na(ANCHOR))) {
+      stop("Some anchor item names not found in 'Data'.", call. = FALSE)
+    }
+  } else {
+    stop("'anchor' must be either NULL, numeric (column indices), or character (column names).", call. = FALSE)
+  }
+
+  return(sort(unique(ANCHOR)))
+}
+
+# checking input - group
+.resolve_group <- function(Data, group) {
+  if (length(group) == 1) {
+    # group is a column index or name
+    if (is.numeric(group)) {
+      if (group < 1 || group > ncol(Data)) {
+        stop("'group' index is out of bounds.", call. = FALSE)
+      }
+      GROUP <- Data[[group]]
+      DATA <- Data[, -group, drop = FALSE]
+    } else if (is.character(group)) {
+      col_idx <- match(group, colnames(Data))
+      if (is.na(col_idx)) {
+        stop(sprintf("Column '%s' not found in 'Data'.", group), call. = FALSE)
+      }
+      GROUP <- Data[[col_idx]]
+      DATA <- Data[, -col_idx, drop = FALSE]
+    } else {
+      stop("'group' must be a column name or index, or a vector of group values.", call. = FALSE)
+    }
+  } else {
+    # group is a standalone vector
+    GROUP <- group
+    DATA <- as.data.frame(Data)
+  }
+
+  # Validate that group is binary
+  group_levels <- na.omit(unique(GROUP))
+  if (length(group_levels) != 2) {
+    stop("'group' must contain exactly two unique non-NA values.", call. = FALSE)
+  }
+
+  # Check that group length matches Data rows
+  if (length(GROUP) != nrow(DATA)) {
+    stop("'group' must be of length equal to the number of rows in 'Data'.", call. = FALSE)
+  }
+
+  return(list(GROUP = GROUP, DATA = DATA))
+}
+
+# checking input - items
+.resolve_items <- function(item, colnames_data) {
+  m <- length(colnames_data)
+
+  if (is.character(item)) {
+    if (any(item == "all")) {
+      return(seq_len(m))
+    } else if (!all(item %in% colnames_data)) {
+      stop("'item' must be either 'all' or valid column names from 'Data'.", call. = FALSE)
+    } else {
+      return(which(colnames_data %in% item))
+    }
+  }
+
+  if (is.numeric(item)) {
+    if (!all(item %in% seq_len(m))) {
+      stop("'item' index is out of bounds.", call. = FALSE)
+    }
+    return(item)
+  }
+
+  stop("'item' must be either 'all', a character vector of column names, or numeric indices.", call. = FALSE)
+}
+
+# checking input for plots - check for convergence issues and select only converged items
+.resolve_non_converged_items_plot <- function(item, conv_fail_items) {
+  non_converged <- intersect(conv_fail_items, item)
+
+  if (length(non_converged) > 0) {
+    remaining <- setdiff(item, conv_fail_items)
+
+    if (length(remaining) == 0) {
+      stop("None of the selected items converged. Characteristic curves cannot be plotted.", call. = FALSE)
+    } else {
+      warning(
+        paste0(
+          "The following items did not converge and will be excluded from plotting: ",
+          paste(non_converged, collapse = ", "), "."
+        ),
+        call. = FALSE
+      )
+      return(remaining)
+    }
+  }
+
+  return(item)
+}
+
+# checking input - check for convergence issues and select only converged items
+.resolve_non_converged_items <- function(item, conv_fail_items) {
+  non_converged <- intersect(conv_fail_items, item)
+
+  if (length(non_converged) > 0) {
+    remaining <- setdiff(item, conv_fail_items)
+
+    if (length(remaining) == 0) {
+      stop("None of the selected items converged. ", call. = FALSE)
+    } else {
+      warning(
+        paste0("Item ", paste(non_converged, collapse = ", "), " does not converge. NA produced."),
+        call. = FALSE
+      )
+      return(remaining)
+    }
+  } else {
+    return(item)
+  }
+}
+
+# checking input - logical arguments
+.check_logical <- function(arg, name) {
+  if (!is.logical(arg) || length(arg) != 1) {
+    stop(sprintf("'%s' must be a single logical value (TRUE or FALSE).", name), call. = FALSE)
+  }
+}
+# checking input - numeric arguments
+.check_numeric <- function(arg, name, low, upp) {
+  if (!is.numeric(arg) || length(arg) != 1 || arg < low || arg > upp) {
+    bounds <- if (upp == Inf) {
+      sprintf("greater than %s", low)
+    } else {
+      sprintf("between %s and %s.", low, upp)
+    }
+    stop(paste0(sprintf("'%s' must be a single numeric value ", name), bounds), call. = FALSE)
+  }
+}

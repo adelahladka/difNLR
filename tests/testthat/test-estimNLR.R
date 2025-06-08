@@ -1,4 +1,4 @@
-test_that("S3 methods of estimNLR on GMAT data", {
+test_that("estimNLR - examples at help page", {
   # skip_on_cran()
   # skip_on_os("linux")
 
@@ -17,45 +17,86 @@ test_that("S3 methods of estimNLR on GMAT data", {
   start <- start[[1]][M$M1$parameters]
 
   # nonlinear least squares
-  fit_nls <- estimNLR(
+  expect_snapshot((fit_nls <- estimNLR(
     y = y, match = match, group = group,
     formula = M$M1$formula, method = "nls",
     lower = M$M1$lower, upper = M$M1$upper, start = start
-  )
+  )))
   # saveRDS(fit_nls, file = "tests/testthat/fixtures/estimNLR_fit_nls.rds")
   fit_nls_expected <- readRDS(test_path("fixtures", "estimNLR_fit_nls.rds"))
   expect_equal(fit_nls, fit_nls_expected)
+  expect_snapshot(coef(fit_nls))
+  expect_snapshot(logLik(fit_nls))
+  expect_snapshot(vcov(fit_nls))
+  expect_snapshot(vcov(fit_nls, sandwich = TRUE))
+  expect_snapshot(fitted(fit_nls))
+  expect_snapshot(residuals(fit_nls))
 
-  # print
-  expect_snapshot(print(fit_nls))
+  # maximum likelihood method
+  expect_snapshot((fit_mle <- estimNLR(
+    y = y, match = match, group = group,
+    formula = M$M1$formula, method = "mle",
+    lower = M$M1$lower, upper = M$M1$upper, start = start
+  )))
+  # saveRDS(fit_mle, file = "tests/testthat/fixtures/estimNLR_fit_mle.rds")
+  fit_mle_expected <- readRDS(test_path("fixtures", "estimNLR_fit_mle.rds"))
+  expect_equal(fit_mle, fit_mle_expected)
+  expect_snapshot(coef(fit_mle))
+  expect_snapshot(logLik(fit_mle))
+  expect_snapshot(vcov(fit_mle))
+  expect_snapshot(fitted(fit_mle))
+  expect_snapshot(residuals(fit_mle))
 
-  # coefs
-  # saveRDS(coef(fit_nls), file = "tests/testthat/fixtures/estimNLR_fit_nls_coef.rds")
-  fit_nls_coef_expected <- readRDS(test_path("fixtures", "estimNLR_fit_nls_coef.rds"))
-  expect_equal(coef(fit_nls), fit_nls_coef_expected)
+  # formula for 3PL model with the same guessing for both groups
+  # intercept-slope parameterization
+  M <- formulaNLR(model = "3PLcg", type = "both", parameterization = "is")
 
-  # logLik
-  # saveRDS(logLik(fit_nls), file = "tests/testthat/fixtures/estimNLR_fit_nls_logLik.rds")
-  fit_nls_logLik <- readRDS(test_path("fixtures", "estimNLR_fit_nls_logLik.rds"))
-  expect_equal(logLik(fit_nls), fit_nls_logLik)
+  # starting values for 3PL model with the same guessing for item 1,
+  start <- startNLR(GMAT[, 1:20], group, model = "3PLcg", parameterization = "is")
+  start <- start[[1]][M$M1$parameters]
 
-  # vcov
-  # saveRDS(vcov(fit_nls), file = "tests/testthat/fixtures/estimNLR_fit_nls_vcov.rds")
-  fit_nls_vcov <- readRDS(test_path("fixtures", "estimNLR_fit_nls_vcov.rds"))
-  expect_equal(vcov(fit_nls), fit_nls_vcov)
+  # EM algorithm
+  expect_snapshot((fit_em <- estimNLR(
+    y = y, match = match, group = group,
+    formula = M$M1$formula, method = "em",
+    lower = M$M1$lower, upper = M$M1$upper, start = start
+  )))
+  # saveRDS(fit_em, file = "tests/testthat/fixtures/estimNLR_fit_em.rds")
+  fit_em_expected <- readRDS(test_path("fixtures", "estimNLR_fit_em.rds"))
+  expect_equal(fit_em, fit_em_expected)
+  expect_snapshot(coef(fit_em))
+  expect_snapshot(logLik(fit_em))
+  expect_snapshot(vcov(fit_em))
+  expect_snapshot(fitted(fit_em))
+  expect_snapshot(residuals(fit_em))
 
-  # vcov - sandwich
-  # saveRDS(vcov(fit_nls, sandwich = TRUE), file = "tests/testthat/fixtures/estimNLR_fit_nls_vcov_sandwich.rds")
-  fit_nls_vcov_sandwich <- readRDS(test_path("fixtures", "estimNLR_fit_nls_vcov_sandwich.rds"))
-  expect_equal(vcov(fit_nls, sandwich = TRUE), fit_nls_vcov_sandwich)
+  # PLF algorithm
+  expect_snapshot((fit_plf <- estimNLR(
+    y = y, match = match, group = group,
+    formula = M$M1$formula, method = "plf",
+    lower = M$M1$lower, upper = M$M1$upper, start = start
+  )))
+  # saveRDS(fit_plf, file = "tests/testthat/fixtures/estimNLR_fit_plf.rds")
+  fit_plf_expected <- readRDS(test_path("fixtures", "estimNLR_fit_plf.rds"))
+  expect_equal(fit_plf, fit_plf_expected)
+  expect_snapshot(coef(fit_plf))
+  expect_snapshot(logLik(fit_plf))
+  expect_snapshot(vcov(fit_plf))
+  expect_snapshot(fitted(fit_plf))
+  expect_snapshot(residuals(fit_plf))
 
-  # fitted
-  # saveRDS(fitted(fit_nls), file = "tests/testthat/fixtures/estimNLR_fit_nls_fitted.rds")
-  fit_nls_fitted <- readRDS(test_path("fixtures", "estimNLR_fit_nls_fitted.rds"))
-  expect_equal(fitted(fit_nls), fit_nls_fitted)
-
-  # residuals
-  # saveRDS(residuals(fit_nls), file = "tests/testthat/fixtures/estimNLR_fit_nls_residuals.rds")
-  fit_nls_residuals <- readRDS(test_path("fixtures", "estimNLR_fit_nls_residuals.rds"))
-  expect_equal(residuals(fit_nls), fit_nls_residuals)
+  # iteratively reweighted least squares for 2PL model
+  M <- formulaNLR(model = "2PL", parameterization = "logistic")
+  expect_snapshot((fit_irls <- estimNLR(
+    y = y, match = match, group = group,
+    formula = M$M1$formula, method = "irls"
+  )))
+  # saveRDS(fit_irls, file = "tests/testthat/fixtures/estimNLR_fit_irls.rds")
+  fit_irls_expected <- readRDS(test_path("fixtures", "estimNLR_fit_irls.rds"))
+  expect_equal(fit_irls, fit_irls_expected)
+  expect_snapshot(coef(fit_irls))
+  expect_snapshot(logLik(fit_irls))
+  expect_snapshot(vcov(fit_irls))
+  expect_snapshot(fitted(fit_irls))
+  expect_snapshot(residuals(fit_irls))
 })

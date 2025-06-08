@@ -702,18 +702,22 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
   # adjusting asymptote parameters
   for (i in 1:m) {
     if ("cF" %in% names(par.m0[[i]]) | "dF" %in% names(par.m0[[i]])) {
-      adj.par.m0 <- .deltamethod.NLR.asymptotes(par = par.m0[[i]], cov = cov.m0[[i]],
-                                                conv = (i %in% conv0),
-                                                cov_fail = (i %in% items.cov.fail0))
+      adj.par.m0 <- .deltamethod.NLR.asymptotes(
+        par = par.m0[[i]], cov = cov.m0[[i]],
+        conv = (i %in% conv0),
+        cov_fail = (i %in% items.cov.fail0)
+      )
       par.m0[[i]] <- adj.par.m0[["par"]]
       cov.m0[[i]] <- adj.par.m0[["cov"]]
       se.m0[[i]] <- adj.par.m0[["se"]]
     }
 
     if ("cF" %in% names(par.m1[[i]]) | "dF" %in% names(par.m1[[i]])) {
-      adj.par.m1 <- .deltamethod.NLR.asymptotes(par = par.m1[[i]], cov = cov.m1[[i]],
-                                                conv = (i %in% conv1),
-                                                cov_fail = (i %in% items.cov.fail1))
+      adj.par.m1 <- .deltamethod.NLR.asymptotes(
+        par = par.m1[[i]], cov = cov.m1[[i]],
+        conv = (i %in% conv1),
+        cov_fail = (i %in% items.cov.fail1)
+      )
       par.m1[[i]] <- adj.par.m1[["par"]]
       cov.m1[[i]] <- adj.par.m1[["cov"]]
       se.m1[[i]] <- adj.par.m1[["se"]]
@@ -805,8 +809,10 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
     )[par_names, par_names]
     cov_new <- matrix(cov_new, nrow = length(par_names), ncol = length(par_names))
     colnames(cov_new) <- rownames(cov_new) <- c("b", "a", "bDif", "aDif", "c", "cDif", "d", "dDif")[par_names]
-    cov_new <- matrix(cov_new[new_order, new_order], nrow = length(par_names), ncol = length(par_names),
-                      dimnames = list(rownames(cov_new)[new_order], colnames(cov_new)[new_order]))
+    cov_new <- matrix(cov_new[new_order, new_order],
+      nrow = length(par_names), ncol = length(par_names),
+      dimnames = list(rownames(cov_new)[new_order], colnames(cov_new)[new_order])
+    )
     se_new <- sqrt(diag(cov_new))
   }
 
@@ -816,7 +822,6 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
 
 #' @noRd
 .deltamethod.NLR.asymptotes <- function(par, cov, conv, cov_fail) {
-
   # this function is executed only when cF or dF is present in parameters
   if ("c" %in% names(par)) {
     names(par)[names(par) == "c"] <- "cR"
@@ -835,14 +840,15 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
   )
   par_tmp[par_names] <- par
   par_new <- setNames(
-    c(par_tmp[1], # b0
+    c(
+      par_tmp[1], # b0
       par_tmp[2], # b1
       par_tmp[3], # b2
       par_tmp[4], # b3
       par_tmp[5], # c = cR
       par_tmp[6] - par_tmp[5], # cDif = cF - cR
       par_tmp[7], # d = dR
-      par_tmp[8] - par_tmp[7]  # dDif = dF - dR
+      par_tmp[8] - par_tmp[7] # dDif = dF - dR
     ),
     c("b0", "b1", "b2", "b3", "c", "cDif", "d", "dDif")
   )[par_names]
@@ -870,8 +876,8 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
     cov_tmp[par_names, par_names] <- cov
     cov_new <- msm::deltamethod(
       list(
-        ~ x1, ~ x2, ~ x3, ~ x4,
-        ~ x5, ~ x6 - x5, ~ x7, ~ x8 - x7
+        ~x1, ~x2, ~x3, ~x4,
+        ~x5, ~ x6 - x5, ~x7, ~ x8 - x7
       ),
       par_tmp,
       cov_tmp,
@@ -884,4 +890,3 @@ You may try increasing the number of recalculations using the `nrBo` argument. "
 
   return(list(par = par_new, cov = cov_new, se = se_new))
 }
-

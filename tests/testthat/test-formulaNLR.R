@@ -1,3 +1,61 @@
+# test_that("formulaNLR - examples at help page", {
+# skip_on_cran()
+# skip_on_os("linux")
+
+# 3PL model with the same guessing parameter for both groups
+# to test both types of DIF
+# TODO: it includes formula with environment
+# expect_snapshot(formulaNLR(model = "3PLcg", type = "both"))
+# expect_snapshot(formulaNLR(model = "3PLcg", type = "both", parameterization = "is"))
+#
+# # 4PL model with the same guessing and inattention parameters
+# # to test uniform DIF
+# expect_snapshot(formulaNLR(model = "4PLcgdg", type = "udif"))
+# expect_snapshot(formulaNLR(model = "4PLcgdg", type = "udif", parameterization = "is"))
+#
+# # 2PL model to test non-uniform DIF
+# expect_snapshot(formulaNLR(model = "2PL", type = "nudif"))
+# expect_snapshot(formulaNLR(model = "2PL", type = "nudif", parameterization = "is"))
+# expect_snapshot(formulaNLR(model = "2PL", type = "nudif", parameterization = "logistic"))
+#
+# # 4PL model to test all possible DIF
+# expect_snapshot(formulaNLR(model = "4PL", type = "all", parameterization = "irt"))
+# expect_snapshot(formulaNLR(model = "4PL", type = "all", parameterization = "is"))
+#
+# # 4PL model with fixed a and c parameters
+# # to test difference in b
+# expect_snapshot(formulaNLR(model = "4PL", constraints = "ac", type = "b"))
+# expect_snapshot(formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "is"))
+# })
+
+test_that("formulaNLR - checking inputs", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  # missing model
+  expect_error(formulaNLR())
+  # invalid model
+  expect_error(formulaNLR(model = "5PL"))
+
+  # invalid type
+  expect_error(formulaNLR(model = "3PL", type = "xxx"))
+  expect_error(formulaNLR(model = "3PL", type = "abcde"))
+
+  # invalid combination of model and type
+  expect_error(formulaNLR(model = "Rasch", type = "nudif"))
+  expect_error(formulaNLR(model = "1PL", type = "nudif"))
+  expect_warning(formulaNLR(model = "Rasch", type = "both"))
+  expect_warning(formulaNLR(model = "1PL", type = "both"))
+  # invalid combination of parametrization and model
+  expect_error(formulaNLR(model = "1PL", parameterization = "logistic"))
+
+  # invalid constraints
+  expect_error(formulaNLR(model = "3PL", constraints = "xa"))
+
+  # invalid combination of constraints and type
+  expect_error(formulaNLR(model = "3PL", constraints = "a", type = "a"))
+})
+
 test_that("formulaNLR equivalence of models for IRT parametrization", {
   # 1PL vs 2PL model with constraints on a
   frm1 <- formulaNLR(model = "1PL")

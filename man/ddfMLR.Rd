@@ -86,6 +86,7 @@ A list of class \code{"ddfMLR"} with the following arguments:
   \item{\code{DDFitems}}{either the column identifiers of the items which were detected as DDF, or
   \code{"No DDF item detected"} in case no item was detected as DDF.}
   \item{\code{type}}{character: type of DDF that was tested.}
+  \item{\code{anchor}}{DIF free items specified by the \code{anchor} and \code{purify}.}
   \item{\code{purification}}{\code{purify} value.}
   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
   is \code{TRUE}.}

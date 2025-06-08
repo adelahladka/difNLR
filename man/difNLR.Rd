@@ -130,6 +130,7 @@ Object of class \code{"difNLR"} is a list with the following components:
   \item{\code{adjusted.pval}}{adjusted p-values by the \code{p.adjust.method}.}
   \item{\code{df}}{the degrees of freedom of the \code{test}.}
   \item{\code{test}}{used test.}
+  \item{\code{anchor}}{DIF free items specified by the \code{anchor} and \code{purify}.}
   \item{\code{purification}}{\code{purify} value.}
   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify} is \code{TRUE}.}
   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.

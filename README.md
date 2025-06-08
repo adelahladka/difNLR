@@ -1,8 +1,8 @@
-# difNLR <img src="difNLR_hex_sticker.png" align="right" width=150/>
+# difNLR <img src="inst/www/difNLR_hex_sticker.png" align="right" width=150/>
 DIF and DDF Detection by Non-Linear Regression Models.
 
-[![R-CMD-check](https://github.com/adelahladka/difNLR/workflows/R-CMD-check/badge.svg)](https://github.com/adelahladka/difNLR/actions)
-[![Codecov test coverage](https://codecov.io/gh/adelahladka/difNLR/graph/badge.svg)](https://app.codecov.io/gh/adelahladka/difNLR)
+<!--# [![R-CMD-check](https://github.com/adelahladka/difNLR/workflows/R-CMD-check/badge.svg)](https://github.com/adelahladka/difNLR/actions)
+[![Codecov test coverage](https://codecov.io/gh/adelahladka/difNLR/graph/badge.svg)](https://app.codecov.io/gh/adelahladka/difNLR) -->
 ![GHversion](https://img.shields.io/github/release/adelahladka/difNLR.svg)
 [![version](https://www.r-pkg.org/badges/version/difNLR)](https://CRAN.R-project.org/package=difNLR)
 ![cranlogs](https://cranlogs.r-pkg.org/badges/difNLR)
@@ -23,9 +23,9 @@ also introduces DIF detection approaches for ordinal data via adjacent category
 logit and cumulative logit regression models.
 
 <p align="center">
-  <img src="inst/DIF_NLR.png" width=32%/> 
-  <img src="inst/DDF_CLRM_cumulative.png" width=32%/> 
-  <img src="inst/DDF_CLRM_category.png" width=32%/> 
+  <img src="inst/www/DIF_NLR.png" width=32%/> 
+  <img src="inst/www/DDF_CLRM_cumulative.png" width=32%/> 
+  <img src="inst/www/DDF_CLRM_category.png" width=32%/> 
 </p>
 
 

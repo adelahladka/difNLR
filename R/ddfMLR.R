@@ -97,6 +97,7 @@
 #'   \item{\code{DDFitems}}{either the column identifiers of the items which were detected as DDF, or
 #'   \code{"No DDF item detected"} in case no item was detected as DDF.}
 #'   \item{\code{type}}{character: type of DDF that was tested.}
+#'   \item{\code{anchor}}{DIF free items specified by the \code{anchor} and \code{purify}.}
 #'   \item{\code{purification}}{\code{purify} value.}
 #'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify}
 #'   is \code{TRUE}.}
@@ -198,120 +199,102 @@
 ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
                    purify = FALSE, nrIter = 10, p.adjust.method = "none",
                    alpha = 0.05, parametrization) {
-  # deprecated args handling
+  # === 0. Deprecation warnings ===
   if (!missing(parametrization)) {
-    warning("Argument 'parametrization' is deprecated; please use 'coef.difORD()' method for different parameterizations. ",
+    warning("Argument 'parametrization' is deprecated; please use 'coef.difORD()'.", call. = FALSE)
+  }
+
+  # === 1. Basic argument checks ===
+  if (!is.character(type) || !type %in% c("udif", "nudif", "both")) {
+    stop("'type' must be one of 'udif', 'nudif', or 'both'.", call. = FALSE)
+  }
+  .check_logical(purify, "purify")
+  if (purify && (!is.numeric(nrIter) || nrIter <= 0 || nrIter %% 1 != 0)) {
+    stop("'nrIter' must be a positive integer.", call. = FALSE)
+  }
+  if (!p.adjust.method %in% p.adjust.methods) {
+    stop("'p.adjust.method' must be one of: ", paste(p.adjust.methods, collapse = ", "), call. = FALSE)
+  }
+  .check_numeric(alpha, "alpha", 0, 1)
+
+  # === 2. Handle group and separate from Data ===
+  group_result <- .resolve_group(Data, group)
+  GROUP <- group_result$GROUP
+  DATA <- group_result$DATA
+  n <- nrow(DATA)
+
+  # === 3. Matching criterion check ===
+
+  if (!(match[1] %in% c("score", "zscore"))) {
+    if (length(match) != n) {
+      stop("'match' must be of length equal to the number of rows in 'Data'.", call. = FALSE)
+    }
+  }
+
+  if (purify && !(match[1] %in% c("score", "zscore"))) {
+    stop("'purify' is only allowed when 'match' is 'score' or 'zscore'.", call. = FALSE)
+  }
+
+  # === 4. Handle missing data ===
+  df <- if (length(match) == n) {
+    data.frame(DATA, GROUP, match, check.names = FALSE)
+  } else {
+    data.frame(DATA, GROUP, check.names = FALSE)
+  }
+
+  df <- df[complete.cases(df), ]
+
+  if (nrow(df) == 0) {
+    stop("'Data' contanins no complete cases after removing missing values.", call. = FALSE)
+  }
+
+  if (nrow(df) < n) {
+    warning(
+      sprintf(
+        "%d observation%s removed due to missing values.",
+        n - nrow(df), ifelse(n - nrow(df) > 1, "s were", " was")
+      ),
       call. = FALSE
     )
   }
 
-  if (!type %in% c("udif", "nudif", "both") | !is.character(type)) {
-    stop("'type' must be either 'udif', 'nudif', or 'both'.",
-      call. = FALSE
-    )
+  GROUP <- df[["GROUP"]]
+  DATA <- df[, !(names(df) %in% c("GROUP", "match")), drop = FALSE]
+  if (length(match) == n) {
+    match <- df[["match"]]
   }
-  if (alpha > 1 | alpha < 0) {
-    stop("'alpha' must be between 0 and 1.",
-      call. = FALSE
-    )
+  DATA[] <- lapply(DATA[], as.factor)
+  DATA[] <- lapply(DATA[], droplevels)
+
+  # === 5. Handle key ===
+  if (is.matrix(key) | is.data.frame(key)) {
+    KEY <- as.vector(t(key))
+  } else {
+    KEY <- key
   }
-  # matching criterion
-  if (!(match[1] %in% c("score", "zscore"))) {
-    if (is.null(dim(Data))) {
-      no <- length(Data)
-    } else {
-      no <- dim(Data)[1]
-    }
-    if (length(match) != no) {
-      stop("Invalid value for 'match'. Possible values are 'zscore', 'score', or vector of the same length as number
-           of observations in 'Data'.")
-    }
+  if (length(KEY) != ncol(DATA)) {
+    stop("'key' must be of length equal to the number of columns (items) in 'Data'.", call. = FALSE)
   }
-  # purification
-  if (purify & !(match[1] %in% c("score", "zscore"))) {
-    stop("Purification not allowed when matching variable is not 'zscore' or 'score'.", call. = FALSE)
+  if (any(is.na(KEY))) {
+    stop("Missing values not allowed for 'key'. All item keys must be defined.", call. = FALSE)
   }
+  KEY <- paste(KEY)
+
+  # === 6. Group re-coding based on focal.name ===
+  group.names <- na.omit(unique(GROUP))
+  if (!focal.name %in% group.names) {
+    stop("'focal.name' must be a valid value from 'group'.", call. = FALSE)
+  }
+  if (group.names[1] == focal.name) {
+    group.names <- rev(group.names)
+  }
+  GROUP <- as.numeric(as.factor(GROUP) == focal.name)
+
+  # === 7. Anchor items ===
+  m <- ncol(DATA)
+  ANCHOR <- .resolve_anchor(anchor, DATA)
 
   internalMLR <- function() {
-    if (length(group) == 1) {
-      if (is.numeric(group)) {
-        GROUP <- Data[, group]
-        DATA <- Data[, (1:dim(Data)[2]) != group]
-        colnames(DATA) <- colnames(Data)[(1:dim(Data)[2]) != group]
-      } else {
-        GROUP <- Data[, colnames(Data) == group]
-        DATA <- Data[, colnames(Data) != group]
-        colnames(DATA) <- colnames(Data)[colnames(Data) != group]
-      }
-    } else {
-      GROUP <- group
-      DATA <- Data
-    }
-    if (length(levels(as.factor(GROUP))) != 2) {
-      stop("'group' must be binary vector", call. = FALSE)
-    }
-    if (is.matrix(DATA) | is.data.frame(DATA)) {
-      if (dim(DATA)[1] != length(GROUP)) {
-        stop("'Data' must have the same number of rows as is length of vector 'group'.",
-          call. = FALSE
-        )
-      }
-    } else {
-      stop("'Data' must be data frame or matrix of binary vectors.",
-        call. = FALSE
-      )
-    }
-    if (is.matrix(key) | is.data.frame(key)) {
-      KEY <- paste(unlist(key))
-    } else {
-      KEY <- key
-    }
-    if (length(KEY)[1] != dim(DATA)[2]) {
-      stop("Number of items in 'Data' is not equal to the length of 'key'.",
-        call. = FALSE
-      )
-    }
-    group.names <- unique(GROUP)[!is.na(unique(GROUP))]
-    if (group.names[1] == focal.name) {
-      group.names <- rev(group.names)
-    }
-    GROUP <- as.numeric(as.factor(GROUP) == focal.name)
-
-    if (length(match) == dim(DATA)[1]) {
-      df <- data.frame(DATA, GROUP, match, check.names = F)
-    } else {
-      df <- data.frame(DATA, GROUP, check.names = F)
-    }
-
-    df <- df[complete.cases(df), ]
-
-    if (dim(df)[1] == 0) {
-      stop("It seems that your 'Data' does not include any subjects that are complete.",
-        call. = FALSE
-      )
-    }
-
-    GROUP <- df[, "GROUP"]
-    DATA <- data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
-    DATA[] <- lapply(DATA[], as.factor)
-    DATA[] <- lapply(DATA[], droplevels)
-
-    if (length(match) > 1) {
-      match <- df[, "match"]
-    }
-
-    if (!is.null(anchor)) {
-      if (is.numeric(anchor)) {
-        ANCHOR <- anchor
-      } else {
-        ANCHOR <- NULL
-        for (i in 1:length(anchor)) {
-          ANCHOR[i] <- (1:dim(DATA)[2])[colnames(DATA) == anchor[i]]
-        }
-      }
-    } else {
-      ANCHOR <- 1:dim(DATA)[2]
-    }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(MLR(
         Data = DATA, group = GROUP,
@@ -359,6 +342,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         AICM0 = PROV$AIC.m0, AICM1 = PROV$AIC.m1,
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
         DDFitems = DDFitems,
+        anchor = ANCHOR,
         type = type,
         purification = purify,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
@@ -457,6 +441,9 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         rownames(ddfPur) <- paste("Step", 0:(dim(ddfPur)[1] - 1), sep = "")
         colnames(ddfPur) <- colnames(DATA)
       }
+      if (purify) {
+        ANCHOR <- ANCHOR[!(ANCHOR %in% DDFitems)]
+      }
       RES <- list(
         Sval = STATS,
         mlrPAR = mlrPAR,
@@ -468,6 +455,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         BICM0 = PROV$BIC.m0, BICM1 = PROV$BIC.m1,
         DDFitems = DDFitems,
         type = type,
+        anchor = ANCHOR,
         purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
         alpha = alpha,
@@ -608,35 +596,8 @@ print.ddfMLR <- function(x, ...) {
 plot.ddfMLR <- function(x, item = "all", group.names, ...) {
   m <- length(x$mlrPAR)
   nams <- colnames(x$Data)
-
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
+  # check item input
+  items <- .resolve_items(item = item, colnames_data = nams)
 
   if (missing(group.names)) {
     group.names <- x$group.names
@@ -652,21 +613,15 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
     }
   }
 
-  if (x$purification) {
-    anchor <- c(1:m)[!c(1:m) %in% x$DDFitems]
-  } else {
-    anchor <- 1:m
-  }
-
   if (x$match[1] == "zscore") {
-    matching <- c(scale(.score(as.data.frame(x$Data[, anchor]), x$key[anchor])))
+    matching <- c(scale(.score(as.data.frame(x$Data[, x$anchor]), x$key[x$anchor])))
     xlab <- "Standardized total score"
   } else {
     if (x$match[1] == "score") {
-      matching <- c(.score(as.data.frame(x$Data[, anchor]), x$key[anchor]))
+      matching <- c(.score(as.data.frame(x$Data[, x$anchor]), x$key[x$anchor]))
       xlab <- "Total score"
     } else {
-      if (length(x$match) == dim(x$Data)[1]) {
+      if (length(x$match) == nrow(x$Data)) {
         matching <- x$match
         xlab <- "Matching criterion"
       } else {
@@ -820,26 +775,10 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
 #' }
 #' @export
 coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
-  if (!inherits(SE, "logical")) {
-    stop("Invalid value for 'SE'. 'SE' needs to be logical. ",
-      call. = FALSE
-    )
-  }
-  if (!inherits(simplify, "logical")) {
-    stop("Invalid value for 'simplify'. 'simplify' needs to be logical. ",
-      call. = FALSE
-    )
-  }
-  if (!inherits(IRTpars, "logical")) {
-    stop("Invalid value for 'IRTpars'. 'IRTpars' needs to be logical. ",
-      call. = FALSE
-    )
-  }
-  if (CI > 1 | CI < 0 | !is.numeric(CI)) {
-    stop("Invalid value for 'CI'. 'CI' must be numeric value between 0 and 1. ",
-      call. = FALSE
-    )
-  }
+  .check_logical(SE, "SE")
+  .check_logical(simplify, "simplify")
+  .check_logical(IRTpars, "IRTpars")
+  .check_numeric(CI, "CI", 0, 1)
 
   m <- dim(object$Data)[2]
   nams <- colnames(object$Data)
@@ -974,35 +913,8 @@ coef.ddfMLR <- function(object, SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI
 logLik.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
   nams <- colnames(object$Data)
-
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
+  # check item input
+  items <- .resolve_items(item = item, colnames_data = nams)
 
   val <- ifelse(items %in% object$DDFitems,
     object$llM1[items],
@@ -1025,35 +937,8 @@ logLik.ddfMLR <- function(object, item = "all", ...) {
 AIC.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
   nams <- colnames(object$Data)
-
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
+  # check item input
+  items <- .resolve_items(item = item, colnames_data = nams)
 
   AIC <- ifelse(items %in% object$DDFitems, object$AICM1[items], object$AICM0[items])
   return(AIC)
@@ -1065,35 +950,8 @@ AIC.ddfMLR <- function(object, item = "all", ...) {
 BIC.ddfMLR <- function(object, item = "all", ...) {
   m <- length(object$mlrPAR)
   nams <- colnames(object$Data)
-
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
+  # check item input
+  items <- .resolve_items(item = item, colnames_data = nams)
 
   BIC <- ifelse(items %in% object$DDFitems, object$BICM1[items], object$BICM0[items])
   return(BIC)
@@ -1153,50 +1011,17 @@ BIC.ddfMLR <- function(object, item = "all", ...) {
 predict.ddfMLR <- function(object, item = "all", match, group, ...) {
   m <- dim(object$Data)[2]
   nams <- colnames(object$Data)
-
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
-
-  if (object$purification) {
-    anchor <- c(1:m)[!c(1:m) %in% object$DIFitems]
-  } else {
-    anchor <- 1:m
-  }
+  # check item input
+  items <- .resolve_items(item = item, colnames_data = nams)
 
   if (missing(match)) {
     if (length(object$match) > 1) {
       match <- object$match
     } else {
       if (object$match == "score") {
-        match <- c(.score(as.data.frame(object$Data[, anchor]), object$key))
+        match <- c(.score(as.data.frame(object$Data[, object$anchor]), object$key))
       } else {
-        match <- c(scale(.score(as.data.frame(object$Data[, anchor]), object$key)))
+        match <- c(scale(.score(as.data.frame(object$Data[, object$anchor]), object$key)))
       }
     }
   }

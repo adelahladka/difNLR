@@ -113,6 +113,9 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
   if (!(is.numeric(sigma))) {
     stop("Invalid value for 'sigma'. 'sigma' needs to be numeric.", call. = FALSE)
   }
+  if (any(sigma <= 0)) {
+    stop("Invalid value for 'sigma'. 'sigma' needs to be positive.", call. = FALSE)
+  }
   if (length(mu) == 1) {
     mu <- c(mu, mu)
   } else {
@@ -139,28 +142,53 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     stop("Invalid value for 'itemtype'. Type of item can be either 'dich', 'nominal', or 'ordinal'.", call. = FALSE)
   }
 
+  if (missing(a)) {
+    stop("Missing 'a'. Discrimination parameter needs to be provided.", call. = FALSE)
+  }
+  if (missing(b)) {
+    stop("Missing 'b'. Difficulty parameter needs to be provided.", call. = FALSE)
+  }
+
   if (itemtype == "dich") {
-    if (missing(a)) {
-      stop("Missing 'a'. Discrimination parameter needs to be provided.", call. = FALSE)
-    }
     if (is.null(dim(a))) {
       a <- cbind(a, a)
+    } else {
+      if (ncol(a) > 2) {
+        stop("Invalid dimension for 'a'. Too many columns.", call. = FALSE)
+      }
     }
     m <- nrow(a)
-    if (missing(b)) {
-      stop("Missing 'b'. Difficulty parameter needs to be provided.", call. = FALSE)
-    }
     if (is.null(dim(b))) {
       b <- cbind(b, b)
+    } else {
+      if (ncol(b) > 2) {
+        stop("Invalid dimension for 'b'. Too many columns.", call. = FALSE)
+      }
     }
-    if (nrow(a) != nrow(b)) {
-      stop("Invalid dimensions for 'a' and 'b'.", call. = FALSE)
+    if (nrow(a) != nrow(b) | ncol(a) != ncol(b)) {
+      stop("'a' and 'b' have to have the same dimensions.", call. = FALSE)
     }
     if (is.null(c)) {
       c <- matrix(0, ncol = 2, nrow = m)
+    } else {
+      if (is.null(dim(c))) {
+        c <- cbind(c, c)
+      } else {
+        if (ncol(c) > 2) {
+          stop("Invalid dimension for 'c'. Too many columns.", call. = FALSE)
+        }
+      }
     }
     if (is.null(d)) {
       d <- matrix(1, ncol = 2, nrow = m)
+    } else {
+      if (is.null(dim(d))) {
+        d <- cbind(d, d)
+      } else {
+        if (ncol(d) > 2) {
+          stop("Invalid dimension for 'd'. Too many columns.", call. = FALSE)
+        }
+      }
     }
     if (any(is.na(a)) | any(is.na(b)) | any(is.na(c)) | any(is.na(d))) {
       stop("Missing values are not allowed in parameters for dichotomous items.", call. = FALSE)
@@ -188,22 +216,15 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
       }
     }
   } else {
-    if (missing(a)) {
-      stop("Missing 'a'. Discrimination parameter needs to be provided.", call. = FALSE)
-    }
     if (!((ncol(a) %% 2) == 0)) {
       stop("Invalid dimension for 'a'.", call. = FALSE)
-    }
-
-    if (missing(b)) {
-      stop("Missing 'b'. Difficulty parameter needs to be provided.", call. = FALSE)
     }
     if (!((ncol(b) %% 2) == 0)) {
       stop("Invalid dimension for 'b'.", call. = FALSE)
     }
 
-    if (nrow(a) != nrow(b)) {
-      stop("Invalid dimensions for 'a' and 'b'.", call. = FALSE)
+    if (nrow(a) != nrow(b) | ncol(a) != ncol(b)) {
+      stop("'a' and 'b' have to have the same dimensions.", call. = FALSE)
     }
 
     if (any(is.na(a) != is.na(b))) {
@@ -211,7 +232,7 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     }
 
     if (ncol(a) > 26 & itemtype == "nominal") {
-      stop("Maximum number of distractors is 26.", call. = FALSE)
+      stop("Maximum number of distractors is 13.", call. = FALSE)
     }
 
     m <- nrow(a)

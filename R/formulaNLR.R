@@ -181,7 +181,7 @@ formulaNLR <- function(model, constraints = NULL, type = "all", parameterization
     if (any(!is.na(constraints))) {
       constr <- unlist(strsplit(constraints, split = ""))
       if (!all(constr %in% letters[1:4])) {
-        warning("Constraints can be only 'a', 'b', 'c', or 'd'!", call. = FALSE)
+        stop("Constraints can be only 'a', 'b', 'c', or 'd'!", call. = FALSE)
       }
       cons <- apply(sapply(constr, function(x) {
         if (x %in% c("c", "d")) {

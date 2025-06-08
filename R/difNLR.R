@@ -188,6 +188,7 @@
 #'   \item{\code{adjusted.pval}}{adjusted p-values by the \code{p.adjust.method}.}
 #'   \item{\code{df}}{the degrees of freedom of the \code{test}.}
 #'   \item{\code{test}}{used test.}
+#'   \item{\code{anchor}}{DIF free items specified by the \code{anchor} and \code{purify}.}
 #'   \item{\code{purification}}{\code{purify} value.}
 #'   \item{\code{nrPur}}{number of iterations in item purification process. Returned only if \code{purify} is \code{TRUE}.}
 #'   \item{\code{difPur}}{a binary matrix with one row per iteration of item purification and one column per item.
@@ -357,248 +358,226 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start,
                    initboot = TRUE, nrBo = 20, sandwich = FALSE) {
-  if (any(type == "nudif" & model == "1PL")) {
-    stop("Detection of non-uniform DIF is not possible with the 1PL model.", call. = FALSE)
+  # === 1. Basic argument checks ===
+  .check_logical(purify, "purify")
+  if (purify && (!is.numeric(nrIter) || nrIter <= 0 || nrIter %% 1 != 0)) {
+    stop("'nrIter' must be a positive integer.", call. = FALSE)
   }
-  if (any(type == "nudif" & model == "Rasch")) {
-    stop("Detection of non-uniform DIF is not possible with the Rasch model.", call. = FALSE)
-  }
-  # input check
-  # model
-  if (missing(model)) {
-    stop("'model' is missing", call. = FALSE)
-  }
-  # constraints
-  if (missing(constraints)) {
-    constraints <- NULL
-  }
-  # matching criterion
-  if (!(match[1] %in% c("score", "zscore"))) {
-    if (is.null(dim(Data))) {
-      n <- length(Data)
-    } else {
-      n <- dim(Data)[1]
-    }
-    if (length(match) != n) {
-      stop("Invalid value for 'match'. Possible values are 'score', 'zscore', or a vector of the same length as a number
-           of observations in 'Data'.", call. = FALSE)
-    }
-  }
-  # purification
-  if (purify & !(match[1] %in% c("score", "zscore"))) {
-    stop("Purification is not allowed when the matching variable is not 'zscore' or 'score'.", call. = FALSE)
-  }
-  # test
   if (!test %in% c("F", "LR", "W") | !is.character(type)) {
-    stop("Invalid value for 'test'. Test for DIF detection must be either 'LR', 'W', or 'F'.", call. = FALSE)
+    stop("'test' must be one of 'LR', 'W', or 'F'.", call. = FALSE)
   }
-  # significance level
-  if (alpha > 1 | alpha < 0) {
-    stop("Argument 'alpha' must be between 0 and 1.", call. = FALSE)
+  .check_numeric(alpha, "alpha", 0, 1)
+  if (!p.adjust.method %in% p.adjust.methods) {
+    stop("'p.adjust.method' mus be one of: ", paste(p.adjust.methods, collapse = ", "), call. = FALSE)
   }
-  # starting values
-  if (missing(start)) {
-    start <- NULL
-  }
-  # starting values with bootstrapped samples
-  if (initboot) {
-    if (nrBo < 1) {
-      stop("The maximal number of iterations for a calculation of starting values using bootstrapped
-           samples 'nrBo' need to be greater than 1.", call. = FALSE)
-    }
-  }
-  # estimation method
+  .check_logical(sandwich, "sandwich")
+
+  # === 2. Method handling ===
   if (method == "likelihood") {
     method <- "mle"
+    message("Option 'likelihood' was renamed to 'mle'.")
   }
-  if (!(method %in% c("nls", "mle", "em", "plf", "irls"))) {
-    stop("Invalid value for 'method'. Estimation method must be either 'nls', 'mle', 'em', 'plf', or 'irls'. ", call. = FALSE)
+  if (!method %in% c("nls", "mle", "em", "plf", "irls")) {
+    stop("'method' must be one of 'nls', 'mle', 'em', 'plf', or 'irls'.", call. = FALSE)
   }
+  if (sandwich & method != "nls") {
+    warning("'sandwich' is only supported with method = 'nls'", call. = FALSE)
+  }
+
+  # === 3. Handle group and separate from Data ===
+  group_result <- .resolve_group(Data, group)
+  GROUP <- group_result$GROUP
+  DATA <- group_result$DATA
+  n <- nrow(DATA)
+  m <- ncol(DATA)
+
+  # === 3. Check DATA structure ===
+  if (!all(apply(DATA, 2, function(i) {
+    length(unique(na.omit(i))) == 2
+  }))) {
+    stop("'Data' must contain binary responses only.", call. = FALSE)
+  }
+
+  # === 4. Matching criterion check ===
+  if (!(match[1] %in% c("score", "zscore"))) {
+    if (length(match) != n) {
+      stop("'match' must be of length equal to the number of rows in 'Data'.", call. = FALSE)
+    }
+  }
+  if (purify && !(match[1] %in% c("score", "zscore"))) {
+    stop("'purify' is only allowed when 'match' is 'score' or 'zscore'.", call. = FALSE)
+  }
+
+  # === 5. Handle missing data ===
+  df <- if (length(match) == n) {
+    data.frame(DATA, GROUP, match, check.names = FALSE)
+  } else {
+    data.frame(DATA, GROUP, check.names = FALSE)
+  }
+
+  df <- df[complete.cases(df), ]
+
+  if (nrow(df) == 0) {
+    stop("'Data' contanins no complete cases after removing missing values.", call. = FALSE)
+  }
+
+  if (nrow(df) < n) {
+    warning(
+      sprintf(
+        "%d observation%s removed due to missing values.",
+        n - nrow(df), ifelse(n - nrow(df) > 1, "s were", " was")
+      ),
+      call. = FALSE
+    )
+  }
+
+  GROUP <- df[["GROUP"]]
+  DATA <- df[, !(names(df) %in% c("GROUP", "match")), drop = FALSE]
+  if (length(match) == n) {
+    match <- df[["match"]]
+  }
+
+  # === 6. Group re-coding based on focal.name ===
+  group.names <- na.omit(unique(GROUP))
+  if (!focal.name %in% group.names) {
+    stop("'focal.name' must be a valid value from 'group'.", call. = FALSE)
+  }
+  if (group.names[1] == focal.name) {
+    group.names <- rev(group.names)
+  }
+  GROUP <- as.numeric(as.factor(GROUP) == focal.name)
+
+  # === 7. Model and type ===
+  if (missing(model)) {
+    stop("'model' must be specified. ", call. = FALSE)
+  }
+  if (!is.character(model)) {
+    stop("'model' must be a character vector.", call. = FALSE)
+  }
+  # repeat model if a single value is provided
+  if (length(model) == 1) {
+    model <- rep(model, m)
+  } else if (length(model) != m) {
+    stop("'model' must be either a single value or have one value per each item.", call. = FALSE)
+  }
+  # valid models
+  valid_models <- c(
+    "Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
+    "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"
+  )
+  # check that all specified models are valid
+  if (!all(model %in% valid_models)) {
+    stop("Unrecognized value in 'model'.", call. = FALSE)
+  }
+  if (!is.character(type)) {
+    stop("'type' must be a character vector.", call. = FALSE)
+  }
+  if (length(type) == 1) {
+    type <- rep(type, m)
+  } else if (length(type) != m) {
+    stop("'type' must be either a single value or have one value per each item.", call. = FALSE)
+  }
+  # identify non-standard DIF types
+  standard_types <- c("udif", "nudif", "both", "all")
+  custom_types <- type[!type %in% standard_types]
+  # validate custom DIF types
+  if (length(custom_types) > 0) {
+    types <- lapply(type, function(t) {
+      if (t %in% standard_types) {
+        NA
+      } else {
+        strsplit(t, "")[[1]]
+      }
+    })
+    unique_types <- unique(unlist(strsplit(custom_types, "")))
+    if (!all(unique_types %in% letters[1:4])) {
+      stop("'type' must be one of 'udif', 'nudif', 'both', 'all', or combinations of 'a', 'b', 'c', and 'd'.", call. = FALSE)
+    }
+  } else {
+    types <- NULL
+  }
+  # invalid combinations of DIF type and model
+  if (any(type == "nudif" & model %in% c("Rasch", "1PL"))) {
+    stop("Non-uniform DIF cannot be tested with the Rasch or 1PL model.", call. = FALSE)
+  }
+
+  # === 8. Constraints ===
+  if (missing(constraints)) {
+    constraints <- as.list(rep(NA, m))
+  } else {
+    if (length(constraints) == 1) {
+      constraints <- rep(constraints, m)
+    } else if (length(constraints) != m) {
+      stop("'constraints' must be either a single value or have one per item.", call. = FALSE)
+    }
+    # parse each constraint string into character vectors
+    constraints <- lapply(constraints, function(x) unique(strsplit(x, "")[[1]]))
+    # validate that constraint characters are only from a-d
+    unique_constraints <- unique(unlist(constraints))
+    if (!all(na.omit(unique_constraints) %in% letters[1:4]) | all(is.na(unique_constraints))) {
+      stop("'constraints' must consist of parameters 'a', 'b', 'c', and 'd' only.", call. = FALSE)
+    }
+
+    # check for overlap with DIF type (if custom types used)
+    if (!is.null(types)) {
+      overlap <- sapply(seq_len(m), function(i) {
+        !is.na(types[[i]][1]) && any(types[[i]] %in% constraints[[i]])
+      })
+
+      if (any(overlap)) {
+        stop("Cannot test for DIF in parameters that are constrained.", call. = FALSE)
+      }
+    }
+  }
+
+  # === 9. Anchor items ===
+  ANCHOR <- .resolve_anchor(anchor, DATA)
+
+  # === 10. Starting values ===
+  if (missing(start)) {
+    start <- NULL
+    # starting values with bootstrapped samples, available only with the startNLR function
+    if (initboot && (!is.numeric(nrBo) || length(nrBo) != 1 || nrBo < 1)) {
+      stop("'nrBo' must be a positive numeric value if 'initboot' is TRUE.", call. = FALSE)
+    }
+  } else {
+    if (!is.list(start) || length(start) != m) {
+      stop("'start' must be a list with one element per item in 'Data'.", call. = FALSE)
+    }
+    valid_names <- c(
+      letters[1:2], paste0(letters[1:2], "Dif"),
+      paste0("b", 0:3), paste0(rep(letters[3:4], each = 2), c("R", "F"))
+    )
+    start_names <- unique(unlist(lapply(start, names)))
+    if (!all(start_names %in% valid_names)) {
+      stop("'start' contains invalid parameter names. Allowed names:
+      'b0', 'b1', 'b2', 'b3' (intercept-slope),
+      'a', 'b', 'aDif', 'bDif' (IRT), and
+      'cR', 'cF', 'dR', 'dF' (asymptotes).", call. = FALSE)
+    }
+    # Convert IRT-style starting values to intercept-slope style
+    if (all(start_names %in% c("a", "b", "aDif", "bDif", "cR", "cF", "dR", "dF"))) {
+      start <- lapply(start, function(x) {
+        pars <- c(a = 1, b = 0, aDif = 0, bDif = 0, cR = 0, cF = 0, dR = 1, dF = 1)
+        pars[names(x)] <- x
+        x <- unlist(pars)
+        tmp <- c(
+          b0 = -x["a"] * x["b"], b1 = x["a"],
+          b2 = -x["a"] * x["bDif"] - x["aDif"] * x["b"] - x["aDif"] * x["bDif"],
+          b3 = x["aDif"],
+          cR = x["cR"], cF = x["cF"], dR = x["dR"], dF = x["dF"]
+        )
+        names(tmp) <- c("b0", "b1", "b2", "b3", "cR", "cF", "dR", "dF")
+        return(tmp)
+      })
+    }
+  }
+
+  # === 12. Parameterization ===
+  parameterization <- rep("is", m)
 
   # internal NLR function
   internalNLR <- function() {
-    if (length(group) == 1) {
-      if (is.numeric(group)) {
-        GROUP <- Data[, group]
-        DATA <- as.data.frame(Data[, (1:dim(Data)[2]) != group])
-        colnames(DATA) <- colnames(Data)[(1:dim(Data)[2]) != group]
-      } else {
-        GROUP <- Data[, colnames(Data) == group]
-        DATA <- as.data.frame(Data[, colnames(Data) != group])
-        colnames(DATA) <- colnames(Data)[colnames(Data) != group]
-      }
-    } else {
-      GROUP <- group
-      DATA <- as.data.frame(Data)
-    }
-    if (length(levels(as.factor(GROUP))) != 2) {
-      stop("'group' must be a binary vector.", call. = FALSE)
-    }
-    if (is.matrix(DATA) | is.data.frame(DATA)) {
-      if (!all(apply(DATA, 2, function(i) {
-        length(levels(as.factor(i))) == 2
-      }))) {
-        stop("'Data' must be a data.frame or a matrix of binary vectors.", call. = FALSE)
-      }
-      if (dim(DATA)[1] != length(GROUP)) {
-        stop("'Data' must have the same number of rows as is the length of vector 'group'.", call. = FALSE)
-      }
-    } else {
-      if (is.vector(DATA)) {
-        if (length(DATA) != length(GROUP)) {
-          stop("'Data' must have the same number of rows as is the length of vector 'group'.", call. = FALSE)
-        }
-        DATA <- as.data.frame(DATA)
-      } else {
-        stop("'Data' must be a data.frame or a matrix of binary vectors.", call. = FALSE)
-      }
-    }
-    group.names <- unique(GROUP)[!is.na(unique(GROUP))]
-    if (group.names[1] == focal.name) {
-      group.names <- rev(group.names)
-    }
-    GROUP <- as.numeric(as.factor(GROUP) == focal.name)
-
-    if (length(match) == dim(DATA)[1]) {
-      df <- data.frame(DATA, GROUP, match, check.names = FALSE)
-    } else {
-      df <- data.frame(DATA, GROUP, check.names = FALSE)
-    }
-
-    df <- df[complete.cases(df), ]
-
-    if (dim(df)[1] == 0) {
-      stop("It seems that your 'Data' does not include any observations that are complete.",
-        call. = FALSE
-      )
-    }
-
-    GROUP <- df[, "GROUP"]
-    DATA <- as.data.frame(df[, !(colnames(df) %in% c("GROUP", "match"))])
-    colnames(DATA) <- colnames(df)[!(colnames(df) %in% c("GROUP", "match"))]
-
-    if (length(match) > 1) {
-      match <- df[, "match"]
-    }
-
-    # number of items
-    m <- dim(DATA)[2]
-    # model
-    if (length(model) == 1) {
-      model <- rep(model, m)
-    } else {
-      if (length(model) != m) {
-        stop("Invalid length of 'model'. Model needs to be specified for each item or
-             by single string. ", call. = FALSE)
-      }
-    }
-    if (!all(model %in% c(
-      "Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
-      "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"
-    ))) {
-      stop("Invalid value for 'model'.", call. = FALSE)
-    }
-
-    # type of DIF to be tested
-    if (length(type) == 1) {
-      type <- rep(type, m)
-    } else {
-      if (length(type) != dim(DATA)[2]) {
-        stop("Invalid length of 'type'. Type of DIF needs to be specified for each item or
-             by a single string. ", call. = FALSE)
-      }
-    }
-    tmptype <- type[!(type %in% c("udif", "nudif", "both", "all"))]
-    if (length(tmptype) > 0) {
-      tmptypes <- unique(unlist(sapply(
-        1:length(tmptype),
-        function(i) unique(unlist(strsplit(tmptype[i], split = "")))
-      )))
-      if (!all(tmptypes %in% letters[1:4])) {
-        stop("Type of DIF to be tested not recognized. Only parameters 'a', 'b', 'c' or 'd' can be tested
-             or 'type' must be one of predefined options: either 'udif', 'nudif', 'both', or 'all'.", call. = FALSE)
-      }
-    }
-
-    # constraints
-    if (!(is.null(constraints))) {
-      if (length(constraints) == 1) {
-        constraints <- rep(constraints, m)
-      } else {
-        if (length(constraints) != m) {
-          stop("Invalid length of 'constraints'. Constraints need to be specified for each item or
-               by single string. ", call. = FALSE)
-        }
-      }
-      constraints <- lapply(1:m, function(i) unique(unlist(strsplit(constraints[i], split = ""))))
-      if (!all(sapply(1:m, function(i) {
-        all(constraints[[i]] %in% letters[1:4]) | all(is.na(constraints[[i]]))
-      }))) {
-        stop("Constraints can be only combinations of parameters 'a', 'b', 'c', and 'd'. ", call. = FALSE)
-      }
-      if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
-        types <- as.list(rep(NA, m))
-        wht <- !(type %in% c("udif", "nudif", "both", "all"))
-        types[wht] <- unlist(strsplit(type[wht], split = ""))
-        if (any(sapply(1:m, function(i) (all(!is.na(constraints[[i]])) & (types[[i]] %in% constraints[[i]]))))) {
-          stop("The difference in constrained parameters cannot be tested.", call. = FALSE)
-        }
-      } else {
-        types <- NULL
-      }
-    } else {
-      constraints <- as.list(rep(NA, m))
-      types <- NULL
-    }
-    # anchors
-    if (!is.null(anchor)) {
-      if (is.numeric(anchor)) {
-        ANCHOR <- anchor
-      } else {
-        ANCHOR <- NULL
-        for (i in 1:length(anchor)) {
-          ANCHOR[i] <- (1:m)[colnames(DATA) == anchor[i]]
-        }
-      }
-    } else {
-      ANCHOR <- 1:m
-    }
-
-    # parameterization
-    parameterization <- rep("is", m)
-    if (!is.null(start)) {
-      if (length(start) != m) {
-        stop("Invalid value for 'start'. Initial values must be a list with as many elements
-             as a number of items in 'Data'.", call. = FALSE)
-      }
-      start_names <- unique(unlist(lapply(start, names)))
-
-
-      if (!all(start_names %in% c(letters[1:4], paste0(letters[1:4], "Dif"), paste0("b", 0:3), paste0(rep(letters[3:4], each = 2), c("R", "F"))))) {
-        stop("Invalid names in 'start'. Each element of 'start' needs to be a numeric vector with names
-        'b0', 'b1', 'b2', 'b3' for intercept-slope parametrization or
-        'a', 'b', 'aDif', 'bDif' for IRT parametrization.
-        For asymptote parameters, starting values need to be named
-        'cR', 'cF', 'dR', and 'dF'. ", call. = FALSE)
-      } else {
-        if (all(start_names %in% c("a", "b", "aDif", "bDif", "cR", "cF", "dR", "dF"))) {
-          start_old <- start
-          start <- lapply(start_old, function(x) {
-            pars <- c("b" = 0, "a" = 1, "bDif" = 0, "aDif" = 0, "cR" = 0, "cF" = 0, "dR" = 1, "dF" = 1)
-            pars[names(x)] <- x
-            x <- unlist(pars)
-            tmp <- unlist(c(
-                b0 = -x["a"] * x["b"], b1 = x["a"],
-                b2 = -x["a"] * x["bDif"] - x["aDif"] * x["b"] - x["aDif"] * x["bDif"],
-                b3 = x["aDif"],
-                cR = x["cR"], cF = x["cF"], dR = x["dR"], dF = x["dF"]
-            ))
-            names(tmp) <- c("b0", "b1", "b2", "b3", "cR", "cF", "dR", "dF")
-            return(tmp)
-          })
-        }
-      }
-    }
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- NLR(DATA, GROUP,
         model = model, constraints = constraints, type = type, method = method,
@@ -653,6 +632,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         model = model, constraints = constraints, type = type, types = types,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
         df = PROV$df, test = test,
+        anchor = ANCHOR,
         purification = purify,
         method = method,
         conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
@@ -682,11 +662,11 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
           function(i) {
             if (i %in% PROV$cf.which) {
               structure(rep(NA, length(PROV$par.m1[[i]])),
-                        names = names(PROV$par.m1[[i]])
+                names = names(PROV$par.m1[[i]])
               )
             } else {
               structure(rep(0, length(PROV$par.m1[[i]])),
-                        names = names(PROV$par.m1[[i]])
+                names = names(PROV$par.m1[[i]])
               )
             }
           }
@@ -790,6 +770,9 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         wht <- (!(type %in% c("udif", "nudif", "both", "all")))
         type[wht] <- "other"
       }
+      if (purify) {
+        ANCHOR <- ANCHOR[!(ANCHOR %in% DIFitems)]
+      }
       RES <- list(
         Sval = STATS,
         nlrPAR = nlrPAR, nlrSE = nlrSE,
@@ -799,6 +782,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         model = model, constraints = constraints, type = type, types = types,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
         df = PROV$df, test = test,
+        anchor = ANCHOR,
         purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
         method = method,
         conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
@@ -1071,6 +1055,9 @@ print.difNLR <- function(x, ...) {
 #' @export
 plot.difNLR <- function(x, plot.type = "cc", item = "all",
                         group.names, draw.empirical = TRUE, draw.CI = FALSE, ...) {
+  .check_logical(draw.empirical, "draw.empirical")
+  .check_logical(draw.CI, "draw.CI")
+
   plotstat <- function(x) {
     if (x$conv.fail != 0) {
       if (length(x$conv.fail) == sum(!is.na(x$Sval))) {
@@ -1081,6 +1068,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
           ),
           "LR" = stop(
             "None of items does converge. LR-statistic values not plotted",
+            call. = FALSE
+          ),
+          "W" = stop(
+            "None of items does converge. W-statistic values not plotted",
             call. = FALSE
           )
         )
@@ -1093,6 +1084,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
           "LR" = warning(paste0("Item ", x$conv.fail.which,
             " does not converge. LR-statistic value not plotted",
             collapse = "\n"
+          ), call. = FALSE),
+          "W" = warning(paste0("Item ", x$conv.fail.which,
+            " does not converge. LR-statistic value not plotted",
+            collapse = "\n"
           ), call. = FALSE)
         )
       }
@@ -1100,7 +1095,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
     title <- "Non-linear regression DIF detection with none multiple comparison correction"
 
-    n <- dim(x$Data)[1]
+    n <- nrow(x$Data)
     if (x$test == "F") {
       if (dim(unique(x$df))[1] == 1) {
         Sval_critical <- unique(qf(1 - x$alpha, x$df[, 1], x$df[, 2]))
@@ -1168,60 +1163,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
   plotCC <- function(x, item = item) {
     m <- length(x$nlrPAR)
     nams <- colnames(x$Data)
-
-    if (inherits(item, "character")) {
-      if (any(item != "all") & !all(item %in% nams)) {
-        stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-          call. = FALSE
-        )
-      }
-      if (any(item == "all")) {
-        items <- 1:m
-      } else {
-        items <- which(nams %in% item)
-      }
-    } else {
-      if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-        stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-          call. = FALSE
-        )
-      } else {
-        if (!all(item %in% 1:m)) {
-          stop("Invalid number for 'item'.",
-            call. = FALSE
-          )
-        } else {
-          items <- item
-        }
-      }
-    }
-
-    if (any(x$conv.fail.which %in% items)) {
-      if (length(setdiff(items, x$conv.fail.which)) == 0) {
-        stop(
-          paste0("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
-            collapse = "\n"
-          ),
-          call. = FALSE
-        )
-      } else {
-        warning(
-          paste0("Item ", intersect(x$conv.fail.which, items), " does not converge. Characteristic curve not plotted.",
-            collapse = "\n"
-          ),
-          call. = FALSE
-        )
-        items <- setdiff(items, x$conv.fail.which)
-      }
-    }
-
-    if (x$purification) {
-      anchor <- c(1:m)[!c(1:m) %in% x$DIFitems]
-    } else {
-      anchor <- 1:m
-    }
+    # check item input
+    items <- .resolve_items(item = item, colnames_data = nams)
+    # remove non-converged items
+    items <- .resolve_non_converged_items_plot(item = items, conv_fail_items = x$conv.fail.which)
 
     if (length(x$match) > 1) {
       xlab <- "Matching criterion"
@@ -1229,10 +1174,10 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     } else {
       if (x$match == "score") {
         xlab <- "Total score"
-        match <- rowSums(as.data.frame(x$Data[, anchor]))
+        match <- rowSums(as.data.frame(x$Data[, x$anchor]))
       } else {
         xlab <- "Standardized total score"
-        match <- scale(rowSums(as.data.frame(x$Data[, anchor])))
+        match <- scale(rowSums(as.data.frame(x$Data[, x$anchor])))
       }
     }
     xR <- match[x$group == 0]
@@ -1361,91 +1306,45 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 #' @export
 fitted.difNLR <- function(object, item = "all", ...) {
   # checking input
-  m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
+  m <- length(nams)
 
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
+  # check item input, resolve item indices/names to numeric indices
+  items <- .resolve_items(item = item, colnames_data = nams)
+  # remove non-converged items
+  ITEMS <- .resolve_non_converged_items(item = items, conv_fail_items = object$conv.fail.which)
+
+  # extracting matching variable
+  if (length(object$match) > 1) {
+    match <- object$match
   } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
+    if (object$match == "score") {
+      match <- rowSums(as.data.frame(object$Data[, object$anchor]))
     } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
+      match <- scale(rowSums(as.data.frame(object$Data[, object$anchor])))
     }
   }
 
-  if (any(object$conv.fail.which %in% items)) {
-    if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-    } else {
-      warning(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-      ITEMS <- setdiff(items, object$conv.fail.which)
-    }
-  } else {
-    ITEMS <- items
-  }
-
+  # extracting item parameters
   PAR <- data.frame(
-    a = rep(1, m), b = 0, c = 0, d = 1,
-    aDif = 0, bDif = 0, cDif = 0, dDif = 0
+    b0 = 0, b1 = rep(1, m), b2 = 0, b3 = 0,
+    c = 0, d = 1, cDif = 0, dDif = 0
   )
   for (i in ITEMS) {
     PAR[i, names(object$nlrPAR[[i]])] <- object$nlrPAR[[i]]
   }
 
-  # data
-  if (length(object$match) > 1) {
-    match <- object$match
-  } else {
-    if (object$match == "score") {
-      match <- c(apply(object$Data, 1, sum))
-    } else {
-      match <- c(scale(apply(object$Data, 1, sum)))
-    }
-  }
-
   # fitted values
   FV <- as.list(rep(NA, m))
   FV[ITEMS] <- lapply(ITEMS, function(i) {
-    .gNLR(
-      match, object$group,
-      PAR[i, "a"], PAR[i, "b"],
-      PAR[i, "c"], PAR[i, "d"],
-      PAR[i, "aDif"], PAR[i, "bDif"],
-      PAR[i, "cDif"], PAR[i, "dDif"]
+    .gNLR.is(
+      x = match, g = object$group,
+      b0 = PAR[i, "b0"], b1 = PAR[i, "b1"], b2 = PAR[i, "b2"], b3 = PAR[i, "b3"],
+      c = PAR[i, "c"], cDif = PAR[i, "cDif"], d = PAR[i, "d"], dDif = PAR[i, "dDif"]
     )
   })
   FV <- do.call(cbind, FV)
-  colnames(FV) <- colnames(object$Data)
+  colnames(FV) <- nams
   rownames(FV) <- rownames(object$Data)
   FV <- FV[, items]
 
@@ -1531,120 +1430,69 @@ fitted.difNLR <- function(object, item = "all", ...) {
 #' @export
 predict.difNLR <- function(object, item = "all", match, group, interval = "none", CI = 0.95, ...) {
   # checking input
-  m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
+  m <- length(nams)
 
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
+  # check item input, resolve item indices/names to numeric indices
+  items <- .resolve_items(item = item, colnames_data = nams)
+  # remove non-converged items
+  ITEMS <- .resolve_non_converged_items(item = items, conv_fail_items = object$conv.fail.which)
+  m <- length(ITEMS)
+  nams <- nams[ITEMS]
 
+  # extracting matching variable
   if (missing(match)) {
     if (length(object$match) > 1) {
       match <- object$match
     } else {
       if (object$match == "score") {
-        match <- c(apply(object$Data, 1, sum))
+        match <- rowSums(as.data.frame(object$Data[, object$anchor]))
       } else {
-        match <- c(scale(apply(object$Data, 1, sum)))
+        match <- scale(rowSums(as.data.frame(object$Data[, object$anchor])))
       }
     }
   }
 
   if (missing(group)) {
     group <- object$group
+  } else {
+    group_levels <- na.omit(unique(group))
+    if (!all(group_levels %in% unique(object$group))) {
+      stop("Invalid value for 'group'.", call. = FALSE)
+    }
   }
+
   if (length(match) != length(group)) {
     if (length(match) == 1) {
       match <- rep(match, length(group))
     } else if (length(group) == 1) {
       group <- rep(group, length(match))
     } else {
-      stop("Arguments 'match' and 'group' must be of the same length.",
-        call. = FALSE
-      )
+      stop("Arguments 'match' and 'group' must be of the same length.", call. = FALSE)
     }
   }
-
-  if (any(object$conv.fail.which %in% items)) {
-    if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-    } else {
-      warning(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-      ITEMS <- setdiff(items, object$conv.fail.which)
-    }
-  } else {
-    ITEMS <- items
-  }
-  m <- length(ITEMS)
-  nams <- nams[ITEMS]
 
   if (!interval %in% c("none", "confidence")) {
-    warning(
-      "Only confidence interval is supported. ",
-      call. = FALSE
-    )
+    warning("Only confidence interval is supported. ", call. = FALSE)
     interval <- "none"
   }
 
-  if (CI > 1 | CI < 0 | !is.numeric(CI)) {
-    stop("Invalid value for 'CI'. 'CI' must be numeric value between 0 and 1. ",
-      call. = FALSE
-    )
-  }
+  .check_numeric(CI, "CI", 0, 1)
 
-  # estimated parameters
-  PAR <- coef(object, item = ITEMS, SE = FALSE, simplify = FALSE, IRTpars = FALSE, CI = 0)
-  # estimated parameters, adding missing parameters
-  PAR_NEW <- lapply(PAR, function(x) {
-    par_names <- names(x)
-    par_tmp <- data.frame(
-      b0 = 0, b1 = 1, b2 = 0, b3 = 0, # b1 = 1 because of Rasch model where it is fixed, TODO: think about case when b1 = 0
-      c = 0, d = 1, cDif = 0, dDif = 0
-    )
-    par_tmp[par_names] <- x[par_names]
-    return(par_tmp)
-  })
+  # extracting item parameters
+  PAR <- data.frame(
+    b0 = 0, b1 = rep(1, m), b2 = 0, b3 = 0,
+    c = 0, d = 1, cDif = 0, dDif = 0
+  )
+  for (i in 1:m) {
+    PAR[i, names(object$nlrPAR[[ITEMS[i]]])] <- object$nlrPAR[[ITEMS[i]]]
+  }
 
   # predicted values
   PV <- lapply(1:m, function(i) {
-    pars <- as.vector(PAR_NEW[[i]])
+    pars <- as.vector(PAR[i, ])
     .gNLR.is(
-      x = as.vector(match), g = group,
+      x = match, g = group,
       b0 = pars[["b0"]], b1 = pars[["b1"]], b2 = pars[["b2"]], b3 = pars[["b3"]],
       c = pars[["c"]], d = pars[["d"]], cDif = pars[["cDif"]], dDif = pars[["dDif"]]
     )
@@ -1652,15 +1500,17 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 
   # confidence interval
   if (interval == "confidence") {
+    # var(g(pars)) (fitted values) = grad(g(pars))T*Sigma*grad(g(pars))
+    # grad(g(pars))
     DELTA_new <- as.list(rep(NA, m))
     DELTA_new <- lapply(1:m, function(i) {
       attr(.delta.gNLR.is(
         match, group,
-        PAR_NEW[[i]][, "b0"], PAR_NEW[[i]][, "b1"], PAR_NEW[[i]][, "b2"], PAR_NEW[[i]][, "b3"],
-        PAR_NEW[[i]][, "c"], PAR_NEW[[i]][, "d"], PAR_NEW[[i]][, "cDif"], PAR_NEW[[i]][, "dDif"]
+        PAR[i, "b0"], PAR[i, "b1"], PAR[i, "b2"], PAR[i, "b3"],
+        PAR[i, "c"], PAR[i, "d"], PAR[i, "cDif"], PAR[i, "dDif"]
       ), "gradient")
     })
-
+    # Sigma
     VCOV_par <- lapply(1:m, function(i) {
       matrix(
         0,
@@ -1681,7 +1531,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
       }
       return(VCOV_par[[i]])
     })
-
+    # SE of predicted values
     SE_new <- const <- lwr <- upp <- lapply(1:m, function(i) c())
     SE_new <- lapply(1:m, function(i) {
       sqrt(diag(DELTA_new[[i]] %*% VCOV_par[[i]] %*% t(DELTA_new[[i]])))
@@ -1710,6 +1560,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
       )
     })
     res <- as.data.frame(do.call(rbind, res))
+    res$item <- factor(res$item, levels = unique(res$item))
   } else {
     res <- lapply(1:m, function(i) {
       data.frame(
@@ -1801,60 +1652,14 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 #' @export
 coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTpars = TRUE, CI = 0.95, ...) {
   # checking input
-  m <- length(object$nlrPAR)
-  nams <- colnames(object$Data)
-
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
-  nams <- nams[items]
+  items <- .resolve_items(item, colnames_data = colnames(object$Data))
+  nams <- colnames(object$Data)[items]
   m <- length(items)
 
-  if (!inherits(SE, "logical")) {
-    stop("Invalid value for 'SE'. 'SE' needs to be logical. ",
-      call. = FALSE
-    )
-  }
-  if (!inherits(simplify, "logical")) {
-    stop("Invalid value for 'simplify'. 'simplify' needs to be logical. ",
-      call. = FALSE
-    )
-  }
-  if (!inherits(IRTpars, "logical")) {
-    stop("Invalid value for 'IRTpars'. 'IRTpars' needs to be logical. ",
-      call. = FALSE
-    )
-  }
-  if (CI > 1 | CI < 0 | !is.numeric(CI)) {
-    stop("Invalid value for 'CI'. 'CI' must be numeric value between 0 and 1. ",
-      call. = FALSE
-    )
-  }
+  .check_logical(SE, "SE")
+  .check_logical(simplify, "simplify")
+  .check_logical(IRTpars, "IRTpars")
+  .check_numeric(CI, "CI", 0, 1)
 
   nlrPAR <- lapply(items, function(i) {
     if (i %in% object$DIFitems) {
@@ -2011,75 +1816,31 @@ coef.difNLR <- function(object, item = "all", SE = FALSE, simplify = FALSE, IRTp
 #' }
 #' @export
 logLik.difNLR <- function(object, item = "all", ...) {
-  m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
+  m <- length(nams)
 
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
+  # check item input, resolve item indices/names to numeric indices
+  items <- .resolve_items(item = item, colnames_data = nams)
+  # remove non-converged items
+  ITEMS <- .resolve_non_converged_items(item = items, conv_fail_items = object$conv.fail.which)
 
-  if (any(object$conv.fail.which %in% items)) {
-    if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-    } else {
-      warning(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-      ITEMS <- setdiff(items, object$conv.fail.which)
-    }
-  } else {
-    ITEMS <- items
-  }
-
-  val <- df <- rep(NA, m)
-
+  val <- rep(NA, m)
   val[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
     object$llM1[ITEMS],
     object$llM0[ITEMS]
   )
-  df[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
-    sapply(object$parM1, length)[ITEMS],
-    sapply(object$parM0, length)[ITEMS]
-  )
   val <- val[items]
-  df <- df[items]
-  if (length(items) == 1) {
+
+  if (length(ITEMS) == 1) {
+    df <- ifelse(ITEMS %in% object$DIFitems,
+      sapply(object$parM1, length)[ITEMS],
+      sapply(object$parM0, length)[ITEMS]
+    )
+
     attr(val, "df") <- df
     class(val) <- "logLik"
   }
+
   return(val)
 }
 
@@ -2087,58 +1848,13 @@ logLik.difNLR <- function(object, item = "all", ...) {
 #' @aliases BIC.difNLR logLik.difNLR
 #' @export
 AIC.difNLR <- function(object, item = "all", ...) {
-  m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
+  m <- length(nams)
 
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
-
-  if (any(object$conv.fail.which %in% items)) {
-    if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-    } else {
-      warning(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-      ITEMS <- setdiff(items, object$conv.fail.which)
-    }
-  } else {
-    ITEMS <- items
-  }
+  # check item input, resolve item indices/names to numeric indices
+  items <- .resolve_items(item = item, colnames_data = nams)
+  # remove non-converged items
+  ITEMS <- .resolve_non_converged_items(item = items, conv_fail_items = object$conv.fail.which)
 
   k <- AIC <- rep(NA, m)
   k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
@@ -2155,64 +1871,20 @@ AIC.difNLR <- function(object, item = "all", ...) {
 #' @aliases AIC.difNLR logLik.difNLR
 #' @export
 BIC.difNLR <- function(object, item = "all", ...) {
-  m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
+  m <- length(nams)
 
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
+  # check item input, resolve item indices/names to numeric indices
+  items <- .resolve_items(item = item, colnames_data = nams)
+  # remove non-converged items
+  ITEMS <- .resolve_non_converged_items(item = items, conv_fail_items = object$conv.fail.which)
 
-  if (any(object$conv.fail.which %in% items)) {
-    if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. ",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-    } else {
-      warning(
-        paste0("Item ", intersect(object$conv.fail.which, items), " does not converge. NA produced.",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-      ITEMS <- setdiff(items, object$conv.fail.which)
-    }
-  } else {
-    ITEMS <- items
-  }
   k <- BIC <- rep(NA, m)
   k[ITEMS] <- ifelse(ITEMS %in% object$DIFitems,
     sapply(object$parM1, length)[ITEMS],
     sapply(object$parM0, length)[ITEMS]
   )
-  n <- dim(object$Data)[1]
+  n <- nrow(object$Data)
   BIC[ITEMS] <- log(n) * k[ITEMS] - 2 * logLik(object, item = ITEMS)
   BIC <- BIC[items]
 
@@ -2287,64 +1959,18 @@ BIC.difNLR <- function(object, item = "all", ...) {
 residuals.difNLR <- function(object, item = "all", ...) {
   # checking input
   n <- dim(object$Data)[1]
-
-  m <- length(object$nlrPAR)
   nams <- colnames(object$Data)
+  m <- length(nams)
 
-  if (inherits(item, "character")) {
-    if (any(item != "all") & !all(item %in% nams)) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    }
-    if (any(item == "all")) {
-      items <- 1:m
-    } else {
-      items <- which(nams %in% item)
-    }
-  } else {
-    if (!inherits(item, "integer") & !inherits(item, "numeric")) {
-      stop("Invalid value for 'item'. Item must be either character 'all', or
-           numeric vector corresponding to column identifiers, or name of the item.",
-        call. = FALSE
-      )
-    } else {
-      if (!all(item %in% 1:m)) {
-        stop("Invalid number for 'item'.",
-          call. = FALSE
-        )
-      } else {
-        items <- item
-      }
-    }
-  }
-
-  if (any(object$conv.fail.which %in% items)) {
-    if (length(setdiff(items, object$conv.fail.which)) == 0) {
-      stop(
-        paste("Item", intersect(object$conv.fail.which, items), "does not converge.",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-    } else {
-      warning(
-        paste("Item", intersect(object$conv.fail.which, items), "does not converge. NA produced.",
-          collapse = "\n"
-        ),
-        call. = FALSE
-      )
-      ITEMS <- setdiff(items, object$conv.fail.which)
-    }
-  } else {
-    ITEMS <- items
-  }
+  # check item input, resolve item indices/names to numeric indices
+  items <- .resolve_items(item = item, colnames_data = nams)
+  # remove non-converged items
+  ITEMS <- .resolve_non_converged_items(item = items, conv_fail_items = object$conv.fail.which)
 
   residuals <- matrix(NA, nrow = n, ncol = m)
   residuals[, ITEMS] <- as.matrix(object$Data[, ITEMS] - fitted(object, item = ITEMS))
 
-  colnames(residuals) <- colnames(object$Data)
+  colnames(residuals) <- nams
   rownames(residuals) <- rownames(object$Data)
   residuals <- residuals[, items]
 
