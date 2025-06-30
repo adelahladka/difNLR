@@ -4325,7 +4325,7 @@
       Step9       0
       Step10      0
 
----
+# testing paper code - R Journal 2020 - LearningToLearn
 
     Code
       predict(fitex3, match = rep(c(-1, 0, 1), 2), group = rep(c(0, 1), each = 3),

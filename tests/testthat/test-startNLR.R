@@ -55,3 +55,16 @@ test_that("startNLR - checking inputs", {
   expect_error(startNLR(Data = GMAT[, 1:20], group = group, model = "2PL", constraints = c("a", "b")))
   expect_error(startNLR(Data = GMAT[, 1:20], group = group, model = "2PL", match = "dscore"))
 })
+
+test_that("startNLR - further examples", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  # loading data
+  data(GMAT)
+  Data <- GMAT[, 1:20] # items
+  group <- GMAT[, "group"] # group membership variable
+
+  # 4PL model with fixed b and d parameters
+  expect_snapshot(startNLR(Data, group, model = "4PL", constraints = "bd", simplify = TRUE))
+})

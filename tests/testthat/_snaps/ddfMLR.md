@@ -299,3 +299,88 @@
        Item2
        Item9
 
+# testing paper code - R Journal 2020 - generated data
+
+    Code
+      head(DataDDF)
+    Output
+        Item1 Item2 Item3 Item4 Item5 Item6 Item7 Item8 Item9 Item10 group
+      1     B     B     C     A     C     B     B     D     B      B     0
+      2     C     A     B     A     C     C     B     B     C      C     0
+      3     B     C     C     B     C     C     B     C     B      D     0
+      4     B     A     C     A     C     B     A     B     B      B     0
+      5     B     B     C     B     C     B     A     C     A      B     0
+      6     B     A     A     A     A     B     B     A     A      A     0
+
+---
+
+    Code
+      (fit1 <- ddfMLR(DataDDF, group = "group", focal.name = 1, key = rep("A", 10)))
+    Output
+      Detection of both types of Differential Distractor
+      Functioning using multinomial log-linear regression model
+      
+      Likelihood-ratio chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+             Chisq-value P-value    
+      Item1  29.5508      0.0000 ***
+      Item2   1.1136      0.8921    
+      Item3   1.0362      0.9043    
+      Item4   4.1345      0.3881    
+      Item5   7.4608      0.1134    
+      Item6  47.0701      0.0000 ***
+      Item7   1.3285      0.9701    
+      Item8   2.3629      0.8835    
+      Item9  10.4472      0.1070    
+      Item10  3.5602      0.7359    
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DDF items:
+       Item1
+       Item6
+
+# testing paper code - R Journal 2020 - LearningToLearn
+
+    Code
+      summary(LtL6_change[, 1:4])
+    Output
+       track    Item6A_changes Item6B_changes Item6C_changes
+       BS:391   00:113         00:186         00:465        
+       AS:391   10: 33         10: 33         10: 36        
+                01:431         01:414         01:252        
+                11:205         11:149         11: 29        
+
+---
+
+    Code
+      (fitex4 <- ddfMLR(Data = LtL6_change, group = "track", focal.name = "AS", key = rep(
+        "11", 8), match = zscore6))
+    Output
+      Detection of both types of Differential Distractor
+      Functioning using multinomial log-linear regression model
+      
+      Likelihood-ratio chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+                     Chisq-value P-value  
+      Item6A_changes  7.7521      0.2568  
+      Item6B_changes 15.1084      0.0194 *
+      Item6C_changes  2.2369      0.8967  
+      Item6D_changes 10.7788      0.0955 .
+      Item6E_changes 13.1187      0.0412 *
+      Item6F_changes  7.9567      0.2413  
+      Item6G_changes  9.5489      0.1450  
+      Item6H_changes  6.6121      0.3582  
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DDF items:
+       Item6B_changes
+       Item6E_changes
+

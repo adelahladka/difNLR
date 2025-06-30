@@ -174,3 +174,56 @@ test_that("ddfMLR S3 methods - checking inputs", {
   # predict - invalid dimensions
   expect_error(predict(fit1, item = "Item2", group = c(0, 1), match = c(-1, 0, 1)))
 })
+
+test_that("testing paper code - R Journal 2020 - generated data", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  set.seed(42)
+  # discrimination
+  a <- matrix(rep(runif(30, -2, -0.5), 2), ncol = 6)
+  a[1:5, c(3, 6)] <- NA
+  # difficulty
+  b <- matrix(rep(runif(30, -3, 1), 2), ncol = 6)
+  b[1:5, c(3, 6)] <- NA
+
+  a[1, 4] <- a[1, 1] - 1
+  a[1, 5] <- a[1, 2] + 1
+  b[6, 4] <- b[6, 1] - 1
+  b[6, 5] <- b[6, 2] - 1.5
+
+  DataDDF <- genNLR(N = 1000, itemtype = "nominal", a = a, b = b)
+  expect_snapshot(head(DataDDF))
+
+  # testing both DIF effects with adjacent category logit model
+  expect_snapshot((fit1 <- ddfMLR(DataDDF, group = "group", focal.name = 1, key = rep("A", 10))))
+  # saveRDS(fit1, file = "tests/testthat/fixtures/ddfMLR_RJournal_fit1.rds")
+  fit1_expected <- readRDS(test_path("fixtures", "ddfMLR_RJournal_fit1.rds"))
+  expect_equal(fit1, fit1_expected)
+
+  fit1_plot <- plot(fit1, item = fit1$DDFitems, group.names = c("Group 1", "Group 2"))
+  vdiffr::expect_doppelganger("ddfMLR_RJournal_fit1_plot1", fit1_plot[[1]])
+  vdiffr::expect_doppelganger("ddfMLR_RJournal_fit1_plot2", fit1_plot[[2]])
+})
+
+test_that("testing paper code - R Journal 2020 - LearningToLearn", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  data(LearningToLearn, package = "ShinyItemAnalysis")
+  # nominal data for changes between 6th and 9th grade
+  LtL6_change <- LearningToLearn[, c("track", paste0("Item6", LETTERS[1:8], "_changes"))]
+  expect_snapshot(summary(LtL6_change[, 1:4]))
+  # standardized total score achieved in Grade 6
+  zscore6 <- LearningToLearn$score_6
+
+  expect_snapshot((fitex4 <- ddfMLR(
+    Data = LtL6_change, group = "track", focal.name = "AS",
+    key = rep("11", 8), match = zscore6
+  )))
+  expect_equal(fitex4$DDFitems, c(2, 5))
+
+  plot1 <- plot(fitex4, item = fitex4$DDFitems)
+  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot3", plot1[[1]])
+  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot4", plot1[[2]])
+})

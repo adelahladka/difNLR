@@ -419,3 +419,139 @@
        R19
        R20
 
+# testing paper code - R Journal 2020 - generated data
+
+    Code
+      summary(DataORD)
+    Output
+       Item1   Item2   Item3   Item4   Item5       group    
+       0:488   0:376   0:417   0:530   0:556   Min.   :0.0  
+       1:229   1:237   1:331   1:226   1:253   1st Qu.:0.0  
+       2:150   2:195   2:170   2:129   2:123   Median :0.5  
+       3: 93   3:114   3: 71   3: 83   3: 47   Mean   :0.5  
+       4: 40   4: 78   4: 11   4: 32   4: 21   3rd Qu.:1.0  
+                                               Max.   :1.0  
+
+---
+
+    Code
+      (fit1 <- difORD(DataORD, group = "group", focal.name = 1, model = "cumulative"))
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using cumulative logit regression model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+            Chisq-value P-value   
+      Item1  7.4263      0.0244 * 
+      Item2 13.4267      0.0012 **
+      Item3  0.6805      0.7116   
+      Item4  5.6662      0.0588 . 
+      Item5  2.7916      0.2476   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       Item1
+       Item2
+
+---
+
+    Code
+      (fit2 <- difORD(DataORD, group = 6, focal.name = 1, model = "adjacent"))
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+            Chisq-value P-value   
+      Item1  8.9024      0.0117 * 
+      Item2 12.9198      0.0016 **
+      Item3  1.0313      0.5971   
+      Item4  4.3545      0.1134   
+      Item5  2.3809      0.3041   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       Item1
+       Item2
+
+---
+
+    Code
+      coef(fit2)[[1]]
+    Output
+                        b1        b2       b3       b4        a       bDIF1
+      estimate  0.01290771 0.6026391 1.499871 2.500063 1.776348 -0.04192627
+      CI2.5    -0.11300539 0.4593669 1.316037 2.223942 1.553720 -0.15544582
+      CI97.5    0.13882081 0.7459112 1.683704 2.776184 1.998976  0.07159328
+                     bDIF2       bDIF3      bDIF4       aDIF
+      estimate -0.12056646 -0.24021154 -0.3735864 0.27332175
+      CI2.5    -0.22781499 -0.39912272 -0.6281280 0.04802373
+      CI97.5   -0.01331792 -0.08130036 -0.1190447 0.49861976
+
+---
+
+    Code
+      coef(fit2, IRTpars = FALSE)[[1]]
+    Output
+               (Intercept):1 (Intercept):2 (Intercept):3 (Intercept):4        x
+      estimate   -0.02292859    -1.0704966     -2.664292     -4.440982 1.776348
+      CI2.5      -0.24583456    -1.3476911     -3.079675     -5.059781 1.553720
+      CI97.5      0.19997739    -0.7933022     -2.248909     -3.822182 1.998976
+                     group    x:group
+      estimate  0.08240705 0.27332175
+      CI2.5    -0.13183983 0.04802373
+      CI97.5    0.29665392 0.49861976
+
+# testing paper code - R Journal 2020 - LearningToLearn
+
+    Code
+      summary(LtL6_change_ord[, 1:4])
+    Output
+       track    Item6A_changes Item6B_changes Item6C_changes
+       BS:391   0: 33          0: 33          0: 36         
+       AS:391   1:318          1:335          1:494         
+                2:431          2:414          2:252         
+
+---
+
+    Code
+      (fitex5 <- difORD(Data = LtL6_change_ord, group = "track", focal.name = "AS",
+        model = "adjacent", match = zscore6))
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+                     Chisq-value P-value  
+      Item6A_changes 5.5961      0.0609  .
+      Item6B_changes 7.8798      0.0194  *
+      Item6C_changes 1.1242      0.5700   
+      Item6D_changes 7.7136      0.0211  *
+      Item6E_changes 8.6452      0.0133  *
+      Item6F_changes 5.6488      0.0593  .
+      Item6G_changes 0.8469      0.6548   
+      Item6H_changes 0.6567      0.7201   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       Item6B_changes
+       Item6D_changes
+       Item6E_changes
+

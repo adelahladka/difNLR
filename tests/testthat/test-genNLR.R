@@ -67,7 +67,7 @@ test_that("genNLR - checking inputs", {
   # invalid dimensions in dich itemtype
   expect_error(genNLR(N = 300, a = a[-1, ], b = b, c = c, d = d))
   expect_error(genNLR(N = 300, a = cbind(a, a), b = b, c = c, d = d))
-  expect_error(genNLR(N = 300, a = cbind(a, a), b = cbind(b, b), c = c, d = d))
+  expect_error(genNLR(N = 300, a = a, b = cbind(b, b), c = c, d = d))
   expect_error(genNLR(N = 300, a = a, b = b, c = cbind(c, c), d = d))
   expect_error(genNLR(N = 300, a = a, b = b, d = cbind(d, d)))
   # missing values in item parameters in dich itemtype
@@ -92,4 +92,28 @@ test_that("genNLR - checking inputs", {
   a <- matrix(runif(28 * 5, 0.8, 2), ncol = 28)
   b <- matrix(runif(28 * 5, -2, 2), ncol = 28)
   expect_error(genNLR(N = 300, itemtype = "nominal", a = a, b = b))
+})
+
+test_that("genNLR - further examples", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  # seed
+  set.seed(123)
+  # generating parameters for dichotomous data with DIF, 5 items
+  a <- runif(5, 0.8, 2)
+  b <- runif(5, -2, 2)
+  c <- runif(5, 0, 0.25)
+  d <- runif(5, 0.8, 1)
+  # generating dichotomous data set with 300 observations (150 each group)
+  set.seed(123)
+  expect_snapshot((df1 <- genNLR(N = 300, a = a, b = b, c = c, d = d)))
+
+  a <- matrix(a, ncol = 1)
+  b <- matrix(b, ncol = 1)
+  c <- matrix(c, ncol = 1)
+  d <- matrix(d, ncol = 1)
+  set.seed(123)
+  expect_snapshot((df2 <- genNLR(N = 300, a = a, b = b, c = c, d = d)))
+  expect_equal(df1, df2)
 })

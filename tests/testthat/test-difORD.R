@@ -194,3 +194,74 @@ test_that("difORD S3 methods - checking inputs", {
   # predict - invalid dimensions
   expect_error(predict(fit1, item = "Item2", group = c(0, 1), match = c(-1, 0, 1)))
 })
+
+test_that("testing paper code - R Journal 2020 - generated data", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  set.seed(42)
+  # discrimination
+  a <- matrix(rep(runif(5, 0.25, 1), 8), ncol = 8)
+  # difficulty
+  b <- t(sapply(1:5, function(i) rep(sort(runif(4, -1, 1)), 2)))
+
+  b[1, 5:8] <- b[1, 5:8] + 0.1
+  a[2, 5:8] <- a[2, 5:8] - 0.2
+
+  DataORD <- genNLR(N = 1000, itemtype = "ordinal", a = a, b = b)
+  expect_snapshot(summary(DataORD))
+
+
+  expect_snapshot((fit1 <- difORD(DataORD, group = "group", focal.name = 1, model = "cumulative")))
+  # saveRDS(fit1, file = "tests/testthat/fixtures/difORD_RJournal_fit1.rds")
+  fit1_expected <- readRDS(test_path("fixtures", "difORD_RJournal_fit1.rds"))
+  expect_equal(fit1, fit1_expected)
+
+  fit1_plot1 <- plot(fit1, item = "Item1", plot.type = "cumulative")[[1]]
+  vdiffr::expect_doppelganger("difORD_RJournal_fit1_plot1", fit1_plot1)
+  fit1_plot2 <- plot(fit1, item = "Item1", plot.type = "category")[[1]]
+  vdiffr::expect_doppelganger("difORD_RJournal_fit1_plot2", fit1_plot2)
+
+  expect_snapshot((fit2 <- difORD(DataORD, group = 6, focal.name = 1, model = "adjacent")))
+  # saveRDS(fit2, file = "tests/testthat/fixtures/difORD_RJournal_fit2.rds")
+  fit2_expected <- readRDS(test_path("fixtures", "difORD_RJournal_fit2.rds"))
+  expect_equal(fit2, fit2_expected)
+
+  fit2_plot <- plot(fit2, item = fit2$DIFitems)
+  vdiffr::expect_doppelganger("difORD_RJournal_fit2_plot1", fit2_plot[[1]])
+  vdiffr::expect_doppelganger("difORD_RJournal_fit2_plot2", fit2_plot[[2]])
+
+  expect_snapshot(coef(fit2)[[1]])
+  expect_snapshot(coef(fit2, IRTpars = FALSE)[[1]])
+})
+
+test_that("testing paper code - R Journal 2020 - LearningToLearn", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  data(LearningToLearn, package = "ShinyItemAnalysis")
+  # nominal data for changes between 6th and 9th grade
+  LtL6_change <- LearningToLearn[, c("track", paste0("Item6", LETTERS[1:8], "_changes"))]
+  # ordinal data for change between Grade 6 and 9
+  LtL6_change_ord <- data.frame(
+    track = LtL6_change$track,
+    lapply(
+      LtL6_change[, -1],
+      function(x) factor(ifelse(x == "10", 0, ifelse(x == "01", 2, 1)))
+    )
+  )
+  expect_snapshot(summary(LtL6_change_ord[, 1:4]))
+  # standardized total score achieved in Grade 6
+  zscore6 <- LearningToLearn$score_6
+
+  expect_snapshot((fitex5 <- difORD(
+    Data = LtL6_change_ord, group = "track", focal.name = "AS",
+    model = "adjacent", match = zscore6
+  )))
+  expect_equal(fitex5$DIFitems, c(2, 4, 5))
+
+  plot1 <- plot(fitex5, item = fitex5$DIFitems)
+  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot5", plot1[[1]])
+  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot6", plot1[[2]])
+  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot7", plot1[[3]])
+})

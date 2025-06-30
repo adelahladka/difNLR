@@ -158,49 +158,37 @@ test_that("difNLR - checking inputs", {
   Data <- GMAT[, 1:20] # items
   group <- GMAT[, "group"] # group membership variable
 
+  # purification
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", purify = list()))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", purify = TRUE, nrIter = -10))
+  # invalid test
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", test = "XXX"))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", test = TRUE))
+  # invalid significance level
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", alpha = 30))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", alpha = logical()))
+  # p-adjust method
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", p.adjust.method = "holoms"))
+  # sandwich
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", sandwich = 42))
+  # invalid method
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", method = "ffff"))
+  expect_message(difNLR(Data, group, focal.name = 1, model = "3PL", method = "likelihood"))
+  # invalid combination of method and sandwich - warning
+  expect_warning(difNLR(Data[, 1], group, focal.name = 1, model = "2PL", method = "mle", sandwich = TRUE, match = GMAT$criterion))
+
   # different dimensions
   expect_error(difNLR(Data, group[-c(1:3)], focal.name = 1, model = "3PL"))
   expect_error(difNLR(Data, group, match = group[-c(1:3)], focal.name = 1, model = "3PL"))
   expect_error(difNLR(Data[1:1999, 1], group, focal.name = 1, model = "3PL"))
   expect_error(difNLR(Data = rep(NA, 2000), group, focal.name = 1, model = "3PL"))
   expect_error(difNLR(Data = c(Data[1:1000, 1], rep(NA, 1000)), group = c(rep(NA, 1000), group[1:1000]), focal.name = 1, model = "3PL"))
-  # invalid model
-  expect_error(difNLR(Data, group, focal.name = 1, model = "5PL"))
-  expect_error(difNLR(Data, group, focal.name = 1))
-  # invalid combination of DIF type and model
-  expect_error(difNLR(Data, group, focal.name = 1, model = "1PL", type = "nudif"))
-  expect_error(difNLR(Data, group, focal.name = 1, model = "Rasch", type = "nudif"))
-  # invalid combination of purification and external matching
-  expect_error(difNLR(Data, group, match = group, focal.name = 1, model = "3PL", purify = TRUE))
-  # invalid test
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", test = "XXX"))
-  # invalid significance level
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", alpha = 30))
-  # invalid number of nrBo with initboot
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", initboot = TRUE, nrBo = -4))
-  # invalid method
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", method = "ffff"))
-  # invalid length of type
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", type = c("udif", "nudif")))
-  # invalid type
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", type = c("abx")))
-  # invalid length of constraints
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", constraints = c("a", "b")))
-  # invalid constraints
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", constraints = c("abx")))
-  # invalid combination of type and constraints
-  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", constraints = "a", type = "a"))
-
-  # # invalid combination of method and sandwich
-  # expect_warning(difNLR(Data, group, focal.name = 1, model = "3PL", method = "plf", sandwich = TRUE))
-
-  # different ways to input group
-  fit1 <- difNLR(GMAT[, 1:20], GMAT$group, focal.name = 1, model = "3PL")
-  fit2 <- difNLR(GMAT[, 1:21], "group", focal.name = 1, model = "3PL")
-  fit3 <- difNLR(GMAT[, 1:21], 21, focal.name = 1, model = "3PL")
-  expect_equal(fit1, fit2)
-  expect_equal(fit1, fit3)
-
+  # NA removing - warning
+  df <- Data[, 1]
+  df[1:20] <- NA
+  expect_warning(difNLR(df, group, focal.name = 1, model = "2PL", match = GMAT$criterion))
+  # invalid focal.name
+  expect_error(difNLR(Data, group, focal.name = 5, model = "3PL"))
   # invalid group
   set.seed(42)
   expect_error(difNLR(Data, rbinom(nrow(Data), 4, prob = runif(nrow(Data))), focal.name = 1, model = "3PL"))
@@ -208,8 +196,34 @@ test_that("difNLR - checking inputs", {
   expect_error(difNLR(Data[-c(1:4), 1], group, match = GMAT$criterion, focal.name = 1, model = "3PL"))
   expect_error(difNLR(Data[-c(1:4), ], group, focal.name = 1, model = "3PL"))
 
-  # invalid length of model
+  # invalid model
+  expect_error(difNLR(Data, group, focal.name = 1, model = "5PL"))
+  expect_error(difNLR(Data, group, focal.name = 1))
   expect_error(difNLR(Data, group, focal.name = 1, model = c("3PL", "2PL")))
+  # invalid combination of DIF type and model
+  expect_error(difNLR(Data, group, focal.name = 1, model = "1PL", type = "nudif"))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "Rasch", type = "nudif"))
+  # invalid type
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", type = list()))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", type = c("abx")))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", type = c("udif", "nudif")))
+  # invalid combination of purification and external matching
+  expect_error(difNLR(Data, group, match = group, focal.name = 1, model = "3PL", purify = TRUE))
+  # invalid constraints
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", constraints = c("abx")))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", constraints = c("a", "b")))
+  # invalid combination of type and constraints
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", constraints = "a", type = "a"))
+
+  # invalid number of nrBo with initboot
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", initboot = TRUE, nrBo = -4))
+
+  # different ways to input group
+  fit1 <- difNLR(GMAT[, 1:20], GMAT$group, focal.name = 1, model = "3PL")
+  fit2 <- difNLR(GMAT[, 1:21], "group", focal.name = 1, model = "3PL")
+  fit3 <- difNLR(GMAT[, 1:21], 21, focal.name = 1, model = "3PL")
+  expect_equal(fit1, fit2)
+  expect_equal(fit1, fit3)
 
   # invalid length of start, specifying starting values
   start <- startNLR(Data, group, model = "3PL", match = scale(apply(Data, 1, sum)), parameterization = "is")
@@ -287,6 +301,23 @@ test_that("difNLR S3 methods - checking inputs", {
   expect_error(plot(fit1, item = "Item25")[[1]])
   expect_error(plot(fit1, item = list("Item1")))
   expect_error(plot(fit1, plot.type = "XXX"))
+})
+
+test_that("difNLR S3 methods - further examples", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  # loading data
+  data(GMAT)
+  Data <- GMAT[, 1:20] # items
+  group <- GMAT[, "group"] # group membership variable
+
+  # testing both DIF effects using likelihood-ratio test and
+  # 3PL model with fixed guessing for groups
+  fit1 <- difNLR(Data, group, focal.name = 1, model = "3PL")
+
+  fit1_plot4 <- plot(fit1, item = 1, draw.CI = TRUE, draw.empirical = FALSE)[[1]]
+  vdiffr::expect_doppelganger("difNLR_fit1_plot4", fit1_plot4)
 })
 
 test_that("testing paper code - R Journal 2020 - generated data", {
@@ -500,7 +531,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
   expect_snapshot(fit14$difPur)
 })
 
-test_that("testing paper code - R Journal 2020 - generated data", {
+test_that("testing paper code - R Journal 2020 - LearningToLearn", {
   # skip_on_cran()
   # skip_on_os("linux")
 
