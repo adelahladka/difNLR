@@ -363,7 +363,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
   if (purify && (!is.numeric(nrIter) || nrIter <= 0 || nrIter %% 1 != 0)) {
     stop("'nrIter' must be a positive integer.", call. = FALSE)
   }
-  if (!test %in% c("F", "LR", "W") | !is.character(type)) {
+  if (!test %in% c("F", "LR", "W") | !is.character(test)) {
     stop("'test' must be one of 'LR', 'W', or 'F'.", call. = FALSE)
   }
   .check_numeric(alpha, "alpha", 0, 1)

@@ -359,9 +359,9 @@ vcov.estimNLR <- function(object, sandwich = FALSE, ...) {
       )
     }
   } else {
-    if (sandwich) {
-      message("Sandwich estimator of covariance is available only for method = 'nls'. ")
-    }
+    # if (sandwich) {
+    #   message("Sandwich estimator of covariance is available only for method = 'nls'. ")
+    # }
     if (inherits(object, "mle")) {
       cov.object <- tryCatch(
         {

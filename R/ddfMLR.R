@@ -665,11 +665,12 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
     df.empirical <- data.frame(
       Group = as.factor(df.empirical$group),
       Match = as.numeric(paste(df.empirical$Var2)),
-      Category = relevel(df.empirical$Var1, ref = paste(x$key[i])),
+      Category = df.empirical$Var1,
       Count = as.numeric(paste(df.empirical$Freq.1)),
       Probability = as.numeric(paste(df.empirical$Freq))
     )
-    levels(df.empirical$Category) <- paste0("P(Y = ", levels(df.empirical$Category), ")")
+    df.empirical$Category <- paste0("P(Y = ", df.empirical$Category, ")")
+    df.empirical$Category <- factor(df.empirical$Category, levels = levels(df.fitted$Category))
 
     cbPalette <- c("#ffbe33", "#34a4e5", "#ce7eaa", "#00805e", "#737373", "#f4eb71", "#0072B2", "#D55E00")
     n_col <- ceiling(n_cats / 8)

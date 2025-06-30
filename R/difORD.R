@@ -235,8 +235,8 @@ difORD <- function(Data, group, focal.name, model = "adjacent", type = "both", m
   n <- nrow(DATA)
 
   # === 3. Check DATA structure ===
-  if (!all(sapply(DATA, is.numeric) | sapply(DATA, is.ordered))) {
-    stop("'Data' must contain numeric or ordered (ordinal) responses only.", call. = FALSE)
+  if (!all(sapply(DATA, is.numeric) | sapply(DATA, is.ordered) | sapply(DATA, is.character) | sapply(DATA, is.factor))) {
+    stop("'Data' must contain numeric or ordinal responses only.", call. = FALSE)
   }
 
   # === 4. Matching criterion check ===

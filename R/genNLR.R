@@ -150,15 +150,13 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
   }
 
   if (itemtype == "dich") {
-    if (is.null(dim(a))) {
+    if (is.null(dim(a)) || ncol(a) == 1) {
       a <- cbind(a, a)
-    } else {
-      if (ncol(a) > 2) {
-        stop("Invalid dimension for 'a'. Too many columns.", call. = FALSE)
-      }
+    } else if (ncol(a) > 2) {
+      stop("Invalid dimension for 'a'. Too many columns.", call. = FALSE)
     }
     m <- nrow(a)
-    if (is.null(dim(b))) {
+    if (is.null(dim(b)) || ncol(b) == 1) {
       b <- cbind(b, b)
     } else {
       if (ncol(b) > 2) {
@@ -171,7 +169,7 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     if (is.null(c)) {
       c <- matrix(0, ncol = 2, nrow = m)
     } else {
-      if (is.null(dim(c))) {
+      if (is.null(dim(c)) || ncol(c) == 1) {
         c <- cbind(c, c)
       } else {
         if (ncol(c) > 2) {
@@ -182,7 +180,7 @@ genNLR <- function(N = 1000, ratio = 1, itemtype = "dich", a, b, c = NULL, d = N
     if (is.null(d)) {
       d <- matrix(1, ncol = 2, nrow = m)
     } else {
-      if (is.null(dim(d))) {
+      if (is.null(dim(d)) || ncol(d) == 1) {
         d <- cbind(d, d)
       } else {
         if (ncol(d) > 2) {
