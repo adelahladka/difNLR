@@ -54,11 +54,14 @@
   ggplot2::theme(
     legend.box.just = "top",
     legend.justification = c("left", "top"),
-    legend.position.inside = c(0.02, 0.98),
+    legend.position = "inside",
+    legend.position.inside = c(0, 1),
     legend.box = "horizontal",
     legend.box.margin = ggplot2::margin(3, 3, 3, 3),
     legend.key = ggplot2::element_rect(fill = "white", colour = NA),
-    legend.key.width = ggplot2::unit(0.9, "cm"),
+    legend.key.width = ggplot2::unit(0.8, "cm"),
+    legend.key.spacing = ggplot2::unit(0.1, "cm"),
+    legend.spacing.x = ggplot2::unit(0.1, "cm"),
     legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
     legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA)
   )
