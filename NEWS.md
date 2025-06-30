@@ -1,4 +1,8 @@
-# difNLR 1.5.1-3-999 (from 2025-06-12)
+# difNLR 1.5.1-4 (2025-06-30)
+
+**_THIS IS A CRAN VERSION_**
+
+*It includes versions 1.5.1-2 - 1.5.1-4*
 
 ## Bug fixes
   * Minor bug in the `plot()` S3 method for the `ddfMLR()` was fixed. Categories

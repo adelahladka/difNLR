@@ -47,8 +47,8 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.5.1-3\cr
-#' Date: 2025-06-08\cr
+#' Version: 1.5.1-4\cr
+#' Date: 2025-06-30\cr
 #' Depends: R (>= 4.0.0)\cr
 #' Imports: calculus, ggplot2 (>= 3.4.0), msm, nnet, plyr, stats, VGAM\cr
 #' Suggests: ShinyItemAnalysis, testthat (>= 3.0.0), vdiffr\cr
