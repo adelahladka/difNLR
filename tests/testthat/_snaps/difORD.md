@@ -419,6 +419,100 @@
        R19
        R20
 
+# difORD - other examples
+
+    Code
+      (fit8 <- difORD(Data[, -c(2, 6, 7, 19, 20)], group, focal.name = 1))
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value 
+      R1  1.6404      0.4403  
+      R3  0.0320      0.9841  
+      R4  0.0008      0.9996  
+      R5  0.8556      0.6520  
+      R8  0.7217      0.6971  
+      R9  2.7545      0.2523  
+      R10 4.2581      0.1190  
+      R11 2.8458      0.2410  
+      R12 3.7298      0.1549  
+      R13 1.2787      0.5276  
+      R14 0.4712      0.7901  
+      R15 1.9018      0.3864  
+      R16 4.1030      0.1285  
+      R17 2.2937      0.3176  
+      R18 0.1617      0.9223  
+      R21 2.7952      0.2472  
+      R22 4.2428      0.1199  
+      R23 2.1986      0.3331  
+      R24 0.7738      0.6792  
+      R25 0.5600      0.7558  
+      R26 0.6024      0.7399  
+      R27 0.7387      0.6912  
+      R28 4.2304      0.1206  
+      R29 3.1896      0.2030  
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      None of items is detected as DIF
+
+---
+
+    Code
+      difORD(Data[, -c(1, 2, 9)], group, focal.name = 1, purify = TRUE)
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was applied with 1 iteration
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value   
+      R3   0.0821      0.9598   
+      R4   0.0169      0.9916   
+      R5   0.8245      0.6622   
+      R6   8.4757      0.0144 * 
+      R7   9.3900      0.0091 **
+      R8   0.7862      0.6750   
+      R10  4.9074      0.0860 . 
+      R11  2.8545      0.2400   
+      R12  3.9523      0.1386   
+      R13  1.4053      0.4953   
+      R14  0.3149      0.8543   
+      R15  1.7206      0.4230   
+      R16  3.8803      0.1437   
+      R17  1.9476      0.3777   
+      R18  0.1024      0.9501   
+      R19  8.1194      0.0173 * 
+      R20 10.3655      0.0056 **
+      R21  2.9738      0.2261   
+      R22  3.8193      0.1481   
+      R23  2.1419      0.3427   
+      R24  0.8296      0.6605   
+      R25  0.5562      0.7572   
+      R26  0.8007      0.6701   
+      R27  0.7215      0.6972   
+      R28  4.0558      0.1316   
+      R29  3.5816      0.1668   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       R6
+       R7
+       R19
+       R20
+
 # testing paper code - R Journal 2020 - generated data
 
     Code

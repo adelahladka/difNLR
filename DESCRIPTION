@@ -23,7 +23,7 @@ Suggests:
 Description: Detection of differential item functioning (DIF) among dichotomously scored items and differential distractor functioning (DDF) among unscored items with non-linear regression  procedures based on generalized logistic regression models (Hladka & Martinkova, 2020, <doi:10.32614/RJ-2020-014>).
 License: GPL-3
 LazyData: yes
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 BugReports: https://github.com/adelahladka/difNLR/issues
 Encoding: UTF-8
 Config/testthat/edition: 3

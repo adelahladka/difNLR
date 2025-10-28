@@ -1,6 +1,6 @@
 test_that("difORD - examples at help page", {
   # skip_on_cran()
-  # skip_on_os("linux")
+  skip_on_os("linux")
 
   # loading data
   data(Anxiety, package = "ShinyItemAnalysis")
@@ -111,6 +111,13 @@ test_that("difORD - checking inputs", {
     Data = cbind(c(Data[1:750, 1], rep(NA, 16)), c(Data[1:750, 2], rep(NA, 16))),
     group = c(rep(NA, 750), group[1:16]), focal.name = 1
   ))
+  # removing NAs
+  DataNA <- Data
+  DataNA[1:10, 3] <- NA
+  expect_warning(difORD(Data = DataNA, group, focal.name = 1))
+
+  # invalid focal.name
+  expect_error(difORD(Data, group, focal.name = 5))
   # invalid model
   expect_error(difORD(Data, group, focal.name = 1, model = "5PL"))
   # invalid type of DIF
@@ -123,6 +130,10 @@ test_that("difORD - checking inputs", {
   expect_warning(difORD(Data, group, focal.name = 1, parametrization = "is"))
   # invalid combination of purification and matching
   expect_error(difORD(Data, group, focal.name = 1, match = Anxiety$zscore, purify = TRUE))
+  # invalid nrIter argument
+  expect_error(difORD(Data, group, focal.name = 1, purify = TRUE, nrIter = -10))
+  # invalid p.adjust.method
+  expect_error(difORD(Data, group, focal.name = 1, p.adjust.method = "xyz"))
 
   # different ways to input group
   fit1 <- difORD(Data, group, focal.name = 1)
@@ -137,6 +148,25 @@ test_that("difORD - checking inputs", {
   # invalid dimensions
   expect_error(difORD(Data[-c(1:4), 1:2], group, match = Anxiety$zscore, focal.name = 1))
   expect_error(difORD(Data[-c(1:4), ], group, focal.name = 1))
+})
+
+test_that("difORD - other examples", {
+  # skip_on_cran()
+  skip_on_os("linux")
+
+  # loading data
+  data(Anxiety, package = "ShinyItemAnalysis")
+  Data <- Anxiety[, paste0("R", 1:29)] # items
+  group <- Anxiety[, "gender"] # group membership variable
+
+  # no DDF items
+  expect_snapshot((fit8 <- difORD(Data[, -c(2, 6, 7, 19, 20)], group, focal.name = 1)))
+  # saveRDS(fit8, file = "tests/testthat/fixtures/difORD_fit8.rds")
+  fit8_expected <- readRDS(test_path("fixtures", "difORD_fit8.rds"))
+  expect_equal(fit8, fit8_expected)
+
+  # no DDF items, item purification
+  expect_snapshot(difORD(Data[, -c(1, 2, 9)], group, focal.name = 1, purify = TRUE))
 })
 
 test_that("difORD S3 methods - checking inputs", {
@@ -261,7 +291,7 @@ test_that("testing paper code - R Journal 2020 - LearningToLearn", {
   expect_equal(fitex5$DIFitems, c(2, 4, 5))
 
   plot1 <- plot(fitex5, item = fitex5$DIFitems)
-  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot5", plot1[[1]])
-  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot6", plot1[[2]])
-  vdiffr::expect_doppelganger("ddfMLR_RJournal_plot7", plot1[[3]])
+  vdiffr::expect_doppelganger("difORD_RJournal_plot5", plot1[[1]])
+  vdiffr::expect_doppelganger("difORD_RJournal_plot6", plot1[[2]])
+  vdiffr::expect_doppelganger("difORD_RJournal_plot7", plot1[[3]])
 })

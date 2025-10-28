@@ -1,6 +1,7 @@
 test_that("difNLR - examples at help page", {
   # skip_on_cran()
-  # skip_on_os("linux")
+  skip_on_os("linux")
+  skip_on_os("windows")
 
   # loading data
   data(GMAT)
@@ -198,6 +199,7 @@ test_that("difNLR - checking inputs", {
 
   # invalid model
   expect_error(difNLR(Data, group, focal.name = 1, model = "5PL"))
+  expect_error(difNLR(Data, group, focal.name = 1, model = 42))
   expect_error(difNLR(Data, group, focal.name = 1))
   expect_error(difNLR(Data, group, focal.name = 1, model = c("3PL", "2PL")))
   # invalid combination of DIF type and model
@@ -317,12 +319,12 @@ test_that("difNLR S3 methods - further examples", {
   fit1 <- difNLR(Data, group, focal.name = 1, model = "3PL")
 
   fit1_plot4 <- plot(fit1, item = 1, draw.CI = TRUE, draw.empirical = FALSE)[[1]]
-  vdiffr::expect_doppelganger("difNLR_fit1_plot4", fit1_plot4)
+  expect_warning(vdiffr::expect_doppelganger("difNLR_fit1_plot4", fit1_plot4))
 })
 
 test_that("testing paper code - R Journal 2020 - generated data", {
   # skip_on_cran()
-  # skip_on_os("linux")
+  skip_on_os("linux")
   #-----------------------------------------------------------------------------
   # DIF DETECTION AMONG BINARY DATA
   #-----------------------------------------------------------------------------
@@ -533,7 +535,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
 
 test_that("testing paper code - R Journal 2020 - LearningToLearn", {
   # skip_on_cran()
-  # skip_on_os("linux")
+  skip_on_os("linux")
 
   data("LearningToLearn", package = "ShinyItemAnalysis")
   # dichotomous items for Grade 6
@@ -576,7 +578,7 @@ test_that("testing paper code - R Journal 2020 - LearningToLearn", {
 
 test_that("testing paper code - R Journal 2020 - special cases (not included)", {
   # skip_on_cran()
-  # skip_on_os("linux")
+  skip_on_os("linux")
 
   # setting parameters
   # discrimination

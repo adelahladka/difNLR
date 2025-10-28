@@ -63,10 +63,10 @@
 <text x='45.61' y='36.97' style='font-size: 11.00px; font-family: sans;' textLength='30.58px' lengthAdjust='spacingAndGlyphs'>Group</text>
 <rect x='45.61' y='40.95' width='22.68' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <line x1='47.88' y1='49.59' x2='66.02' y2='49.59' style='stroke-width: 1.71; stroke: #1C86EE; stroke-linecap: butt;' />
-<rect x='46.32' y='41.66' width='21.26' height='15.86' style='stroke-width: 1.07; stroke: #1C86EE; stroke-linecap: butt; stroke-linejoin: miter; fill: #1C86EE; fill-opacity: 0.25;' />
+<rect x='46.32' y='41.66' width='21.26' height='15.86' style='stroke-width: 1.07; stroke: #1C86EE; stroke-linecap: butt; fill: #1C86EE; fill-opacity: 0.25;' />
 <rect x='45.61' y='58.23' width='22.68' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <line x1='47.88' y1='66.87' x2='66.02' y2='66.87' style='stroke-width: 1.71; stroke: #EEB422; stroke-dasharray: 9.10,9.10; stroke-linecap: butt;' />
-<rect x='46.32' y='58.94' width='21.26' height='15.86' style='stroke-width: 1.07; stroke: #EEB422; stroke-linecap: butt; stroke-linejoin: miter; fill: #EEB422; fill-opacity: 0.25;' />
+<rect x='46.32' y='58.94' width='21.26' height='15.86' style='stroke-width: 1.07; stroke: #EEB422; stroke-linecap: butt; fill: #EEB422; fill-opacity: 0.25;' />
 <text x='71.12' y='52.62' style='font-size: 8.80px; font-family: sans;' textLength='40.61px' lengthAdjust='spacingAndGlyphs'>Reference</text>
 <text x='71.12' y='69.90' style='font-size: 8.80px; font-family: sans;' textLength='21.52px' lengthAdjust='spacingAndGlyphs'>Focal</text>
 <text x='40.13' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='33.02px' lengthAdjust='spacingAndGlyphs'>Item1</text>

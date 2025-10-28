@@ -60,7 +60,7 @@ test_that("ddfMLR - examples at help page", {
   expect_equal(fit4, fit4_expected)
 
   # testing non-uniform DDF effects
-  expect_snapshot((fit5 <- ddfMLR(Data, group, key, focal.name = 1, type = "udif")))
+  expect_snapshot((fit5 <- ddfMLR(Data, group, key, focal.name = 1, type = "nudif")))
   # saveRDS(fit5, file = "tests/testthat/fixtures/ddfMLR_fit5.rds")
   fit5_expected <- readRDS(test_path("fixtures", "ddfMLR_fit5.rds"))
   expect_equal(fit5, fit5_expected)
@@ -82,6 +82,9 @@ test_that("ddfMLR - checking inputs", {
   group <- GMATtest[, "group"] # group membership variable
   key <- GMATkey # correct answers
 
+  # deprecated arguments
+  expect_warning(ddfMLR(Data, group, key, focal.name = 1, parametrization = "xyz"))
+
   # different dimensions
   expect_error(ddfMLR(Data, group[-c(1:3)], key, focal.name = 1))
   expect_error(ddfMLR(Data, group, key, match = group[-c(1:3)], focal.name = 1))
@@ -95,6 +98,13 @@ test_that("ddfMLR - checking inputs", {
     Data = cbind(c(Data[1:1000, 1], rep(NA, 1000)), c(Data[1:1000, 2], rep(NA, 1000))),
     group = c(rep(NA, 1000), group[1001:2000]), key[1:2], focal.name = 1
   ))
+  # removing NAs
+  DataNA <- Data
+  DataNA[1:10, 3] <- NA
+  expect_warning(ddfMLR(Data = DataNA, group, key, focal.name = 1))
+
+  # invalid focal.name
+  expect_error(ddfMLR(Data, group, key, focal.name = "xxx"))
   # invalid type of DIF
   expect_error(ddfMLR(Data, group, key, focal.name = 1, type = "xxx"))
   # invalid match
@@ -105,6 +115,10 @@ test_that("ddfMLR - checking inputs", {
   expect_error(ddfMLR(Data, group, key, focal.name = 1, purify = TRUE, match = GMATtest$criterion))
   # deprecated parametrization
   expect_warning(ddfMLR(Data, group, key, focal.name = 1, parametrization = "is"))
+  # invalid nrIter argument
+  expect_error(ddfMLR(Data, group, key, focal.name = 1, purify = TRUE, nrIter = -10))
+  # invalid p.adjust.method
+  expect_error(ddfMLR(Data, group, key, focal.name = 1, p.adjust.method = "xyz"))
 
   # different ways to input group
   fit1 <- ddfMLR(Data, group, key, focal.name = 1)
@@ -113,9 +127,35 @@ test_that("ddfMLR - checking inputs", {
   expect_equal(fit1, fit2)
   expect_equal(fit1, fit3)
 
+  # different ways to input key
+  fit4 <- ddfMLR(Data, group, as.data.frame(key), focal.name = 1)
+  expect_equal(fit1, fit4)
+  # NA values in key
+  expect_error(ddfMLR(Data, group, c(NA, key[-1]), focal.name = 1))
+
   # invalid group
   set.seed(42)
   expect_error(ddfMLR(Data, rbinom(nrow(Data), 4, prob = runif(nrow(Data))), key, focal.name = 1))
+})
+
+test_that("ddfMLR - other examples", {
+  # skip_on_cran()
+  # skip_on_os("linux")
+
+  # loading data
+  data(GMATtest, GMATkey)
+  Data <- GMATtest[, 1:20] # items
+  group <- GMATtest[, "group"] # group membership variable
+  key <- GMATkey # correct answers
+
+  # no DDF items
+  expect_snapshot((fit7 <- ddfMLR(Data[, -c(1, 2, 9)], group, key[-c(1, 2, 9)], focal.name = 1)))
+  # saveRDS(fit7, file = "tests/testthat/fixtures/ddfMLR_fit7.rds")
+  fit7_expected <- readRDS(test_path("fixtures", "ddfMLR_fit7.rds"))
+  expect_equal(fit7, fit7_expected)
+
+  # no DDF items, item purification
+  expect_snapshot(ddfMLR(Data[, -c(1, 2, 9)], group, key[-c(1, 2, 9)], focal.name = 1, purify = TRUE))
 })
 
 test_that("ddfMLR S3 methods - checking inputs", {
