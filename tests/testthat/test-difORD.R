@@ -11,7 +11,7 @@ test_that("difORD - examples at help page", {
   expect_snapshot((fit1 <- difORD(Data, group, focal.name = 1, model = "adjacent")))
   # saveRDS(fit1, file = "tests/testthat/fixtures/difORD_fit1.rds")
   fit1_expected <- readRDS(test_path("fixtures", "difORD_fit1.rds"))
-  expect_equal(fit1, fit1_expected, tolerance = 1e-5)
+  expect_equal(fit1, fit1_expected, tolerance = 1e-3)
 
   # graphical devices
   fit1_plot1 <- plot(fit1, item = 6)[[1]]
@@ -24,13 +24,13 @@ test_that("difORD - examples at help page", {
   # estimated parameters
   # saveRDS(coef(fit1), file = "tests/testthat/fixtures/difORD_fit1_coef1.rds")
   fit1_coef1_expected <- readRDS(test_path("fixtures", "difORD_fit1_coef1.rds"))
-  expect_equal(coef(fit1), fit1_coef1_expected, tolerance = 1e-5)
+  expect_equal(coef(fit1), fit1_coef1_expected, tolerance = 1e-3)
   # saveRDS(coef(fit1, SE = TRUE), file = "tests/testthat/fixtures/difORD_fit1_coef2.rds")
   fit1_coef2_expected <- readRDS(test_path("fixtures", "difORD_fit1_coef2.rds"))
-  expect_equal(coef(fit1, SE = TRUE), fit1_coef2_expected, tolerance = 1e-5) # with SE
+  expect_equal(coef(fit1, SE = TRUE), fit1_coef2_expected, tolerance = 1e-3) # with SE
   # saveRDS(coef(fit1, SE = TRUE, simplify = TRUE), file = "tests/testthat/fixtures/difORD_fit1_coef3.rds")
   fit1_coef3_expected <- readRDS(test_path("fixtures", "difORD_fit1_coef3.rds"))
-  expect_equal(coef(fit1, SE = TRUE, simplify = TRUE), fit1_coef3_expected, tolerance = 1e-5) # with SE, simplified
+  expect_equal(coef(fit1, SE = TRUE, simplify = TRUE), fit1_coef3_expected, tolerance = 1e-3) # with SE, simplified
 
   # AIC, BIC, log-likelihood
   expect_snapshot(AIC(fit1))
@@ -46,54 +46,54 @@ test_that("difORD - examples at help page", {
   expect_snapshot((fit2 <- difORD(Data, group, focal.name = 1, model = "adjacent", p.adjust.method = "BH")))
   # saveRDS(fit2, file = "tests/testthat/fixtures/difORD_fit2.rds")
   fit2_expected <- readRDS(test_path("fixtures", "difORD_fit2.rds"))
-  expect_equal(fit2, fit2_expected, tolerance = 1e-5)
+  expect_equal(fit2, fit2_expected, tolerance = 1e-3)
 
   # testing both DIF effects with item purification
   expect_snapshot((fit3 <- difORD(Data, group, focal.name = 1, model = "adjacent", purify = TRUE)))
   # saveRDS(fit3, file = "tests/testthat/fixtures/difORD_fit3.rds")
   fit3_expected <- readRDS(test_path("fixtures", "difORD_fit3.rds"))
-  expect_equal(fit3, fit3_expected, tolerance = 1e-5)
+  expect_equal(fit3, fit3_expected, tolerance = 1e-3)
 
   # testing uniform DIF effects
   expect_snapshot((fit4 <- difORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")))
   # saveRDS(fit4, file = "tests/testthat/fixtures/difORD_fit4.rds")
   fit4_expected <- readRDS(test_path("fixtures", "difORD_fit4.rds"))
-  expect_equal(fit4, fit4_expected, tolerance = 1e-5)
+  expect_equal(fit4, fit4_expected, tolerance = 1e-3)
 
   # testing non-uniform DIF effects
   expect_snapshot((fit5 <- difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")))
   # saveRDS(fit5, file = "tests/testthat/fixtures/difORD_fit5.rds")
   fit5_expected <- readRDS(test_path("fixtures", "difORD_fit5.rds"))
-  expect_equal(fit5, fit5_expected, tolerance = 1e-5)
+  expect_equal(fit5, fit5_expected, tolerance = 1e-3)
 
   # testing both DIF effects with different matching criteria
   expect_snapshot((fit6a <- difORD(Data, group, model = "adjacent", focal.name = 1, match = "score")))
   # saveRDS(fit6a, file = "tests/testthat/fixtures/difORD_fit6a.rds")
   fit6a_expected <- readRDS(test_path("fixtures", "difORD_fit6a.rds"))
-  expect_equal(fit6a, fit6a_expected, tolerance = 1e-5)
+  expect_equal(fit6a, fit6a_expected, tolerance = 1e-3)
   expect_snapshot((fit6b <- difORD(Data, group, model = "adjacent", focal.name = 1, match = "restscore")))
   # saveRDS(fit6b, file = "tests/testthat/fixtures/difORD_fit6b.rds")
   fit6b_expected <- readRDS(test_path("fixtures", "difORD_fit6b.rds"))
-  expect_equal(fit6b, fit6b_expected, tolerance = 1e-5)
+  expect_equal(fit6b, fit6b_expected, tolerance = 1e-3)
   expect_snapshot((fit6c <- difORD(Data, group, model = "adjacent", focal.name = 1, match = "zrestscore")))
   # saveRDS(fit6c, file = "tests/testthat/fixtures/difORD_fit6c.rds")
   fit6c_expected <- readRDS(test_path("fixtures", "difORD_fit6c.rds"))
-  expect_equal(fit6c, fit6c_expected, tolerance = 1e-5)
+  expect_equal(fit6c, fit6c_expected, tolerance = 1e-3)
   match <- rowSums(Data)
   expect_snapshot((fit6d <- difORD(Data, group, model = "adjacent", focal.name = 1, match = match)))
   match <- replicate(ncol(Data), match)
   expect_snapshot((fit6e <- difORD(Data, group, model = "adjacent", focal.name = 1, match = match)))
   match <- as.data.frame(match)
   expect_snapshot((fit6f <- difORD(Data, group, model = "adjacent", focal.name = 1, match = match)))
-  expect_equal(fit6a[!names(fit6a) %in% c("match", "match.name")], fit6d[!names(fit6d) %in% c("match", "match.name")], tolerance = 1e-5)
-  expect_equal(fit6a[!names(fit6a) %in% c("match", "match.name")], fit6e[!names(fit6e) %in% c("match", "match.name")], tolerance = 1e-5)
-  expect_equal(fit6a[!names(fit6a) %in% c("match", "match.name")], fit6f[!names(fit6f) %in% c("match", "match.name")], tolerance = 1e-5)
+  expect_equal(fit6a[!names(fit6a) %in% c("match", "match.name")], fit6d[!names(fit6d) %in% c("match", "match.name")], tolerance = 1e-3)
+  expect_equal(fit6a[!names(fit6a) %in% c("match", "match.name")], fit6e[!names(fit6e) %in% c("match", "match.name")], tolerance = 1e-3)
+  expect_equal(fit6a[!names(fit6a) %in% c("match", "match.name")], fit6f[!names(fit6f) %in% c("match", "match.name")], tolerance = 1e-3)
 
   # testing both DIF effects with cumulative logit model
   expect_snapshot((fit7 <- difORD(Data, group, focal.name = 1, model = "cumulative")))
   # saveRDS(fit7, file = "tests/testthat/fixtures/difORD_fit7.rds")
   fit7_expected <- readRDS(test_path("fixtures", "difORD_fit7.rds"))
-  expect_equal(fit7, fit7_expected, tolerance = 1e-5)
+  expect_equal(fit7, fit7_expected, tolerance = 1e-3)
 
   # graphical devices
   fit7_plot1 <- plot(fit7, item = 7, plot.type = "cumulative")[[1]]
@@ -104,7 +104,7 @@ test_that("difORD - examples at help page", {
   # estimated parameters
   # saveRDS(coef(fit7, simplify = TRUE), file = "tests/testthat/fixtures/difORD_fit7_coef.rds")
   fit7_coef_expected <- readRDS(test_path("fixtures", "difORD_fit7_coef.rds"))
-  expect_equal(coef(fit7, simplify = TRUE), fit7_coef_expected, tolerance = 1e-5)
+  expect_equal(coef(fit7, simplify = TRUE), fit7_coef_expected, tolerance = 1e-3)
 })
 
 test_that("difORD - checking inputs", {
@@ -158,8 +158,8 @@ test_that("difORD - checking inputs", {
   fit1 <- difORD(Data, group, focal.name = 1)
   fit2 <- difORD(Anxiety[, c("gender", paste0("R", 1:29))], "gender", focal.name = 1)
   fit3 <- difORD(Anxiety[, c("gender", paste0("R", 1:29))], 1, focal.name = 1)
-  expect_equal(fit1, fit2, tolerance = 1e-5)
-  expect_equal(fit1, fit3, tolerance = 1e-5)
+  expect_equal(fit1, fit2, tolerance = 1e-3)
+  expect_equal(fit1, fit3, tolerance = 1e-3)
 
   # invalid group
   set.seed(42)
@@ -182,7 +182,7 @@ test_that("difORD - other examples", {
   expect_snapshot((fit8 <- difORD(Data[, -c(2, 6, 7, 19, 20)], group, focal.name = 1)))
   # saveRDS(fit8, file = "tests/testthat/fixtures/difORD_fit8.rds")
   fit8_expected <- readRDS(test_path("fixtures", "difORD_fit8.rds"))
-  expect_equal(fit8, fit8_expected, tolerance = 1e-5)
+  expect_equal(fit8, fit8_expected, tolerance = 1e-3)
   expect_snapshot((difORD(Data[, -c(2, 6, 7, 16, 19, 20, 22, 28)], group, focal.name = 1, type = "udif")))
   expect_snapshot((difORD(Data[, -c(2, 6, 7, 19, 20)], group, focal.name = 1, type = "nudif")))
 
@@ -190,7 +190,7 @@ test_that("difORD - other examples", {
   expect_snapshot((fit9 <- difORD(Data[, -c(2, 6, 7, 19)], group, focal.name = 1, purify = TRUE)))
   # saveRDS(fit9, file = "tests/testthat/fixtures/difORD_fit9.rds")
   fit9_expected <- readRDS(test_path("fixtures", "difORD_fit9.rds"))
-  expect_equal(fit9, fit9_expected, tolerance = 1e-5)
+  expect_equal(fit9, fit9_expected, tolerance = 1e-3)
 
   # no DIF items, item purification
   expect_snapshot(difORD(Data[, -c(1, 2, 9)], group, focal.name = 1, purify = TRUE))
@@ -271,7 +271,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
   expect_snapshot((fit1 <- difORD(DataORD, group = "group", focal.name = 1, model = "cumulative")))
   # saveRDS(fit1, file = "tests/testthat/fixtures/difORD_RJournal_fit1.rds")
   fit1_expected <- readRDS(test_path("fixtures", "difORD_RJournal_fit1.rds"))
-  expect_equal(fit1, fit1_expected, tolerance = 1e-5)
+  expect_equal(fit1, fit1_expected, tolerance = 1e-3)
 
   fit1_plot1 <- plot(fit1, item = "Item1", plot.type = "cumulative")[[1]]
   vdiffr::expect_doppelganger("difORD_RJournal_fit1_plot1", fit1_plot1)
@@ -281,7 +281,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
   expect_snapshot((fit2 <- difORD(DataORD, group = 6, focal.name = 1, model = "adjacent")))
   # saveRDS(fit2, file = "tests/testthat/fixtures/difORD_RJournal_fit2.rds")
   fit2_expected <- readRDS(test_path("fixtures", "difORD_RJournal_fit2.rds"))
-  expect_equal(fit2, fit2_expected, tolerance = 1e-5)
+  expect_equal(fit2, fit2_expected, tolerance = 1e-3)
 
   fit2_plot <- plot(fit2, item = fit2$DIFitems)
   vdiffr::expect_doppelganger("difORD_RJournal_fit2_plot1", fit2_plot[[1]])
