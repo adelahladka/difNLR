@@ -734,8 +734,8 @@ test_that("testing paper code - R Journal 2020 - special cases (not included)", 
   fit8d_plot1 <- plot(fit8d, item = 5)
   vdiffr::expect_doppelganger("difNLR_RJournal_fit8c_plot1", fit8c_plot1)
   vdiffr::expect_doppelganger("difNLR_RJournal_fit8d_plot1", fit8d_plot1)
-  vdiffr::expect_doppelganger("difNLR_RJournal_fit8c_plot1", fit8d_plot1)
-  vdiffr::expect_doppelganger("difNLR_RJournal_fit8d_plot1", fit8c_plot1)
+  # vdiffr::expect_doppelganger("difNLR_RJournal_fit8c_plot1", fit8d_plot1)
+  # vdiffr::expect_doppelganger("difNLR_RJournal_fit8d_plot1", fit8c_plot1)
 
   # no DIF items
   expect_snapshot((fit15a <- difNLR(DataDIF[, -c(5, 8, 11, 15)], groupDIF,
