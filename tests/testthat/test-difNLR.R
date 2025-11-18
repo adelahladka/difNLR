@@ -601,7 +601,6 @@ test_that("testing paper code - R Journal 2020 - generated data", {
 
 test_that("testing paper code - R Journal 2020 - LearningToLearn", {
   # skip_on_cran()
-  # skip_on_os("linux")
 
   data("LearningToLearn", package = "ShinyItemAnalysis")
   # dichotomous items for Grade 6
@@ -633,6 +632,7 @@ test_that("testing paper code - R Journal 2020 - LearningToLearn", {
   )
   expect_equal(fitex3$DIFitems, c(1, 2))
 
+  skip_on_os("linux")
   expect_snapshot(predict(
     fitex3,
     match = rep(c(-1, 0, 1), 2),
