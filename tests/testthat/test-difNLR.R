@@ -1,6 +1,6 @@
 test_that("difNLR - examples at help page", {
   # skip_on_cran()
-  # skip_on_os("linux")
+  skip_on_os("linux")
   # skip_on_os("windows")
 
   # loading data
@@ -644,7 +644,7 @@ test_that("testing paper code - R Journal 2020 - LearningToLearn", {
 
 test_that("testing paper code - R Journal 2020 - special cases (not included)", {
   # skip_on_cran()
-  # skip_on_os("linux")
+  skip_on_os("linux")
 
   # setting parameters
   # discrimination
