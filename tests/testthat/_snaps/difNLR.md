@@ -3638,7 +3638,250 @@
 ---
 
     Code
-      (fit7 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score"))
+      (fit7a <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score"))
+    Output
+      Detection of all types of differential item functioning
+      using the generalized logistic regression model
+      
+      Generalized logistic regression likelihood ratio chi-square statistics
+      based on 3PL model with fixed guessing for groups 
+      
+      Parameters were estimated using non-linear least squares
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+             Chisq-value P-value    
+      Item1  82.0689      0.0000 ***
+      Item2  28.3232      0.0000 ***
+      Item3   0.6845      0.7102    
+      Item4   3.3055      0.1915    
+      Item5   1.1984      0.5492    
+      Item6   0.1573      0.9244    
+      Item7   8.3032      0.0157 *  
+      Item8   2.8660      0.2386    
+      Item9   0.4549      0.7966    
+      Item10  1.3507      0.5090    
+      Item11  1.2431      0.5371    
+      Item12  1.0537      0.5905    
+      Item13  4.4139      0.1100    
+      Item14  1.4940      0.4738    
+      Item15  1.3079      0.5200    
+      Item16  0.1424      0.9313    
+      Item17  3.1673      0.2052    
+      Item18  2.0206      0.3641    
+      Item19  6.2546      0.0438 *  
+      Item20  3.4871      0.1749    
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Detection thresholds: 5.9915 (significance level: 0.05)
+      
+      Items detected as DIF items:
+       Item1
+       Item2
+       Item7
+       Item19
+
+---
+
+    Code
+      (fit7b <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "restscore")
+      )
+    Message
+      Trying to recalculate starting values based on bootstrapped samples... 
+      The recalculation of starting values was successful. 
+    Output
+      Detection of all types of differential item functioning
+      using the generalized logistic regression model
+      
+      Generalized logistic regression likelihood ratio chi-square statistics
+      based on 3PL model with fixed guessing for groups 
+      
+      Parameters were estimated using non-linear least squares
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+             Chisq-value P-value    
+      Item1  75.6719      0.0000 ***
+      Item2  27.0087      0.0000 ***
+      Item3   0.6859      0.7097    
+      Item4   3.1385      0.2082    
+      Item5   0.2006      0.9046    
+      Item6   0.1170      0.9432    
+      Item7   7.5484      0.0230 *  
+      Item8   4.3590      0.1131    
+      Item9   0.3903      0.8227    
+      Item10  1.1064      0.5751    
+      Item11  0.9851      0.6111    
+      Item12  0.6209      0.7331    
+      Item13  2.5064      0.2856    
+      Item14  1.4418      0.4863    
+      Item15  1.2315      0.5402    
+      Item16  0.2056      0.9023    
+      Item17  2.9997      0.2232    
+      Item18  1.6633      0.4353    
+      Item19  5.9430      0.0512 .  
+      Item20  1.5849      0.4527    
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Detection thresholds: 5.9915 (significance level: 0.05)
+      
+      Items detected as DIF items:
+       Item1
+       Item2
+       Item7
+
+---
+
+    Code
+      (fit7c <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "zrestscore")
+      )
+    Output
+      Detection of all types of differential item functioning
+      using the generalized logistic regression model
+      
+      Generalized logistic regression likelihood ratio chi-square statistics
+      based on 3PL model with fixed guessing for groups 
+      
+      Parameters were estimated using non-linear least squares
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+             Chisq-value P-value    
+      Item1  75.6719      0.0000 ***
+      Item2  27.0087      0.0000 ***
+      Item3   0.6859      0.7097    
+      Item4   3.1385      0.2082    
+      Item5   0.2006      0.9046    
+      Item6   0.1170      0.9432    
+      Item7   7.5484      0.0230 *  
+      Item8   4.3590      0.1131    
+      Item9   0.3903      0.8227    
+      Item10  1.1064      0.5751    
+      Item11  0.9851      0.6111    
+      Item12  0.6209      0.7331    
+      Item13  2.5064      0.2856    
+      Item14  1.4418      0.4863    
+      Item15  1.2315      0.5402    
+      Item16  0.2056      0.9023    
+      Item17  2.9997      0.2232    
+      Item18  1.6633      0.4353    
+      Item19  5.9430      0.0512 .  
+      Item20  1.5849      0.4527    
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Detection thresholds: 5.9915 (significance level: 0.05)
+      
+      Items detected as DIF items:
+       Item1
+       Item2
+       Item7
+
+---
+
+    Code
+      (fit7d <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match))
+    Output
+      Detection of all types of differential item functioning
+      using the generalized logistic regression model
+      
+      Generalized logistic regression likelihood ratio chi-square statistics
+      based on 3PL model with fixed guessing for groups 
+      
+      Parameters were estimated using non-linear least squares
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+             Chisq-value P-value    
+      Item1  82.0689      0.0000 ***
+      Item2  28.3232      0.0000 ***
+      Item3   0.6845      0.7102    
+      Item4   3.3055      0.1915    
+      Item5   1.1984      0.5492    
+      Item6   0.1573      0.9244    
+      Item7   8.3032      0.0157 *  
+      Item8   2.8660      0.2386    
+      Item9   0.4549      0.7966    
+      Item10  1.3507      0.5090    
+      Item11  1.2431      0.5371    
+      Item12  1.0537      0.5905    
+      Item13  4.4139      0.1100    
+      Item14  1.4940      0.4738    
+      Item15  1.3079      0.5200    
+      Item16  0.1424      0.9313    
+      Item17  3.1673      0.2052    
+      Item18  2.0206      0.3641    
+      Item19  6.2546      0.0438 *  
+      Item20  3.4871      0.1749    
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Detection thresholds: 5.9915 (significance level: 0.05)
+      
+      Items detected as DIF items:
+       Item1
+       Item2
+       Item7
+       Item19
+
+---
+
+    Code
+      (fit7e <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match))
+    Output
+      Detection of all types of differential item functioning
+      using the generalized logistic regression model
+      
+      Generalized logistic regression likelihood ratio chi-square statistics
+      based on 3PL model with fixed guessing for groups 
+      
+      Parameters were estimated using non-linear least squares
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+             Chisq-value P-value    
+      Item1  82.0689      0.0000 ***
+      Item2  28.3232      0.0000 ***
+      Item3   0.6845      0.7102    
+      Item4   3.3055      0.1915    
+      Item5   1.1984      0.5492    
+      Item6   0.1573      0.9244    
+      Item7   8.3032      0.0157 *  
+      Item8   2.8660      0.2386    
+      Item9   0.4549      0.7966    
+      Item10  1.3507      0.5090    
+      Item11  1.2431      0.5371    
+      Item12  1.0537      0.5905    
+      Item13  4.4139      0.1100    
+      Item14  1.4940      0.4738    
+      Item15  1.3079      0.5200    
+      Item16  0.1424      0.9313    
+      Item17  3.1673      0.2052    
+      Item18  2.0206      0.3641    
+      Item19  6.2546      0.0438 *  
+      Item20  3.4871      0.1749    
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Detection thresholds: 5.9915 (significance level: 0.05)
+      
+      Items detected as DIF items:
+       Item1
+       Item2
+       Item7
+       Item19
+
+---
+
+    Code
+      (fit7f <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match))
     Output
       Detection of all types of differential item functioning
       using the generalized logistic regression model

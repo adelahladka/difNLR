@@ -16,16 +16,8 @@
 }
 
 # generalized logistic regression function
-.gNLR <- function(x, g, a, b, c, d, aDif, bDif, cDif, dDif) {
-  return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(a + aDif * g) * (x - (b + bDif * g)))))
-}
 .gNLR.is <- function(x, g, b0, b1, b2, b3, c, d, cDif, dDif) {
   return((c + cDif * g) + ((d + dDif * g) - (c + cDif * g)) / (1 + exp(-(b0 + b1 * x + b2 * g + b3 * x * g))))
-}
-
-# generalized logistic regression function without group variable
-.gNLR_group <- function(x, a, b, c, d) {
-  return(c + (d - c) / (1 + exp(-(a * (x - b)))))
 }
 
 # delta method for generalized logistic regression function
@@ -85,8 +77,8 @@
 }
 
 # checking inputs - anchor
-.resolve_anchor <- function(anchor, DATA) {
-  m <- ncol(DATA)
+.resolve_anchor <- function(anchor, Data) {
+  m <- ncol(Data)
 
   if (is.null(anchor)) {
     ANCHOR <- seq_len(m)
@@ -96,7 +88,7 @@
     }
     ANCHOR <- anchor
   } else if (is.character(anchor)) {
-    ANCHOR <- match(anchor, colnames(DATA))
+    ANCHOR <- match(anchor, colnames(Data))
     if (any(is.na(ANCHOR))) {
       stop("Some anchor item names not found in 'Data'.", call. = FALSE)
     }
@@ -108,9 +100,18 @@
 }
 
 # checking input - group
-.resolve_group <- function(Data, group) {
+.resolve_group <- function(Data, group, focal.name) {
+  # 0. standardize Data into a data.frame
+  if (is.vector(Data)) {
+    Data <- data.frame(Item1 = Data)
+  } else if (is.matrix(Data)) {
+    Data <- as.data.frame(Data)
+  } else if (!is.data.frame(Data)) {
+    stop("'Data' must be a vector, matrix, or data.frame.", call. = FALSE)
+  }
+
+  # 1. group is a column index or name
   if (length(group) == 1) {
-    # group is a column index or name
     if (is.numeric(group)) {
       if (group < 1 || group > ncol(Data)) {
         stop("'group' index is out of bounds.", call. = FALSE)
@@ -127,24 +128,147 @@
     } else {
       stop("'group' must be a column name or index, or a vector of group values.", call. = FALSE)
     }
+    # 2. group is a vector
   } else {
+    if (length(group) != nrow(Data)) {
+      stop("'group' must be of length equal to the number of rows in 'Data'.", call. = FALSE)
+    }
     # group is a standalone vector
     GROUP <- group
     DATA <- as.data.frame(Data)
   }
 
-  # Validate that group is binary
+  # validate that group is binary
   group_levels <- na.omit(unique(GROUP))
   if (length(group_levels) != 2) {
     stop("'group' must contain exactly two unique non-NA values.", call. = FALSE)
   }
+  if (!focal.name %in% group_levels) {
+    stop("'focal.name' must be a valid value from 'group'.", call. = FALSE)
+  }
+  if (group_levels[1] == focal.name) {
+    group_levels <- rev(group_levels)
+  }
+  GROUP <- as.numeric(as.factor(GROUP) == focal.name)
+  DATA <- as.data.frame(DATA)
 
-  # Check that group length matches Data rows
-  if (length(GROUP) != nrow(DATA)) {
-    stop("'group' must be of length equal to the number of rows in 'Data'.", call. = FALSE)
+  return(list(GROUP = GROUP, DATA = DATA, group_levels = group_levels))
+}
+
+# checking input - match
+.resolve_match <- function(match, Data, anchor, key = NULL) {
+  m <- ncol(Data)
+  # 1. match is predefined character option
+  if (is.character(match) && match[1] %in% c("score", "zscore", "restscore", "zrestscore")) {
+    match.name <- switch(match[1],
+                         "zscore" = "Standardized total score",
+                         "score" = "Total score",
+                         "restscore" = "Total score without tested item",
+                         "zrestscore" = "Standardized total score without tested item")
+    if (match[1] %in% c("score", "zscore")) {
+      # anchor items with item currently tested
+      MATCH <- sapply(1:m, function(item) {
+        # item_anchor <- union(anchor, item)
+        # DATA <- Data[, item_anchor, drop = FALSE]
+        DATA <- Data[, anchor, drop = FALSE]
+        if (is.null(key)) {
+          rowSums(DATA, na.rm = TRUE)
+        } else {
+          .score(DATA, key[anchor])
+        }
+
+      })
+      if (match[1] == "zscore") {
+        MATCH[] <- sapply(1:m, function(item) scale(MATCH[, item]))
+      }
+    } else if (match[1] %in% c("restscore", "zrestscore")) {
+      # anchor items without item currently tested
+      MATCH <- sapply(1:m, function(item) {
+        rest_anchor <- setdiff(anchor, item)
+        if (length(rest_anchor) == 0) {
+          stop("No items left to compute matching criterion. Try to re-specify anchor or match arguments. ", call. = FALSE)
+        } else {
+          DATA <- Data[, rest_anchor, drop = FALSE]
+          if (is.null(key)) {
+            rowSums(DATA, na.rm = TRUE)
+          } else {
+            .score(DATA, key[anchor])
+          }
+        }
+      })
+      if (match[1] == "zrestscore") {
+        MATCH[] <- sapply(1:m, function(item) scale(MATCH[, item]))
+      }
+    }
+    # 2. match is user-specified
+  } else {
+    match.name <- "Matching criterion"
+    if (is.numeric(match) && is.null(dim(match))) {
+      # 2a. numeric vector
+      if (length(match) != nrow(Data)) {
+        stop("'match' vector must have the same length as number of rows in 'Data'.", call. = FALSE)
+      }
+      MATCH <- as.data.frame(replicate(m, match))
+    } else if (is.numeric(match) && !is.null(dim(match))) {
+      # 2b. numeric matrix
+      # when match is a numeric matrix (each column is a matching for one item)
+      if (any(dim(match) != dim(Data))) {
+        if (nrow(match) == nrow(Data) && ncol(match) == 1) {
+          MATCH <- as.data.frame(replicate(m, match))
+        } else {
+          stop("'match' matrix must have the same dimensions as 'Data'.", call. = FALSE)
+        }
+      } else {
+        MATCH <- match
+      }
+    } else if (is.data.frame(match)) {
+      # 2c. numeric data.frame
+      if (!all(sapply(match, is.numeric))) {
+        stop("'match' data.frame must contain only numeric columns.", call. = FALSE)
+      }
+      if (!all(dim(match) == dim(Data))) {
+        stop("'match' data.frame must have the same dimensions as 'Data'.", call. = FALSE)
+      }
+      MATCH <- match
+    } else {
+      # 3. anything else (invalid)
+      stop("'match' must be either 'score', 'zscore', 'restscore', 'zrestscore',
+      a numeric vector of length equal to the number of rows in 'Data', or
+           a numeric matrix of the same dimension as 'Data'.", call. = FALSE)
+    }
+  }
+  MATCH <- as.data.frame(MATCH)
+  colnames(MATCH) <- paste0("MATCH", 1:m)
+
+  return(list(MATCH = MATCH, match.name = match.name))
+}
+
+# remove missing values
+.resolve_missing <- function(Data, group, match) {
+  n <- nrow(Data)
+
+  df <- data.frame(Data, group, match, check.rows = FALSE)
+  df <- df[complete.cases(df), ]
+  n_df <- nrow(df)
+
+  if (nrow(df) == 0) {
+    stop("'Data' contanins no complete cases after removing missing values.", call. = FALSE)
+  }
+  if (n_df < n) {
+    warning(
+      sprintf(
+        "%d observation%s removed due to missing values.",
+        n - n_df, ifelse(n - n_df > 1, "s were", " was")
+      ),
+      call. = FALSE
+    )
   }
 
-  return(list(GROUP = GROUP, DATA = DATA))
+  DATA <- df[, !grepl("MATCH", colnames(df)) & !grepl("group", colnames(df)), drop = FALSE]
+  GROUP <- df[["group"]]
+  MATCH <- df[, grepl("MATCH", colnames(df)), drop = FALSE]
+
+  return(list(DATA = DATA, GROUP = GROUP, MATCH = MATCH))
 }
 
 # checking input - items
@@ -232,4 +356,38 @@
     }
     stop(paste0(sprintf("'%s' must be a single numeric value ", name), bounds), call. = FALSE)
   }
+}
+# checking input - character arguments
+.check_character <- function(arg, name, values) {
+  if (!is.character(arg) | !(arg %in% values)) {
+    n_vals <- length(values)
+    values <- paste0("'", values, "'")
+    vals <- paste0(paste0(values[seq(n_vals - 1)], collapse = ", "), ifelse(n_vals == 2, " or ", ", or "), values[n_vals], ".")
+    stop(paste0(sprintf("'%s' must be either ", name), vals), call. = FALSE)
+  }
+}
+# checking input - character arguments, item specific
+.resolve_character_is <- function(arg, name, values, m) {
+  n_arg <- length(arg)
+  if (n_arg == 1) {
+    if (!is.character(arg) | !(arg %in% values)) {
+      n_vals <- length(values)
+      values <- paste0("'", values, "'")
+      vals <- paste0(paste0(values[seq(n_vals - 1)], collapse = ", "), ifelse(n_vals == 2, " or ", ", or "), values[n_vals], ".")
+      stop(paste0(sprintf("'%s' must be either ", name), vals), call. = FALSE)
+    }
+    ARG <- rep(arg, m)
+  } else {
+    if (!is.character(arg) | !(all(arg %in% values))) {
+      n_vals <- length(values)
+      values <- paste0("'", values, "'")
+      vals <- paste0(paste0(values[seq(n_vals - 1)], collapse = ", "), ifelse(n_vals == 2, " or ", ", or "), values[n_vals], ".")
+      stop(paste0(sprintf("'%s' must be either ", name), vals), call. = FALSE)
+    }
+    if (n_arg != m) {
+      stop(sprintf("'%s' must be either must be either a single value or have one value per each item.", name), call. = FALSE)
+    }
+    ARG <- arg
+  }
+  return(ARG)
 }

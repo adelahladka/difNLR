@@ -139,32 +139,17 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     )
   }
 
-  m <- dim(Data)[2]
+  m <- ncol(Data)
 
-  for (i in 1:m) {
-    Data[, i] <- as.numeric(paste(Data[, i]))
-  }
-
-  if (match[1] == "zscore") {
-    x <- c(unlist(scale(rowSums(as.data.frame(Data[, anchor])))))
-  } else {
-    if (match[1] == "score") {
-      x <- rowSums(as.data.frame(Data[, anchor]))
-    } else {
-      if (length(match) == dim(Data)[1]) {
-        x <- match
-      } else {
-        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
-             of observations in 'Data'.", call. = FALSE)
-      }
-    }
-  }
+  x <- .resolve_match(match = match, Data = Data, anchor = anchor, key = NULL)
+  x <- x$MATCH
 
   # reordering data
   uval <- lapply(Data, function(x) sort(unique(x)))
-  for (i in 1:dim(Data)[2]) {
-    Data[, i] <- factor(Data[, i], levels = uval[[i]], ordered = TRUE)
-  }
+  # for (i in 1:m) {
+  #   Data[, i] <- factor(Data[, i], levels = uval[[i]], ordered = TRUE)
+  # }
+  Data[] <- as.data.frame(sapply(1:m, function(item) factor(Data[, item], levels = uval[[item]], ordered = TRUE)))
 
   if (model == "adjacent") {
     family <- VGAM::acat(reverse = FALSE, parallel = TRUE)
@@ -173,6 +158,7 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
   }
 
   m1 <- lapply(1:m, function(i) {
+    x <- x[, i]
     switch(type,
       "both"  = VGAM::vglm(Data[, i] ~ x * group, family = family),
       "nudif" = VGAM::vglm(Data[, i] ~ x * group, family = family),
@@ -180,6 +166,7 @@ ORD <- function(Data, group, model = "adjacent", type = "both", match = "zscore"
     )
   })
   m0 <- lapply(1:m, function(i) {
+    x <- x[, i]
     switch(type,
       "both"  = VGAM::vglm(Data[, i] ~ x, family = family),
       "nudif" = VGAM::vglm(Data[, i] ~ x + group, family = family),

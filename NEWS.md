@@ -1,3 +1,30 @@
+
+# difNLR 1.5.2 (2025-11-18)
+
+**_THIS IS A CRAN VERSION_**
+
+## Major updates
+  * `match` argument of the `difNLR()`, `difORD()`, and `ddfMLR()` now handles 
+    a numeric matrix where each column represents the matching criterion for 
+    each item of `Data`.
+  * `match` argument of the `difNLR()`, `difORD()`, and `ddfMLR()` now can take
+    also values of `"restscore"` and `"zrestscore"` representing total score
+    without item being currently tested and its standardized version,
+    respectively.
+  * Argument `constraints` is now used in the `startNLR()` function when 
+    computing starting values for the `difNLR()` function.
+    
+## Minor updates
+  * Tests extended and updated. 
+  * Checking inputs of the `difNLR()`, `difORD()`, and `ddfMLR()` functions was 
+    updated.
+  * Documentation of the `difNLR()`, `difORD()`, and `ddfMLR()` functions was
+    updated; specifically for `match`, `anchor`, and `purify` arguments. New
+    output `match.name` describing name of the matching criterion for plotting 
+    was added.
+
+------
+
 # difNLR 1.5.1-4 (2025-06-30)
 
 **_THIS IS A CRAN VERSION_**
@@ -925,7 +952,7 @@
      for detecting DDF with MLR model.
   * The `difNLR()` function can handle 6 generalized logistic
      regression models with option `model`.
-  * Functions `startNLR()`, `genNLR()` ans S3 methods for class
+  * Functions `startNLR()`, `genNLR()` and S3 methods for class
      `difNLR` were changed according `difNLR()` function. S3 method
      `coef` was created.
   * New functions `NLR()` and `constrNLR()` can now calculates DIF

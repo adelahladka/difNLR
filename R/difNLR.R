@@ -41,18 +41,29 @@
 #'   algorithm based on parametric link function, and \code{"irls"} for the maximum
 #'   likelihood estimation with the iteratively reweighted least squares algorithm
 #'   (available for the \code{"2PL"} model only). See \strong{Details}.
-#' @param match character or numeric: matching criterion to be used as
-#'   an estimate of the trait. It can be either \code{"zscore"} (default,
-#'   standardized total score), \code{"score"} (total test score), or
-#'   a numeric vector of the same length as a number of observations in
-#'   the \code{Data}.
-#' @param anchor character or numeric: specification of DIF free items. Either
-#'   \code{NULL} (default), or a vector of item identifiers (integers specifying
-#'   the column number) specifying which items are currently considered as anchor
-#'   (DIF free) items. Argument is ignored if the \code{match} is not
-#'   \code{"zscore"} or \code{"score"}.
-#' @param purify logical: should the item purification be applied? (the default is
-#'   \code{FALSE}).
+#' @param match character or numeric: matching criterion to be used as an
+#'   estimate of the trait. It can be either \code{"zscore"} (default;
+#'   standardized total score), \code{"score"} (total test score),
+#'   \code{"restscore"} (total score without the tested item),
+#'   \code{"zrestscore"} (standardized total score without the tested item), a
+#'   numeric vector of the same length as a number of observations in the
+#'   \code{Data}, or a numeric matrix of the same dimensions as \code{Data}
+#'   (each column represents matching criterion for one item).
+#' @param anchor character or numeric: specification of DIF-free (anchor) items
+#'   used to compute the matching criterion (\code{match}). Can be either
+#'   \code{NULL} (default; all items are used for the calculation), or a vector
+#'   of item identifiers (integers indicating column numbers or item names in
+#'   `Data`) specifying which items are currently considered as anchor items.
+#'   This argument is ignored if the \code{match} is not \code{"zscore"},
+#'   \code{"score"}, \code{"restscore"}, or \code{"zrestscore"}. For \code{match =
+#'   "score"} or \code{match = "zscore"}, the matching criterion is computed
+#'   from the items specified in the anchor set. For \code{match = "restscore"} or
+#'   \code{match = "zrestscore"}, the same anchor items are used, except that the
+#'   item currently under test is excluded from the computation.
+#' @param purify logical: should the item purification be applied? (the default
+#'   is \code{FALSE}). Item purification is not applied when set of anchor items
+#'   in \code{anchor} is specified or when \code{match} is not \code{"zscore"},
+#'   \code{"score"}, \code{"restscore"}, or \code{"zrestscore"}.
 #' @param nrIter numeric: the maximal number of iterations in the item
 #'   purification (the default is 10).
 #' @param test character: a statistical test to be performed for DIF detection.
@@ -106,7 +117,7 @@
 #' \eqn{i}. Terms \eqn{a_{i\text{DIF}}}, \eqn{b_{i\text{DIF}}},
 #' \eqn{c_{i\text{DIF}}}, and \eqn{d_{i\text{DIF}}} then represent differences
 #' between the focal and reference groups in discrimination, difficulty,
-#' guessing, and inattention for item \eqn{i}.
+#' guessing, and inattention for item \eqn{i}, respectively.
 #'
 #' Alternatively, intercept-slope parameterization may be applied:
 #' \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{i} + c_{i\text{DIF}} \cdot G_p) +
@@ -202,6 +213,7 @@
 #'   \item{\code{group}}{the vector of group membership.}
 #'   \item{\code{group.names}}{names of groups.}
 #'   \item{\code{match}}{matching criterion.}
+#'   \item{\code{match.name}}{Name of the matching criterion.}
 #' }
 #'
 #' Several methods are available for an object of the \code{"difNLR"} class (e.g.,
@@ -325,8 +337,16 @@
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = TRUE)
 #'
 #' # testing both DIF effects using 3PL model with fixed guessing for groups
-#' # and total score as matching criterion
+#' # and different matching criteria
 #' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score")
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "restscore")
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "zrestscore")
+#' match <- rowSums(Data)
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)
+#' match <- replicate(nrow(Data), match)
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)
+#' match <- as.data.frame(match)
+#' difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)
 #'
 #' # testing uniform DIF effects using 4PL model with the same
 #' # guessing and inattention
@@ -358,131 +378,68 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
                    match = "zscore", anchor = NULL, purify = FALSE, nrIter = 10,
                    test = "LR", alpha = 0.05, p.adjust.method = "none", start,
                    initboot = TRUE, nrBo = 20, sandwich = FALSE) {
-  # === 1. Basic argument checks ===
-  .check_logical(purify, "purify")
-  if (purify && (!is.numeric(nrIter) || nrIter <= 0 || nrIter %% 1 != 0)) {
-    stop("'nrIter' must be a positive integer.", call. = FALSE)
-  }
-  if (!test %in% c("F", "LR", "W") | !is.character(test)) {
-    stop("'test' must be one of 'LR', 'W', or 'F'.", call. = FALSE)
-  }
-  .check_numeric(alpha, "alpha", 0, 1)
-  if (!p.adjust.method %in% p.adjust.methods) {
-    stop("'p.adjust.method' mus be one of: ", paste(p.adjust.methods, collapse = ", "), call. = FALSE)
-  }
-  .check_logical(sandwich, "sandwich")
-
-  # === 2. Method handling ===
-  if (method == "likelihood") {
-    method <- "mle"
-    message("Option 'likelihood' was renamed to 'mle'.")
-  }
-  if (!method %in% c("nls", "mle", "em", "plf", "irls")) {
-    stop("'method' must be one of 'nls', 'mle', 'em', 'plf', or 'irls'.", call. = FALSE)
-  }
-  if (sandwich & method != "nls") {
-    warning("'sandwich' is only supported with method = 'nls'", call. = FALSE)
-  }
-
-  # === 3. Handle group and separate from Data ===
-  group_result <- .resolve_group(Data, group)
+  # === INPUTS CHECK and PROCESSING ===
+  # === 1. Data and group check and processing ===
+  group_result <- .resolve_group(Data, group, focal.name)
   GROUP <- group_result$GROUP
   DATA <- group_result$DATA
+  group.names <- group_result$group_levels
+
   n <- nrow(DATA)
   m <- ncol(DATA)
 
-  # === 3. Check DATA structure ===
+  # checking structure of Data - binary items required
   if (!all(apply(DATA, 2, function(i) {
     length(unique(na.omit(i))) == 2
   }))) {
     stop("'Data' must contain binary responses only.", call. = FALSE)
   }
 
-  # === 4. Matching criterion check ===
-  if (!(match[1] %in% c("score", "zscore"))) {
-    if (length(match) != n) {
-      stop("'match' must be of length equal to the number of rows in 'Data'.", call. = FALSE)
-    }
-  }
-  if (purify && !(match[1] %in% c("score", "zscore"))) {
-    stop("'purify' is only allowed when 'match' is 'score' or 'zscore'.", call. = FALSE)
-  }
+  # === 2. Anchor items check and processing ===
+  ANCHOR <- .resolve_anchor(anchor, DATA)
 
-  # === 5. Handle missing data ===
-  df <- if (length(match) == n) {
-    data.frame(DATA, GROUP, match, check.names = FALSE)
-  } else {
-    data.frame(DATA, GROUP, check.names = FALSE)
-  }
+  # === 3. Matching criterion check and computation ===
+  match_result <- .resolve_match(match = match, Data = DATA, anchor = ANCHOR)
+  MATCH <- match_result$MATCH
+  match.name <- match_result$match.name
 
-  df <- df[complete.cases(df), ]
-
-  if (nrow(df) == 0) {
-    stop("'Data' contanins no complete cases after removing missing values.", call. = FALSE)
-  }
-
-  if (nrow(df) < n) {
-    warning(
-      sprintf(
-        "%d observation%s removed due to missing values.",
-        n - nrow(df), ifelse(n - nrow(df) > 1, "s were", " was")
-      ),
-      call. = FALSE
-    )
-  }
-
+  # === 4. Removing missing data ===
+  df <- .resolve_missing(Data = DATA, group = GROUP, match = MATCH)
+  DATA <- df[["DATA"]]
   GROUP <- df[["GROUP"]]
-  DATA <- df[, !(names(df) %in% c("GROUP", "match")), drop = FALSE]
-  if (length(match) == n) {
-    match <- df[["match"]]
-  }
+  MATCH <- df[["MATCH"]]
 
-  # === 6. Group re-coding based on focal.name ===
-  group.names <- na.omit(unique(GROUP))
-  if (!focal.name %in% group.names) {
-    stop("'focal.name' must be a valid value from 'group'.", call. = FALSE)
-  }
-  if (group.names[1] == focal.name) {
-    group.names <- rev(group.names)
-  }
-  GROUP <- as.numeric(as.factor(GROUP) == focal.name)
-
-  # === 7. Model and type ===
+  # === 5. Model and type ===
   if (missing(model)) {
     stop("'model' must be specified. ", call. = FALSE)
-  }
-  if (!is.character(model)) {
-    stop("'model' must be a character vector.", call. = FALSE)
-  }
-  # repeat model if a single value is provided
-  if (length(model) == 1) {
-    model <- rep(model, m)
-  } else if (length(model) != m) {
-    stop("'model' must be either a single value or have one value per each item.", call. = FALSE)
   }
   # valid models
   valid_models <- c(
     "Rasch", "1PL", "2PL", "3PLcg", "3PLdg", "3PLc", "3PL", "3PLd",
     "4PLcgdg", "4PLcgd", "4PLd", "4PLcdg", "4PLc", "4PL"
   )
-  # check that all specified models are valid
-  if (!all(model %in% valid_models)) {
-    stop("Unrecognized value in 'model'.", call. = FALSE)
+  MODEL <- .resolve_character_is(model, "model", valid_models, m)
+
+  # invalid combinations of DIF type and model
+  if (any(type == "nudif" & model %in% c("Rasch", "1PL"))) {
+    stop("Non-uniform DIF cannot be tested with the Rasch or 1PL model.", call. = FALSE)
   }
   if (!is.character(type)) {
     stop("'type' must be a character vector.", call. = FALSE)
   }
   if (length(type) == 1) {
-    type <- rep(type, m)
-  } else if (length(type) != m) {
+    TYPE <- rep(type, m)
+  } else if (length(type) == m) {
+    TYPE <- type
+  } else {
     stop("'type' must be either a single value or have one value per each item.", call. = FALSE)
   }
   # identify non-standard DIF types
   standard_types <- c("udif", "nudif", "both", "all")
-  custom_types <- type[!type %in% standard_types]
+  custom_types <- TYPE[!TYPE %in% standard_types]
   # validate custom DIF types
   if (length(custom_types) > 0) {
-    types <- lapply(type, function(t) {
+    types <- lapply(TYPE, function(t) {
       if (t %in% standard_types) {
         NA
       } else {
@@ -496,24 +453,22 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
   } else {
     types <- NULL
   }
-  # invalid combinations of DIF type and model
-  if (any(type == "nudif" & model %in% c("Rasch", "1PL"))) {
-    stop("Non-uniform DIF cannot be tested with the Rasch or 1PL model.", call. = FALSE)
-  }
 
-  # === 8. Constraints ===
+  # === 6. Constraints ===
   if (missing(constraints)) {
-    constraints <- as.list(rep(NA, m))
+    CONSTRAINTS <- as.list(rep(NA, m))
   } else {
     if (length(constraints) == 1) {
-      constraints <- rep(constraints, m)
-    } else if (length(constraints) != m) {
+      CONSTRAINTS <- rep(constraints, m)
+    } else if (length(constraints) == m) {
+      CONSTRAINTS <- constraints
+    } else {
       stop("'constraints' must be either a single value or have one per item.", call. = FALSE)
     }
     # parse each constraint string into character vectors
-    constraints <- lapply(constraints, function(x) unique(strsplit(x, "")[[1]]))
+    CONSTRAINTS <- lapply(CONSTRAINTS, function(x) unique(strsplit(x, "")[[1]]))
     # validate that constraint characters are only from a-d
-    unique_constraints <- unique(unlist(constraints))
+    unique_constraints <- unique(unlist(CONSTRAINTS))
     if (!all(na.omit(unique_constraints) %in% letters[1:4]) | all(is.na(unique_constraints))) {
       stop("'constraints' must consist of parameters 'a', 'b', 'c', and 'd' only.", call. = FALSE)
     }
@@ -521,7 +476,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     # check for overlap with DIF type (if custom types used)
     if (!is.null(types)) {
       overlap <- sapply(seq_len(m), function(i) {
-        !is.na(types[[i]][1]) && any(types[[i]] %in% constraints[[i]])
+        !is.na(types[[i]][1]) && any(types[[i]] %in% CONSTRAINTS[[i]])
       })
 
       if (any(overlap)) {
@@ -530,12 +485,52 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     }
   }
 
-  # === 9. Anchor items ===
-  ANCHOR <- .resolve_anchor(anchor, DATA)
+  # === 7. Method check ===
+  if (method == "likelihood") {
+    method <- "mle"
+    message("Option 'likelihood' was renamed to 'mle'.")
+  }
+  .check_logical(sandwich, "sandwich")
+  .check_character(method, "method", c("nls", "mle", "em", "plf", "irls"))
+  if (sandwich & method != "nls") {
+    warning("'sandwich' is only supported with method = 'nls'", call. = FALSE)
+  }
 
-  # === 10. Starting values ===
-  if (missing(start)) {
-    start <- NULL
+  # === 8. Item purification and p.adjustment check ===
+  .check_logical(purify, "purify")
+  # deactivating item purification when anchors are specified
+  if (!is.null(anchor) & purify) {
+    purify <- FALSE
+    warning("Item purification not activated as the set of anchor items is specified. ", call. = FALSE)
+  }
+  # purify only allowed when matching criterion is zscore or score
+  if (purify && !any(match[1] %in% c("zscore", "score", "restscore", "zrestscore"))) {
+    stop("'purify' is only allowed when 'match' is 'zscore' or 'score'.", call. = FALSE)
+  }
+  if (purify && (!is.numeric(nrIter) || nrIter <= 0 || nrIter %% 1 != 0)) {
+    stop("'nrIter' must be a positive integer.", call. = FALSE)
+  }
+  .check_character(p.adjust.method, "p.adjust.method", p.adjust.methods)
+
+  # === 9. Test and alpha check ===
+  .check_character(test, "test", c("LR", "W", "F"))
+  .check_numeric(alpha, "alpha", 0, 1)
+
+  # === 10. Parameterization ===
+  if (method == "irls") {
+    parameterization <- rep("logistic", m)
+  } else {
+    parameterization <- rep("is", m)
+  }
+
+  # === 11. Starting values ===
+  .check_logical(initboot)
+  .check_numeric(nrBo, "nrBo", 1, Inf)
+
+  if (method == "irls") {
+    START <- NULL
+  } else if (missing(start)) {
+    START <- startNLR(Data = DATA, group = GROUP, model = MODEL, constraints = CONSTRAINTS, match = MATCH, parameterization = parameterization)
     # starting values with bootstrapped samples, available only with the startNLR function
     if (initboot && (!is.numeric(nrBo) || length(nrBo) != 1 || nrBo < 1)) {
       stop("'nrBo' must be a positive numeric value if 'initboot' is TRUE.", call. = FALSE)
@@ -557,7 +552,7 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
     }
     # Convert IRT-style starting values to intercept-slope style
     if (all(start_names %in% c("a", "b", "aDif", "bDif", "cR", "cF", "dR", "dF"))) {
-      start <- lapply(start, function(x) {
+      START <- lapply(start, function(x) {
         pars <- c(a = 1, b = 0, aDif = 0, bDif = 0, cR = 0, cF = 0, dR = 1, dF = 1)
         pars[names(x)] <- x
         x <- unlist(pars)
@@ -570,23 +565,164 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         names(tmp) <- c("b0", "b1", "b2", "b3", "cR", "cF", "dR", "dF")
         return(tmp)
       })
+    } else {
+      START <- start
     }
   }
 
-  # === 12. Parameterization ===
-  parameterization <- rep("is", m)
+  # === DIF DETECTION ===
+  if (!purify | !(match[1] %in% c("zscore", "score", "restscore", "zrestscore")) | !is.null(anchor)) {
+    PROV <- NLR(DATA, GROUP,
+      model = MODEL, constraints = CONSTRAINTS, type = TYPE, method = method,
+      match = MATCH, anchor = ANCHOR, start = START, p.adjust.method = p.adjust.method,
+      test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
+    )
+    STATS <- PROV$Sval
+    ADJ.PVAL <- PROV$adjusted.pval
+    significant <- which(ADJ.PVAL < alpha)
 
-  # internal NLR function
-  internalNLR <- function() {
-    if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
-      PROV <- NLR(DATA, GROUP,
-        model = model, constraints = constraints, type = type, method = method,
-        match = match, anchor = ANCHOR, start = start, p.adjust.method = p.adjust.method,
-        test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
+    nlrPAR <- nlrSE <- lapply(
+      1:length(PROV$par.m1),
+      function(i) {
+        if (i %in% PROV$cf.which) {
+          structure(rep(NA, length(PROV$par.m1[[i]])),
+            names = names(PROV$par.m1[[i]])
+          )
+        } else {
+          structure(rep(0, length(PROV$par.m1[[i]])),
+            names = names(PROV$par.m1[[i]])
+          )
+        }
+      }
+    )
+    for (i in 1:length(PROV$par.m1)) {
+      if (!(i %in% PROV$cf.which)) {
+        nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
+        nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
+      }
+    }
+
+    if (length(significant) > 0) {
+      DIFitems <- significant
+      for (idif in 1:length(DIFitems)) {
+        nlrPAR[[DIFitems[idif]]] <- PROV$par.m1[[DIFitems[idif]]]
+        nlrSE[[DIFitems[idif]]] <- PROV$se.m1[[DIFitems[idif]]]
+      }
+    } else {
+      DIFitems <- "No DIF item detected"
+    }
+
+    if (any(!(TYPE %in% c("udif", "nudif", "both", "all")))) {
+      wht <- (!(TYPE %in% c("udif", "nudif", "both", "all")))
+      TYPE[wht] <- "other"
+    }
+    RES <- list(
+      Sval = STATS,
+      nlrPAR = nlrPAR, nlrSE = nlrSE,
+      parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0, llM0 = PROV$ll.m0,
+      parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1, llM1 = PROV$ll.m1,
+      DIFitems = DIFitems,
+      model = MODEL, constraints = CONSTRAINTS, type = TYPE, types = types,
+      p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
+      df = PROV$df, test = test,
+      anchor = ANCHOR,
+      purification = purify,
+      method = method,
+      conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
+      alpha = alpha,
+      Data = DATA, group = GROUP, group.names = group.names, match = MATCH, match.name = match.name
+    )
+  } else {
+    nrPur <- 0
+    difPur <- NULL
+    noLoop <- FALSE
+    prov1 <- NLR(DATA, GROUP,
+      model = MODEL, constraints = CONSTRAINTS, type = TYPE, method = method,
+      match = MATCH, anchor = ANCHOR, start = START, p.adjust.method = p.adjust.method,
+      test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
+    )
+    stats1 <- prov1$Sval
+    pval1 <- prov1$pval
+    # pval.adjust1 <- prov1$adjusted.pval
+    significant1 <- which(pval1 < alpha)
+
+    if (length(significant1) == 0) {
+      PROV <- prov1
+      STATS <- stats1
+      DIFitems <- "No DIF item detected"
+
+      nlrPAR <- nlrSE <- lapply(
+        1:length(PROV$par.m1),
+        function(i) {
+          if (i %in% PROV$cf.which) {
+            structure(rep(NA, length(PROV$par.m1[[i]])),
+              names = names(PROV$par.m1[[i]])
+            )
+          } else {
+            structure(rep(0, length(PROV$par.m1[[i]])),
+              names = names(PROV$par.m1[[i]])
+            )
+          }
+        }
       )
-      STATS <- PROV$Sval
-      ADJ.PVAL <- PROV$adjusted.pval
-      significant <- which(ADJ.PVAL < alpha)
+      for (i in 1:length(PROV$par.m1)) {
+        if (!(i %in% PROV$cf.which)) {
+          nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
+          nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
+        }
+      }
+      noLoop <- TRUE
+    } else {
+      dif <- significant1
+      difPur <- rep(0, length(stats1))
+      difPur[dif] <- 1
+      repeat {
+        if (nrPur >= nrIter) {
+          break
+        } else {
+          nrPur <- nrPur + 1
+          nodif <- if (is.null(dif)) {
+            1:m # all items if no DIF
+          } else {
+            setdiff(1:m, dif) # items not in dif
+          }
+          match_result <- .resolve_match(match = match, Data = DATA, anchor = nodif)
+          MATCH <- match_result$MATCH
+          if (missing(start)) {
+            START <- startNLR(Data = DATA, group = GROUP, model = MODEL, constraints = CONSTRAINTS, match = MATCH, parameterization = parameterization)
+          }
+          prov2 <- NLR(DATA, GROUP,
+            model = MODEL, constraints = CONSTRAINTS, type = TYPE, method = method,
+            match = MATCH, anchor = nodif, start = START, p.adjust.method = p.adjust.method,
+            test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
+          )
+          stats2 <- prov2$Sval
+          pval2 <- prov2$pval
+          significant2 <- which(pval2 < alpha)
+          if (length(significant2) == 0) {
+            dif2 <- NULL
+          } else {
+            dif2 <- significant2
+          }
+          difPur <- rbind(difPur, rep(0, m))
+          difPur[nrPur + 1, dif2] <- 1
+          if (length(dif) != length(dif2)) {
+            dif <- dif2
+          } else {
+            dif <- sort(dif)
+            dif2 <- sort(dif2)
+            if (sum(dif == dif2) == length(dif)) {
+              noLoop <- TRUE
+              break
+            } else {
+              dif <- dif2
+            }
+          }
+        }
+      }
+      PROV <- prov2
+      STATS <- stats2
+      significant1 <- which(PROV$adjusted.pval < alpha)
 
       nlrPAR <- nlrSE <- lapply(
         1:length(PROV$par.m1),
@@ -609,8 +745,8 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
         }
       }
 
-      if (length(significant) > 0) {
-        DIFitems <- significant
+      if (length(significant1) > 0) {
+        DIFitems <- significant1
         for (idif in 1:length(DIFitems)) {
           nlrPAR[[DIFitems[idif]]] <- PROV$par.m1[[DIFitems[idif]]]
           nlrSE[[DIFitems[idif]]] <- PROV$se.m1[[DIFitems[idif]]]
@@ -618,196 +754,50 @@ difNLR <- function(Data, group, focal.name, model, constraints, type = "all", me
       } else {
         DIFitems <- "No DIF item detected"
       }
+    }
+    if (!is.null(difPur)) {
+      rownames(difPur) <- paste0("Step", 0:(dim(difPur)[1] - 1))
+      colnames(difPur) <- colnames(DATA)
+    }
 
-      if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
-        wht <- (!(type %in% c("udif", "nudif", "both", "all")))
-        type[wht] <- "other"
-      }
-      RES <- list(
-        Sval = STATS,
-        nlrPAR = nlrPAR, nlrSE = nlrSE,
-        parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0, llM0 = PROV$ll.m0,
-        parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1, llM1 = PROV$ll.m1,
-        DIFitems = DIFitems,
-        model = model, constraints = constraints, type = type, types = types,
-        p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
-        df = PROV$df, test = test,
-        anchor = ANCHOR,
-        purification = purify,
-        method = method,
-        conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
-        alpha = alpha,
-        Data = DATA, group = GROUP, group.names = group.names, match = match
-      )
-    } else {
-      nrPur <- 0
-      difPur <- NULL
-      noLoop <- FALSE
-      prov1 <- NLR(DATA, GROUP,
-        model = model, constraints = constraints, type = type, method = method,
-        match = match, start = start, p.adjust.method = p.adjust.method, test = test,
-        alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
-      )
-      stats1 <- prov1$Sval
-      pval1 <- prov1$pval
-      significant1 <- which(pval1 < alpha)
-
-      if (length(significant1) == 0) {
-        PROV <- prov1
-        STATS <- stats1
-        DIFitems <- "No DIF item detected"
-
-        nlrPAR <- nlrSE <- lapply(
-          1:length(PROV$par.m1),
-          function(i) {
-            if (i %in% PROV$cf.which) {
-              structure(rep(NA, length(PROV$par.m1[[i]])),
-                names = names(PROV$par.m1[[i]])
-              )
-            } else {
-              structure(rep(0, length(PROV$par.m1[[i]])),
-                names = names(PROV$par.m1[[i]])
-              )
-            }
-          }
-        )
-        for (i in 1:length(PROV$par.m1)) {
-          if (!(i %in% PROV$cf.which)) {
-            nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
-            nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
-          }
-        }
-        noLoop <- TRUE
-      } else {
-        dif <- significant1
-        difPur <- rep(0, length(stats1))
-        difPur[dif] <- 1
-        repeat {
-          if (nrPur >= nrIter) {
-            break
-          } else {
-            nrPur <- nrPur + 1
-            nodif <- NULL
-            if (is.null(dif)) {
-              nodif <- 1:m
-            } else {
-              for (i in 1:m) {
-                if (sum(i == dif) == 0) {
-                  nodif <- c(nodif, i)
-                }
-              }
-            }
-            prov2 <- NLR(DATA, GROUP,
-              model = model, constraints = constraints, type = type, method = method,
-              match = match, anchor = nodif, start = start, p.adjust.method = p.adjust.method,
-              test = test, alpha = alpha, initboot = initboot, nrBo = nrBo, sandwich = sandwich
-            )
-            stats2 <- prov2$Sval
-            pval2 <- prov2$pval
-            significant2 <- which(pval2 < alpha)
-            if (length(significant2) == 0) {
-              dif2 <- NULL
-            } else {
-              dif2 <- significant2
-            }
-            difPur <- rbind(difPur, rep(0, m))
-            difPur[nrPur + 1, dif2] <- 1
-            if (length(dif) != length(dif2)) {
-              dif <- dif2
-            } else {
-              dif <- sort(dif)
-              dif2 <- sort(dif2)
-              if (sum(dif == dif2) == length(dif)) {
-                noLoop <- TRUE
-                break
-              } else {
-                dif <- dif2
-              }
-            }
-          }
-        }
-        PROV <- prov2
-        STATS <- stats2
-        significant1 <- which(PROV$adjusted.pval < alpha)
-
-        nlrPAR <- nlrSE <- lapply(
-          1:length(PROV$par.m1),
-          function(i) {
-            if (i %in% PROV$cf.which) {
-              structure(rep(NA, length(PROV$par.m1[[i]])),
-                names = names(PROV$par.m1[[i]])
-              )
-            } else {
-              structure(rep(0, length(PROV$par.m1[[i]])),
-                names = names(PROV$par.m1[[i]])
-              )
-            }
-          }
-        )
-        for (i in 1:length(PROV$par.m1)) {
-          if (!(i %in% PROV$cf.which)) {
-            nlrPAR[[i]][names(PROV$par.m0[[i]])] <- PROV$par.m0[[i]]
-            nlrSE[[i]][names(PROV$se.m0[[i]])] <- PROV$se.m0[[i]]
-          }
-        }
-
-        if (length(significant1) > 0) {
-          DIFitems <- significant1
-          for (idif in 1:length(DIFitems)) {
-            nlrPAR[[DIFitems[idif]]] <- PROV$par.m1[[DIFitems[idif]]]
-            nlrSE[[DIFitems[idif]]] <- PROV$se.m1[[DIFitems[idif]]]
-          }
-        } else {
-          DIFitems <- "No DIF item detected"
-        }
-      }
-      if (!is.null(difPur)) {
-        rownames(difPur) <- paste0("Step", 0:(dim(difPur)[1] - 1))
-        colnames(difPur) <- colnames(DATA)
-      }
-
-      if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
-        wht <- (!(type %in% c("udif", "nudif", "both", "all")))
-        type[wht] <- "other"
-      }
-      if (purify) {
-        ANCHOR <- ANCHOR[!(ANCHOR %in% DIFitems)]
-      }
-      RES <- list(
-        Sval = STATS,
-        nlrPAR = nlrPAR, nlrSE = nlrSE,
-        parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0, llM0 = PROV$ll.m0,
-        parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1, llM1 = PROV$ll.m1,
-        DIFitems = DIFitems,
-        model = model, constraints = constraints, type = type, types = types,
-        p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
-        df = PROV$df, test = test,
-        anchor = ANCHOR,
-        purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
-        method = method,
-        conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
-        alpha = alpha,
-        Data = DATA, group = GROUP, group.names = group.names, match = match
-      )
+    if (any(!(type %in% c("udif", "nudif", "both", "all")))) {
+      wht <- (!(type %in% c("udif", "nudif", "both", "all")))
+      type[wht] <- "other"
     }
     if (purify) {
-      if (!noLoop) {
-        warning(
-          paste0(
-            "Item purification process not converged after ",
-            nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
-            "Results are based on the last iteration of the item purification.\n"
-          ),
-          call. = FALSE
-        )
-      }
+      ANCHOR <- ANCHOR[!(ANCHOR %in% DIFitems)]
     }
-    class(RES) <- "difNLR"
-    return(RES)
+    RES <- list(
+      Sval = STATS,
+      nlrPAR = nlrPAR, nlrSE = nlrSE,
+      parM0 = PROV$par.m0, seM0 = PROV$se.m0, covM0 = PROV$cov.m0, llM0 = PROV$ll.m0,
+      parM1 = PROV$par.m1, seM1 = PROV$se.m1, covM1 = PROV$cov.m1, llM1 = PROV$ll.m1,
+      DIFitems = DIFitems,
+      model = MODEL, constraints = CONSTRAINTS, type = TYPE, types = types,
+      p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval,
+      df = PROV$df, test = test,
+      anchor = ANCHOR,
+      purification = purify, nrPur = nrPur, difPur = difPur, conv.puri = noLoop,
+      method = method,
+      conv.fail = PROV$cf, conv.fail.which = PROV$cf.which,
+      alpha = alpha,
+      Data = DATA, group = GROUP, group.names = group.names, match = MATCH, match.name = match.name
+    )
   }
-
-  resToReturn <- internalNLR()
-  return(resToReturn)
+  if (purify) {
+    if (!noLoop) {
+      warning(
+        paste0(
+          "Item purification process not converged after ",
+          nrPur, ifelse(nrPur <= 1, " iteration.", " iterations."), "\n",
+          "Results are based on the last iteration of the item purification.\n"
+        ),
+        call. = FALSE
+      )
+    }
+  }
+  class(RES) <- "difNLR"
+  return(RES)
 }
 
 #' @export
@@ -1168,23 +1158,14 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
     # remove non-converged items
     items <- .resolve_non_converged_items_plot(item = items, conv_fail_items = x$conv.fail.which)
 
-    if (length(x$match) > 1) {
-      xlab <- "Matching criterion"
-      match <- x$match
-    } else {
-      if (x$match == "score") {
-        xlab <- "Total score"
-        match <- rowSums(as.data.frame(x$Data[, x$anchor]))
-      } else {
-        xlab <- "Standardized total score"
-        match <- scale(rowSums(as.data.frame(x$Data[, x$anchor])))
-      }
-    }
-    xR <- match[x$group == 0]
-    xF <- match[x$group == 1]
+    xlab <- x$match.name
+    match <- x$match
 
-    max_match <- max(c(xR, xF), na.rm = TRUE)
-    min_match <- min(c(xR, xF), na.rm = TRUE)
+    xR <- match[x$group == 0, , drop = FALSE]
+    xF <- match[x$group == 1, , drop = FALSE]
+
+    max_match <- sapply(match, max, na.rm = TRUE)
+    min_match <- sapply(match, min, na.rm = TRUE)
 
     plot_CC <- list()
 
@@ -1194,8 +1175,8 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
       df_line <- predict(x,
         item = i,
         match = rep(
-          seq(floor(min_match),
-            ceiling(max_match),
+          seq(floor(min_match[i]),
+            ceiling(max_match[i]),
             length.out = 100
           ),
           2
@@ -1206,17 +1187,17 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
 
       if (draw.empirical) {
         df_point_0 <- data.frame(cbind(
-          as.numeric(levels(as.factor(xR))),
+          as.numeric(levels(as.factor(xR[, i]))),
           tapply(
             x$Data[x$group == 0, i],
-            as.factor(xR), mean
+            as.factor(xR[, i]), mean
           )
         ))
         df_point_1 <- data.frame(cbind(
-          as.numeric(levels(as.factor(xF))),
+          as.numeric(levels(as.factor(xF[, i]))),
           tapply(
             x$Data[x$group == 1, i],
-            as.factor(xF), mean
+            as.factor(xF[, i]), mean
           )
         ))
         df_point <- data.frame(rbind(
@@ -1225,7 +1206,7 @@ plot.difNLR <- function(x, plot.type = "cc", item = "all",
         ))
         colnames(df_point) <- c("match", "prob", "group")
         rownames(df_point) <- NULL
-        df_point$size <- c(table(xR), table(xF))
+        df_point$size <- c(table(xR[, i]), table(xF[, i]))
       }
 
       g <- ggplot2::ggplot() +
@@ -1315,15 +1296,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
   ITEMS <- .resolve_non_converged_items(item = items, conv_fail_items = object$conv.fail.which)
 
   # extracting matching variable
-  if (length(object$match) > 1) {
-    match <- object$match
-  } else {
-    if (object$match == "score") {
-      match <- rowSums(as.data.frame(object$Data[, object$anchor]))
-    } else {
-      match <- scale(rowSums(as.data.frame(object$Data[, object$anchor])))
-    }
-  }
+  match <- object$match
 
   # extracting item parameters
   PAR <- data.frame(
@@ -1338,7 +1311,7 @@ fitted.difNLR <- function(object, item = "all", ...) {
   FV <- as.list(rep(NA, m))
   FV[ITEMS] <- lapply(ITEMS, function(i) {
     .gNLR.is(
-      x = match, g = object$group,
+      x = match[, i], g = object$group,
       b0 = PAR[i, "b0"], b1 = PAR[i, "b1"], b2 = PAR[i, "b2"], b3 = PAR[i, "b3"],
       c = PAR[i, "c"], cDif = PAR[i, "cDif"], d = PAR[i, "d"], dDif = PAR[i, "dDif"]
     )
@@ -1442,15 +1415,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
 
   # extracting matching variable
   if (missing(match)) {
-    if (length(object$match) > 1) {
-      match <- object$match
-    } else {
-      if (object$match == "score") {
-        match <- rowSums(as.data.frame(object$Data[, object$anchor]))
-      } else {
-        match <- scale(rowSums(as.data.frame(object$Data[, object$anchor])))
-      }
-    }
+    match <- object$match
   }
 
   if (missing(group)) {
@@ -1462,14 +1427,24 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
     }
   }
 
-  if (length(match) != length(group)) {
-    if (length(match) == 1) {
-      match <- rep(match, length(group))
-    } else if (length(group) == 1) {
-      group <- rep(group, length(match))
-    } else {
-      stop("Arguments 'match' and 'group' must be of the same length.", call. = FALSE)
+  if (is.matrix(match) | is.data.frame(match)) {
+    if (nrow(match) != length(group)) {
+      stop("'group' must be of the same length as number of observations in 'match'. ", call. = FALSE)
     }
+    if (length(group) == 1) {
+      group <- rep(group, nrow(match))
+    }
+  } else {
+    if (length(match) != length(group)) {
+      if (length(match) == 1) {
+        match <- rep(match, length(group))
+      } else if (length(group) == 1) {
+        group <- rep(group, length(match))
+      } else {
+        stop("Arguments 'match' and 'group' must be of the same length.", call. = FALSE)
+      }
+    }
+    match <- replicate(ncol(object$Data), match)
   }
 
   if (!interval %in% c("none", "confidence")) {
@@ -1492,7 +1467,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
   PV <- lapply(1:m, function(i) {
     pars <- as.vector(PAR[i, ])
     .gNLR.is(
-      x = match, g = group,
+      x = match[, i], g = group,
       b0 = pars[["b0"]], b1 = pars[["b1"]], b2 = pars[["b2"]], b3 = pars[["b3"]],
       c = pars[["c"]], d = pars[["d"]], cDif = pars[["cDif"]], dDif = pars[["dDif"]]
     )
@@ -1505,7 +1480,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
     DELTA_new <- as.list(rep(NA, m))
     DELTA_new <- lapply(1:m, function(i) {
       attr(.delta.gNLR.is(
-        match, group,
+        match[, i], group,
         PAR[i, "b0"], PAR[i, "b1"], PAR[i, "b2"], PAR[i, "b3"],
         PAR[i, "c"], PAR[i, "d"], PAR[i, "cDif"], PAR[i, "dDif"]
       ), "gradient")
@@ -1552,7 +1527,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
     res <- lapply(1:m, function(i) {
       data.frame(
         item = nams[i],
-        match = match,
+        match = match[, i],
         group = as.factor(group),
         prob = PV[[i]],
         lwr.conf = lwr[[i]],
@@ -1565,7 +1540,7 @@ predict.difNLR <- function(object, item = "all", match, group, interval = "none"
     res <- lapply(1:m, function(i) {
       data.frame(
         item = nams[i],
-        match = match,
+        match = match[, i],
         group = as.factor(group),
         prob = PV[[i]]
       )

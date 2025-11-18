@@ -25,19 +25,29 @@
 #'   non-uniform DDF only (i.e., difference in discrimination
 #'   parameter \code{"a"}). Can be specified as a single value (for
 #'   all items) or as an item-specific vector.
-#' @param match numeric or character: matching criterion to be used as
-#'   an estimate of trait. Can be either \code{"zscore"} (default,
-#'   standardized total score), \code{"score"} (total test score), or
-#'   vector of the same length as number of observations in
-#'   \code{Data}.
-#' @param anchor numeric or character: specification of DDF free
-#'   items. Either \code{NULL} (default), or a vector of item names
-#'   (column names of \code{Data}), or item identifiers (integers
-#'   specifying the column number) determining which items are
-#'   currently considered as anchor (DDF free) items. Argument is
-#'   ignored if \code{match} is not \code{"zscore"} or \code{"score"}.
-#' @param purify logical: should the item purification be applied?
-#'   (default is \code{FALSE}).
+#' @param match character or numeric: matching criterion to be used as an
+#'   estimate of the trait. It can be either \code{"zscore"} (default;
+#'   standardized total score), \code{"score"} (total test score),
+#'   \code{"restscore"} (total score without the tested item),
+#'   \code{"zrestscore"} (standardized total score without the tested item), a
+#'   numeric vector of the same length as a number of observations in the
+#'   \code{Data}, or a numeric matrix of the same dimensions as \code{Data}
+#'   (each column represents matching criterion for one item).
+#' @param anchor character or numeric: specification of DIF-free (anchor) items
+#'   used to compute the matching criterion (\code{match}). Can be either
+#'   \code{NULL} (default; all items are used for the calculation), or a vector
+#'   of item identifiers (integers indicating column numbers or item names in
+#'   `Data`) specifying which items are currently considered as anchor items.
+#'   This argument is ignored if the \code{match} is not \code{"zscore"},
+#'   \code{"score"}, \code{"restscore"}, or \code{"zrestscore"}. For \code{match =
+#'   "score"} or \code{match = "zscore"}, the matching criterion is computed
+#'   from the items specified in the anchor set. For \code{match = "restscore"} or
+#'   \code{match = "zrestscore"}, the same anchor items are used, except that the
+#'   item currently under test is excluded from the computation.
+#' @param purify logical: should the item purification be applied? (default is
+#'   \code{FALSE}). Item purification is not applied when set of anchor items in
+#'   \code{anchor} is specified or when \code{match} is not \code{"zscore"},
+#'   \code{"score"}, \code{"restscore"}, or \code{"zrestscore"}.
 #' @param nrIter numeric: the maximal number of iterations in the item
 #'   purification (default is 10).
 #' @param p.adjust.method character: method for multiple comparison
@@ -116,6 +126,7 @@
 #'   \item{\code{group.names}}{levels of grouping variable.}
 #'   \item{\code{key}}{key of correct answers.}
 #'   \item{\code{match}}{matching criterion.}
+#'   \item{\code{match.name}}{Name of the matching criterion.}
 #'   }
 #'
 #' For an object of class \code{"ddfMLR"} several methods are available (e.g. \code{methods(class = "ddfMLR")}).
@@ -190,8 +201,16 @@
 #' # testing non-uniform DDF effects
 #' ddfMLR(Data, group, focal.name = 1, key, type = "nudif")
 #'
-#' # testing both DDF effects with total score as matching criterion
+#' # testing both DDF effects with different matching criteria
 #' ddfMLR(Data, group, focal.name = 1, key, match = "score")
+#' ddfMLR(Data, group, focal.name = 1, key, match = "restscore")
+#' ddfMLR(Data, group, focal.name = 1, key, match = "zrestscore")
+#' match <- rowSums(GMAT[, 1:20])
+#' ddfMLR(Data, group, focal.name = 1, key, match = match)
+#' match <- replicate(ncol(Data), GMAT$criterion)
+#' ddfMLR(Data, group, focal.name = 1, key, match = match)
+#' match <- as.data.frame(match)
+#' ddfMLR(Data, group, focal.name = 1, key, match = match)
 #' }
 #'
 #' @keywords DDF
@@ -199,74 +218,26 @@
 ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore", anchor = NULL,
                    purify = FALSE, nrIter = 10, p.adjust.method = "none",
                    alpha = 0.05, parametrization) {
+  # === INPUTS CHECK and PROCESSING ===
   # === 0. Deprecation warnings ===
   if (!missing(parametrization)) {
     warning("Argument 'parametrization' is deprecated; please use 'coef.difORD()'.", call. = FALSE)
   }
 
-  # === 1. Basic argument checks ===
-  if (!is.character(type) || !type %in% c("udif", "nudif", "both")) {
-    stop("'type' must be one of 'udif', 'nudif', or 'both'.", call. = FALSE)
-  }
-  .check_logical(purify, "purify")
-  if (purify && (!is.numeric(nrIter) || nrIter <= 0 || nrIter %% 1 != 0)) {
-    stop("'nrIter' must be a positive integer.", call. = FALSE)
-  }
-  if (!p.adjust.method %in% p.adjust.methods) {
-    stop("'p.adjust.method' must be one of: ", paste(p.adjust.methods, collapse = ", "), call. = FALSE)
-  }
-  .check_numeric(alpha, "alpha", 0, 1)
-
-  # === 2. Handle group and separate from Data ===
-  group_result <- .resolve_group(Data, group)
+  # === 1. Data and group check and processing ===
+  group_result <- .resolve_group(Data, group, focal.name)
   GROUP <- group_result$GROUP
   DATA <- group_result$DATA
+  group.names <- group_result$group_levels
+
   n <- nrow(DATA)
+  m <- ncol(DATA)
 
-  # === 3. Matching criterion check ===
-
-  if (!(match[1] %in% c("score", "zscore"))) {
-    if (length(match) != n) {
-      stop("'match' must be of length equal to the number of rows in 'Data'.", call. = FALSE)
-    }
-  }
-
-  if (purify && !(match[1] %in% c("score", "zscore"))) {
-    stop("'purify' is only allowed when 'match' is 'score' or 'zscore'.", call. = FALSE)
-  }
-
-  # === 4. Handle missing data ===
-  df <- if (length(match) == n) {
-    data.frame(DATA, GROUP, match, check.names = FALSE)
-  } else {
-    data.frame(DATA, GROUP, check.names = FALSE)
-  }
-
-  df <- df[complete.cases(df), ]
-
-  if (nrow(df) == 0) {
-    stop("'Data' contanins no complete cases after removing missing values.", call. = FALSE)
-  }
-
-  if (nrow(df) < n) {
-    warning(
-      sprintf(
-        "%d observation%s removed due to missing values.",
-        n - nrow(df), ifelse(n - nrow(df) > 1, "s were", " was")
-      ),
-      call. = FALSE
-    )
-  }
-
-  GROUP <- df[["GROUP"]]
-  DATA <- df[, !(names(df) %in% c("GROUP", "match")), drop = FALSE]
-  if (length(match) == n) {
-    match <- df[["match"]]
-  }
+  # checking structure of Data - nominal items required
   DATA[] <- lapply(DATA[], as.factor)
   DATA[] <- lapply(DATA[], droplevels)
 
-  # === 5. Handle key ===
+  # === 2. Key check ===
   if (is.matrix(key) | is.data.frame(key)) {
     KEY <- as.vector(t(key))
   } else {
@@ -280,21 +251,43 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
   }
   KEY <- paste(KEY)
 
-  # === 6. Group re-coding based on focal.name ===
-  group.names <- na.omit(unique(GROUP))
-  if (!focal.name %in% group.names) {
-    stop("'focal.name' must be a valid value from 'group'.", call. = FALSE)
-  }
-  if (group.names[1] == focal.name) {
-    group.names <- rev(group.names)
-  }
-  GROUP <- as.numeric(as.factor(GROUP) == focal.name)
-
-  # === 7. Anchor items ===
-  m <- ncol(DATA)
+  # === 3. Anchor items check and processing ===
   ANCHOR <- .resolve_anchor(anchor, DATA)
 
-  internalMLR <- function() {
+  # === 4. Matching criterion check and computation ===
+  match_result <- .resolve_match(match = match, Data = DATA, anchor = ANCHOR, key = KEY)
+  MATCH <- match_result$MATCH
+  match.name <- match_result$match.name
+
+  # === 5. Removing missing data ===
+  df <- .resolve_missing(Data = DATA, group = GROUP, match = MATCH)
+  DATA <- df[["DATA"]]
+  GROUP <- df[["GROUP"]]
+  MATCH <- df[["MATCH"]]
+
+  # === 6. Type ===
+  .check_character(type, "type", c("udif", "nudif", "both"))
+
+  # === 7. Item purification and p.adjustment check ===
+  .check_logical(purify, "purify")
+  # deactivating item purification when anchors are specified
+  if (!is.null(anchor) & purify) {
+    purify <- FALSE
+    warning("Item purification not activated as the set of anchor items is specified. ", call. = FALSE)
+  }
+  # purify only allowed when matching criterion is zscore or score
+  if (purify && !any(match[1] %in% c("zscore", "score", "restscore", "zrestscore"))) {
+    stop("'purify' is only allowed when 'match' is 'zscore' or 'score'.", call. = FALSE)
+  }
+  if (purify && (!is.numeric(nrIter) || nrIter <= 0 || nrIter %% 1 != 0)) {
+    stop("'nrIter' must be a positive integer.", call. = FALSE)
+  }
+  .check_character(p.adjust.method, "p.adjust.method", p.adjust.methods)
+
+  # === 8. alpha check ===
+  .check_numeric(alpha, "alpha", 0, 1)
+
+  # === DIF DETECTION ===
     if (!purify | !(match[1] %in% c("zscore", "score")) | !is.null(anchor)) {
       PROV <- suppressWarnings(MLR(
         Data = DATA, group = GROUP,
@@ -347,7 +340,7 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         purification = purify,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
         alpha = alpha,
-        Data = DATA, group = GROUP, group.names = group.names, key = c(KEY), match = match
+        Data = DATA, group = GROUP, group.names = group.names, key = c(KEY), match = MATCH, match.name = match.name
       )
     } else {
       nrPur <- 0
@@ -380,19 +373,16 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
             break
           } else {
             nrPur <- nrPur + 1
-            nodif <- NULL
-            if (is.null(dif)) {
-              nodif <- 1:dim(DATA)[2]
+            nodif <- if (is.null(dif)) {
+              1:m # all items if no DIF
             } else {
-              for (i in 1:dim(DATA)[2]) {
-                if (sum(i == dif) == 0) {
-                  nodif <- c(nodif, i)
-                }
-              }
+              setdiff(1:m, dif) # items not in dif
             }
+            match_result <- .resolve_match(match = match, Data = DATA, anchor = nodif, key = KEY)
+            MATCH <- match_result$MATCH
             prov2 <- suppressWarnings(MLR(
               Data = DATA, group = GROUP,
-              key = KEY, anchor = nodif, type = type,
+              key = KEY, match = MATCH, anchor = nodif, type = type,
               p.adjust.method = p.adjust.method,
               alpha = alpha
             ))
@@ -459,14 +449,12 @@ ddfMLR <- function(Data, group, focal.name, key, type = "both", match = "zscore"
         purification = purify, nrPur = nrPur, ddfPur = ddfPur, conv.puri = noLoop,
         p.adjust.method = p.adjust.method, pval = PROV$pval, adj.pval = PROV$adjusted.pval, df = PROV$df,
         alpha = alpha,
-        Data = DATA, group = GROUP, group.names = group.names, key = c(KEY), match = match
+        Data = DATA, group = GROUP, group.names = group.names, key = c(KEY), match = MATCH, match.name = match.name
       )
     }
     class(RES) <- "ddfMLR"
     return(RES)
-  }
-  resToReturn <- internalMLR()
-  return(resToReturn)
+
 }
 
 #' @export
@@ -613,33 +601,18 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
     }
   }
 
-  if (x$match[1] == "zscore") {
-    matching <- c(scale(.score(as.data.frame(x$Data[, x$anchor]), x$key[x$anchor])))
-    xlab <- "Standardized total score"
-  } else {
-    if (x$match[1] == "score") {
-      matching <- c(.score(as.data.frame(x$Data[, x$anchor]), x$key[x$anchor]))
-      xlab <- "Total score"
-    } else {
-      if (length(x$match) == nrow(x$Data)) {
-        matching <- x$match
-        xlab <- "Matching criterion"
-      } else {
-        stop("Invalid value for 'match'. Possible values are 'score', 'zscore' or vector of the same length as number
-             of observations in 'Data'!")
-      }
-    }
-  }
+  xlab <- x$match.name
+  matching <- x$match
+  match <- sapply(matching, function(x) seq(min(x, na.rm = TRUE), max(x, na.rm = TRUE), length.out = 300))
 
-  match <- seq(min(matching, na.rm = TRUE), max(matching, na.rm = TRUE), length.out = 300)
   plot_CC <- list()
 
   for (i in items) {
     TITLE <- colnames(x$Data)[i]
 
     df.fitted <- data.frame(rbind(
-      cbind(Group = "0", Match = match, predict(x, item = i, match = match, group = 0)),
-      cbind(Group = "1", Match = match, predict(x, item = i, match = match, group = 1))
+      cbind(Group = "0", Match = match[, i], predict(x, item = i, match = match[, i], group = 0)),
+      cbind(Group = "1", Match = match[, i], predict(x, item = i, match = match[, i], group = 1))
     ), check.names = FALSE)
     df.fitted <- reshape(
       data = df.fitted, direction = "long",
@@ -653,12 +626,12 @@ plot.ddfMLR <- function(x, item = "all", group.names, ...) {
     n_cats <- length(levels(df.fitted$Category))
 
     df.empirical <- rbind(
-      data.frame(prop.table(table(x$Data[x$group == 1, i], matching[x$group == 1]), 2),
-        table(x$Data[x$group == 1, i], matching[x$group == 1]),
+      data.frame(prop.table(table(x$Data[x$group == 1, i], matching[x$group == 1, i]), 2),
+        table(x$Data[x$group == 1, i], matching[x$group == 1, i]),
         group = "1"
       ),
-      data.frame(prop.table(table(x$Data[x$group == 0, i], matching[x$group == 0]), 2),
-        table(x$Data[x$group == 0, i], matching[x$group == 0]),
+      data.frame(prop.table(table(x$Data[x$group == 0, i], matching[x$group == 0, i]), 2),
+        table(x$Data[x$group == 0, i], matching[x$group == 0, i]),
         group = "0"
       )
     )
@@ -1015,38 +988,45 @@ predict.ddfMLR <- function(object, item = "all", match, group, ...) {
   # check item input
   items <- .resolve_items(item = item, colnames_data = nams)
 
+  # extracting matching variable
   if (missing(match)) {
-    if (length(object$match) > 1) {
-      match <- object$match
-    } else {
-      if (object$match == "score") {
-        match <- c(.score(as.data.frame(object$Data[, object$anchor]), object$key))
-      } else {
-        match <- c(scale(.score(as.data.frame(object$Data[, object$anchor]), object$key)))
-      }
-    }
+    match <- object$match
   }
 
   if (missing(group)) {
     group <- object$group
-  }
-  if (length(match) != length(group)) {
-    if (length(match) == 1) {
-      match <- rep(match, length(group))
-    } else if (length(group) == 1) {
-      group <- rep(group, length(match))
-    } else {
-      stop("Arguments 'match' and 'group' must be of the same length.",
-        call. = FALSE
-      )
+  } else {
+    group_levels <- na.omit(unique(group))
+    if (!all(group_levels %in% unique(object$group))) {
+      stop("Invalid value for 'group'.", call. = FALSE)
     }
   }
 
-  mat <- cbind("(Intercept)" = 1, "x" = match, "group" = group, "x:group" = match * group)
+  if (is.matrix(match) | is.data.frame(match)) {
+    if (nrow(match) != length(group)) {
+      stop("'group' must be of the same length as number of observations in 'match'. ", call. = FALSE)
+    }
+    if (length(group) == 1) {
+      group <- rep(group, nrow(match))
+    }
+  } else {
+    if (length(match) != length(group)) {
+      if (length(match) == 1) {
+        match <- rep(match, length(group))
+      } else if (length(group) == 1) {
+        group <- rep(group, length(match))
+      } else {
+        stop("Arguments 'match' and 'group' must be of the same length.", call. = FALSE)
+      }
+    }
+    match <- replicate(ncol(object$Data), match)
+  }
+
   coefs_all <- coef(object, IRTpars = FALSE, CI = 0)
   res <- list()
 
   for (i in items) {
+    mat <- cbind("(Intercept)" = 1, "x" = match[, i], "group" = group, "x:group" = match[, i] * group)
     coefs <- coefs_all[[i]]
 
     if (is.null(dim(coefs))) coefs <- matrix(coefs, ncol = length(coefs))

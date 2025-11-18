@@ -252,23 +252,11 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
   #   message("Note that the default option for `method` is now 'plf' instead of 'nls'.")
   # }
 
-  if (match[1] == "zscore") {
-    x <- as.vector(scale(apply(as.data.frame(Data[, anchor]), 1, sum)))
-  } else {
-    if (match[1] == "score") {
-      x <- apply(as.data.frame(Data[, anchor]), 1, sum)
-    } else {
-      if (length(match) == dim(Data)[1]) {
-        x <- match
-      } else {
-        stop("Invalid value for 'match'. Possible values are 'score', 'zscore', or a vector of the same length as a number
-             of observations in 'Data'!", call. = FALSE)
-      }
-    }
-  }
+  x <- .resolve_match(match = match, Data = Data, anchor = anchor, key = NULL)
+  x <- x$MATCH
 
-  m <- dim(Data)[2]
-  n <- dim(Data)[1]
+  m <- ncol(Data)
+  n <- nrow(Data)
 
   if (length(model) == 1) {
     model <- rep(model, m)
@@ -304,17 +292,18 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
   if (method == "irls") {
     start <- NULL
   } else if (missing(start) || is.null(start)) {
-    start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+    start <- startNLR(Data = Data, group = group, model = model, constraints = constraints, match = x, parameterization = parameterization)
   } else {
     if (all(sapply(1:m, function(i) all(M[[i]]$M1$parameters %in% names(start[[i]]))))) {
       start <- lapply(1:m, function(i) start[[i]][M[[i]]$M1$parameters])
     }
     if (!all(sapply(1:m, function(i) length(start[[i]]) == length(M[[i]]$M1$parameters))) ||
-      !all(sapply(1:m, function(i) all(sort(names(start[[i]])) == sort(M[[i]]$M1$parameters))))) {
+        !all(sapply(1:m, function(i) all(sort(names(start[[i]])) == sort(M[[i]]$M1$parameters))))) {
       warning("Invalid names of item parameters in 'start'. Initial values are calculated with the 'startNLR' function.", call. = FALSE)
-      start <- startNLR(Data, group, model, match = x, parameterization = parameterization)
+      start <- startNLR(Data, group, model = model, constraints = constraints, match = x, parameterization = parameterization)
     }
   }
+
   # model fitting
   m0 <- lapply(1:m, function(i) {
     start_tmp <- start[[i]]
@@ -327,7 +316,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
     }
 
     estimNLR(
-      y = Data[, i], match = x, group = group,
+      y = Data[, i], match = x[, i], group = group,
       formula = M[[i]]$M0$formula,
       method = method,
       start = structure(start_tmp[M[[i]]$M0$parameters],
@@ -348,7 +337,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
     }
 
     estimNLR(
-      y = Data[, i], match = x, group = group,
+      y = Data[, i], match = x[, i], group = group,
       formula = M[[i]]$M1$formula,
       method = method,
       start = structure(start_tmp[M[[i]]$M1$parameters],
@@ -425,8 +414,8 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
       set.seed(k)
       samp <- sample(1:n, size = n, replace = TRUE)
       startalt <- tryCatch(
-        startNLR(Data[samp, ], group[samp], model,
-          match = x[samp],
+        startNLR(Data = Data[samp, ], group = group[samp], model = model, constraints = constraints,
+          match = x[samp, ],
           parameterization = parameterization
         ),
         error = function(e) {},
@@ -450,7 +439,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
           }
 
           estimNLR(
-            y = Data[, j], match = x, group = group,
+            y = Data[, j], match = x[, j], group = group,
             formula = M[[j]]$M0$formula,
             method = method,
             start = structure(start_tmp[M[[j]]$M0$parameters],
@@ -498,7 +487,7 @@ NLR <- function(Data, group, model, constraints = NULL, type = "all", method = "
           }
 
           estimNLR(
-            y = Data[, j], match = x, group = group,
+            y = Data[, j], match = x[, j], group = group,
             formula = M[[j]]$M1$formula,
             method = method,
             start = structure(start_tmp[M[[j]]$M1$parameters],

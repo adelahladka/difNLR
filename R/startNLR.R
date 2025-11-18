@@ -205,11 +205,11 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
 
     x <- cbind(
       mean(covar[Q3 == LETTERS[1]], na.rm = TRUE),
-      colMeans(data.frame(DATA[Q3 == LETTERS[1], ]), na.rm = TRUE)
+      mean(DATA[Q3 == LETTERS[1]], na.rm = TRUE)
     )
     y <- cbind(
       mean(covar[Q3 == LETTERS[lb]], na.rm = TRUE),
-      colMeans(data.frame(DATA[Q3 == LETTERS[lb], ]), na.rm = TRUE)
+      mean(DATA[Q3 == LETTERS[lb]], na.rm = TRUE)
     )
     u1 <- y[, 1] - x[, 1]
     u2 <- y[, 2] - x[, 2]
@@ -218,39 +218,32 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
 
     k <- u2 / u1
 
-    results <- as.data.frame(cbind(k, q))
+    results <- c(k, q)
     return(results)
   }
 
-  if (match[1] == "zscore") {
-    MATCH <- as.vector(scale(apply(Data, 1, sum, na.rm = TRUE)))
-  } else {
-    if (match[1] == "score") {
-      MATCH <- as.numeric(apply(Data, 1, sum, na.rm = TRUE))
-    } else {
-      if (length(match) == dim(Data)[1]) {
-        MATCH <- match
-      } else {
-        stop("Invalid value for 'match'. Possible values are 'score', 'zscore', or a vector of
-              the same length as a number of observations in 'Data'.", call. = FALSE)
-      }
-    }
-  }
+  match_result <- .resolve_match(match = match, Data = Data, anchor = 1:ncol(Data), key = NULL)
+  MATCH <- match_result$MATCH
 
-  M_R <- mean(MATCH[group == 0], na.rm = TRUE)
-  M_F <- mean(MATCH[group == 1], na.rm = TRUE)
-  M <- mean(MATCH, na.rm = TRUE)
-  SD_R <- sd(MATCH[group == 0], na.rm = TRUE)
-  SD_F <- sd(MATCH[group == 1], na.rm = TRUE)
-  SD <- sd(MATCH, na.rm = TRUE)
-  MATCH <- as.vector(scale(MATCH))
+  M_R <- colMeans(MATCH[group == 0, , drop = FALSE], na.rm = TRUE)
+  M_F <- colMeans(MATCH[group == 1, , drop = FALSE], na.rm = TRUE)
+  M <- colMeans(MATCH, na.rm = TRUE)
+  SD_R <- sapply(1:m, function(item) sd(MATCH[group == 0, item], na.rm = TRUE))
+  SD_F <- sapply(1:m, function(item) sd(MATCH[group == 1, item], na.rm = TRUE))
+  SD <-  sapply(1:m, function(item) sd(MATCH[, item], na.rm = TRUE))
+  MATCH[] <-  sapply(1:m, function(item) scale(MATCH[, item]))
 
-  line <- startNLR_line(MATCH, DATA = Data)
+  line <- sapply(1:m, function(item) startNLR_line(MATCH[, item], DATA = Data[, item]))
+  line <- as.data.frame(t(line))
+  colnames(line) <- c("k", "q")
 
-  data_R <- data.frame(Data[group == 0, ]) ### reference group
-  data_F <- data.frame(Data[group == 1, ]) ### foal group
-  line_R <- startNLR_line(MATCH[group == 0], DATA = data_R)
-  line_F <- startNLR_line(MATCH[group == 1], DATA = data_F)
+  # data_R <- data.frame(Data[group == 0, ]) ### reference group
+  # data_F <- data.frame(Data[group == 1, ]) ### foal group
+  line_R <- sapply(1:m, function(item) startNLR_line(MATCH[group == 0, item], DATA = Data[group == 0, item]))
+  line_F <- sapply(1:m, function(item) startNLR_line(MATCH[group == 1, item], DATA = Data[group == 1, item]))
+  line_R <- as.data.frame(t(line_R))
+  line_F <- as.data.frame(t(line_F))
+  colnames(line_R) <- colnames(line_F) <- c("k", "q")
 
   a_R <- a_F <- b_R <- b_F <- c_R <- c_F <- d_R <- d_F <- c()
 
@@ -260,7 +253,7 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
       if (model[i] %in% c("Rasch", "1PL", "2PL", "3PLdg", "3PLd")) {
         c_R[i] <- c_F[i] <- 0
       } else {
-        if (grepl("cg", model[i]) || (!is.null(constraints) && grepl("c", constraints[i]))) {
+        if (grepl("cg", model[i]) || (!is.null(constraints) && any(grepl("c", constraints[[i]])))) {
           c_R[i] <- c_F[i] <- .checkInterval(line$k * (-4) + line$q, c(0, 0.99))[i]
         } else {
           c_R[i] <- .checkInterval(line_R$k * (-4) + line_R$q, c(0, 0.99))[i]
@@ -279,7 +272,7 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
       if (model[i] %in% c("Rasch", "1PL", "2PL", "3PLcg", "3PLc", "3PL")) {
         d_R[i] <- d_F[i] <- 1
       } else {
-        if (grepl("dg", model[i]) || (!is.null(constraints) && grepl("d", constraints[i]))) {
+        if (grepl("dg", model[i]) || (!is.null(constraints) && any(grepl("d", constraints[[i]])))) {
           d_R[i] <- d_F[i] <- .checkInterval(line$k * 4 + line$q, c(0.01, 1))[i]
         } else {
           d_R[i] <- .checkInterval(line_R$k * 4 + line_R$q, c(0.01, 1))[i]
@@ -298,11 +291,11 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
       if (model[i] == "Rasch") {
         a_R[i] <- a_F[i] <- 1
       } else {
-        if (model[i] == "1PL" || (!is.null(constraints) && grepl("a", constraints[i]))) {
-          a_R[i] <- a_F[i] <- ((4 * line$k / (d_R - c_R))[i]) / SD
+        if (model[i] == "1PL" || (!is.null(constraints) && any(grepl("a", constraints[[i]])))) {
+          a_R[i] <- a_F[i] <- ((4 * line$k / (d_R - c_R))[i]) / SD[i]
         } else {
-          a_R[i] <- ((4 * line_R$k / (d_R - c_R))[i]) / SD_R
-          a_F[i] <- ((4 * line_F$k / (d_F - c_F))[i]) / SD_F
+          a_R[i] <- ((4 * line_R$k / (d_R - c_R))[i]) / SD_R[i]
+          a_F[i] <- ((4 * line_F$k / (d_F - c_F))[i]) / SD_F[i]
         }
       }
       return(c(a_R[i], a_F[i]))
@@ -314,14 +307,14 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
   b <- t(sapply(
     1:ncol(Data),
     function(i) {
-      if (!is.null(constraints) && grepl("b", constraints[i])) {
+      if (!is.null(constraints) && any(grepl("b", constraints[[i]]))) {
         c_tmp <- mean(c_R[i], c_F[i])
         d_tmp <- mean(d_R[i], d_F[i])
 
-        b_R[i] <- b_F[i] <- (((d_tmp + c_tmp) / 2 - line$q[i]) / line$k[i]) * SD + M
+        b_R[i] <- b_F[i] <- (((d_tmp + c_tmp) / 2 - line$q[i]) / line$k[i]) * SD[i] + M[i]
       } else {
-        b_R[i] <- (((d_R[i] + c_R[i]) / 2 - line_R$q[i]) / line_R$k[i]) * SD_R + M_R
-        b_F[i] <- (((d_F[i] + c_F[i]) / 2 - line_F$q[i]) / line_F$k[i]) * SD_F + M_F
+        b_R[i] <- (((d_R[i] + c_R[i]) / 2 - line_R$q[i]) / line_R$k[i]) * SD_R[i] + M_R[i]
+        b_F[i] <- (((d_F[i] + c_F[i]) / 2 - line_F$q[i]) / line_F$k[i]) * SD_F[i] + M_F[i]
       }
       return(c(b_R[i], b_F[i]))
     }
@@ -351,16 +344,16 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
       "4PL"     = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
     )
     names(tmp) <- c("a", "b", "cR", "dR", "aDif", "bDif", "cF", "dF")
-    if (!is.null(constraints) && grepl("a", constraints[i])) {
+    if (!is.null(constraints) && any(grepl("a", constraints[[i]]))) {
       tmp["aDif"] <- FALSE
     }
-    if (!is.null(constraints) && grepl("b", constraints[i])) {
+    if (!is.null(constraints) && any(grepl("b", constraints[[i]]))) {
       tmp["bDif"] <- FALSE
     }
-    if (!is.null(constraints) && grepl("c", constraints[i])) {
+    if (!is.null(constraints) && any(grepl("c", constraints[[i]]))) {
       tmp["cF"] <- FALSE
     }
-    if (!is.null(constraints) && grepl("d", constraints[i])) {
+    if (!is.null(constraints) && any(grepl("d", constraints[[i]]))) {
       tmp["dF"] <- FALSE
     }
     return(tmp)
@@ -404,10 +397,10 @@ startNLR <- function(Data, group, model, constraints = NULL, match = "zscore",
           "b3" = a_F - a_R, "b2" = -a_R * b_R + a_F * b_F, "cF" = c_F, "dF" = d_F
         )[i, ][mod[[i]]]
       )
-      if (!("cF" %in% colnames(tmp)) & ("cR" %in% colnames(tmp)) || (!is.null(constraints) && grepl("c", constraints[i]))) {
+      if (!("cF" %in% colnames(tmp)) & ("cR" %in% colnames(tmp)) || (!is.null(constraints) && any(grepl("c", constraints[[i]])))) {
         colnames(tmp)[colnames(tmp) == "cR"] <- "c"
       }
-      if (!("dF" %in% colnames(tmp)) & ("dR" %in% colnames(tmp)) || (!is.null(constraints) && grepl("d", constraints[i]))) {
+      if (!("dF" %in% colnames(tmp)) & ("dR" %in% colnames(tmp)) || (!is.null(constraints) && any(grepl("d", constraints[[i]])))) {
         colnames(tmp)[colnames(tmp) == "dR"] <- "d"
       }
 

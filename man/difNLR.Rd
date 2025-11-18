@@ -47,20 +47,31 @@ algorithm based on parametric link function, and \code{"irls"} for the maximum
 likelihood estimation with the iteratively reweighted least squares algorithm
 (available for the \code{"2PL"} model only). See \strong{Details}.}
 
-\item{match}{character or numeric: matching criterion to be used as
-an estimate of the trait. It can be either \code{"zscore"} (default,
-standardized total score), \code{"score"} (total test score), or
-a numeric vector of the same length as a number of observations in
-the \code{Data}.}
+\item{match}{character or numeric: matching criterion to be used as an
+estimate of the trait. It can be either \code{"zscore"} (default;
+standardized total score), \code{"score"} (total test score),
+\code{"restscore"} (total score without the tested item),
+\code{"zrestscore"} (standardized total score without the tested item), a
+numeric vector of the same length as a number of observations in the
+\code{Data}, or a numeric matrix of the same dimensions as \code{Data}
+(each column represents matching criterion for one item).}
 
-\item{anchor}{character or numeric: specification of DIF free items. Either
-\code{NULL} (default), or a vector of item identifiers (integers specifying
-the column number) specifying which items are currently considered as anchor
-(DIF free) items. Argument is ignored if the \code{match} is not
-\code{"zscore"} or \code{"score"}.}
+\item{anchor}{character or numeric: specification of DIF-free (anchor) items
+used to compute the matching criterion (\code{match}). Can be either
+\code{NULL} (default; all items are used for the calculation), or a vector
+of item identifiers (integers indicating column numbers or item names in
+`Data`) specifying which items are currently considered as anchor items.
+This argument is ignored if the \code{match} is not \code{"zscore"},
+\code{"score"}, \code{"restscore"}, or \code{"zrestscore"}. For \code{match =
+"score"} or \code{match = "zscore"}, the matching criterion is computed
+from the items specified in the anchor set. For \code{match = "restscore"} or
+\code{match = "zrestscore"}, the same anchor items are used, except that the
+item currently under test is excluded from the computation.}
 
-\item{purify}{logical: should the item purification be applied? (the default is
-\code{FALSE}).}
+\item{purify}{logical: should the item purification be applied? (the default
+is \code{FALSE}). Item purification is not applied when set of anchor items
+in \code{anchor} is specified or when \code{match} is not \code{"zscore"},
+\code{"score"}, \code{"restscore"}, or \code{"zrestscore"}.}
 
 \item{nrIter}{numeric: the maximal number of iterations in the item
 purification (the default is 10).}
@@ -144,6 +155,7 @@ Object of class \code{"difNLR"} is a list with the following components:
   \item{\code{group}}{the vector of group membership.}
   \item{\code{group.names}}{names of groups.}
   \item{\code{match}}{matching criterion.}
+  \item{\code{match.name}}{Name of the matching criterion.}
 }
 
 Several methods are available for an object of the \code{"difNLR"} class (e.g.,
@@ -174,7 +186,7 @@ difficulty, guessing, and inattention for the reference group for item
 \eqn{i}. Terms \eqn{a_{i\text{DIF}}}, \eqn{b_{i\text{DIF}}},
 \eqn{c_{i\text{DIF}}}, and \eqn{d_{i\text{DIF}}} then represent differences
 between the focal and reference groups in discrimination, difficulty,
-guessing, and inattention for item \eqn{i}.
+guessing, and inattention for item \eqn{i}, respectively.
 
 Alternatively, intercept-slope parameterization may be applied:
 \deqn{P(Y_{pi} = 1|X_p, G_p) = (c_{i} + c_{i\text{DIF}} \cdot G_p) +
@@ -299,8 +311,16 @@ difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")
 difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = TRUE)
 
 # testing both DIF effects using 3PL model with fixed guessing for groups
-# and total score as matching criterion
+# and different matching criteria
 difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score")
+difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "restscore")
+difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "zrestscore")
+match <- rowSums(Data)
+difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)
+match <- replicate(nrow(Data), match)
+difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)
+match <- as.data.frame(match)
+difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)
 
 # testing uniform DIF effects using 4PL model with the same
 # guessing and inattention

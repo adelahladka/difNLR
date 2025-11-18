@@ -31,21 +31,31 @@ length as \code{nrow(Data)} or a column identifier of
 non-uniform DIF only. Can be specified as a single value (for all
 items) or as an item-specific vector.}
 
-\item{match}{numeric or character: matching criterion to be used as
-an estimate of trait. Can be either \code{"zscore"} (default,
-standardized total score), \code{"score"} (total test score), or
-vector of the same length as number of observations in
-\code{Data}.}
+\item{match}{character or numeric: matching criterion to be used as an
+estimate of the trait. It can be either \code{"zscore"} (default;
+standardized total score), \code{"score"} (total test score),
+\code{"restscore"} (total score without the tested item),
+\code{"zrestscore"} (standardized total score without the tested item), a
+numeric vector of the same length as a number of observations in the
+\code{Data}, or a numeric matrix of the same dimensions as \code{Data}
+(each column represents matching criterion for one item).}
 
-\item{anchor}{numeric or character: specification of DIF free
-items. Either \code{NULL} (default), or a vector of item names
-(column names of \code{Data}), or item identifiers (integers
-specifying the column number) determining which items are
-currently considered as anchor (DIF free) items. Argument is
-ignored if \code{match} is not \code{"zscore"} or \code{"score"}.}
+\item{anchor}{character or numeric: specification of DIF-free (anchor) items
+used to compute the matching criterion (\code{match}). Can be either
+\code{NULL} (default; all items are used for the calculation), or a vector
+of item identifiers (integers indicating column numbers or item names in
+`Data`) specifying which items are currently considered as anchor items.
+This argument is ignored if the \code{match} is not \code{"zscore"},
+\code{"score"}, \code{"restscore"}, or \code{"zrestscore"}. For \code{match =
+"score"} or \code{match = "zscore"}, the matching criterion is computed
+from the items specified in the anchor set. For \code{match = "restscore"} or
+\code{match = "zrestscore"}, the same anchor items are used, except that the
+item currently under test is excluded from the computation.}
 
-\item{purify}{logical: should the item purification be applied?
-(default is \code{FALSE}).}
+\item{purify}{logical: should the item purification be applied? (default is
+\code{FALSE}). Item purification is not applied when set of anchor items in
+\code{anchor} is specified or when \code{match} is not \code{"zscore"},
+\code{"score"}, \code{"restscore"}, or \code{"zrestscore"}.}
 
 \item{nrIter}{numeric: the maximal number of iterations in the item
 purification (default is 10).}
@@ -103,6 +113,7 @@ A list of class \code{"difORD"} with the following arguments:
   \item{\code{group}}{the vector of group membership.}
   \item{\code{group.names}}{levels of grouping variable.}
   \item{\code{match}}{matching criterion.}
+  \item{\code{match.name}}{Name of the matching criterion.}
   }
 
 For an object of class \code{"difORD"} several methods are available (e.g., \code{methods(class = "difORD")}).
@@ -175,7 +186,17 @@ difORD(Data, group, focal.name = 1, model = "adjacent", type = "udif")
 # testing non-uniform DIF effects
 difORD(Data, group, focal.name = 1, model = "adjacent", type = "nudif")
 
-# testing both DIF effects with total score as matching criterion
+# testing both DIF effects with different matching criteria
+ddfMLR(Data, group, focal.name = 1, model = "adjacent", match = "score")
+difORD(Data, group, focal.name = 1, model = "adjacent", match = "restscore")
+difORD(Data, group, focal.name = 1, key, match = "zrestscore")
+match <- rowSums(GMAT[, 1:20])
+difORD(Data, group, focal.name = 1, key, match = match)
+match <- replicate(ncol(Data), GMAT$criterion)
+difORD(Data, group, focal.name = 1, key, match = match)
+match <- as.data.frame(match)
+difORD(Data, group, focal.name = 1, key, match = match)
+
 difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
 
 # testing both DIF effects with cumulative logit model

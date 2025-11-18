@@ -127,24 +127,13 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     )
   }
 
-  if (match[1] == "zscore") {
-    x <- c(scale(.score(as.data.frame(Data[, anchor]), key[anchor])))
-  } else {
-    if (match[1] == "score") {
-      x <- c(.score(as.data.frame(Data[, anchor]), key[anchor]))
-    } else {
-      if (length(match) == dim(Data)[1]) {
-        x <- match
-      } else {
-        stop("Invalid value for 'match'. Possible values are 'score', 'zscore', or vector of the same length as number
-             of observations in 'Data'.", call. = FALSE)
-      }
-    }
-  }
+  x <- .resolve_match(match = match, Data = Data, anchor = anchor, key = key)
+  x <- x$MATCH
 
   m <- dim(Data)[2]
 
   m1 <- lapply(1:m, function(i) {
+    x <- x[, i]
     switch(type,
       "both" = nnet::multinom(
         relevel(as.factor(Data[, i]),
@@ -167,6 +156,7 @@ MLR <- function(Data, group, key, type = "both", match = "zscore", anchor = 1:nc
     )
   })
   m0 <- lapply(1:m, function(i) {
+    x <- x[, i]
     switch(type,
       "both" = nnet::multinom(
         relevel(as.factor(Data[, i]),

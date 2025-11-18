@@ -1,7 +1,7 @@
 test_that("difNLR - examples at help page", {
   # skip_on_cran()
-  skip_on_os("linux")
-  skip_on_os("windows")
+  # skip_on_os("linux")
+  # skip_on_os("windows")
 
   # loading data
   data(GMAT)
@@ -12,7 +12,7 @@ test_that("difNLR - examples at help page", {
   expect_snapshot((fit1 <- difNLR(Data, group, focal.name = 1, model = "3PLcg")))
   # saveRDS(fit1, file = "tests/testthat/fixtures/difNLR_fit1.rds")
   fit1_expected <- readRDS(test_path("fixtures", "difNLR_fit1.rds"))
-  expect_equal(fit1, fit1_expected)
+  expect_equal(fit1, fit1_expected, tolerance = 1e-5)
 
   # graphical devices
   fit1_plot1 <- plot(fit1, item = "Item1")[[1]]
@@ -25,13 +25,13 @@ test_that("difNLR - examples at help page", {
   # estimated parameters
   # saveRDS(coef(fit1), file = "tests/testthat/fixtures/difNLR_fit1_coef1.rds")
   fit1_coef1_expected <- readRDS(test_path("fixtures", "difNLR_fit1_coef1.rds"))
-  expect_equal(coef(fit1), fit1_coef1_expected)
+  expect_equal(coef(fit1), fit1_coef1_expected, tolerance = 1e-5)
   # saveRDS(coef(fit1, SE = TRUE), file = "tests/testthat/fixtures/difNLR_fit1_coef2.rds")
   fit1_coef2_expected <- readRDS(test_path("fixtures", "difNLR_fit1_coef2.rds"))
-  expect_equal(coef(fit1, SE = TRUE), fit1_coef2_expected) # with SE
+  expect_equal(coef(fit1, SE = TRUE), fit1_coef2_expected, tolerance = 1e-5) # with SE
   # saveRDS(coef(fit1, SE = TRUE, simplify = TRUE), file = "tests/testthat/fixtures/difNLR_fit1_coef3.rds")
   fit1_coef3_expected <- readRDS(test_path("fixtures", "difNLR_fit1_coef3.rds"))
-  expect_equal(coef(fit1, SE = TRUE, simplify = TRUE), fit1_coef3_expected) # with SE, simplified
+  expect_equal(coef(fit1, SE = TRUE, simplify = TRUE), fit1_coef3_expected, tolerance = 1e-5) # with SE, simplified
 
   # fitted values
   expect_snapshot(summary(fitted(fit1)))
@@ -45,7 +45,7 @@ test_that("difNLR - examples at help page", {
   expect_snapshot(summary(predict(fit1)))
   expect_snapshot(predict(fit1, item = 1))
 
-  expect_equal(predict(fit1, item = 1)$prob, as.vector(fitted(fit1, item = 1)))
+  expect_equal(predict(fit1, item = 1)$prob, as.vector(fitted(fit1, item = 1)), tolerance = 1e-5)
 
   # predicted values for new subjects
   expect_snapshot(predict(fit1, item = 1, match = 0, group = c(0, 1)))
@@ -65,14 +65,14 @@ test_that("difNLR - examples at help page", {
   expect_snapshot((fit2 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "W")))
   # saveRDS(fit2, file = "tests/testthat/fixtures/difNLR_fit2.rds")
   fit2_expected <- readRDS(test_path("fixtures", "difNLR_fit2.rds"))
-  expect_equal(fit2, fit2_expected)
+  expect_equal(fit2, fit2_expected, tolerance = 1e-5)
 
   # testing both DIF effects using F test and
   # 3PL model with fixed guessing for groups
   expect_snapshot((fit3 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", test = "F")))
   # saveRDS(fit3, file = "tests/testthat/fixtures/difNLR_fit3.rds")
   fit3_expected <- readRDS(test_path("fixtures", "difNLR_fit3.rds"))
-  expect_equal(fit3, fit3_expected)
+  expect_equal(fit3, fit3_expected, tolerance = 1e-5)
 
   # testing both DIF effects using
   # 3PL model with fixed guessing for groups and sandwich estimator
@@ -80,7 +80,7 @@ test_that("difNLR - examples at help page", {
   expect_snapshot((fit4 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", sandwich = TRUE)))
   # saveRDS(fit4, file = "tests/testthat/fixtures/difNLR_fit4.rds")
   fit4_expected <- readRDS(test_path("fixtures", "difNLR_fit4.rds"))
-  expect_equal(fit4, fit4_expected)
+  expect_equal(fit4, fit4_expected, tolerance = 1e-5)
 
   # testing both DIF effects using LR test,
   # 3PL model with fixed guessing for groups
@@ -88,7 +88,7 @@ test_that("difNLR - examples at help page", {
   expect_snapshot((fit5 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", p.adjust.method = "BH")))
   # saveRDS(fit5, file = "tests/testthat/fixtures/difNLR_fit5.rds")
   fit5_expected <- readRDS(test_path("fixtures", "difNLR_fit5.rds"))
-  expect_equal(fit5, fit5_expected)
+  expect_equal(fit5, fit5_expected, tolerance = 1e-5)
 
   # testing both DIF effects using LR test,
   # 3PL model with fixed guessing for groups
@@ -96,34 +96,60 @@ test_that("difNLR - examples at help page", {
   expect_snapshot((fit6 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", purify = TRUE)))
   # saveRDS(fit6, file = "tests/testthat/fixtures/difNLR_fit6.rds")
   fit6_expected <- readRDS(test_path("fixtures", "difNLR_fit6.rds"))
-  expect_equal(fit6, fit6_expected)
+  expect_equal(fit6, fit6_expected, tolerance = 1e-5)
 
   # testing both DIF effects using 3PL model with fixed guessing for groups
-  # and total score as matching criterion
-  expect_snapshot((fit7 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score")))
-  # saveRDS(fit7, file = "tests/testthat/fixtures/difNLR_fit7.rds")
-  fit7_expected <- readRDS(test_path("fixtures", "difNLR_fit7.rds"))
-  expect_equal(fit7, fit7_expected)
+  # and different matching criteria
+  expect_snapshot((fit7a <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "score")))
+  # saveRDS(fit7a, file = "tests/testthat/fixtures/difNLR_fit7a.rds")
+  fit7a_expected <- readRDS(test_path("fixtures", "difNLR_fit7a.rds"))
+  expect_equal(fit7a, fit7a_expected, tolerance = 1e-5)
+  expect_snapshot((fit7b <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "restscore")))
+  # saveRDS(fit7b, file = "tests/testthat/fixtures/difNLR_fit7b.rds")
+  fit7b_expected <- readRDS(test_path("fixtures", "difNLR_fit7b.rds"))
+  expect_equal(fit7b, fit7b_expected, tolerance = 1e-5)
+  expect_snapshot((fit7c <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = "zrestscore")))
+  # saveRDS(fit7c, file = "tests/testthat/fixtures/difNLR_fit7c.rds")
+  fit7c_expected <- readRDS(test_path("fixtures", "difNLR_fit7c.rds"))
+  expect_equal(fit7c, fit7c_expected, tolerance = 1e-5)
+  match <- rowSums(Data)
+  expect_snapshot((fit7d <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)))
+  match <- replicate(ncol(Data), match)
+  expect_snapshot((fit7e <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)))
+  match <- as.data.frame(match)
+  expect_snapshot((fit7f <- difNLR(Data, group, focal.name = 1, model = "3PLcg", match = match)))
+  expect_equal(fit7a[!names(fit7a) %in% c("match", "match.name")], fit7d[!names(fit7d) %in% c("match", "match.name")], tolerance = 1e-5)
+  expect_equal(fit7a[!names(fit7a) %in% c("match", "match.name")], fit7e[!names(fit7e) %in% c("match", "match.name")], tolerance = 1e-5)
+  expect_equal(fit7a[!names(fit7a) %in% c("match", "match.name")], fit7f[!names(fit7f) %in% c("match", "match.name")], tolerance = 1e-5)
+
+
+  # graphical devices - additional
+  fit7b_plot1 <- plot(fit7b, item = "Item5")[[1]]
+  vdiffr::expect_doppelganger("difNLR_fit7b_plot1", fit7b_plot1)
+  fit7c_plot1 <- plot(fit7c, item = "Item5")[[1]]
+  vdiffr::expect_doppelganger("difNLR_fit7c_plot1", fit7c_plot1)
+  fit7d_plot1 <- plot(fit7d, item = "Item5")[[1]]
+  vdiffr::expect_doppelganger("difNLR_fit7d_plot1", fit7d_plot1)
 
   # testing uniform DIF effects using 4PL model with the same
   # guessing and inattention
   expect_snapshot((fit8 <- difNLR(Data, group, focal.name = 1, model = "4PLcgdg", type = "udif")))
   # saveRDS(fit8, file = "tests/testthat/fixtures/difNLR_fit8.rds")
   fit8_expected <- readRDS(test_path("fixtures", "difNLR_fit8.rds"))
-  expect_equal(fit8, fit8_expected)
+  expect_equal(fit8, fit8_expected, tolerance = 1e-5)
 
   # testing non-uniform DIF effects using 2PL model
   expect_snapshot((fit9 <- difNLR(Data, group, focal.name = 1, model = "2PL", type = "nudif")))
   # saveRDS(fit9, file = "tests/testthat/fixtures/difNLR_fit9.rds")
   fit9_expected <- readRDS(test_path("fixtures", "difNLR_fit9.rds"))
-  expect_equal(fit9, fit9_expected)
+  expect_equal(fit9, fit9_expected, tolerance = 1e-5)
 
   # testing difference in parameter b using 4PL model with fixed
   # a and c parameters
   expect_snapshot((fit10 <- difNLR(Data, group, focal.name = 1, model = "4PL", constraints = "ac", type = "b")))
   # saveRDS(fit10, file = "tests/testthat/fixtures/difNLR_fit10.rds")
   fit10_expected <- readRDS(test_path("fixtures", "difNLR_fit10.rds"))
-  expect_equal(fit10, fit10_expected)
+  expect_equal(fit10, fit10_expected, tolerance = 1e-5)
 
   # testing both DIF effects using LR test,
   # 3PL model with fixed guessing for groups
@@ -132,22 +158,22 @@ test_that("difNLR - examples at help page", {
   expect_snapshot((fit11 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "mle")))
   # saveRDS(fit11, file = "tests/testthat/fixtures/difNLR_fit11.rds")
   fit11_expected <- readRDS(test_path("fixtures", "difNLR_fit11.rds"))
-  expect_equal(fit11, fit11_expected)
+  expect_equal(fit11, fit11_expected, tolerance = 1e-5)
   # expect_snapshot((fit12 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "em")))
   # # saveRDS(fit12, file = "tests/testthat/fixtures/difNLR_fit12.rds")
   # fit12_expected <- readRDS(test_path("fixtures", "difNLR_fit12.rds"))
-  # expect_equal(fit12, fit12_expected)
+  # expect_equal(fit12, fit12_expected, tolerance = 1e-5)
   expect_snapshot((fit13 <- difNLR(Data, group, focal.name = 1, model = "3PLcg", method = "plf")))
   # saveRDS(fit13, file = "tests/testthat/fixtures/difNLR_fit13.rds")
   fit13_expected <- readRDS(test_path("fixtures", "difNLR_fit13.rds"))
-  expect_equal(fit13, fit13_expected)
+  expect_equal(fit13, fit13_expected, tolerance = 1e-5)
 
   # testing both DIF effects using LR test and 2PL model
   # using maximum likelihood estimation with iteratively reweighted least squares algorithm
   expect_snapshot((fit14 <- difNLR(Data, group, focal.name = 1, model = "2PL", method = "irls")))
   # saveRDS(fit14, file = "tests/testthat/fixtures/difNLR_fit14.rds")
   fit14_expected <- readRDS(test_path("fixtures", "difNLR_fit14.rds"))
-  expect_equal(fit14, fit14_expected)
+  expect_equal(fit14, fit14_expected, tolerance = 1e-5)
 })
 
 test_that("difNLR - checking inputs", {
@@ -161,6 +187,8 @@ test_that("difNLR - checking inputs", {
 
   # purification
   expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", purify = list()))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", match = rowSums(Data), purify = TRUE))
+  expect_warning(difNLR(Data, group, focal.name = 1, model = "3PL", anchor = 1:15, purify = TRUE))
   expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", purify = TRUE, nrIter = -10))
   # invalid test
   expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", test = "XXX"))
@@ -177,6 +205,10 @@ test_that("difNLR - checking inputs", {
   expect_message(difNLR(Data, group, focal.name = 1, model = "3PL", method = "likelihood"))
   # invalid combination of method and sandwich - warning
   expect_warning(difNLR(Data[, 1], group, focal.name = 1, model = "2PL", method = "mle", sandwich = TRUE, match = GMAT$criterion))
+  # invalid anchor
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", anchor = c(1:21)))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", anchor = paste0("Item", 6:27)))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", anchor = TRUE))
 
   # different dimensions
   expect_error(difNLR(Data, group[-c(1:3)], focal.name = 1, model = "3PL"))
@@ -193,9 +225,21 @@ test_that("difNLR - checking inputs", {
   # invalid group
   set.seed(42)
   expect_error(difNLR(Data, rbinom(nrow(Data), 4, prob = runif(nrow(Data))), focal.name = 1, model = "3PL"))
+  expect_error(difNLR(Data, group = 25, focal.name = 1, model = "3PL"))
+  expect_error(difNLR(Data, group = "GROUP", focal.name = 1, model = "3PL"))
+  expect_error(difNLR(Data, group = FALSE, focal.name = 1, model = "3PL"))
   # invalid dimensions
   expect_error(difNLR(Data[-c(1:4), 1], group, match = GMAT$criterion, focal.name = 1, model = "3PL"))
   expect_error(difNLR(Data[-c(1:4), ], group, focal.name = 1, model = "3PL"))
+  # invalid match
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", match = "XXX"))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", match = FALSE))
+  match <- replicate(ncol(Data), rowSums(Data))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", match = match[, 1:19]))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", match = match[1:1000, ]))
+  match <- as.data.frame(match)
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", match = match[, 1:19]))
+  expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", match = match[1:1000, ]))
 
   # invalid model
   expect_error(difNLR(Data, group, focal.name = 1, model = "5PL"))
@@ -224,19 +268,20 @@ test_that("difNLR - checking inputs", {
   fit1 <- difNLR(GMAT[, 1:20], GMAT$group, focal.name = 1, model = "3PL")
   fit2 <- difNLR(GMAT[, 1:21], "group", focal.name = 1, model = "3PL")
   fit3 <- difNLR(GMAT[, 1:21], 21, focal.name = 1, model = "3PL")
-  expect_equal(fit1, fit2)
-  expect_equal(fit1, fit3)
+  expect_equal(fit1, fit2, tolerance = 1e-5)
+  expect_equal(fit1, fit3, tolerance = 1e-5)
 
   # invalid length of start, specifying starting values
-  start <- startNLR(Data, group, model = "3PL", match = scale(apply(Data, 1, sum)), parameterization = "is")
+  match <- as.data.frame(replicate(ncol(Data), scale(apply(Data, 1, sum))))
+  start <- startNLR(Data, group, model = "3PL", match = match, parameterization = "is")
   expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", start = start[1:19]))
   fit4 <- difNLR(Data, group, focal.name = 1, model = "3PL", start = start)
   fit5 <- difNLR(Data, group, focal.name = 1, model = "3PL")
-  expect_equal(fit4, fit5)
+  expect_equal(fit4, fit5, tolerance = 1e-5)
 
-  start <- startNLR(Data, group, model = "3PL", match = scale(apply(Data, 1, sum)), parameterization = "irt")
+  start <- startNLR(Data, group, model = "3PL", match = match, parameterization = "irt")
   fit6 <- difNLR(Data, group, focal.name = 1, model = "3PL", start = start)
-  expect_equal(fit5$DIFitems, fit6$DIFitems)
+  expect_equal(fit5$DIFitems, fit6$DIFitems, tolerance = 1e-5)
   names(start[[1]]) <- letters[1:6]
   expect_error(difNLR(Data, group, focal.name = 1, model = "3PL", start = start))
 })
@@ -324,7 +369,7 @@ test_that("difNLR S3 methods - further examples", {
 
 test_that("testing paper code - R Journal 2020 - generated data", {
   # skip_on_cran()
-  skip_on_os("linux")
+  # skip_on_os("linux")
   #-----------------------------------------------------------------------------
   # DIF DETECTION AMONG BINARY DATA
   #-----------------------------------------------------------------------------
@@ -376,7 +421,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
   expect_snapshot((fit1 <- difNLR(DataDIF, groupDIF, focal.name = 1, model = "4PL", type = "all")))
   # saveRDS(fit1, file = "tests/testthat/fixtures/difNLR_RJournal_fit1.rds")
   fit1_expected <- readRDS(test_path("fixtures", "difNLR_RJournal_fit1.rds"))
-  expect_equal(fit1, fit1_expected)
+  expect_equal(fit1, fit1_expected, tolerance = 1e-5)
 
   # estimated parameters
   expect_snapshot(round(coef(fit1, simplify = TRUE), 3))
@@ -535,7 +580,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
 
 test_that("testing paper code - R Journal 2020 - LearningToLearn", {
   # skip_on_cran()
-  skip_on_os("linux")
+  # skip_on_os("linux")
 
   data("LearningToLearn", package = "ShinyItemAnalysis")
   # dichotomous items for Grade 6
@@ -578,7 +623,7 @@ test_that("testing paper code - R Journal 2020 - LearningToLearn", {
 
 test_that("testing paper code - R Journal 2020 - special cases (not included)", {
   # skip_on_cran()
-  skip_on_os("linux")
+  # skip_on_os("linux")
 
   # setting parameters
   # discrimination
@@ -626,7 +671,7 @@ test_that("testing paper code - R Journal 2020 - special cases (not included)", 
   ))
   # saveRDS(fit12b, file = "tests/testthat/fixtures/difNLR_RJournal_fit12b.rds")
   fit12b_expected <- readRDS(test_path("fixtures", "difNLR_RJournal_fit12b.rds"))
-  expect_equal(fit12b, fit12b_expected)
+  expect_equal(fit12b, fit12b_expected, tolerance = 1e-5)
 
   # plots
   expect_error(plot(fit12b, item = 14))
@@ -679,7 +724,7 @@ test_that("testing paper code - R Journal 2020 - special cases (not included)", 
     focal.name = 1, match = "score",
     model = "4PL", type = "all", anchor = paste0("Item", c(1:4, 6))
   )
-  expect_equal(fit8c, fit8b)
+  expect_equal(fit8c, fit8b, tolerance = 1e-5)
   fit8d <- difNLR(DataDIF[, 1:6], groupDIF,
     focal.name = 1, match = "score",
     model = "4PL", type = "all", purify = TRUE

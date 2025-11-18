@@ -315,7 +315,279 @@
 ---
 
     Code
-      (fit6 <- difORD(Data, group, focal.name = 1, model = "adjacent", match = "score")
+      (fit6a <- difORD(Data, group, model = "adjacent", focal.name = 1, match = "score")
+      )
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value   
+      R1   1.2551      0.5339   
+      R2   5.9526      0.0510 . 
+      R3   0.0852      0.9583   
+      R4   0.1258      0.9390   
+      R5   1.0432      0.5936   
+      R6   9.8619      0.0072 **
+      R7   9.9535      0.0069 **
+      R8   1.0119      0.6029   
+      R9   2.8220      0.2439   
+      R10  5.2412      0.0728 . 
+      R11  2.5074      0.2855   
+      R12  4.0344      0.1330   
+      R13  1.6216      0.4445   
+      R14  0.5069      0.7761   
+      R15  1.6559      0.4370   
+      R16  3.9444      0.1391   
+      R17  1.7717      0.4124   
+      R18  0.1236      0.9401   
+      R19  9.1928      0.0101 * 
+      R20 11.1244      0.0038 **
+      R21  3.0459      0.2181   
+      R22  3.7980      0.1497   
+      R23  2.7844      0.2485   
+      R24  0.5137      0.7735   
+      R25  1.0364      0.5956   
+      R26  0.9524      0.6211   
+      R27  0.2938      0.8634   
+      R28  4.3879      0.1115   
+      R29  3.4921      0.1745   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       R6
+       R7
+       R19
+       R20
+
+---
+
+    Code
+      (fit6b <- difORD(Data, group, model = "adjacent", focal.name = 1, match = "restscore")
+      )
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value   
+      R1   1.5208      0.4675   
+      R2   6.3025      0.0428 * 
+      R3   0.0528      0.9740   
+      R4   0.1180      0.9427   
+      R5   1.1060      0.5752   
+      R6   9.0875      0.0106 * 
+      R7  10.2041      0.0061 **
+      R8   1.0272      0.5983   
+      R9   2.4786      0.2896   
+      R10  4.9273      0.0851 . 
+      R11  2.7030      0.2589   
+      R12  3.5580      0.1688   
+      R13  1.5899      0.4516   
+      R14  0.5471      0.7607   
+      R15  1.8928      0.3881   
+      R16  4.4791      0.1065   
+      R17  1.8432      0.3979   
+      R18  0.2343      0.8894   
+      R19  8.8618      0.0119 * 
+      R20 11.3123      0.0035 **
+      R21  2.9970      0.2235   
+      R22  4.1696      0.1243   
+      R23  3.1700      0.2049   
+      R24  0.7125      0.7003   
+      R25  1.3713      0.5038   
+      R26  0.9296      0.6282   
+      R27  0.3159      0.8539   
+      R28  5.0765      0.0790 . 
+      R29  3.1817      0.2038   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       R2
+       R6
+       R7
+       R19
+       R20
+
+---
+
+    Code
+      (fit6c <- difORD(Data, group, model = "adjacent", focal.name = 1, match = "zrestscore")
+      )
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value   
+      R1   1.5208      0.4675   
+      R2   6.3025      0.0428 * 
+      R3   0.0528      0.9740   
+      R4   0.1180      0.9427   
+      R5   1.1060      0.5752   
+      R6   9.0875      0.0106 * 
+      R7  10.2041      0.0061 **
+      R8   1.0272      0.5983   
+      R9   2.4786      0.2896   
+      R10  4.9273      0.0851 . 
+      R11  2.7030      0.2589   
+      R12  3.5580      0.1688   
+      R13  1.5899      0.4516   
+      R14  0.5471      0.7607   
+      R15  1.8928      0.3881   
+      R16  4.4791      0.1065   
+      R17  1.8432      0.3979   
+      R18  0.2343      0.8894   
+      R19  8.8618      0.0119 * 
+      R20 11.3123      0.0035 **
+      R21  2.9970      0.2235   
+      R22  4.1696      0.1243   
+      R23  3.1700      0.2049   
+      R24  0.7125      0.7003   
+      R25  1.3713      0.5038   
+      R26  0.9296      0.6282   
+      R27  0.3159      0.8539   
+      R28  5.0765      0.0790 . 
+      R29  3.1817      0.2038   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       R2
+       R6
+       R7
+       R19
+       R20
+
+---
+
+    Code
+      (fit6d <- difORD(Data, group, model = "adjacent", focal.name = 1, match = match)
+      )
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value   
+      R1   1.2551      0.5339   
+      R2   5.9526      0.0510 . 
+      R3   0.0852      0.9583   
+      R4   0.1258      0.9390   
+      R5   1.0432      0.5936   
+      R6   9.8619      0.0072 **
+      R7   9.9535      0.0069 **
+      R8   1.0119      0.6029   
+      R9   2.8220      0.2439   
+      R10  5.2412      0.0728 . 
+      R11  2.5074      0.2855   
+      R12  4.0344      0.1330   
+      R13  1.6216      0.4445   
+      R14  0.5069      0.7761   
+      R15  1.6559      0.4370   
+      R16  3.9444      0.1391   
+      R17  1.7717      0.4124   
+      R18  0.1236      0.9401   
+      R19  9.1928      0.0101 * 
+      R20 11.1244      0.0038 **
+      R21  3.0459      0.2181   
+      R22  3.7980      0.1497   
+      R23  2.7844      0.2485   
+      R24  0.5137      0.7735   
+      R25  1.0364      0.5956   
+      R26  0.9524      0.6211   
+      R27  0.2938      0.8634   
+      R28  4.3879      0.1115   
+      R29  3.4921      0.1745   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       R6
+       R7
+       R19
+       R20
+
+---
+
+    Code
+      (fit6e <- difORD(Data, group, model = "adjacent", focal.name = 1, match = match)
+      )
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value   
+      R1   1.2551      0.5339   
+      R2   5.9526      0.0510 . 
+      R3   0.0852      0.9583   
+      R4   0.1258      0.9390   
+      R5   1.0432      0.5936   
+      R6   9.8619      0.0072 **
+      R7   9.9535      0.0069 **
+      R8   1.0119      0.6029   
+      R9   2.8220      0.2439   
+      R10  5.2412      0.0728 . 
+      R11  2.5074      0.2855   
+      R12  4.0344      0.1330   
+      R13  1.6216      0.4445   
+      R14  0.5069      0.7761   
+      R15  1.6559      0.4370   
+      R16  3.9444      0.1391   
+      R17  1.7717      0.4124   
+      R18  0.1236      0.9401   
+      R19  9.1928      0.0101 * 
+      R20 11.1244      0.0038 **
+      R21  3.0459      0.2181   
+      R22  3.7980      0.1497   
+      R23  2.7844      0.2485   
+      R24  0.5137      0.7735   
+      R25  1.0364      0.5956   
+      R26  0.9524      0.6211   
+      R27  0.2938      0.8634   
+      R28  4.3879      0.1115   
+      R29  3.4921      0.1745   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       R6
+       R7
+       R19
+       R20
+
+---
+
+    Code
+      (fit6f <- difORD(Data, group, model = "adjacent", focal.name = 1, match = match)
       )
     Output
       Detection of both types of Differential Item Functioning
@@ -462,6 +734,136 @@
       Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
       
       None of items is detected as DIF
+
+---
+
+    Code
+      (difORD(Data[, -c(2, 6, 7, 16, 19, 20, 22, 28)], group, focal.name = 1, type = "udif")
+      )
+    Output
+      Detection of uniform Differential Item Functioning for
+      ordinal data using adjacent category logit regression model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value  
+      R1  1.3723      0.2414   
+      R3  0.0431      0.8356   
+      R4  0.1352      0.7131   
+      R5  0.2152      0.6427   
+      R8  0.0188      0.8910   
+      R9  2.1395      0.1436   
+      R10 0.7101      0.3994   
+      R11 2.8381      0.0921  .
+      R12 2.2716      0.1318   
+      R13 0.7219      0.3955   
+      R14 0.4644      0.4956   
+      R15 1.5201      0.2176   
+      R17 2.4646      0.1164   
+      R18 0.3905      0.5321   
+      R21 2.0723      0.1500   
+      R23 1.8330      0.1758   
+      R24 0.9434      0.3314   
+      R25 0.5988      0.4390   
+      R26 0.0395      0.8424   
+      R27 0.5795      0.4465   
+      R29 1.9700      0.1604   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      None of items is detected as uniform DIF
+
+---
+
+    Code
+      (difORD(Data[, -c(2, 6, 7, 19, 20)], group, focal.name = 1, type = "nudif"))
+    Output
+      Detection of non-uniformDifferential Item Functioning for
+      ordinal data using adjacent category logit regression model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was not applied
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value  
+      R1  0.8087      0.3685   
+      R3  0.0316      0.8588   
+      R4  0.0005      0.9821   
+      R5  0.7859      0.3753   
+      R8  0.7215      0.3956   
+      R9  0.1145      0.7351   
+      R10 3.0934      0.0786  .
+      R11 0.6004      0.4384   
+      R12 0.6746      0.4114   
+      R13 0.2193      0.6395   
+      R14 0.2624      0.6085   
+      R15 0.8815      0.3478   
+      R16 0.0718      0.7887   
+      R17 0.4181      0.5179   
+      R18 0.0047      0.9451   
+      R21 0.3873      0.5337   
+      R22 0.2730      0.6013   
+      R23 1.0133      0.3141   
+      R24 0.3488      0.5548   
+      R25 0.2105      0.6464   
+      R26 0.3306      0.5653   
+      R27 0.6151      0.4329   
+      R28 0.6801      0.4095   
+      R29 0.3372      0.5614   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      None of items is detected as non-uniform DIF
+
+---
+
+    Code
+      (fit9 <- difORD(Data[, -c(2, 6, 7, 19)], group, focal.name = 1, purify = TRUE))
+    Output
+      Detection of both types of Differential Item Functioning
+      for ordinal data using adjacent category logit regression
+      model
+      
+      Likelihood-ratio Chi-square statistics
+      
+      Item purification was applied with 1 iteration
+      No p-value adjustment for multiple comparisons
+      
+          Chisq-value P-value   
+      R1   1.6404      0.4403   
+      R3   0.0320      0.9841   
+      R4   0.0008      0.9996   
+      R5   0.8556      0.6520   
+      R8   0.7217      0.6971   
+      R9   2.7545      0.2523   
+      R10  4.2581      0.1190   
+      R11  2.8458      0.2410   
+      R12  3.7298      0.1549   
+      R13  1.2787      0.5276   
+      R14  0.4712      0.7901   
+      R15  1.9018      0.3864   
+      R16  4.1030      0.1285   
+      R17  2.2937      0.3176   
+      R18  0.1617      0.9223   
+      R20 11.2324      0.0036 **
+      R21  2.7952      0.2472   
+      R22  4.2428      0.1199   
+      R23  2.1986      0.3331   
+      R24  0.7738      0.6792   
+      R25  0.5600      0.7558   
+      R26  0.6024      0.7399   
+      R27  0.7387      0.6912   
+      R28  4.2304      0.1206   
+      R29  3.1896      0.2030   
+      
+      Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+      
+      Items detected as DIF items:
+       R20
 
 ---
 
