@@ -20,3 +20,6 @@
 .Rproj.user/C7420700/cpp-definition-cache
 *.xml
 hex_sticker.R
+docs
+/doc/
+/Meta/

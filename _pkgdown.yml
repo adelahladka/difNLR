@@ -1,0 +1,77 @@
+template:
+  bootstrap: 5
+  bslib:
+    bootswatch: simplex
+    primary: "#0072B2"
+  params:
+    logo: man/figures/logo.png
+    assets: pkgdown
+
+url: https://adelahladka.github.io/difNLR/
+
+home:
+  title: difNLR
+  description: >
+    Differential Item Functioning detection using Nonlinear Logistic Regression models.
+  sidebar:
+    structure: [links, license, authors]
+
+navbar:
+  structure:
+    left: [home, reference, articles, news]
+    right: [sia, siamodules, github]
+  components:
+    sia:
+      text: "SIA"
+      href: https://shinyitemanalysis.org/
+      target: "_blank"              # opens in new tab
+      rel: "noopener noreferrer"    # security best practice
+      aria_label: "SIA"
+    siamodules:
+      text: "SIAmodules"
+      href: https://CRAN.R-project.org/package=SIAmodules
+      target: "_blank"
+      rel: "noopener noreferrer"
+      aria_label: "SIAmodules"
+
+reference:
+  - title: Package overview
+    contents:
+      - difNLR-package
+
+  - title: Core functions
+    contents:
+      - difNLR
+      - difORD
+      - ddfMLR
+      - genNLR
+
+  - title: Helper functions
+    contents:
+      - startNLR
+      - estimNLR
+      - formulaNLR
+      - MLR
+      - NLR
+      - ORD
+
+  - title: Utilities
+    contents:
+      - ends_with(".difNLR")
+      - ends_with(".difORD")
+      - ends_with(".ddfMLR")
+
+  - title: Data
+    contents:
+      - GMAT
+      - GMATkey
+      - GMATtest
+      - GMAT2
+      - GMAT2key
+      - GMAT2test
+      - starts_with("MSATB")
+
+articles:
+   - title: Quick Start with the `difNLR()` function
+     contents:
+       - difNLR-quick_start
