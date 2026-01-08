@@ -47,14 +47,16 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.5.2\cr
-#' Date: 2025-11-18\cr
+#' Version: 1.5.3\cr
+#' Date: 2026-01-08\cr
 #' Depends: R (>= 4.0.0)\cr
 #' Imports: calculus, ggplot2 (>= 3.4.0), msm, nnet, plyr, stats, VGAM\cr
-#' Suggests: ShinyItemAnalysis, testthat (>= 3.0.0), vdiffr\cr
+#' Suggests: knitr, pkgdown, rmarkdown, ShinyItemAnalysis, testthat (>= 3.0.0), vdiffr\cr
+#' VignetteBuilder: knitr
 #' License: GPL-3\cr
 #' BugReports: \url{https://github.com/adelahladka/difNLR/issues}\cr
 #' Encoding: UTF-8\cr
+#' Url: \url{https://adelahladka.github.io/difNLR/}
 #'
 #' @author
 #' Adela Hladka (nee Drabinova) \cr

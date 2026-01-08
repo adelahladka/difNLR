@@ -22,14 +22,16 @@ The difNLR package provides methods for detecting differential
 \details{
 Package: difNLR\cr
 Type: Package\cr
-Version: 1.5.2\cr
-Date: 2025-11-18\cr
+Version: 1.5.3\cr
+Date: 2026-01-08\cr
 Depends: R (>= 4.0.0)\cr
 Imports: calculus, ggplot2 (>= 3.4.0), msm, nnet, plyr, stats, VGAM\cr
-Suggests: ShinyItemAnalysis, testthat (>= 3.0.0), vdiffr\cr
+Suggests: knitr, pkgdown, rmarkdown, ShinyItemAnalysis, testthat (>= 3.0.0), vdiffr\cr
+VignetteBuilder: knitr
 License: GPL-3\cr
 BugReports: \url{https://github.com/adelahladka/difNLR/issues}\cr
 Encoding: UTF-8\cr
+Url: \url{https://adelahladka.github.io/difNLR/}
 }
 \note{
 This package was supported by grant funded by Czech Science foundation under number GJ15-15856Y.
@@ -89,6 +91,7 @@ Vlckova, K. (2014). Test and item fairness. Master's thesis. Faculty of Mathemat
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://adelahladka.github.io/difNLR/}
   \item Report bugs at \url{https://github.com/adelahladka/difNLR/issues}
 }
 

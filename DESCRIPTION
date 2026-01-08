@@ -1,9 +1,9 @@
 Package: difNLR
 Type: Package
 Title: DIF and DDF Detection by Non-Linear Regression Models
-Version: 1.5.2
-Date: 2025-11-18
-Authors@R: c(person("Adela", "Hladka", role = c("aut", "cre"), email = "hladka@cs.cas.cz"), person("Patricia", "Martinkova", role = "aut"), person("Karel", "Zvara", role = "ctb"))
+Version: 1.5.3
+Date: 2026-01-08
+Authors@R: c(person("Adela", "Hladka", role = c("aut", "cre"), email = "hladka@cs.cas.cz", comment = c(ORCID = "0000-0002-9112-1208", URL = "https://www.cs.cas.cz/hladka/")), person("Patricia", "Martinkova", role = "aut", comment = c(ORCID = "0000-0003-4754-8543", URL = "https://www.cs.cas.cz/martinkova/")), person("Karel", "Zvara", role = "ctb"))
 Author: Adela Hladka [aut, cre], Patricia Martinkova [aut], Karel Zvara [ctb]
 Maintainer: Adela Hladka <hladka@cs.cas.cz>
 Depends:
@@ -17,9 +17,13 @@ Imports:
     stats,
     VGAM
 Suggests: 
+    knitr,
+    pkgdown,
+    rmarkdown,
     ShinyItemAnalysis,
     testthat (>= 3.0.0),
     vdiffr
+VignetteBuilder: knitr
 Description: Detection of differential item functioning (DIF) among dichotomously scored items and differential distractor functioning (DDF) among unscored items with non-linear regression  procedures based on generalized logistic regression models (Hladka & Martinkova, 2020, <doi:10.32614/RJ-2020-014>).
 License: GPL-3
 LazyData: yes
@@ -27,3 +31,4 @@ RoxygenNote: 7.3.3
 BugReports: https://github.com/adelahladka/difNLR/issues
 Encoding: UTF-8
 Config/testthat/edition: 3
+URL: https://adelahladka.github.io/difNLR/

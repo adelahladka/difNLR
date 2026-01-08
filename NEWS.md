@@ -1,7 +1,22 @@
+# difNLR 1.5.3 (2026-01-08)
 
-# difNLR 1.5.2 (2025-11-18)
+## Major updates
+  * A webpage https://adelahladka.github.io/difNLR/ was created.
+  * The first vignette for a quick start with the `difNLR()` function was 
+    created. 
+
+------
+
+# difNLR 1.5.2-1-2 (2025-11-19)
 
 **_THIS IS A CRAN VERSION_**
+
+## Minor updates
+  * Tests skipped on CRAN. 
+
+------
+
+# difNLR 1.5.2 (2025-11-18)
 
 ## Major updates
   * `match` argument of the `difNLR()`, `difORD()`, and `ddfMLR()` now handles 
