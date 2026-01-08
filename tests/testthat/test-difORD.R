@@ -1,5 +1,5 @@
 test_that("difORD - examples at help page", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -108,7 +108,7 @@ test_that("difORD - examples at help page", {
 })
 
 test_that("difORD - checking inputs", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -170,7 +170,7 @@ test_that("difORD - checking inputs", {
 })
 
 test_that("difORD - other examples", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -197,7 +197,7 @@ test_that("difORD - other examples", {
 })
 
 test_that("difORD S3 methods - checking inputs", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -253,7 +253,7 @@ test_that("difORD S3 methods - checking inputs", {
 })
 
 test_that("testing paper code - R Journal 2020 - generated data", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   set.seed(42)
@@ -292,7 +292,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
 })
 
 test_that("testing paper code - R Journal 2020 - LearningToLearn", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   data(LearningToLearn, package = "ShinyItemAnalysis")

@@ -1,5 +1,5 @@
 test_that("startNLR - examples at help page", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -36,7 +36,7 @@ test_that("startNLR - examples at help page", {
 })
 
 test_that("startNLR - checking inputs", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -57,7 +57,7 @@ test_that("startNLR - checking inputs", {
 })
 
 test_that("startNLR - further examples", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # loading data

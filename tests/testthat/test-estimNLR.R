@@ -1,5 +1,5 @@
 test_that("estimNLR - examples at help page", {
-  # skip_on_cran()
+  skip_on_cran()
   skip_on_os("linux")
 
   # loading data

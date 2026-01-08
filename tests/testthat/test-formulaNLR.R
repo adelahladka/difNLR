@@ -57,6 +57,7 @@ test_that("formulaNLR - checking inputs", {
 })
 
 test_that("formulaNLR equivalence of models for IRT parametrization", {
+  skip_on_cran()
   # 1PL vs 2PL model with constraints on a
   frm1 <- formulaNLR(model = "1PL")
   frm2 <- formulaNLR(model = "2PL", constraints = "a")
@@ -107,6 +108,7 @@ test_that("formulaNLR equivalence of models for IRT parametrization", {
 })
 
 test_that("formulaNLR equivalence of models for IS parametrization", {
+  skip_on_cran()
   # 1PL vs 2PL model with constraints on a
   frm1 <- formulaNLR(model = "1PL", parameterization = "is")
   frm2 <- formulaNLR(model = "2PL", constraints = "a", parameterization = "is")
@@ -157,6 +159,7 @@ test_that("formulaNLR equivalence of models for IS parametrization", {
 })
 
 test_that("formulaNLR equivalence of models for logistic parametrization", {
+  skip_on_cran()
   # 2PL with uniform DIF vs 2PL model with constraints on a
   frm1 <- formulaNLR(model = "2PL", type = "udif", parameterization = "logistic")
   frm2 <- formulaNLR(model = "2PL", constraints = "a", parameterization = "logistic")

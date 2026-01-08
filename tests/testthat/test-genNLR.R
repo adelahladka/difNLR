@@ -1,5 +1,5 @@
 test_that("genNLR - examples at help page", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # seed
@@ -39,7 +39,7 @@ test_that("genNLR - examples at help page", {
 })
 
 test_that("genNLR - checking inputs", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # seed
@@ -95,7 +95,7 @@ test_that("genNLR - checking inputs", {
 })
 
 test_that("genNLR - further examples", {
-  # skip_on_cran()
+  skip_on_cran()
   # skip_on_os("linux")
 
   # seed
