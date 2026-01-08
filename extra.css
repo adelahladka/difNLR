@@ -1,0 +1,111 @@
+/* -----------------------------
+   Navbar general adjustments
+------------------------------*/
+
+/* Shrink navbar height */
+.navbar {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  min-height: 55px; /* adjust to fit logos */
+}
+
+/* Align all nav links and brand vertically */
+.navbar-brand,
+.navbar-nav .nav-link {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  height: 50px;  /* matches logo height */
+}
+
+/* -----------------------------
+   difNLR logo (brand) styling
+------------------------------*/
+
+/* Vertically center brand and nav items */
+.navbar .container,
+.navbar .container-fluid {
+  display: flex;
+  align-items: center;
+}
+
+/* Brand container */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;        /* space between logo and text */
+  white-space: nowrap;
+}
+
+/* Logo */
+.navbar-brand::before {
+  content: "";
+  display: inline-block;
+  width: 55px;
+  height: 50px;
+  background-image: url("logo.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+/* -----------------------------
+   SIA logo (right nav-link)
+------------------------------*/
+.navbar-nav .nav-link[href="https://shinyitemanalysis.org/"] {
+  background-image: url("sia.svg");  /* your SIA logo */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 55px;  /* logo width */
+  height: 50px; /* logo height */
+  padding: 0;
+  text-indent: -9999px; /* hide text visually */
+  display: inline-block;
+}
+
+/* -----------------------------
+   SIAmodules logo (right nav-link)
+------------------------------*/
+.navbar-nav .nav-link[href="https://CRAN.R-project.org/package=SIAmodules"] {
+  background-image: url("siamodules.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 55px;
+  height: 50px;
+  padding: 0;
+  text-indent: -9999px;   /* hide text */
+  display: inline-block;
+}
+
+/* -----------------------------
+   GitHub icon adjustments
+------------------------------*/
+
+/* Make GitHub icon same size as SIA logo */
+.navbar .nav-link[href*="github.com"] .fa {
+  font-size: 32px !important;  /* adjust as needed */
+}
+
+/* Center the icon vertically in the navbar */
+.navbar .nav-link[href*="github.com"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;   /* bit narrower than SIA/logo width */
+  height: 50px;  /* match SIA/logo height */
+  padding: 0;
+}
+
+/* -----------------------------
+   Optional fine-tuning
+------------------------------*/
+
+/* Ensure SIA logo aligns vertically with brand & GitHub */
+.navbar-nav .nav-link[href="https://shinyitemanalysis.org/"] {
+  background-position: center 50%; /* tweak vertical alignment if needed */
+}
