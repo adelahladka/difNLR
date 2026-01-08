@@ -1,0 +1,99 @@
+---
+title: "Quick Start with the `difNLR()` function"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick Start with the `difNLR()` function}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,       # show code
+  eval = TRUE,       # run code
+  results = 'markup',# show printed output
+  warning = TRUE,    # show warnings
+  message = TRUE,    # show messages
+  fig.width = 6,     # default figure width
+  fig.height = 4,    # default figure height
+  fig.align = "center"
+)
+```
+
+This vignette demonstrates the **basic usage of the `difNLR()` function** using example data from the package.
+
+## Load package
+
+```{r loading package}
+library(difNLR)
+```
+
+## Load data
+
+We here use the `GMAT` dataset. It is s a generated dataset based on parameters
+from Graduate Management Admission Test (GMAT, Kingston et al., 1985). First two
+items were considered to function differently in uniform and non-uniform way
+respectively. The dataset represents responses of 2,000 subjects to
+multiple-choice test of 20 items. A correct answer is coded as 1 and incorrect
+answer as 0. The column group represents group membership, where 0 indicates
+reference group and 1 indicates focal group. Groups are the same size (i.e.
+1,000 per group). The distributions of total scores (sum of correct answers) are
+the same for both reference and focal group (Martinkova et al., 2017).
+
+```{r loading data}
+data(GMAT)
+Data <- GMAT[, 1:20] # binary items
+group <- GMAT[, "group"] # group membership variable
+
+summary(Data)
+table(group)
+```
+
+## DIF detection with generalized logistic regression models
+
+Not constrained 4 parameter logistic (PL) model using the IRT parametrization is
+of the following form:
+$$
+\begin{align}
+P(Y_{pi} = 1 \mid X_p, G_p) =& (c_{i} + c_{i\text{DIF}} \cdot G_p) + (d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) / \\
+ &(1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot (X_p - b_p - b_{i\text{DIF}} \cdot G_p))),
+\end{align}
+$$
+where \(X_p\) is the matching criterion (e.g., standardized total score) and
+\(G_p\) is a group membership variable for respondent \(p\). Parameters
+\(a_i\), \(b_i\), \(c_i\), and \(d_i\) are discrimination, difficulty,
+guessing, and inattention for the reference group for item \(i\). Terms
+\(a_{i\text{DIF}}\), \(b_{i\text{DIF}}\), \(c_{i\text{DIF}}\), and
+\(d_{i\text{DIF}}\) then represent differences between the focal and reference
+groups in discrimination, difficulty, guessing, and inattention for item
+\(i\), respectively.
+
+To perform DIF detection, besides `Data` and `group` variable, we need to
+specify the name of the focal group with the argument `focal.name` and the
+generalized regression model through the `model` argument. The options are as
+follows: \code{Rasch} for 1PL model with discrimination parameter fixed on value
+1 for both groups, \code{1PL} for 1PL model with discrimination parameter set
+the same for both groups, \code{2PL} for logistic regression model, \code{3PLcg}
+for 3PL model with fixed guessing for both groups, \code{3PLdg} for 3PL model
+with fixed inattention for both groups, \code{3PLc} (alternatively also
+\code{3PL}) for 3PL regression model with guessing parameter, \code{3PLd} for
+3PL model with inattention parameter, \code{4PLcgdg} for 4PL model with fixed
+guessing and inattention parameter for both groups, \code{4PLcgd} (alternatively
+also \code{4PLd}) for 4PL model with fixed guessing for both groups,
+\code{4PLcdg} (alternatively also \code{4PLc}) for 4PL model with fixed
+inattention for both groups, or \code{4PL} for 4PL model.
+
+Here we use the 3PL model with the same guessing parameter \(c_i\) for both
+groups on the `GMAT` dataset.
+```{r difNLR with 3PL model}
+(x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
+```
+The functions computes \(\chi^2\)-statistics and corresponding p-values, suggesting
+items 1, 2, 7, and 19 to function differently for the reference and focal groups. 
+
+## Plot item characteristic curves
+
+We plot item characteristic curves for DIF items.
+```{r plot difNLR}
+plot(x, item = x$DIFitems)
+```
