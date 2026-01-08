@@ -15,7 +15,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/adelahladka/difNLR/blob/master/inst/CITATION)
+[`inst/CITATION`](https://github.com/adelahladka/difNLR/blob/HEAD/inst/CITATION)
 
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic
 regression models for DIF and DDF detection. The R Journal, 12(1),

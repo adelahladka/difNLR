@@ -128,7 +128,7 @@ formulaNLR(model = "3PLcg", type = "both")
 #> $M0
 #> $M0$formula
 #> y ~ c + (1 - c)/(1 + exp(-a * (x - b)))
-#> <environment: 0x562184f75c80>
+#> <environment: 0x000001e23953f8f0>
 #> 
 #> $M0$parameters
 #> [1] "a" "b" "c"
@@ -145,7 +145,7 @@ formulaNLR(model = "3PLcg", type = "both")
 #> $M1
 #> $M1$formula
 #> y ~ c + (1 - c)/(1 + exp(-(a + aDif * g) * (x - (b + bDif * g))))
-#> <environment: 0x562184f75c80>
+#> <environment: 0x000001e23953f8f0>
 #> 
 #> $M1$parameters
 #> [1] "a"    "b"    "c"    "aDif" "bDif"
@@ -163,7 +163,7 @@ formulaNLR(model = "3PLcg", type = "both", parameterization = "is")
 #> $M0
 #> $M0$formula
 #> y ~ c + (1 - c)/(1 + exp(-(b0 + b1 * x)))
-#> <environment: 0x562184fcb328>
+#> <environment: 0x000001e237f5db90>
 #> 
 #> $M0$parameters
 #> [1] "b0" "b1" "c" 
@@ -180,7 +180,7 @@ formulaNLR(model = "3PLcg", type = "both", parameterization = "is")
 #> $M1
 #> $M1$formula
 #> y ~ c + (1 - c)/(1 + exp(-(b0 + b1 * x + b2 * g + b3 * x * g)))
-#> <environment: 0x562184fcb328>
+#> <environment: 0x000001e237f5db90>
 #> 
 #> $M1$parameters
 #> [1] "b0" "b1" "b2" "b3" "c" 
@@ -201,7 +201,7 @@ formulaNLR(model = "4PLcgdg", type = "udif")
 #> $M0
 #> $M0$formula
 #> y ~ c + (d - c)/(1 + exp(-a * (x - b)))
-#> <environment: 0x562185034260>
+#> <environment: 0x000001e237875300>
 #> 
 #> $M0$parameters
 #> [1] "a" "b" "c" "d"
@@ -218,7 +218,7 @@ formulaNLR(model = "4PLcgdg", type = "udif")
 #> $M1
 #> $M1$formula
 #> y ~ c + (d - c)/(1 + exp(-a * (x - (b + bDif * g))))
-#> <environment: 0x562185034260>
+#> <environment: 0x000001e237875300>
 #> 
 #> $M1$parameters
 #> [1] "a"    "b"    "c"    "d"    "bDif"
@@ -236,7 +236,7 @@ formulaNLR(model = "4PLcgdg", type = "udif", parameterization = "is")
 #> $M0
 #> $M0$formula
 #> y ~ c + (d - c)/(1 + exp(-(b0 + b1 * x)))
-#> <environment: 0x562185087908>
+#> <environment: 0x000001e23767d488>
 #> 
 #> $M0$parameters
 #> [1] "b0" "b1" "c"  "d" 
@@ -253,7 +253,7 @@ formulaNLR(model = "4PLcgdg", type = "udif", parameterization = "is")
 #> $M1
 #> $M1$formula
 #> y ~ c + (d - c)/(1 + exp(-(b0 + b1 * x + b2 * g)))
-#> <environment: 0x562185087908>
+#> <environment: 0x000001e23767d488>
 #> 
 #> $M1$parameters
 #> [1] "b0" "b1" "b2" "c"  "d" 
@@ -273,7 +273,7 @@ formulaNLR(model = "2PL", type = "nudif")
 #> $M0
 #> $M0$formula
 #> y ~ 1/(1 + exp(-a * (x - (b + bDif * g))))
-#> <environment: 0x5621850e63c0>
+#> <environment: 0x000001e23748ea80>
 #> 
 #> $M0$parameters
 #> [1] "a"    "b"    "bDif"
@@ -290,7 +290,7 @@ formulaNLR(model = "2PL", type = "nudif")
 #> $M1
 #> $M1$formula
 #> y ~ 1/(1 + exp(-(a + aDif * g) * (x - (b + bDif * g))))
-#> <environment: 0x5621850e63c0>
+#> <environment: 0x000001e23748ea80>
 #> 
 #> $M1$parameters
 #> [1] "a"    "b"    "aDif" "bDif"
@@ -308,7 +308,7 @@ formulaNLR(model = "2PL", type = "nudif", parameterization = "is")
 #> $M0
 #> $M0$formula
 #> y ~ 1/(1 + exp(-(b0 + b1 * x + b2 * g)))
-#> <environment: 0x562185139310>
+#> <environment: 0x000001e23735bb48>
 #> 
 #> $M0$parameters
 #> [1] "b0" "b1" "b2"
@@ -325,7 +325,7 @@ formulaNLR(model = "2PL", type = "nudif", parameterization = "is")
 #> $M1
 #> $M1$formula
 #> y ~ 1/(1 + exp(-(b0 + b1 * x + b2 * g + b3 * x * g)))
-#> <environment: 0x562185139310>
+#> <environment: 0x000001e23735bb48>
 #> 
 #> $M1$parameters
 #> [1] "b0" "b1" "b2" "b3"
@@ -343,7 +343,7 @@ formulaNLR(model = "2PL", type = "nudif", parameterization = "logistic")
 #> $M0
 #> $M0$formula
 #> y ~ x + g
-#> <environment: 0x56218517e0e8>
+#> <environment: 0x000001e237258040>
 #> 
 #> $M0$parameters
 #> [1] "(Intercept)" "x"           "g"          
@@ -358,7 +358,7 @@ formulaNLR(model = "2PL", type = "nudif", parameterization = "logistic")
 #> $M1
 #> $M1$formula
 #> y ~ x + g + x:g
-#> <environment: 0x56218517e0e8>
+#> <environment: 0x000001e237258040>
 #> 
 #> $M1$parameters
 #> [1] "(Intercept)" "x"           "g"           "x:g"        
@@ -376,7 +376,7 @@ formulaNLR(model = "4PL", type = "all", parameterization = "irt")
 #> $M0
 #> $M0$formula
 #> y ~ c + (d - c)/(1 + exp(-a * (x - b)))
-#> <environment: 0x5621851cc748>
+#> <environment: 0x000001e2357be900>
 #> 
 #> $M0$parameters
 #> [1] "a" "b" "c" "d"
@@ -395,7 +395,7 @@ formulaNLR(model = "4PL", type = "all", parameterization = "irt")
 #> y ~ (cR * (1 - g) + cF * g) + (dR * (1 - g) + dF * g - (cR * 
 #>     (1 - g) + cF * g))/(1 + exp(-(a + aDif * g) * (x - (b + bDif * 
 #>     g))))
-#> <environment: 0x5621851cc748>
+#> <environment: 0x000001e2357be900>
 #> 
 #> $M1$parameters
 #> [1] "a"    "b"    "cR"   "dR"   "aDif" "bDif" "cF"   "dF"  
@@ -413,7 +413,7 @@ formulaNLR(model = "4PL", type = "all", parameterization = "is")
 #> $M0
 #> $M0$formula
 #> y ~ c + (d - c)/(1 + exp(-(b0 + b1 * x)))
-#> <environment: 0x5621852222c8>
+#> <environment: 0x000001e2352d4378>
 #> 
 #> $M0$parameters
 #> [1] "b0" "b1" "c"  "d" 
@@ -432,7 +432,7 @@ formulaNLR(model = "4PL", type = "all", parameterization = "is")
 #> y ~ (cR * (1 - g) + cF * g) + (dR * (1 - g) + dF * g - (cR * 
 #>     (1 - g) + cF * g))/(1 + exp(-(b0 + b1 * x + b2 * g + b3 * 
 #>     x * g)))
-#> <environment: 0x5621852222c8>
+#> <environment: 0x000001e2352d4378>
 #> 
 #> $M1$parameters
 #> [1] "b0" "b1" "b2" "b3" "cR" "cF" "dR" "dF"
@@ -453,7 +453,7 @@ formulaNLR(model = "4PL", constraints = "ac", type = "b")
 #> $M0
 #> $M0$formula
 #> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-a * (x - b)))
-#> <environment: 0x56218528e688>
+#> <environment: 0x000001e25862ff10>
 #> 
 #> $M0$parameters
 #> [1] "a"  "b"  "c"  "dR" "dF"
@@ -471,7 +471,7 @@ formulaNLR(model = "4PL", constraints = "ac", type = "b")
 #> $M1$formula
 #> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-a * (x - (b + bDif * 
 #>     g))))
-#> <environment: 0x56218528e688>
+#> <environment: 0x000001e25862ff10>
 #> 
 #> $M1$parameters
 #> [1] "a"    "b"    "c"    "dR"   "bDif" "dF"  
@@ -489,7 +489,7 @@ formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "is
 #> $M0
 #> $M0$formula
 #> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-(b0 + b1 * x)))
-#> <environment: 0x562185333ed8>
+#> <environment: 0x000001e24bd4e570>
 #> 
 #> $M0$parameters
 #> [1] "b0" "b1" "c"  "dR" "dF"
@@ -507,7 +507,7 @@ formulaNLR(model = "4PL", constraints = "ac", type = "b", parameterization = "is
 #> $M1$formula
 #> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-(b0 + b1 * x + 
 #>     b2 * g)))
-#> <environment: 0x562185333ed8>
+#> <environment: 0x000001e24bd4e570>
 #> 
 #> $M1$parameters
 #> [1] "b0" "b1" "b2" "c"  "dR" "dF"

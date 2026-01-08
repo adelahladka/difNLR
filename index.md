@@ -52,11 +52,25 @@ is 1.5.2-2. The newest development version available on
 
 To cite the **difNLR** package in publications, please, use:
 
+- Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic
+  regression models for DIF and DDF detection. *The R Journal, 12*(1),
+  300–323, <https://doi.org/10.32614/RJ-2020-014>
+
 &nbsp;
+
+- Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+  functioning with nonlinear regression: A non-IRT approach accounting
+  for guessing. *Journal of Educational Measurement, 54*(4), 498–517,
+  <https://doi.org/10.1111/jedm.12158>
 
 To cite new estimation approaches provided in the
 [`difNLR()`](https://adelahladka.github.io/difNLR/reference/difNLR.md)
 function, please, use:
+
+- Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative
+  algorithms for estimation of item functioning. *Journal of Educational
+  and Behavioral Statistics.* Online first,
+  <https://doi.org/10.3102/10769986241312354>
 
 ## Try online
 

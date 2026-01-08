@@ -1,9 +1,9 @@
-pandoc: 3.1.11
+pandoc: 3.6.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   difNLR-quick_start: difNLR-quick_start.html
-last_built: 2026-01-08T10:23Z
+last_built: 2026-01-08T11:23Z
 urls:
   reference: https://adelahladka.github.io/difNLR/reference
   article: https://adelahladka.github.io/difNLR/articles

@@ -78,17 +78,22 @@ table(group)
 ## DIF detection with generalized logistic regression models
 
 Not constrained 4 parameter logistic (PL) model using the IRT
-parametrization is of the following form: $$\begin{aligned}
-{P\left( Y_{pi} = 1 \mid X_{p},G_{p} \right) =} & {\left( c_{i} + c_{i\text{DIF}} \cdot G_{p} \right) + \left( d_{i} + d_{i\text{DIF}} \cdot G_{p} - c_{i} - c_{i\text{DIF}} \cdot G_{p} \right)/} \\
- & {\left( 1 + \exp\left( - \left( a_{i} + a_{i\text{DIF}} \cdot G_{p} \right) \cdot \left( X_{p} - b_{p} - b_{i\text{DIF}} \cdot G_{p} \right) \right) \right),}
-\end{aligned}$$ where $X_{p}$ is the matching criterion (e.g.,
-standardized total score) and $G_{p}$ is a group membership variable for
-respondent $p$. Parameters $a_{i}$, $b_{i}$, $c_{i}$, and $d_{i}$ are
-discrimination, difficulty, guessing, and inattention for the reference
-group for item $i$. Terms $a_{i\text{DIF}}$, $b_{i\text{DIF}}$,
-$c_{i\text{DIF}}$, and $d_{i\text{DIF}}$ then represent differences
+parametrization is of the following form:
+``` math
+
+\begin{align}
+P(Y_{pi} = 1 \mid X_p, G_p) =& (c_{i} + c_{i\text{DIF}} \cdot G_p) + (d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) / \\
+ &(1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot (X_p - b_p - b_{i\text{DIF}} \cdot G_p))),
+\end{align}
+```
+where $`X_p`$ is the matching criterion (e.g., standardized total score)
+and $`G_p`$ is a group membership variable for respondent $`p`$.
+Parameters $`a_i`$, $`b_i`$, $`c_i`$, and $`d_i`$ are discrimination,
+difficulty, guessing, and inattention for the reference group for item
+$`i`$. Terms $`a_{i\text{DIF}}`$, $`b_{i\text{DIF}}`$,
+$`c_{i\text{DIF}}`$, and $`d_{i\text{DIF}}`$ then represent differences
 between the focal and reference groups in discrimination, difficulty,
-guessing, and inattention for item $i$, respectively.
+guessing, and inattention for item $`i`$, respectively.
 
 To perform DIF detection, besides `Data` and `group` variable, we need
 to specify the name of the focal group with the argument `focal.name`
@@ -104,7 +109,7 @@ for both groups, (alternatively also ) for 4PL model with fixed guessing
 for both groups, (alternatively also ) for 4PL model with fixed
 inattention for both groups, or for 4PL model.
 
-Here we use the 3PL model with the same guessing parameter $c_{i}$ for
+Here we use the 3PL model with the same guessing parameter $`c_i`$ for
 both groups on the `GMAT` dataset.
 
 ``` r
@@ -154,7 +159,7 @@ both groups on the `GMAT` dataset.
     ##  Item7
     ##  Item19
 
-The functions computes $\chi^{2}$-statistics and corresponding p-values,
+The functions computes $`\chi^2`$-statistics and corresponding p-values,
 suggesting items 1, 2, 7, and 19 to function differently for the
 reference and focal groups.
 
