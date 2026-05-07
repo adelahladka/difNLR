@@ -15,7 +15,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/adelahladka/difNLR/blob/HEAD/inst/CITATION)
+[`inst/CITATION`](https://github.com/adelahladka/difNLR/blob/master/inst/CITATION)
 
 Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic
 regression models for DIF and DDF detection. The R Journal, 12(1),
@@ -33,13 +33,13 @@ regression models for DIF and DDF detection. The R Journal, 12(1),
     }
 
 Hladka, A. & Martinkova, P. (2026). difNLR: DIF and DDF detection by
-non-linear regression models. R package version 1.5.3.
+non-linear regression models. R package version 1.5.3-1.
 
     @Manual{,
       title = {{difNLR}: {DIF} and {DDF} Detection by Non-Linear Regression Models},
       author = {Adela Hladka and Patricia Martinkova},
       year = {2026},
-      note = {R package version 1.5.3},
+      note = {R package version 1.5.3-1},
       url = {https://CRAN.R-project.org/package=difNLR},
     }
 
@@ -58,4 +58,20 @@ guessing. Journal of Educational Measurement, 54(4), 498--517, doi:
       pages = {498--517},
       doi = {10.1111/jedm.12158},
       publisher = {Wiley Online Library},
+    }
+
+Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative
+algorithms for estimation of item functioning. Journal of Educational
+and Behavioral Statistics, 51(1), 175--205, doi:
+10.3102/10769986241312354
+
+    @Article{,
+      title = {New iterative algorithms for estimation of item functioning},
+      author = {Adela Hladka and Patricia Martinkova and Marek Brabec},
+      year = {2026},
+      doi = {10.3102/10769986241312354},
+      pages = {175--205},
+      volume = {51},
+      number = {1},
+      journal = {Journal of Educational and Behavioral Statistics},
     }

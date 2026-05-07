@@ -7,6 +7,7 @@ function** using example data from the package.
 ## Load package
 
 ``` r
+
 library(difNLR)
 ```
 
@@ -24,6 +25,7 @@ The distributions of total scores (sum of correct answers) are the same
 for both reference and focal group (Martinkova et al., 2017).
 
 ``` r
+
 data(GMAT)
 Data <- GMAT[, 1:20] # binary items
 group <- GMAT[, "group"] # group membership variable
@@ -68,6 +70,7 @@ summary(Data)
     ##  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000
 
 ``` r
+
 table(group)
 ```
 
@@ -80,7 +83,6 @@ table(group)
 Not constrained 4 parameter logistic (PL) model using the IRT
 parametrization is of the following form:
 ``` math
-
 \begin{align}
 P(Y_{pi} = 1 \mid X_p, G_p) =& (c_{i} + c_{i\text{DIF}} \cdot G_p) + (d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) / \\
  &(1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot (X_p - b_p - b_{i\text{DIF}} \cdot G_p))),
@@ -113,6 +115,7 @@ Here we use the 3PL model with the same guessing parameter $`c_i`$ for
 both groups on the `GMAT` dataset.
 
 ``` r
+
 (x <- difNLR(Data, group, focal.name = 1, model = "3PLcg"))
 ```
 
@@ -168,6 +171,7 @@ reference and focal groups.
 We plot item characteristic curves for DIF items.
 
 ``` r
+
 plot(x, item = x$DIFitems)
 ```
 

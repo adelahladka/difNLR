@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">difNLR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3-1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Quick Start with the `difNLR()` function</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/adelahladka/difNLR/blob/HEAD/vignettes/difNLR-quick_start.Rmd" class="external-link"><code>vignettes/difNLR-quick_start.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/adelahladka/difNLR/blob/master/vignettes/difNLR-quick_start.Rmd" class="external-link"><code>vignettes/difNLR-quick_start.Rmd</code></a></small>
       <div class="d-none name"><code>difNLR-quick_start.Rmd</code></div>
     </div>
 
@@ -139,7 +139,7 @@ correct answers) are the same for both reference and focal group
 </h2>
 <p>Not constrained 4 parameter logistic (PL) model using the IRT
 parametrization is of the following form:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>Y</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn><mo>∣</mo><msub><mi>X</mi><mi>p</mi></msub><mo>,</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo></mtd><mtd columnalign="left" style="text-align: left"><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>c</mi><mi>i</mi></msub><mo>+</mo><msub><mi>c</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>d</mi><mi>i</mi></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo>−</mo><msub><mi>c</mi><mi>i</mi></msub><mo>−</mo><msub><mi>c</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd><mtd columnalign="left" style="text-align: left"><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>−</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>+</mo><msub><mi>a</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>X</mi><mi>p</mi></msub><mo>−</mo><msub><mi>b</mi><mi>p</mi></msub><mo>−</mo><msub><mi>b</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mrow><mi>p</mi><mi>i</mi></mrow></msub><mo>=</mo><mn>1</mn><mo>∣</mo><msub><mi>X</mi><mi>p</mi></msub><mo>,</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><mi>i</mi></msub><mo>+</mo><msub><mi>c</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>d</mi><mi>i</mi></msub><mo>+</mo><msub><mi>d</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo>−</mo><msub><mi>c</mi><mi>i</mi></msub><mo>−</mo><msub><mi>c</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>+</mo><mrow><mi mathvariant="normal">exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>a</mi><mi>i</mi></msub><mo>+</mo><msub><mi>a</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>X</mi><mi>p</mi></msub><mo>−</mo><msub><mi>b</mi><mi>p</mi></msub><mo>−</mo><msub><mi>b</mi><mrow><mi>i</mi><mtext mathvariant="normal">DIF</mtext></mrow></msub><mo>⋅</mo><msub><mi>G</mi><mi>p</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
 \begin{align}
 P(Y_{pi} = 1 \mid X_p, G_p) =&amp; (c_{i} + c_{i\text{DIF}} \cdot G_p) + (d_{i} + d_{i\text{DIF}} \cdot G_p - c_{i} - c_{i\text{DIF}} \cdot G_p) / \\
  &amp;(1 + \exp(-(a_i + a_{i\text{DIF}} \cdot G_p) \cdot (X_p - b_p - b_{i\text{DIF}} \cdot G_p))),
@@ -242,16 +242,16 @@ differently for the reference and focal groups.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, item <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">DIFitems</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $Item1</span></span></code></pre>
-<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-1.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
+<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-1.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## $Item2</span></span></code></pre>
-<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-2.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
+<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-2.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## $Item7</span></span></code></pre>
-<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-3.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
+<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-3.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## $Item19</span></span></code></pre>
-<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-4.png" class="r-plt" width="576" style="display: block; margin: auto;"></p>
+<p><img src="difNLR-quick_start_files/figure-html/plot%20difNLR-4.png" class="r-plt" alt="" width="576" style="display: block; margin: auto;"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

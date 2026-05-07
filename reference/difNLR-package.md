@@ -19,8 +19,8 @@ models.
 
 Package: difNLR  
 Type: Package  
-Version: 1.5.3  
-Date: 2026-01-08  
+Version: 1.5.3-1  
+Date: 2026-05-07  
 Depends: R (\>= 4.0.0)  
 Imports: calculus, ggplot2 (\>= 3.4.0), msm, nnet, plyr, stats, VGAM  
 Suggests: knitr, pkgdown, rmarkdown, ShinyItemAnalysis, testthat (\>=
@@ -82,9 +82,9 @@ regression models for DIF and DDF detection. The R Journal, 12(1),
 300–323,
 [doi:10.32614/RJ-2020-014](https://doi.org/10.32614/RJ-2020-014) .
 
-Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative
+Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative
 algorithms for estimation of item functioning. Journal of Educational
-and Behavioral Statistics. Online first,
+and Behavioral Statistics, 51(1), 175–205,
 [doi:10.3102/10769986241312354](https://doi.org/10.3102/10769986241312354)
 .
 

@@ -46,7 +46,7 @@ Or you can get the newest development version from GitHub:
 
 Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR)
 is 1.5.2-2. The newest development version available on
-[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.3.
+[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.3-1.
 
 ## Reference
 
@@ -67,9 +67,9 @@ To cite new estimation approaches provided in the
 [`difNLR()`](https://adelahladka.github.io/difNLR/reference/difNLR.md)
 function, please, use:
 
-- Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative
+- Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative
   algorithms for estimation of item functioning. *Journal of Educational
-  and Behavioral Statistics.* Online first,
+  and Behavioral Statistics, 51*(1), 175–205,
   <https://doi.org/10.3102/10769986241312354>
 
 ## Try online

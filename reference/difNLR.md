@@ -414,9 +414,9 @@ regression models for DIF and DDF detection. The R Journal, 12(1),
 300–323,
 [doi:10.32614/RJ-2020-014](https://doi.org/10.32614/RJ-2020-014) .
 
-Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative
+Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative
 algorithms for estimation of item functioning. Journal of Educational
-and Behavioral Statistics. Online first,
+and Behavioral Statistics, 51(1), 175–205,
 [doi:10.3102/10769986241312354](https://doi.org/10.3102/10769986241312354)
 .
 

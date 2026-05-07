@@ -9,7 +9,7 @@ on model specification and DIF type to be tested."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">difNLR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.3-1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,7 +31,7 @@ on model specification and DIF type to be tested."><meta property="og:image" con
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Creates a formula for non-linear regression DIF models.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/adelahladka/difNLR/blob/HEAD/R/formulaNLR.R" class="external-link"><code>R/formulaNLR.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/adelahladka/difNLR/blob/master/R/formulaNLR.R" class="external-link"><code>R/formulaNLR.R</code></a></small>
       <div class="d-none name"><code>formulaNLR.Rd</code></div>
     </div>
 
@@ -163,7 +163,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (1 - c)/(1 + exp(-a * (x - b)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23953f8f0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630badfe50&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a" "b" "c"</span>
@@ -180,7 +180,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (1 - c)/(1 + exp(-(a + aDif * g) * (x - (b + bDif * g))))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23953f8f0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630badfe50&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"    "b"    "c"    "aDif" "bDif"</span>
@@ -198,7 +198,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (1 - c)/(1 + exp(-(b0 + b1 * x)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e237f5db90&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630ba7cea8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "c" </span>
@@ -215,7 +215,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (1 - c)/(1 + exp(-(b0 + b1 * x + b2 * g + b3 * x * g)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e237f5db90&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630ba7cea8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "b2" "b3" "c" </span>
@@ -236,7 +236,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (d - c)/(1 + exp(-a * (x - b)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e237875300&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630ba047c0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a" "b" "c" "d"</span>
@@ -253,7 +253,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (d - c)/(1 + exp(-a * (x - (b + bDif * g))))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e237875300&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630ba047c0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"    "b"    "c"    "d"    "bDif"</span>
@@ -271,7 +271,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (d - c)/(1 + exp(-(b0 + b1 * x)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23767d488&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b9a95b0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "c"  "d" </span>
@@ -288,7 +288,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (d - c)/(1 + exp(-(b0 + b1 * x + b2 * g)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23767d488&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b9a95b0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "b2" "c"  "d" </span>
@@ -308,7 +308,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ 1/(1 + exp(-a * (x - (b + bDif * g))))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23748ea80&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b93b808&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"    "b"    "bDif"</span>
@@ -325,7 +325,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ 1/(1 + exp(-(a + aDif * g) * (x - (b + bDif * g))))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23748ea80&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b93b808&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"    "b"    "aDif" "bDif"</span>
@@ -343,7 +343,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ 1/(1 + exp(-(b0 + b1 * x + b2 * g)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23735bb48&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b8df238&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "b2"</span>
@@ -360,7 +360,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ 1/(1 + exp(-(b0 + b1 * x + b2 * g + b3 * x * g)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e23735bb48&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b8df238&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "b2" "b3"</span>
@@ -378,7 +378,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ x + g</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e237258040&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b87c850&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "(Intercept)" "x"           "g"          </span>
@@ -393,7 +393,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ x + g + x:g</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e237258040&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b87c850&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "(Intercept)" "x"           "g"           "x:g"        </span>
@@ -411,7 +411,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (d - c)/(1 + exp(-a * (x - b)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e2357be900&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b827d08&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a" "b" "c" "d"</span>
@@ -430,7 +430,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ (cR * (1 - g) + cF * g) + (dR * (1 - g) + dF * g - (cR * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     (1 - g) + cF * g))/(1 + exp(-(a + aDif * g) * (x - (b + bDif * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     g))))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e2357be900&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b827d08&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"    "b"    "cR"   "dR"   "aDif" "bDif" "cF"   "dF"  </span>
@@ -448,7 +448,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (d - c)/(1 + exp(-(b0 + b1 * x)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e2352d4378&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b6de7a0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "c"  "d" </span>
@@ -467,7 +467,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ (cR * (1 - g) + cF * g) + (dR * (1 - g) + dF * g - (cR * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     (1 - g) + cF * g))/(1 + exp(-(b0 + b1 * x + b2 * g + b3 * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     x * g)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e2352d4378&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b6de7a0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "b2" "b3" "cR" "cF" "dR" "dF"</span>
@@ -488,7 +488,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-a * (x - b)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e25862ff10&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b6695c8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"  "b"  "c"  "dR" "dF"</span>
@@ -506,7 +506,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-a * (x - (b + bDif * </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     g))))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e25862ff10&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b6695c8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "a"    "b"    "c"    "dR"   "bDif" "dF"  </span>
@@ -524,7 +524,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-(b0 + b1 * x)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e24bd4e570&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b5f02a0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M0$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "c"  "dR" "dF"</span>
@@ -542,7 +542,7 @@ Institute of Computer Science of the Czech Academy of Sciences <br><a href="mail
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$formula</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> y ~ c + (dR * (1 - g) + dF * g - c)/(1 + exp(-(b0 + b1 * x + </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     b2 * g)))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x000001e24bd4e570&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: 0x55630b5f02a0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $M1$parameters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "b0" "b1" "b2" "c"  "dR" "dF"</span>
