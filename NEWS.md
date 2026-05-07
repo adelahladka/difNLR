@@ -1,3 +1,11 @@
+# difNLR 1.5.3-1 (2026-05-07)
+
+## Minor updates
+  * References were updated.
+  * Tests and examples were expanded.
+
+------
+
 # difNLR 1.5.3 (2026-01-08)
 
 ## Major updates

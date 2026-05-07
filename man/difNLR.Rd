@@ -361,9 +361,9 @@ Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
 models for DIF and DDF detection. The R Journal, 12(1), 300--323,
 \doi{10.32614/RJ-2020-014}.
 
-Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms
+Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative algorithms
 for estimation of item functioning. Journal of Educational and Behavioral
-Statistics. Online first, \doi{10.3102/10769986241312354}.
+Statistics, 51(1), 175--205, \doi{10.3102/10769986241312354}.
 
 Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item
 functioning using logistic regression procedures. Journal of Educational

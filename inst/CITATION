@@ -1,7 +1,13 @@
 year <- sub("-.*", "", meta$Date)
 note <- sprintf("R package version %s", meta$Version)
 
-citHeader("To cite the 'difNLR' package in publications use:")
+citHeader("To cite the 'difNLR' package in publications, please, use:
+
+- 2020 for the 'difNLR' package description
+
+- 2017 for the 3PL non-IRT model validation
+
+- 2026 for new estimation approaches provided in the 'difNLR()' function")
 
 bibentry(bibtype = "article",
          title = "{difNLR}: Generalized logistic regression models for {DIF} and {DDF} detection",
@@ -36,3 +42,14 @@ bibentry(bibtype = "article",
          doi = "10.1111/jedm.12158",
          publisher = "Wiley Online Library",
          textVersion = "Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression: A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517, doi: 10.1111/jedm.12158")
+
+bibentry(bibtype = "article",
+         title = "New iterative algorithms for estimation of item functioning",
+         author = c(as.person("Adela Hladka"), as.person("Patricia Martinkova"), as.person("Marek Brabec")),
+         year = "2026",
+         doi = "10.3102/10769986241312354",
+         pages = "175--205",
+         volume = "51",
+         number = "1",
+         journal = "Journal of Educational and Behavioral Statistics",
+         textVersion = "Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative algorithms for estimation of item functioning. Journal of Educational and Behavioral Statistics, 51(1), 175--205, doi: 10.3102/10769986241312354")

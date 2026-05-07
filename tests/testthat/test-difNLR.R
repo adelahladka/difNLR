@@ -1,5 +1,5 @@
 test_that("difNLR - examples at help page", {
-  skip_on_cran()
+  # skip_on_cran()
   skip_on_os("linux")
   # skip_on_os("windows")
 
@@ -198,7 +198,7 @@ test_that("difNLR - examples at help page", {
 })
 
 test_that("difNLR - checking inputs", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -308,7 +308,7 @@ test_that("difNLR - checking inputs", {
 })
 
 test_that("difNLR S3 methods - checking inputs", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -372,7 +372,7 @@ test_that("difNLR S3 methods - checking inputs", {
 })
 
 test_that("difNLR S3 methods - further examples", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -389,7 +389,7 @@ test_that("difNLR S3 methods - further examples", {
 })
 
 test_that("testing paper code - R Journal 2020 - generated data", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
   #-----------------------------------------------------------------------------
   # DIF DETECTION AMONG BINARY DATA
@@ -600,7 +600,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
 })
 
 test_that("testing paper code - R Journal 2020 - LearningToLearn", {
-  skip_on_cran()
+  # skip_on_cran()
 
   data("LearningToLearn", package = "ShinyItemAnalysis")
   # dichotomous items for Grade 6
@@ -643,7 +643,7 @@ test_that("testing paper code - R Journal 2020 - LearningToLearn", {
 })
 
 test_that("testing paper code - R Journal 2020 - special cases (not included)", {
-  skip_on_cran()
+  # skip_on_cran()
   skip_on_os("linux")
 
   # setting parameters

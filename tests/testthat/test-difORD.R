@@ -1,5 +1,5 @@
 test_that("difORD - examples at help page", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -31,6 +31,16 @@ test_that("difORD - examples at help page", {
   # saveRDS(coef(fit1, SE = TRUE, simplify = TRUE), file = "tests/testthat/fixtures/difORD_fit1_coef3.rds")
   fit1_coef3_expected <- readRDS(test_path("fixtures", "difORD_fit1_coef3.rds"))
   expect_equal(coef(fit1, SE = TRUE, simplify = TRUE), fit1_coef3_expected, tolerance = 1e-3) # with SE, simplified
+
+  # predicted values
+  fit1_predict <- predict(fit1)
+  # saveRDS(predict(fit1), file = "tests/testthat/fixtures/difORD_fit1_predict.rds")
+  fit1_predict_expected <- readRDS(test_path("fixtures", "difORD_fit1_predict.rds"))
+  expect_equal(fit1_predict, fit1_predict_expected, tolerance = 1e-3)
+  fit1_predict_item1 <- predict(fit1, item = 1)
+  # saveRDS(predict(fit1, item = 1), file = "tests/testthat/fixtures/difORD_fit1_predict_item1.rds")
+  fit1_predict_item1_expected <- readRDS(test_path("fixtures", "difORD_fit1_predict_item1.rds"))
+  expect_equal(fit1_predict_item1, fit1_predict_item1_expected, tolerance = 1e-3)
 
   # AIC, BIC, log-likelihood
   expect_snapshot(AIC(fit1))
@@ -108,7 +118,7 @@ test_that("difORD - examples at help page", {
 })
 
 test_that("difORD - checking inputs", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -170,7 +180,7 @@ test_that("difORD - checking inputs", {
 })
 
 test_that("difORD - other examples", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -197,7 +207,7 @@ test_that("difORD - other examples", {
 })
 
 test_that("difORD S3 methods - checking inputs", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   # loading data
@@ -253,7 +263,7 @@ test_that("difORD S3 methods - checking inputs", {
 })
 
 test_that("testing paper code - R Journal 2020 - generated data", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   set.seed(42)
@@ -292,7 +302,7 @@ test_that("testing paper code - R Journal 2020 - generated data", {
 })
 
 test_that("testing paper code - R Journal 2020 - LearningToLearn", {
-  skip_on_cran()
+  # skip_on_cran()
   # skip_on_os("linux")
 
   data(LearningToLearn, package = "ShinyItemAnalysis")

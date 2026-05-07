@@ -183,9 +183,9 @@ Hladka, A. (2021). Statistical models for detection of differential item
 functioning. Dissertation thesis.
 Faculty of Mathematics and Physics, Charles University.
 
-Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms
+Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative algorithms
 for estimation of item functioning. Journal of Educational and Behavioral
-Statistics. Online first, \doi{10.3102/10769986241312354}.
+Statistics, 51(1), 175--205, \doi{10.3102/10769986241312354}.
 }
 \author{
 Adela Hladka (nee Drabinova) \cr

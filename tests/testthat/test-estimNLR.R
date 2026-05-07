@@ -1,5 +1,5 @@
 test_that("estimNLR - examples at help page", {
-  skip_on_cran()
+  # skip_on_cran()
   skip_on_os("linux")
 
   # loading data
@@ -93,7 +93,7 @@ test_that("estimNLR - examples at help page", {
   )))
   # saveRDS(fit_irls, file = "tests/testthat/fixtures/estimNLR_fit_irls.rds")
   fit_irls_expected <- readRDS(test_path("fixtures", "estimNLR_fit_irls.rds"))
-  expect_equal(fit_irls, fit_irls_expected, tolerance = 1e-3)
+  expect_equal(fit_irls, fit_irls_expected, tolerance = 1e-3, ignore_function_env = TRUE)
   expect_snapshot(coef(fit_irls))
   expect_snapshot(logLik(fit_irls))
   expect_snapshot(vcov(fit_irls))

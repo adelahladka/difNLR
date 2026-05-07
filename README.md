@@ -1,4 +1,4 @@
-# difNLR
+# difNLR <img src="man/figures/logo.png" align="right" width=150/>
 DIF and DDF Detection by Non-Linear Regression Models.
 
 [![R-CMD-check](https://github.com/adelahladka/difNLR/workflows/R-CMD-check/badge.svg)](https://github.com/adelahladka/difNLR/actions)
@@ -42,32 +42,32 @@ devtools::install_github("adelahladka/difNLR")
 ## Version
 Current version on [**CRAN**](https://CRAN.R-project.org/package=difNLR) is
 1.5.2-2. The newest development version available on
-[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.3.
+[**GitHub**](https://github.com/adelahladka/difNLR) is 1.5.3-1.
 
 ## Reference
 To cite the **difNLR** package in publications, please, use:
 
 <ul>Hladka, A. & Martinkova, P. (2020). 
   difNLR: Generalized logistic regression models for DIF and DDF detection. 
-  <i>The R Journal, 12</i>(1), 300--323, 
+  <i>The R Journal, 12</i>(1), 300&ndash;323, 
   https://doi.org/10.32614/RJ-2020-014</ul>
 
 <ul>Drabinova, A. & Martinkova, P. (2017). 
-  Detection of differential item functioning with nonlinear regression: A non-IRT approach accounting for guessing. 
-  <i>Journal of Educational Measurement, 54</i>(4), 498--517, 
+  Detection of differential item functioning with nonlinear regression: 
+  A non-IRT approach accounting for guessing. 
+  <i>Journal of Educational Measurement, 54</i>(4), 498&ndash;517, 
   https://doi.org/10.1111/jedm.12158</ul>
   
-
 To cite new estimation approaches provided in the `difNLR()` function, please, use:
 
-<ul>Hladka, A., Martinkova, P., & Brabec, M. (2025). 
+<ul>Hladka, A., Martinkova, P., & Brabec, M. (2026). 
   New iterative algorithms for estimation of item functioning. 
-  <i>Journal of Educational and Behavioral Statistics. </i> 
-  Online first, https://doi.org/10.3102/10769986241312354</ul>
+  <i>Journal of Educational and Behavioral Statistics, 51</i>(1), 175&ndash;205, 
+  https://doi.org/10.3102/10769986241312354</ul>
   
 ## Try online
 You can try some functionalities of the **difNLR** package
-[online](https://shiny.cs.cas.cz/ShinyItemAnalysis/) using
+[online](https://shiny.cs.cas.cz/ShinyItemAnalysis/) using 
 the [**ShinyItemAnalysis**](https://github.com/patriciamar/ShinyItemAnalysis)
 application and package and its DIF/Fairness section.
   

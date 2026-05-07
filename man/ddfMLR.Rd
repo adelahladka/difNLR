@@ -167,6 +167,10 @@ coef(x)
 coef(x, SE = TRUE)
 coef(x, SE = TRUE, simplify = TRUE)
 
+# predicted values
+predict(x)
+predict(x, item = 3)
+
 # AIC, BIC, log-likelihood
 AIC(x)
 BIC(x)

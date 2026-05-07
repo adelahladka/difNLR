@@ -47,8 +47,8 @@
 #' @details
 #' Package: difNLR\cr
 #' Type: Package\cr
-#' Version: 1.5.3\cr
-#' Date: 2026-01-08\cr
+#' Version: 1.5.3-1\cr
+#' Date: 2026-05-07\cr
 #' Depends: R (>= 4.0.0)\cr
 #' Imports: calculus, ggplot2 (>= 3.4.0), msm, nnet, plyr, stats, VGAM\cr
 #' Suggests: knitr, pkgdown, rmarkdown, ShinyItemAnalysis, testthat (>= 3.0.0), vdiffr\cr
@@ -68,34 +68,44 @@
 #' \email{martinkova@@cs.cas.cz} \cr
 #'
 #' @references
-#' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition. John Wiley & Sons.
+#' Agresti, A. (2010). Analysis of ordinal categorical data. Second edition.
+#' John Wiley & Sons.
 #'
-#' Drabinova, A. & Martinkova, P. (2017). Detection of differential item functioning with nonlinear regression:
-#' A non-IRT approach accounting for guessing. Journal of Educational Measurement, 54(4), 498--517,
+#' Drabinova, A. & Martinkova, P. (2017). Detection of differential item
+#' functioning with nonlinear regression: A non-IRT approach accounting for
+#' guessing. Journal of Educational Measurement, 54(4), 498--517,
 #' \doi{10.1111/jedm.12158}.
 #'
-#' Hladka, A. (2021). Statistical models for detection of differential item functioning. Dissertation thesis.
-#' Faculty of Mathematics and Physics, Charles University.
+#' Hladka, A. (2021). Statistical models for detection of differential item
+#' functioning. Dissertation thesis. Faculty of Mathematics and Physics, Charles
+#' University.
 #'
-#' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression models for DIF and DDF detection.
-#' The R Journal, 12(1), 300--323, \doi{10.32614/RJ-2020-014}.
+#' Hladka, A. & Martinkova, P. (2020). difNLR: Generalized logistic regression
+#' models for DIF and DDF detection. The R Journal, 12(1), 300--323,
+#' \doi{10.32614/RJ-2020-014}.
 #'
-#' Hladka, A., Martinkova, P., & Brabec, M. (2025). New iterative algorithms for estimation of item functioning.
-#' Journal of Educational and Behavioral Statistics. Online first, \doi{10.3102/10769986241312354}.
+#' Hladka, A., Martinkova, P., & Brabec, M. (2026). New iterative algorithms
+#' for estimation of item functioning. Journal of Educational and Behavioral
+#' Statistics, 51(1), 175--205, \doi{10.3102/10769986241312354}.
 #'
-#' Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the applicability of item response theory
-#' methods to the Graduate Management Admission Test. ETS Research Report Series, 1985(2): 1--64.
+#' Kingston, N., Leary, L., & Wightman, L. (1985). An exploratory study of the
+#' applicability of item response theory methods to the Graduate Management
+#' Admission Test. ETS Research Report Series, 1985(2): 1--64.
 #'
-#' Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L., & Price, R. M. (2017).
-#' Checking equity: Why differential item functioning analysis should be a routine part of developing conceptual
-#' assessments. CBE--Life Sciences Education, 16(2), rm2, \doi{10.1187/cbe.16-10-0307}.
+#' Martinkova, P., Drabinova, A., Liaw, Y. L., Sanders, E. A., McFarland, J. L.,
+#' & Price, R. M. (2017). Checking equity: Why differential item functioning
+#' analysis should be a routine part of developing conceptual assessments.
+#' CBE--Life Sciences Education, 16(2), rm2, \doi{10.1187/cbe.16-10-0307}.
 #'
-#' Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item functioning using logistic regression procedures.
-#' Journal of Educational Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
+#' Swaminathan, H. & Rogers, H. J. (1990). Detecting differential item
+#' functioning using logistic regression procedures. Journal of Educational
+#' Measurement, 27(4), 361--370, \doi{10.1111/j.1745-3984.1990.tb00754.x}
 #'
-#' Vlckova, K. (2014). Test and item fairness. Master's thesis. Faculty of Mathematics and Physics, Charles University.
+#' Vlckova, K. (2014). Test and item fairness. Master's thesis. Faculty of
+#' Mathematics and Physics, Charles University.
 #'
-#' @note This package was supported by grant funded by Czech Science foundation under number GJ15-15856Y.
+#' @note This package was supported by grant funded by Czech Science foundation
+#' under number GJ15-15856Y.
 #'
 #' @docType package
 "_PACKAGE"
